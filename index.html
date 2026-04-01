@@ -3837,7 +3837,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <span class="p-badge bm">Medium Risk</span>
           <span class="p-badge bp">Awaiting Docs</span>
           <div style="width:1px;height:20px;background:var(--border-strong);margin:0 4px;flex-shrink:0;"></div>
-          <div style="display:inline-flex;align-items:center;gap:6px;position:relative;" id="md-assign-bar"><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'partner','md')" title="Reassign partner"><span class="ap-av" style="background:#8C7A5E;">SL</span><span><div class="ap-label">Partner</div><div class="ap-name">Summit Lending</div></span><span class="ap-edit">✎</span></span><div class="assign-sep"></div><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'rep','md')" title="Reassign rep"><span class="ap-av" style="background:#5B7A5E;">SR</span><span><div class="ap-label">Rep</div><div class="ap-name">Sara Reyes</div></span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'md')" title="Add another rep">+ Rep</button></div>
+          <span class="assign-bar" id="md-assign-bar"><span class="assign-pill" onclick="assignDropdown(this,'partner','md')"><span class="ap-av" style="background:#8C7A5E;">SL</span><span class="ap-type">Partner</span><span class="ap-name">Summit Lending</span><span class="ap-edit">✎</span></span><span class="assign-sep"></span><span class="assign-pill" onclick="assignDropdown(this,'rep','md')"><span class="ap-av" style="background:#5B7A5E;">SR</span><span class="ap-type">Rep</span><span class="ap-name">Sara Reyes</span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'md')">+ Rep</button></span>
         </div>
         <div class="topbar-right">
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
@@ -5514,7 +5514,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <div class="dr-topbar-name" id="dr-name">Pacific Coast Retail</div>
           <div class="dr-topbar-sub" id="dr-sub">Summit Lending · Medium Risk · MID: Pending</div>
         </div>
-        <div style="display:inline-flex;align-items:center;gap:6px;position:relative;" id="dr-assign-bar"><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'partner','dr')" title="Reassign partner"><span class="ap-av" style="background:#8C7A5E;">SL</span><span><div class="ap-label">Partner</div><div class="ap-name">Summit Lending</div></span><span class="ap-edit">✎</span></span><div class="assign-sep"></div><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'rep','dr')" title="Reassign rep"><span class="ap-av" style="background:#6366F1;">JC</span><span><div class="ap-label">Rep</div><div class="ap-name">James Carter</div></span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'dr')" title="Add another rep">+ Rep</button></div>
+        <span class="assign-bar" id="dr-assign-bar"><span class="assign-pill" onclick="assignDropdown(this,'partner','dr')"><span class="ap-av" style="background:#8C7A5E;">SL</span><span class="ap-type">Partner</span><span class="ap-name">Summit Lending</span><span class="ap-edit">✎</span></span><span class="assign-sep"></span><span class="assign-pill" onclick="assignDropdown(this,'rep','dr')"><span class="ap-av" style="background:#6366F1;">JC</span><span class="ap-type">Rep</span><span class="ap-name">James Carter</span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'dr')">+ Rep</button></span>
         <span class="p-badge" id="dr-status-badge" style="font-size:11px;">Underwriting</span>
         <div class="dr-days warn" id="dr-days">⏱ 5 days in stage</div>
         <div class="dr-topbar-actions">
@@ -5633,7 +5633,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <span class="p-badge bb">MID: 7823-4491-0012</span>
         <span class="p-badge bm">First Data Omaha</span>
         <div style="width:1px;height:20px;background:var(--border-strong);margin:0 4px;flex-shrink:0;"></div>
-        <div style="display:inline-flex;align-items:center;gap:6px;position:relative;" id="ma-assign-bar"><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'partner','ma')" title="Reassign partner"><span class="ap-av" style="background:#6B839B;">AE</span><span><div class="ap-label">Partner</div><div class="ap-name">Apex Elite</div></span><span class="ap-edit">✎</span></span><div class="assign-sep"></div><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'rep','ma')" title="Reassign rep"><span class="ap-av" style="background:#6366F1;">JC</span><span><div class="ap-label">Rep</div><div class="ap-name">James Carter</div></span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'ma')" title="Add another rep">+ Rep</button></div>
+        <span class="assign-bar" id="ma-assign-bar"><span class="assign-pill" onclick="assignDropdown(this,'partner','ma')"><span class="ap-av" style="background:#6B839B;">AE</span><span class="ap-type">Partner</span><span class="ap-name">Apex Elite</span><span class="ap-edit">✎</span></span><span class="assign-sep"></span><span class="assign-pill" onclick="assignDropdown(this,'rep','ma')"><span class="ap-av" style="background:#6366F1;">JC</span><span class="ap-type">Rep</span><span class="ap-name">James Carter</span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'ma')">+ Rep</button></span>
         <div style="flex:1;"></div>
         <button style="padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">↓ Export</button>
         <button style="padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">⚙ Settings</button>
@@ -28148,8 +28148,10 @@ function assignDropdown(pill, type, context) {
     dd.appendChild(opt);
   });
 
-  pill.style.position = 'relative';
-  pill.appendChild(dd);
+  document.body.appendChild(dd);
+  var rect = pill.getBoundingClientRect();
+  dd.style.top  = (rect.bottom + 6) + 'px';
+  dd.style.left = rect.left + 'px';
 
   // Click outside to close
   setTimeout(function(){
@@ -28198,8 +28200,10 @@ function assignAddRep(btn, context) {
     dd.appendChild(opt);
   });
 
-  btn.style.position = 'relative';
-  btn.appendChild(dd);
+  document.body.appendChild(dd);
+  var btnRect = btn.getBoundingClientRect();
+  dd.style.top  = (btnRect.bottom + 6) + 'px';
+  dd.style.left = btnRect.left + 'px';
   setTimeout(function(){
     document.addEventListener('click', function close(ev){
       if (!dd.contains(ev.target) && ev.target !== btn) { dd.remove(); document.removeEventListener('click', close); }
