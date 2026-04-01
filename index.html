@@ -6938,15 +6938,24 @@
 
           <!-- Commissions by Assignee (who to pay) -->
           <div class="card" style="margin-bottom:12px;">
-            <div class="card-header">
-              <div><div class="card-title">Commissions by Assignee</div><div class="card-sub">Who you owe · sorted by payout amount</div></div>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-ghost res-filter-btn active" style="font-size:12px;padding:3px 8px;" onclick="resFilterPayouts('all',this)">All</button>
-                <button class="btn btn-ghost res-filter-btn" style="font-size:12px;padding:3px 8px;" onclick="resFilterPayouts('pending',this)">Pending</button>
-                <button class="btn btn-ghost res-filter-btn" style="font-size:12px;padding:3px 8px;" onclick="resFilterPayouts('hold',this)">On Hold</button>
+            <div class="card-header" style="flex-direction:column;align-items:flex-start;gap:10px;padding-bottom:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                <div><div class="card-title">Commissions by Assignee</div><div class="card-sub">Who you owe · sorted by payout amount</div></div>
+                <div style="display:flex;gap:6px;">
+                  <button class="btn btn-ghost res-filter-btn active" style="font-size:12px;padding:3px 8px;" onclick="resFilterPayouts('all',this)">All</button>
+                  <button class="btn btn-ghost res-filter-btn" style="font-size:12px;padding:3px 8px;" onclick="resFilterPayouts('pending',this)">Pending</button>
+                  <button class="btn btn-ghost res-filter-btn" style="font-size:12px;padding:3px 8px;" onclick="resFilterPayouts('hold',this)">On Hold</button>
+                </div>
+              </div>
+              <!-- Partners / Internal Reps tab switcher -->
+              <div style="display:flex;gap:0;border-bottom:1px solid var(--border);width:100%;margin:0 -16px;padding:0 16px;">
+                <div id="payout-tab-partners" class="rtab active" style="font-size:12px;padding:7px 14px;cursor:pointer;border-radius:0;border-bottom:2px solid var(--yellow);color:var(--text-primary);" onclick="switchPayoutTab('partners')">Partners</div>
+                <div id="payout-tab-reps" class="rtab" style="font-size:12px;padding:7px 14px;cursor:pointer;border-radius:0;border-bottom:2px solid transparent;color:var(--text-muted);" onclick="switchPayoutTab('reps')">Internal Reps</div>
               </div>
             </div>
-            <div class="card-body" style="padding:0;overflow-x:auto;">
+
+            <!-- PARTNERS TABLE -->
+            <div id="payout-panel-partners" class="card-body" style="padding:0;overflow-x:auto;">
               <table class="res-table" id="res-payouts-table">
                 <thead>
                   <tr>
@@ -6972,37 +6981,37 @@
                     <td><span class="p-badge badge-green">APPROVED</span></td>
                     <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">View</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Landon Pierce">
+        <tr class="res-accordion-row" data-parent="Landon Pierce" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Landon Pierce</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>14</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Landon Pierce">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Landon Pierce</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>30</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6366F1;">JC</div><span style="font-size:12px;color:var(--text-secondary);">James Carter</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">12</td>
+          <td style="font-size:12px;">$1.8M</td>
+          <td style="font-size:12px;color:var(--green);">$2,160</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.12%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Landon Pierce">
+        <tr class="res-accordion-row" data-parent="Landon Pierce" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Landon Pierce</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>16</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#5B7A5E;">SR</div><span style="font-size:12px;color:var(--text-secondary);">Sara Reyes</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">8</td>
+          <td style="font-size:12px;">$940K</td>
+          <td style="font-size:12px;color:var(--green);">$799</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.085%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
+          <td></td>
+        </tr>
+        <tr class="res-accordion-row" data-parent="Landon Pierce" data-row-type="partner">
+          <td></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6B839B;">DM</div><span style="font-size:12px;color:var(--text-secondary);">Dan Mitchell</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">5</td>
+          <td style="font-size:12px;">$610K</td>
+          <td style="font-size:12px;color:var(--green);">$427</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.07%</td>
+          <td><span class="p-badge badge-amber" style="font-size:9px;">PENDING</span></td>
           <td></td>
         </tr>
 
@@ -7016,37 +7025,26 @@
                     <td><span class="p-badge badge-green">APPROVED</span></td>
                     <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">View</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Andrew Fry">
+        <tr class="res-accordion-row" data-parent="Andrew Fry" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Andrew Fry</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>42</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Andrew Fry">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Andrew Fry</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>28</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#5B7A5E;">SR</div><span style="font-size:12px;color:var(--text-secondary);">Sara Reyes</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">11</td>
+          <td style="font-size:12px;">$1.3M</td>
+          <td style="font-size:12px;color:var(--green);">$1,105</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.085%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Andrew Fry">
+        <tr class="res-accordion-row" data-parent="Andrew Fry" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Andrew Fry</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>36</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#A67C5B;">TP</div><span style="font-size:12px;color:var(--text-secondary);">Tara Patel</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">6</td>
+          <td style="font-size:12px;">$520K</td>
+          <td style="font-size:12px;color:var(--green);">$312</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.06%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
 
@@ -7060,37 +7058,26 @@
                     <td><span class="p-badge badge-green">APPROVED</span></td>
                     <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">View</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Tatenda Chaviza">
+        <tr class="res-accordion-row" data-parent="Tatenda Chaviza" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Tatenda Chaviza</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>41</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Tatenda Chaviza">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Tatenda Chaviza</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>29</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6366F1;">JC</div><span style="font-size:12px;color:var(--text-secondary);">James Carter</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">9</td>
+          <td style="font-size:12px;">$1.1M</td>
+          <td style="font-size:12px;color:var(--green);">$1,320</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.12%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Tatenda Chaviza">
+        <tr class="res-accordion-row" data-parent="Tatenda Chaviza" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Tatenda Chaviza</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>34</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6B839B;">DM</div><span style="font-size:12px;color:var(--text-secondary);">Dan Mitchell</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">4</td>
+          <td style="font-size:12px;">$380K</td>
+          <td style="font-size:12px;color:var(--green);">$266</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.07%</td>
+          <td><span class="p-badge badge-amber" style="font-size:9px;">PENDING</span></td>
           <td></td>
         </tr>
 
@@ -7104,37 +7091,26 @@
                     <td><span class="p-badge badge-amber">PENDING</span></td>
                     <td><button class="btn btn-success" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">Approve</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Sarah Kim">
+        <tr class="res-accordion-row" data-parent="Sarah Kim" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Sarah Kim</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>38</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Sarah Kim">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Sarah Kim</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>36</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#5B7A5E;">SR</div><span style="font-size:12px;color:var(--text-secondary);">Sara Reyes</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">7</td>
+          <td style="font-size:12px;">$810K</td>
+          <td style="font-size:12px;color:var(--green);">$689</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.085%</td>
+          <td><span class="p-badge badge-amber" style="font-size:9px;">PENDING</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Sarah Kim">
+        <tr class="res-accordion-row" data-parent="Sarah Kim" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Sarah Kim</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>40</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6366F1;">JC</div><span style="font-size:12px;color:var(--text-secondary);">James Carter</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">5</td>
+          <td style="font-size:12px;">$620K</td>
+          <td style="font-size:12px;color:var(--green);">$744</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.12%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
 
@@ -7148,37 +7124,26 @@
                     <td><span class="p-badge badge-amber">PENDING</span></td>
                     <td><button class="btn btn-success" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">Approve</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Marcus Reed">
+        <tr class="res-accordion-row" data-parent="Marcus Reed" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Marcus Reed</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>22</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Marcus Reed">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Marcus Reed</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>40</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6B839B;">DM</div><span style="font-size:12px;color:var(--text-secondary);">Dan Mitchell</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">6</td>
+          <td style="font-size:12px;">$740K</td>
+          <td style="font-size:12px;color:var(--green);">$518</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.07%</td>
+          <td><span class="p-badge badge-amber" style="font-size:9px;">PENDING</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Marcus Reed">
+        <tr class="res-accordion-row" data-parent="Marcus Reed" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Marcus Reed</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>49</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#A67C5B;">TP</div><span style="font-size:12px;color:var(--text-secondary);">Tara Patel</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">4</td>
+          <td style="font-size:12px;">$390K</td>
+          <td style="font-size:12px;color:var(--green);">$234</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.06%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
 
@@ -7192,37 +7157,26 @@
                     <td><span class="p-badge badge-green">APPROVED</span></td>
                     <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">View</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="James Wilson">
+        <tr class="res-accordion-row" data-parent="James Wilson" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ James Wilson</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>17</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="James Wilson">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ James Wilson</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>17</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6366F1;">JC</div><span style="font-size:12px;color:var(--text-secondary);">James Carter</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">8</td>
+          <td style="font-size:12px;">$960K</td>
+          <td style="font-size:12px;color:var(--green);">$1,152</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.12%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="James Wilson">
+        <tr class="res-accordion-row" data-parent="James Wilson" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ James Wilson</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>50</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#5B7A5E;">SR</div><span style="font-size:12px;color:var(--text-secondary);">Sara Reyes</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">6</td>
+          <td style="font-size:12px;">$700K</td>
+          <td style="font-size:12px;color:var(--green);">$595</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.085%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
 
@@ -7236,37 +7190,26 @@
                     <td><span class="p-badge badge-amber">PENDING</span></td>
                     <td><button class="btn btn-success" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">Approve</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Diana Martinez">
+        <tr class="res-accordion-row" data-parent="Diana Martinez" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Diana Martinez</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>30</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Diana Martinez">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Diana Martinez</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>41</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#A67C5B;">TP</div><span style="font-size:12px;color:var(--text-secondary);">Tara Patel</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">5</td>
+          <td style="font-size:12px;">$580K</td>
+          <td style="font-size:12px;color:var(--green);">$348</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.06%</td>
+          <td><span class="p-badge badge-amber" style="font-size:9px;">PENDING</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Diana Martinez">
+        <tr class="res-accordion-row" data-parent="Diana Martinez" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Diana Martinez</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>42</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6B839B;">DM</div><span style="font-size:12px;color:var(--text-secondary);">Dan Mitchell</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">3</td>
+          <td style="font-size:12px;">$310K</td>
+          <td style="font-size:12px;color:var(--green);">$217</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.07%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
 
@@ -7280,37 +7223,26 @@
                     <td><span class="p-badge badge-green">APPROVED</span></td>
                     <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="openAssigneeModal(this, \'\', this.closest(\'tr\').getAttribute(\'data-pstatus\')); event.stopPropagation();">View</button></td>
                   </tr>
-        <tr class="res-accordion-row" data-parent="Ryan Johnson">
+        <tr class="res-accordion-row" data-parent="Ryan Johnson" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Ryan Johnson</td>
-          <td style="text-align:left;">Feb 2026</td>
-          <td>40</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
-          <td></td>
-        </tr>
-        <tr class="res-accordion-row" data-parent="Ryan Johnson">
-          <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Ryan Johnson</td>
-          <td style="text-align:left;">Jan 2026</td>
-          <td>11</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#5B7A5E;">SR</div><span style="font-size:12px;color:var(--text-secondary);">Sara Reyes</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">4</td>
+          <td style="font-size:12px;">$460K</td>
+          <td style="font-size:12px;color:var(--green);">$391</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.085%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
-        <tr class="res-accordion-row" data-parent="Ryan Johnson">
+        <tr class="res-accordion-row" data-parent="Ryan Johnson" data-row-type="partner">
           <td></td>
-          <td style="text-align:left; color:var(--text-secondary); padding-left: 36px;">↳ Ryan Johnson</td>
-          <td style="text-align:left;">Dec 2025</td>
-          <td>23</td>
-          <td>$-</td>
-          <td style="color:var(--text-muted);">-</td>
-          <td style="color:var(--text-secondary);">-</td>
-          <td><span class="p-badge badge-green">APPROVED</span></td>
+          <td style="text-align:left;padding-left:36px;"><div style="display:flex;align-items:center;gap:7px;"><div class="avatar-sm" style="width:20px;height:20px;font-size:8px;background:#6366F1;">JC</div><span style="font-size:12px;color:var(--text-secondary);">James Carter</span></div></td>
+          <td style="font-size:12px;color:var(--text-muted);">Rep</td>
+          <td style="font-size:12px;">3</td>
+          <td style="font-size:12px;">$380K</td>
+          <td style="font-size:12px;color:var(--green);">$456</td>
+          <td style="font-size:12px;color:var(--text-secondary);">0.12%</td>
+          <td><span class="p-badge badge-green" style="font-size:9px;">APPROVED</span></td>
           <td></td>
         </tr>
 
@@ -7755,8 +7687,170 @@
         </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
+            </div><!-- /payout-panel-partners -->
+
+            <!-- INTERNAL REPS TABLE -->
+            <div id="payout-panel-reps" class="card-body" style="padding:0;overflow-x:auto;display:none;">
+              <table class="res-table" id="res-reps-payouts-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;width:30px;"><input type="checkbox" style="accent-color:var(--yellow);"></th>
+                    <th style="text-align:left;">Internal Rep</th>
+                    <th>Active Merchants</th>
+                    <th>MTD Volume</th>
+                    <th>Residual %</th>
+                    <th>Commission</th>
+                    <th>Up-front Bonus</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <!-- James Carter -->
+                  <tr onclick="toggleRepAccordion(event,this)" data-rep="James Carter" data-pstatus="approved">
+                    <td style="text-align:left;"><input type="checkbox" style="accent-color:var(--yellow);"></td>
+                    <td style="text-align:left;"><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="width:24px;height:24px;font-size:9px;background:#6366F1;">JC</div><strong>James Carter</strong><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">Sales · Owner</span></div></td>
+                    <td>34</td><td>$412K</td><td style="color:var(--green);">1.20%</td>
+                    <td style="font-weight:700;color:var(--green);">$3,240</td>
+                    <td style="font-family:var(--font-mono);">$2,500</td>
+                    <td><span class="p-badge badge-green">APPROVED</span></td>
+                    <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="event.stopPropagation();">View</button></td>
+                  </tr>
+                  <tr class="res-accordion-row" data-rep-parent="James Carter">
+                    <td colspan="9" style="padding:0;">
+                      <div style="padding:8px 16px 12px 40px;background:rgba(99,102,241,0.03);border-bottom:1px solid var(--border);">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Merchants Under James Carter — Mar 2026</div>
+                        <table style="width:100%;border-collapse:collapse;">
+                          <thead><tr style="border-bottom:1px solid var(--border);">
+                            <th style="text-align:left;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 8px 4px 0;text-transform:uppercase;">Merchant</th>
+                            <th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Volume</th>
+                            <th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Res %</th>
+                            <th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Earned</th>
+                            <th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Override</th>
+                          </tr></thead>
+                          <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Harbor Bistro</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$218K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.20%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$2,616</td><td style="text-align:right;font-size:11px;color:var(--blue);">1.60%</td></tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Lakeview Dental</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$194K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.20%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$2,328</td><td style="text-align:right;font-size:11px;color:var(--blue);">1.45%</td></tr>
+                            <tr><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Green Valley Market</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$176K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.20%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$2,112</td><td style="text-align:right;font-size:11px;color:var(--blue);">1.35%</td></tr>
+                          </tbody>
+                        </table>
+                        <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">+ 31 more merchants · <a style="color:var(--yellow);cursor:pointer;">View all</a></div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Sara Reyes -->
+                  <tr onclick="toggleRepAccordion(event,this)" data-rep="Sara Reyes" data-pstatus="approved">
+                    <td style="text-align:left;"><input type="checkbox" style="accent-color:var(--yellow);"></td>
+                    <td style="text-align:left;"><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="width:24px;height:24px;font-size:9px;background:#5B7A5E;">SR</div><strong>Sara Reyes</strong><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">Sales · Rep</span></div></td>
+                    <td>19</td><td>$188K</td><td style="color:var(--green);">0.85%</td>
+                    <td style="font-weight:700;color:var(--green);">$1,820</td>
+                    <td style="font-family:var(--font-mono);">$1,000</td>
+                    <td><span class="p-badge badge-green">APPROVED</span></td>
+                    <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="event.stopPropagation();">View</button></td>
+                  </tr>
+                  <tr class="res-accordion-row" data-rep-parent="Sara Reyes">
+                    <td colspan="9" style="padding:0;">
+                      <div style="padding:8px 16px 12px 40px;background:rgba(91,122,94,0.03);border-bottom:1px solid var(--border);">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Merchants Under Sara Reyes — Mar 2026</div>
+                        <table style="width:100%;border-collapse:collapse;">
+                          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 8px 4px 0;text-transform:uppercase;">Merchant</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Volume</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Res %</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Earned</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Override</th></tr></thead>
+                          <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Pines Auto Group</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$163K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">0.85%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$1,386</td><td style="text-align:right;font-size:11px;color:var(--blue);">0.90%</td></tr>
+                            <tr><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">TechSupply Pro LLC</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$94K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">0.85%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$799</td><td style="text-align:right;font-size:11px;color:var(--blue);">—</td></tr>
+                          </tbody>
+                        </table>
+                        <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">+ 17 more merchants · <a style="color:var(--yellow);cursor:pointer;">View all</a></div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Dan Mitchell -->
+                  <tr onclick="toggleRepAccordion(event,this)" data-rep="Dan Mitchell" data-pstatus="approved">
+                    <td style="text-align:left;"><input type="checkbox" style="accent-color:var(--yellow);"></td>
+                    <td style="text-align:left;"><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="width:24px;height:24px;font-size:9px;background:#6B839B;">DM</div><strong>Dan Mitchell</strong><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">Operations · Rep</span></div></td>
+                    <td>12</td><td>$143K</td><td style="color:var(--green);">0.70%</td>
+                    <td style="font-weight:700;color:var(--green);">$940</td>
+                    <td style="font-family:var(--font-mono);">—</td>
+                    <td><span class="p-badge badge-green">APPROVED</span></td>
+                    <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="event.stopPropagation();">View</button></td>
+                  </tr>
+                  <tr class="res-accordion-row" data-rep-parent="Dan Mitchell">
+                    <td colspan="9" style="padding:0;">
+                      <div style="padding:8px 16px 12px 40px;background:rgba(107,131,155,0.03);border-bottom:1px solid var(--border);">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Merchants Under Dan Mitchell — Mar 2026</div>
+                        <table style="width:100%;border-collapse:collapse;">
+                          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 8px 4px 0;text-transform:uppercase;">Merchant</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Volume</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Res %</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Earned</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Override</th></tr></thead>
+                          <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Pines Auto Group</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$163K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">0.70%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$1,141</td><td style="text-align:right;font-size:11px;color:var(--blue);">0.75%</td></tr>
+                            <tr><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Metro Print Shop</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$141K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">0.70%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$987</td><td style="text-align:right;font-size:11px;color:var(--blue);">—</td></tr>
+                          </tbody>
+                        </table>
+                        <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">+ 10 more merchants · <a style="color:var(--yellow);cursor:pointer;">View all</a></div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Mike Wright -->
+                  <tr onclick="toggleRepAccordion(event,this)" data-rep="Mike Wright" data-pstatus="approved">
+                    <td style="text-align:left;"><input type="checkbox" style="accent-color:var(--yellow);"></td>
+                    <td style="text-align:left;"><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="width:24px;height:24px;font-size:9px;background:var(--yellow);color:var(--navy);">MW</div><strong>Mike Wright</strong><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">Executive · Owner</span></div></td>
+                    <td>94</td><td>$3.1M</td><td style="color:var(--green);">1.50%</td>
+                    <td style="font-weight:700;color:var(--green);">$6,100</td>
+                    <td style="font-family:var(--font-mono);">$5,000</td>
+                    <td><span class="p-badge badge-green">APPROVED</span></td>
+                    <td><button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;" onclick="event.stopPropagation();">View</button></td>
+                  </tr>
+                  <tr class="res-accordion-row" data-rep-parent="Mike Wright">
+                    <td colspan="9" style="padding:0;">
+                      <div style="padding:8px 16px 12px 40px;background:rgba(255,222,0,0.03);border-bottom:1px solid var(--border);">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Portfolio Overview — Mike Wright — Mar 2026</div>
+                        <table style="width:100%;border-collapse:collapse;">
+                          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 8px 4px 0;text-transform:uppercase;">Partner</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Merchants</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Volume</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Override %</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Earned</th></tr></thead>
+                          <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Apex Elite</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">218</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$921K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.50%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$1,382</td></tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">NovaPay</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">157</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$641K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.50%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$962</td></tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Summit Lending</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">184</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$784K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.50%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$1,176</td></tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Rivermark</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">132</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$512K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.50%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$768</td></tr>
+                            <tr><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Coastal Commerce</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">94</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$391K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">1.50%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$587</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Tara Patel -->
+                  <tr onclick="toggleRepAccordion(event,this)" data-rep="Tara Patel" data-pstatus="pending">
+                    <td style="text-align:left;"><input type="checkbox" style="accent-color:var(--yellow);"></td>
+                    <td style="text-align:left;"><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="width:24px;height:24px;font-size:9px;background:#A67C5B;">TP</div><strong>Tara Patel</strong><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">Sales · Rep</span></div></td>
+                    <td>8</td><td>$62K</td><td style="color:var(--green);">0.60%</td>
+                    <td style="font-weight:700;">$720</td>
+                    <td style="font-family:var(--font-mono);">$500</td>
+                    <td><span class="p-badge badge-amber">PENDING</span></td>
+                    <td><button class="btn btn-success" style="font-size:9px;padding:2px 6px;" onclick="event.stopPropagation();">Approve</button></td>
+                  </tr>
+                  <tr class="res-accordion-row" data-rep-parent="Tara Patel">
+                    <td colspan="9" style="padding:0;">
+                      <div style="padding:8px 16px 12px 40px;background:rgba(166,124,91,0.03);border-bottom:1px solid var(--border);">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Merchants Under Tara Patel — Mar 2026</div>
+                        <table style="width:100%;border-collapse:collapse;">
+                          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 8px 4px 0;text-transform:uppercase;">Merchant</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Volume</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Res %</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Earned</th><th style="text-align:right;font-size:10px;color:var(--text-muted);font-weight:600;padding:4px 0;text-transform:uppercase;">Override</th></tr></thead>
+                          <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.04);"><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Metro Print Shop</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$141K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">0.60%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$846</td><td style="text-align:right;font-size:11px;color:var(--blue);">0.65%</td></tr>
+                            <tr><td style="padding:6px 8px 6px 0;font-size:12px;font-weight:500;">Sunrise Cafe</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;">$88K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);">0.60%</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--green);">$528</td><td style="text-align:right;font-size:11px;color:var(--blue);">—</td></tr>
+                          </tbody>
+                        </table>
+                        <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">+ 6 more merchants · <a style="color:var(--yellow);cursor:pointer;">View all</a></div>
+                      </div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div><!-- /payout-panel-reps -->
+
+          </div><!-- /commissions card -->
 
           <!-- Payout Trend Chart -->
           <div class="card">
@@ -27054,6 +27148,47 @@ function addManagedPartnerRow() {
     + '<td style="padding:7px 0;text-align:right;font-size:12px;color:var(--text-muted);">—</td>'
     + '<td style="text-align:center;"><button class="ud-del-row" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>';
   tbody.appendChild(tr);
+}
+
+/* ── Payouts tab switcher ──────────────────────── */
+function switchPayoutTab(tab) {
+  var isPartners = tab === 'partners';
+  var partnerTab = document.getElementById('payout-tab-partners');
+  var repsTab    = document.getElementById('payout-tab-reps');
+  var partnerPanel = document.getElementById('payout-panel-partners');
+  var repsPanel    = document.getElementById('payout-panel-reps');
+  if (!partnerTab) return;
+
+  partnerTab.style.borderBottomColor = isPartners ? 'var(--yellow)' : 'transparent';
+  partnerTab.style.color = isPartners ? 'var(--text-primary)' : 'var(--text-muted)';
+  repsTab.style.borderBottomColor    = !isPartners ? 'var(--yellow)' : 'transparent';
+  repsTab.style.color    = !isPartners ? 'var(--text-primary)' : 'var(--text-muted)';
+
+  partnerPanel.style.display = isPartners ? '' : 'none';
+  repsPanel.style.display    = !isPartners ? '' : 'none';
+}
+
+/* ── Internal Reps accordion toggle ─────────────── */
+function toggleRepAccordion(e, row) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+  var rep = row.getAttribute('data-rep');
+  var next = row.nextElementSibling;
+  if (!next || !next.getAttribute('data-rep-parent')) return;
+
+  var isOpen = next.classList.contains('open');
+  // Close all rep accordions first
+  document.querySelectorAll('#res-reps-payouts-table .res-accordion-row').forEach(function(r) {
+    r.classList.remove('open');
+  });
+  document.querySelectorAll('#res-reps-payouts-table tr[data-rep]').forEach(function(r) {
+    r.classList.remove('open');
+  });
+
+  if (!isOpen) {
+    next.classList.add('open');
+    row.classList.add('open');
+    next.style.display = '';
+  }
 }
 </script>
 <style id="alerts-css">
