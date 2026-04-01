@@ -1469,6 +1469,21 @@
 .res-merch-wf-panel .wf-field { padding: 8px 12px; }
 .res-merch-wf-panel .wf-field-val { font-size: 13px; }
 tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg); color: var(--yellow); }
+/* ── Merchant header assignment pills ─────────── */
+.assign-bar { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; }
+.assign-pill { display:inline-flex; align-items:center; gap:5px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:6px; padding:3px 8px 3px 5px; font-size:11px; cursor:pointer; transition:all .12s; user-select:none; white-space:nowrap; position:relative; }
+.assign-pill:hover { border-color:var(--yellow); background:rgba(255,222,0,0.05); }
+.assign-pill .ap-av { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; flex-shrink:0; }
+.assign-pill .ap-type { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-right:1px; }
+.assign-pill .ap-name { font-size:11px; font-weight:600; color:var(--text-primary); }
+.assign-pill .ap-edit { font-size:9px; color:var(--text-muted); opacity:0.6; }
+.assign-sep { width:1px; height:14px; background:var(--border-strong); flex-shrink:0; }
+.assign-add-btn { display:inline-flex; align-items:center; gap:4px; background:none; border:1px dashed var(--border-strong); border-radius:6px; padding:3px 8px; font-size:10px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all .12s; white-space:nowrap; }
+.assign-add-btn:hover { border-color:var(--yellow); color:var(--text-primary); }
+.assign-dropdown { position:fixed; min-width:210px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:9px; box-shadow:0 8px 24px rgba(0,0,0,.22); z-index:9000; overflow:hidden; }
+.assign-dropdown-hdr { padding:7px 12px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); border-bottom:1px solid var(--border); }
+.assign-dd-opt { display:flex; align-items:center; gap:8px; padding:7px 12px; cursor:pointer; transition:background .1s; font-size:12px; }
+.assign-dd-opt:hover { background:var(--bg-hover); }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -28377,21 +28392,5 @@ function assignToast(msg) {
 </body>
 </html>
 <!-- cache-bust:1773827400 -->
-/* ── Merchant header assignment pills ─────────── */
-.assign-pill { display:inline-flex; align-items:center; gap:6px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:20px; padding:3px 10px 3px 4px; font-size:11px; cursor:pointer; transition:all .12s; user-select:none; }
-.assign-pill:hover { border-color:var(--yellow); background:var(--bg-hover); }
-.assign-pill .ap-av { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; flex-shrink:0; }
-.assign-pill .ap-label { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); }
-.assign-pill .ap-name { font-weight:600; color:var(--text-primary); }
-.assign-pill .ap-edit { font-size:10px; color:var(--text-muted); margin-left:2px; }
-.assign-sep { width:1px; height:16px; background:var(--border-strong); margin:0 2px; flex-shrink:0; }
-.assign-add-btn { display:inline-flex; align-items:center; gap:5px; background:none; border:1px dashed var(--border-strong); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--text-muted); cursor:pointer; transition:all .12s; }
-.assign-add-btn:hover { border-color:var(--yellow); color:var(--text-primary); }
-
-/* Re-assign dropdown */
-.assign-dropdown { position:absolute; top:calc(100% + 6px); left:0; min-width:220px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:9px; box-shadow:0 8px 24px rgba(0,0,0,.18); z-index:800; overflow:hidden; }
-.assign-dropdown-hdr { padding:8px 12px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); border-bottom:1px solid var(--border); }
-.assign-dd-opt { display:flex; align-items:center; gap:8px; padding:8px 12px; cursor:pointer; transition:background .1s; font-size:12px; }
-.assign-dd-opt:hover { background:var(--bg-hover); }
-.assign-dd-sep { height:1px; background:var(--border); margin:2px 0; }
-
+</body>
+</html>
