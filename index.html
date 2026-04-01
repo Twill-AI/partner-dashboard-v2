@@ -2161,6 +2161,350 @@
     </div><!-- /view-partner-detail -->
 
 
+
+    <!-- ── VIEW: USERS ─────────────────────────────── -->
+    <div class="view" id="view-users">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div>
+            <div class="page-title">Users</div>
+            <div class="page-sub">Internal reps &amp; admin team</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost">&#8595; Export</button>
+          <button class="btn btn-primary" style="gap:6px;" onclick="openAddUserDrawer()">
+            <svg viewBox="0 0 16 16" fill="currentColor" style="width:12px;height:12px;"><path d="M8 2a.75.75 0 01.75.75v4.5h4.5a.75.75 0 010 1.5h-4.5v4.5a.75.75 0 01-1.5 0v-4.5h-4.5a.75.75 0 010-1.5h4.5v-4.5A.75.75 0 018 2z"/></svg>
+            Add User
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary strip -->
+      <div class="m-portfolio-summary">
+        <div class="m-summary-stat"><div class="m-stat-label">Total Users</div><div class="m-stat-value">6</div><div class="m-stat-sub">4 Rep · 2 Owner</div></div>
+        <div class="m-summary-stat"><div class="m-stat-label">Active</div><div class="m-stat-value" style="color:var(--green);">5</div><div class="m-stat-sub">Logged in this week</div></div>
+        <div class="m-summary-stat"><div class="m-stat-label">Residuals On</div><div class="m-stat-value">4</div><div class="m-stat-sub">Receiving payouts</div></div>
+        <div class="m-summary-stat"><div class="m-stat-label">Total Earned MTD</div><div class="m-stat-value">$14,820</div><div class="m-stat-sub">Across all reps</div></div>
+        <div class="m-summary-stat"><div class="m-stat-label">Partner Overrides</div><div class="m-stat-value">12</div><div class="m-stat-sub">Active assignments</div></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="m-toolbar">
+        <div class="m-search">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+          <input type="text" placeholder="Search users&#8230;" oninput="filterUsersTable(this.value)">
+        </div>
+        <div class="m-divider"></div>
+        <div class="m-filter">Type &#9662;</div>
+        <div class="m-filter">Status &#9662;</div>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);" id="users-count">6 users</span>
+      </div>
+
+      <!-- Users table -->
+      <div class="m-table-wrap">
+        <table class="m-table" id="users-table">
+          <colgroup>
+            <col style="width:22%"><col style="width:13%"><col style="width:11%">
+            <col style="width:13%"><col style="width:10%"><col style="width:10%">
+            <col style="width:12%"><col style="width:9%"><col style="width:4%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>User</th><th>Department</th><th>Type</th>
+              <th>Residuals</th><th>Payout</th><th>Up-front Bonus</th>
+              <th>Partner Overrides</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+
+            <tr onclick="openUserDetail('James Carter')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="p-avatar" style="background:#6366F1;width:30px;height:30px;font-size:11px;flex-shrink:0;">JC</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:600;">James Carter</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">USR-001 &middot; james@twill.io</div>
+                </div>
+              </div></td>
+              <td>Sales</td><td><span class="p-badge bb">Owner</span></td>
+              <td><span style="color:var(--green);font-weight:600;font-family:var(--font-mono);">Yes — 1.20%</span></td>
+              <td><span class="p-badge badge-green">On</span></td>
+              <td><span style="font-family:var(--font-mono);">$2,500</span></td>
+              <td style="font-size:11px;color:var(--text-secondary);">Apex Elite, NovaPay +2</td>
+              <td><span class="p-badge badge-green">Active</span></td>
+              <td style="text-align:center;color:var(--text-muted);">&#8250;</td>
+            </tr>
+
+            <tr onclick="openUserDetail('Sara Reyes')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="p-avatar" style="background:#5B7A5E;width:30px;height:30px;font-size:11px;flex-shrink:0;">SR</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:600;">Sara Reyes</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">USR-002 &middot; sara@twill.io</div>
+                </div>
+              </div></td>
+              <td>Sales</td><td><span class="p-badge" style="background:rgba(91,122,94,0.12);color:#5B7A5E;">Rep</span></td>
+              <td><span style="color:var(--green);font-weight:600;font-family:var(--font-mono);">Yes — 0.85%</span></td>
+              <td><span class="p-badge badge-green">On</span></td>
+              <td><span style="font-family:var(--font-mono);">$1,000</span></td>
+              <td style="font-size:11px;color:var(--text-secondary);">NovaPay, Rivermark</td>
+              <td><span class="p-badge badge-green">Active</span></td>
+              <td style="text-align:center;color:var(--text-muted);">&#8250;</td>
+            </tr>
+
+            <tr onclick="openUserDetail('Dan Mitchell')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="p-avatar" style="background:#6B839B;width:30px;height:30px;font-size:11px;flex-shrink:0;">DM</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:600;">Dan Mitchell</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">USR-003 &middot; dan@twill.io</div>
+                </div>
+              </div></td>
+              <td>Operations</td><td><span class="p-badge" style="background:rgba(91,122,94,0.12);color:#5B7A5E;">Rep</span></td>
+              <td><span style="color:var(--green);font-weight:600;font-family:var(--font-mono);">Yes — 0.70%</span></td>
+              <td><span class="p-badge badge-green">On</span></td>
+              <td><span style="font-family:var(--font-mono);">—</span></td>
+              <td style="font-size:11px;color:var(--text-secondary);">Summit Lending</td>
+              <td><span class="p-badge badge-green">Active</span></td>
+              <td style="text-align:center;color:var(--text-muted);">&#8250;</td>
+            </tr>
+
+            <tr onclick="openUserDetail('Mike Wright')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="p-avatar" style="background:var(--yellow);color:var(--navy);width:30px;height:30px;font-size:11px;flex-shrink:0;">MW</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:600;">Mike Wright</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">USR-004 &middot; mike@twill.io</div>
+                </div>
+              </div></td>
+              <td>Executive</td><td><span class="p-badge bb">Owner</span></td>
+              <td><span style="color:var(--green);font-weight:600;font-family:var(--font-mono);">Yes — 1.50%</span></td>
+              <td><span class="p-badge badge-green">On</span></td>
+              <td><span style="font-family:var(--font-mono);">$5,000</span></td>
+              <td style="font-size:11px;color:var(--text-secondary);">All Partners</td>
+              <td><span class="p-badge badge-green">Active</span></td>
+              <td style="text-align:center;color:var(--text-muted);">&#8250;</td>
+            </tr>
+
+            <tr onclick="openUserDetail('Blake Chen')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="p-avatar" style="background:#9B6B5B;width:30px;height:30px;font-size:11px;flex-shrink:0;">BC</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:600;">Blake Chen</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">USR-005 &middot; blake@twill.io</div>
+                </div>
+              </div></td>
+              <td>Support</td><td><span class="p-badge" style="background:rgba(91,122,94,0.12);color:#5B7A5E;">Rep</span></td>
+              <td><span style="color:var(--text-muted);font-family:var(--font-mono);">No</span></td>
+              <td><span class="p-badge" style="background:var(--bg-hover);color:var(--text-muted);">Off</span></td>
+              <td><span style="font-family:var(--font-mono);">—</span></td>
+              <td style="font-size:11px;color:var(--text-secondary);">—</td>
+              <td><span class="p-badge badge-green">Active</span></td>
+              <td style="text-align:center;color:var(--text-muted);">&#8250;</td>
+            </tr>
+
+            <tr onclick="openUserDetail('Tara Patel')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="p-avatar" style="background:#A67C5B;width:30px;height:30px;font-size:11px;flex-shrink:0;">TP</div>
+                <div style="min-width:0;">
+                  <div style="font-weight:600;">Tara Patel</div>
+                  <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">USR-006 &middot; tara@twill.io</div>
+                </div>
+              </div></td>
+              <td>Sales</td><td><span class="p-badge" style="background:rgba(91,122,94,0.12);color:#5B7A5E;">Rep</span></td>
+              <td><span style="color:var(--green);font-weight:600;font-family:var(--font-mono);">Yes — 0.60%</span></td>
+              <td><span class="p-badge badge-green">On</span></td>
+              <td><span style="font-family:var(--font-mono);">$500</span></td>
+              <td style="font-size:11px;color:var(--text-secondary);">Coastal Commerce</td>
+              <td><span class="p-badge badge-amber">Inactive</span></td>
+              <td style="text-align:center;color:var(--text-muted);">&#8250;</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /view-users -->
+
+    <!-- ── VIEW: USER DETAIL ────────────────────────── -->
+    <div class="view" id="view-user-detail">
+      <div class="topbar" style="background:var(--bg-surface);">
+        <div class="topbar-left" style="gap:10px;">
+          <div class="back-btn" onclick="showView('users', document.getElementById('nav-users'))">&#8592;</div>
+          <div id="ud-avatar" class="p-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0;background:#6366F1;">JC</div>
+          <div id="ud-name" class="merch-name">James Carter</div>
+          <span id="ud-type-badge" class="p-badge bb">Owner</span>
+          <span id="ud-meta" class="p-badge" style="color:var(--text-muted);background:transparent;border:none;font-family:var(--font-mono);font-size:11px;">USR-001 &middot; Sales</span>
+        </div>
+        <div class="topbar-right" style="gap:8px;">
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;">&#9881; Settings</button>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;">&#8595; Export</button>
+        </div>
+      </div>
+
+      <div class="body-row" style="flex-direction:column;overflow:auto;">
+        <div style="padding:20px 24px 32px;display:flex;flex-direction:column;gap:14px;">
+
+          <!-- KPI strip -->
+          <div class="m-portfolio-summary" style="padding:16px 0 0;">
+            <div class="m-summary-stat" style="padding-left:20px;">
+              <div class="m-stat-label">MTD Earned</div>
+              <div class="m-stat-value" style="color:var(--green);" id="ud-kpi-earned">$3,240</div>
+              <div class="m-stat-sub">Residuals this month</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Residual %</div>
+              <div class="m-stat-value" id="ud-kpi-res">1.20%</div>
+              <div class="m-stat-sub">Base rate</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Up-front Bonus</div>
+              <div class="m-stat-value" id="ud-kpi-bonus">$2,500</div>
+              <div class="m-stat-sub">Per new merchant</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Partner Overrides</div>
+              <div class="m-stat-value" id="ud-kpi-povr">4</div>
+              <div class="m-stat-sub">Active assignments</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Merchant Overrides</div>
+              <div class="m-stat-value" id="ud-kpi-movr">7</div>
+              <div class="m-stat-sub">Direct assignments</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">YTD Earned</div>
+              <div class="m-stat-value" id="ud-kpi-ytd">$18,400</div>
+              <div class="m-stat-sub">This year</div>
+            </div>
+          </div>
+
+          <!-- Two column: Contact Info + Payout Settings -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="sc gray" style="margin-bottom:0;">
+              <div class="sc-hdr gray">
+                <div class="sc-hdr-left"><span class="sc-icon">&#9786;</span>
+                  <div><div class="sc-title">Contact Info</div></div>
+                </div>
+                <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Edit</button>
+              </div>
+              <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+                <div class="tsb-row"><span class="tsb-key">Email</span><span class="tsb-val" id="ud-email">james@twill.io</span></div>
+                <div class="tsb-row"><span class="tsb-key">Phone</span><span class="tsb-val" id="ud-phone">(310) 555-0182</span></div>
+                <div class="tsb-row"><span class="tsb-key">Department</span><span class="tsb-val" id="ud-dept">Sales</span></div>
+                <div class="tsb-row"><span class="tsb-key">Type</span><span class="tsb-val" id="ud-type">Owner</span></div>
+                <div class="tsb-row"><span class="tsb-key">Status</span><span class="tsb-val"><span class="p-badge badge-green">Active</span></span></div>
+                <div class="tsb-row"><span class="tsb-key">Joined</span><span class="tsb-val" id="ud-joined">Jan 8, 2025</span></div>
+              </div>
+            </div>
+
+            <div class="sc gray" style="margin-bottom:0;">
+              <div class="sc-hdr gray">
+                <div class="sc-hdr-left"><span class="sc-icon">&#36;</span>
+                  <div><div class="sc-title">Payout Settings</div></div>
+                </div>
+                <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Edit</button>
+              </div>
+              <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+                <div class="tsb-row"><span class="tsb-key">See Residuals</span><span class="tsb-val"><span class="p-badge badge-green" id="ud-see-res">Yes</span></span></div>
+                <div class="tsb-row"><span class="tsb-key">Payouts Enabled</span><span class="tsb-val"><span class="p-badge badge-green" id="ud-pay-on">Yes</span></span></div>
+                <div class="tsb-row"><span class="tsb-key">Residual %</span><span class="tsb-val mono" id="ud-res-pct">1.20%</span></div>
+                <div class="tsb-row"><span class="tsb-key">Up-front Bonus</span><span class="tsb-val mono" id="ud-upfront">$2,500 per merchant</span></div>
+                <div class="tsb-row"><span class="tsb-key">Payout Cycle</span><span class="tsb-val" id="ud-cycle">Net 30</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partner Overrides -->
+          <div class="sc gray" style="margin-bottom:0;">
+            <div class="sc-hdr gray">
+              <div class="sc-hdr-left"><span class="sc-icon">&#9670;</span>
+                <div><div class="sc-title">Partner Overrides</div><div class="sc-desc">Override residual % per partner</div></div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="addPartnerOverrideRow('ud-partner-overrides')">+ Add</button>
+            </div>
+            <div style="padding:0 16px 12px;" id="ud-partner-overrides">
+              <table style="width:100%;border-collapse:collapse;">
+                <thead><tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;letter-spacing:.05em;">Partner</th>
+                  <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;letter-spacing:.05em;">Override %</th>
+                  <th style="width:32px;"></th>
+                </tr></thead>
+                <tbody id="ud-partner-override-rows">
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">Apex Elite</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--green);">1.40%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">NovaPay</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--green);">1.25%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">Summit Lending</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--green);">1.10%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">Rivermark</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--green);">1.00%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Merchant Overrides -->
+          <div class="sc gray" style="margin-bottom:0;">
+            <div class="sc-hdr gray">
+              <div class="sc-hdr-left"><span class="sc-icon">&#9776;</span>
+                <div><div class="sc-title">Merchant Overrides</div><div class="sc-desc">Override residual % per specific merchant</div></div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="addMerchantOverrideRow('ud-merchant-override-rows')">+ Add</button>
+            </div>
+            <div style="padding:0 16px 12px;">
+              <table style="width:100%;border-collapse:collapse;">
+                <thead><tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;letter-spacing:.05em;">Merchant</th>
+                  <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;letter-spacing:.05em;">Override %</th>
+                  <th style="width:32px;"></th>
+                </tr></thead>
+                <tbody id="ud-merchant-override-rows">
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">Harbor Bistro</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--blue);">1.60%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">Lakeview Dental</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--blue);">1.45%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:9px 0;font-size:13px;font-weight:500;">Green Valley Market</td>
+                    <td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--blue);">1.35%</td>
+                    <td style="text-align:center;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Residuals history chart -->
+          <div class="sc gray" style="margin-bottom:0;">
+            <div class="sc-hdr gray">
+              <div class="sc-hdr-left"><span class="sc-icon">&#9650;</span>
+                <div><div class="sc-title">Residuals History</div><div class="sc-desc">Monthly earned — last 6 months</div></div>
+              </div>
+            </div>
+            <div style="padding:16px 20px;height:160px;"><canvas id="ud-residuals-chart"></canvas></div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /view-user-detail -->
+
     <!-- ── VIEW: TICKETS ────────────────────────────── -->
     <div class="view" id="view-tickets">
       <div class="topbar">
@@ -10186,6 +10530,147 @@
   </div>
 </div>
 <div id="add-partner-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:300;" onclick="closeAddPartnerDrawer()"></div>
+
+<div class="kb-drawer" id="add-user-drawer" style="width:min(680px,calc(100vw - 220px));">
+  <div class="kb-drawer-bar">
+    <div class="kb-drawer-breadcrumb">
+      <span>Users</span><span style="opacity:.4;">›</span><strong>Add User</strong>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-ghost" style="font-size:11px;padding:4px 12px;" onclick="closeAddUserDrawer()">Cancel</button>
+      <button class="btn btn-primary" style="font-size:11px;padding:4px 14px;" onclick="submitAddUser()">Save User</button>
+      <div class="kb-drawer-close" onclick="closeAddUserDrawer()">&#10005;</div>
+    </div>
+  </div>
+  <div class="kb-drawer-body" style="overflow:auto;padding:24px;display:flex;flex-direction:column;gap:24px;">
+
+    <!-- Basic Info -->
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:14px;">User Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Full Name <span style="color:var(--red);">*</span></label>
+          <input id="au-name" type="text" placeholder="e.g. James Carter" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Email <span style="color:var(--red);">*</span></label>
+          <input id="au-email" type="email" placeholder="james@twill.io" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Phone</label>
+          <input id="au-phone" type="tel" placeholder="(310) 555-0100" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Department <span style="color:var(--red);">*</span></label>
+          <select id="au-dept" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;appearance:none;">
+            <option>Sales</option><option>Operations</option><option>Support</option><option>Executive</option><option>Finance</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Type <span style="color:var(--red);">*</span></label>
+          <select id="au-type" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;appearance:none;">
+            <option value="Rep">Rep</option><option value="Owner">Owner</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Residuals & Payouts -->
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:14px;">Residuals &amp; Payouts</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+        <!-- See Residuals toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:10px 12px;">
+          <div>
+            <div style="font-size:13px;font-weight:500;">See Residuals</div>
+            <div style="font-size:11px;color:var(--text-muted);">Can view residual reports</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:38px;height:20px;cursor:pointer;">
+            <input type="checkbox" id="au-see-res" checked style="opacity:0;width:0;height:0;" onchange="document.getElementById('au-see-res-track').style.background=this.checked?'var(--yellow)':'var(--border-strong)'">
+            <span id="au-see-res-track" style="position:absolute;inset:0;border-radius:20px;background:var(--yellow);transition:.2s;"></span>
+            <span id="au-see-res-thumb" style="position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);"></span>
+          </label>
+        </div>
+
+        <!-- Payouts toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:10px 12px;">
+          <div>
+            <div style="font-size:13px;font-weight:500;">Payouts Enabled</div>
+            <div style="font-size:11px;color:var(--text-muted);">Receives residual payouts</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:38px;height:20px;cursor:pointer;">
+            <input type="checkbox" id="au-payouts" checked style="opacity:0;width:0;height:0;" onchange="toggleUserPayoutFields(this.checked)">
+            <span id="au-payouts-track" style="position:absolute;inset:0;border-radius:20px;background:var(--yellow);transition:.2s;"></span>
+            <span style="position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);"></span>
+          </label>
+        </div>
+
+        <!-- Residual % — shown when payouts on -->
+        <div id="au-res-pct-wrap" style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Residual % <span style="color:var(--red);">*</span></label>
+          <div style="position:relative;">
+            <input id="au-res-pct" type="number" step="0.01" min="0" max="5" placeholder="e.g. 1.20" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 32px 8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-mono);outline:none;width:100%;box-sizing:border-box;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);">%</span>
+          </div>
+        </div>
+
+        <!-- Up-front bonus — shown when payouts on -->
+        <div id="au-bonus-wrap" style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Up-front Bonus</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);">$</span>
+            <input id="au-bonus" type="number" step="100" min="0" placeholder="e.g. 1000" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px 8px 24px;color:var(--text-primary);font-size:13px;font-family:var(--font-mono);outline:none;width:100%;box-sizing:border-box;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'">
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);">Per newly boarded merchant</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Partner Overrides -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);">Partner Overrides</div>
+        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px;" onclick="addPartnerOverrideRow('au-partner-override-rows')">+ Add Partner</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px 0;text-transform:uppercase;">Partner</th>
+          <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px 0;text-transform:uppercase;">Override %</th>
+          <th style="width:32px;"></th>
+        </tr></thead>
+        <tbody id="au-partner-override-rows">
+          <tr style="border-bottom:1px dashed var(--border);" id="au-partner-empty">
+            <td colspan="3" style="padding:12px 0;font-size:12px;color:var(--text-muted);text-align:center;">No partner overrides — click + Add Partner to assign one</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Merchant Overrides -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);">Merchant Overrides</div>
+        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px;" onclick="addMerchantOverrideRow('au-merchant-override-rows')">+ Add Merchant</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px 0;text-transform:uppercase;">Merchant</th>
+          <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:6px 0;text-transform:uppercase;">Override %</th>
+          <th style="width:32px;"></th>
+        </tr></thead>
+        <tbody id="au-merchant-override-rows">
+          <tr style="border-bottom:1px dashed var(--border);" id="au-merchant-empty">
+            <td colspan="3" style="padding:12px 0;font-size:12px;color:var(--text-muted);text-align:center;">No merchant overrides — click + Add Merchant to assign one</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+<div id="add-user-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:300;" onclick="closeAddUserDrawer()"></div>
 
 <div class="kb-drawer" id="kb-drawer">
   <div class="kb-drawer-bar">
@@ -25465,7 +25950,8 @@ function showView(name, clickedNav) {
     'residuals': 'nav-residuals',
     'analytics': 'nav-analytics',
     'tickets': 'nav-tickets',
-    'alerts':  'nav-alerts'
+    'alerts':  'nav-alerts',
+    'users':   'nav-users'
   };
   function applyHash() {
     var h = (window.location.hash || '').replace('#','').toLowerCase();
@@ -26184,6 +26670,212 @@ function openAlertByMerchant(merchantName) {
 
 
 
+
+/* ═══════════════════════════════════════════════════════
+   USERS PAGE — list, detail, drawer, overrides
+   ═══════════════════════════════════════════════════════ */
+
+const usersData = [
+  { id:'USR-001', name:'James Carter',  initials:'JC', color:'#6366F1', dept:'Sales',     type:'Owner', email:'james@twill.io', phone:'(310) 555-0182', joined:'Jan 8, 2025',
+    seeRes:true, payouts:true, resPct:'1.20%', bonus:'$2,500', cycle:'Net 30', earned:'$3,240', ytd:'$18,400',
+    partnerOverrides:[{name:'Apex Elite',pct:'1.40%'},{name:'NovaPay',pct:'1.25%'},{name:'Summit Lending',pct:'1.10%'},{name:'Rivermark',pct:'1.00%'}],
+    merchantOverrides:[{name:'Harbor Bistro',pct:'1.60%'},{name:'Lakeview Dental',pct:'1.45%'},{name:'Green Valley Market',pct:'1.35%'}] },
+  { id:'USR-002', name:'Sara Reyes',    initials:'SR', color:'#5B7A5E', dept:'Sales',     type:'Rep',   email:'sara@twill.io',  phone:'(424) 555-0044', joined:'Mar 15, 2025',
+    seeRes:true, payouts:true, resPct:'0.85%', bonus:'$1,000', cycle:'Net 30', earned:'$1,820', ytd:'$9,200',
+    partnerOverrides:[{name:'NovaPay',pct:'0.90%'},{name:'Rivermark',pct:'0.80%'}],
+    merchantOverrides:[] },
+  { id:'USR-003', name:'Dan Mitchell',  initials:'DM', color:'#6B839B', dept:'Operations',type:'Rep',   email:'dan@twill.io',   phone:'(213) 555-0091', joined:'Jun 2, 2024',
+    seeRes:true, payouts:true, resPct:'0.70%', bonus:null,     cycle:'Net 45', earned:'$940',  ytd:'$6,100',
+    partnerOverrides:[{name:'Summit Lending',pct:'0.75%'}],
+    merchantOverrides:[{name:'Pines Auto Group',pct:'0.80%'}] },
+  { id:'USR-004', name:'Mike Wright',   initials:'MW', color:'#FFDE00', dept:'Executive', type:'Owner', email:'mike@twill.io',  phone:'(310) 555-0001', joined:'Jan 1, 2024',
+    seeRes:true, payouts:true, resPct:'1.50%', bonus:'$5,000', cycle:'Net 30', earned:'$6,100', ytd:'$38,400',
+    partnerOverrides:[{name:'All Partners',pct:'1.50%'}],
+    merchantOverrides:[] },
+  { id:'USR-005', name:'Blake Chen',    initials:'BC', color:'#9B6B5B', dept:'Support',   type:'Rep',   email:'blake@twill.io', phone:'(818) 555-0072', joined:'Sep 19, 2024',
+    seeRes:false, payouts:false, resPct:null, bonus:null, cycle:null, earned:'$0', ytd:'$0',
+    partnerOverrides:[], merchantOverrides:[] },
+  { id:'USR-006', name:'Tara Patel',    initials:'TP', color:'#A67C5B', dept:'Sales',     type:'Rep',   email:'tara@twill.io',  phone:'(562) 555-0033', joined:'Feb 11, 2024',
+    seeRes:true, payouts:true, resPct:'0.60%', bonus:'$500',   cycle:'Net 30', earned:'$720',  ytd:'$4,520',
+    partnerOverrides:[{name:'Coastal Commerce',pct:'0.65%'}],
+    merchantOverrides:[{name:'Metro Print Shop',pct:'0.70%'}] },
+];
+
+function filterUsersTable(q) {
+  const lq = q.toLowerCase();
+  let count = 0;
+  document.querySelectorAll('#users-tbody tr').forEach(row => {
+    const show = row.textContent.toLowerCase().includes(lq);
+    row.style.display = show ? '' : 'none';
+    if (show) count++;
+  });
+  const el = document.getElementById('users-count');
+  if (el) el.textContent = count + ' user' + (count !== 1 ? 's' : '');
+}
+
+function openUserDetail(name) {
+  const u = usersData.find(x => x.name === name);
+  if (!u) return;
+
+  const av = document.getElementById('ud-avatar');
+  if (av) { av.textContent = u.initials; av.style.background = u.color; av.style.color = u.color === '#FFDE00' ? 'var(--navy)' : '#fff'; }
+  const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val || '—'; };
+  setEl('ud-name', u.name);
+  const badge = document.getElementById('ud-type-badge');
+  if (badge) { badge.textContent = u.type; badge.className = 'p-badge ' + (u.type === 'Owner' ? 'bb' : ''); badge.style.background = u.type === 'Owner' ? '' : 'rgba(91,122,94,0.12)'; badge.style.color = u.type === 'Owner' ? '' : '#5B7A5E'; }
+  setEl('ud-meta', u.id + ' \u00b7 ' + u.dept);
+  setEl('ud-kpi-earned', u.earned);
+  setEl('ud-kpi-res', u.resPct || '—');
+  setEl('ud-kpi-bonus', u.bonus || '—');
+  setEl('ud-kpi-povr', u.partnerOverrides.length);
+  setEl('ud-kpi-movr', u.merchantOverrides.length);
+  setEl('ud-kpi-ytd', u.ytd);
+  setEl('ud-email', u.email);
+  setEl('ud-phone', u.phone);
+  setEl('ud-dept', u.dept);
+  setEl('ud-type', u.type);
+  setEl('ud-joined', u.joined);
+
+  const setBadge = (id, yes) => { const e = document.getElementById(id); if (e) { e.textContent = yes ? 'Yes' : 'No'; e.className = 'p-badge ' + (yes ? 'badge-green' : ''); } };
+  setBadge('ud-see-res', u.seeRes);
+  setBadge('ud-pay-on', u.payouts);
+  setEl('ud-res-pct', u.resPct || 'N/A');
+  setEl('ud-upfront', u.bonus ? u.bonus + ' per merchant' : 'N/A');
+  setEl('ud-cycle', u.cycle || 'N/A');
+
+  function buildRows(list, color) {
+    if (!list.length) return '<tr><td colspan="3" style="padding:10px 0;font-size:12px;color:var(--text-muted);text-align:center;">None assigned</td></tr>';
+    return list.map(function(o, i) {
+      var bb = i < list.length - 1 ? '1px solid var(--border)' : 'none';
+      return '<tr style="border-bottom:' + bb + '">'
+        + '<td style="padding:9px 0;font-size:13px;font-weight:500">' + o.name + '</td>'
+        + '<td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:' + color + '">' + o.pct + '</td>'
+        + '<td style="text-align:center"><button class="ud-del-row" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">&#10005;</button></td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  const pRows = document.getElementById('ud-partner-override-rows');
+  if (pRows) pRows.innerHTML = buildRows(u.partnerOverrides, 'var(--green)');
+  const mRows = document.getElementById('ud-merchant-override-rows');
+  if (mRows) mRows.innerHTML = buildRows(u.merchantOverrides, 'var(--blue)');
+
+  setTimeout(function() {
+    const ctx = document.getElementById('ud-residuals-chart');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (ctx._chartInstance) ctx._chartInstance.destroy();
+    const months = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+    const base = parseFloat((u.resPct||'0').replace('%','')) || 0;
+    const data = months.map(function() { return Math.round(base * 1000 * (0.7 + Math.random()*0.6) * 10) / 10; });
+    ctx._chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: months, datasets: [{ data: data, backgroundColor: 'rgba(34,46,72,0.18)', borderColor: 'rgba(34,46,72,0.5)', borderWidth: 1, borderRadius: 3 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: '#787774', font: { size: 10 } } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false }, ticks: { color: '#787774', font: { size: 10 }, callback: function(v) { return '$' + v; } } } } }
+    });
+  }, 80);
+
+  showView('user-detail', null);
+}
+
+/* Add Partner Override row */
+function addPartnerOverrideRow(tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const emptyRow = tbody.querySelector('#' + tbodyId.replace('-rows','-empty'));
+  if (emptyRow) emptyRow.remove();
+  const partners = ['Apex Elite','NovaPay','Summit Lending','Rivermark','Coastal Commerce'];
+  const opts = partners.map(p => '<option>' + p + '</option>').join('');
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--border)';
+  tr.innerHTML = '<td style="padding:6px 0;"><select style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:5px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-ui);outline:none;">' + opts + '</select></td>' +
+    '<td style="padding:6px 0;text-align:right;"><div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;"><input type="number" step="0.01" min="0" max="5" placeholder="0.00" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:5px 6px;color:var(--text-primary);font-size:12px;font-family:var(--font-mono);outline:none;width:70px;text-align:right;"><span style="font-size:12px;color:var(--text-muted);">%</span></div></td>' +
+    '<td style="text-align:center;"><button class="ud-del-row" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>';
+  tbody.appendChild(tr);
+}
+
+/* Add Merchant Override row */
+function addMerchantOverrideRow(tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const emptyRow = tbody.querySelector('#' + tbodyId.replace('-rows','-empty'));
+  if (emptyRow) emptyRow.remove();
+  const merchants = ['Harbor Bistro','Lakeview Dental','Green Valley Market','Pines Auto Group','Metro Print Shop','Sunrise Cafe','TechSupply Pro LLC'];
+  const opts = merchants.map(m => '<option>' + m + '</option>').join('');
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--border)';
+  tr.innerHTML = '<td style="padding:6px 0;"><select style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:5px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-ui);outline:none;">' + opts + '</select></td>' +
+    '<td style="padding:6px 0;text-align:right;"><div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;"><input type="number" step="0.01" min="0" max="5" placeholder="0.00" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:5px 6px;color:var(--text-primary);font-size:12px;font-family:var(--font-mono);outline:none;width:70px;text-align:right;"><span style="font-size:12px;color:var(--text-muted);">%</span></div></td>' +
+    '<td style="text-align:center;"><button class="ud-del-row" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>';
+  tbody.appendChild(tr);
+}
+
+/* Drawer open/close */
+function openAddUserDrawer() {
+  document.getElementById('add-user-drawer').classList.add('open');
+  document.getElementById('add-user-overlay').style.display = 'block';
+}
+function closeAddUserDrawer() {
+  document.getElementById('add-user-drawer').classList.remove('open');
+  document.getElementById('add-user-overlay').style.display = 'none';
+}
+
+/* Toggle payout fields visibility */
+function toggleUserPayoutFields(on) {
+  const track = document.getElementById('au-payouts-track');
+  if (track) track.style.background = on ? 'var(--yellow)' : 'var(--border-strong)';
+  ['au-res-pct-wrap','au-bonus-wrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.opacity = on ? '1' : '0.4';
+  });
+}
+
+/* Submit new user (demo — just adds a row) */
+function submitAddUser() {
+  const name  = document.getElementById('au-name').value.trim();
+  const email = document.getElementById('au-email').value.trim();
+  if (!name || !email) { alert('Name and email are required.'); return; }
+  const type  = document.getElementById('au-type').value;
+  const dept  = document.getElementById('au-dept').value;
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  const colors = ['#6366F1','#5B7A5E','#6B839B','#A67C5B','#8C7A5E','#9B6B5B'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const resPct = document.getElementById('au-res-pct').value;
+  const bonus  = document.getElementById('au-bonus').value;
+  const newId  = 'USR-' + String(100 + usersData.length + 1).slice(1);
+
+  usersData.push({ id:newId, name, initials, color, dept, type, email,
+    phone:document.getElementById('au-phone').value||'—', joined: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    seeRes: document.getElementById('au-see-res').checked,
+    payouts: document.getElementById('au-payouts').checked,
+    resPct: resPct ? resPct + '%' : null, bonus: bonus ? '$' + bonus : null, cycle:'Net 30',
+    earned:'$0', ytd:'$0', partnerOverrides:[], merchantOverrides:[] });
+
+  // Add row to table
+  const tbody = document.getElementById('users-tbody');
+  if (tbody) {
+    const tr = document.createElement('tr');
+    tr.setAttribute('onclick', 'openUserDetail("' + name.replace(/"/g,'&quot;') + '")');
+    tr.innerHTML = '<td><div style="display:flex;align-items:center;gap:10px"><div class="p-avatar" style="background:' + color + ';width:30px;height:30px;font-size:11px;flex-shrink:0">' + initials + '</div><div style="min-width:0"><div style="font-weight:600">' + name + '</div><div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">' + newId + ' · ' + email + '</div></div></div></td>' +
+      '<td>' + dept + '</td><td><span class="p-badge ' + (type==='Owner'?'bb':'') + '">' + type + '</span></td>' +
+      '<td>' + (resPct ? '<span style="color:var(--green);font-weight:600;font-family:var(--font-mono);">Yes — ' + resPct + '%</span>' : '<span style="color:var(--text-muted);">No</span>') + '</td>' +
+      '<td><span class="p-badge badge-green">On</span></td>' +
+      '<td><span style="font-family:var(--font-mono);">' + (bonus ? '$'+bonus : '—') + '</span></td>' +
+      '<td style="font-size:11px;color:var(--text-secondary);">—</td>' +
+      '<td><span class="p-badge badge-green">Active</span></td>' +
+      '<td style="text-align:center;color:var(--text-muted);">&#8250;</td>';
+    tbody.appendChild(tr);
+  }
+
+  closeAddUserDrawer();
+}
+
+
+/* Delete override row via event delegation */
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('ud-del-row')) {
+    e.target.closest('tr').remove();
+  }
+});
 </script>
 <style id="alerts-css">
 /* ── Alerts view: amber accent header ─── */
