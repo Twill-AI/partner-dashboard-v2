@@ -1413,6 +1413,52 @@
 
 /* ── Ticket resolved state ──────────────────────── */
 .tdetail-header.resolved { border-bottom: 2px solid var(--green); }
+
+/* ── Payout Waterfall ──────────────────────────── */
+.wf-container { display:flex; flex-direction:column; gap:0; position:relative; }
+.wf-entry { display:flex; align-items:stretch; gap:0; position:relative; }
+.wf-spine { display:flex; flex-direction:column; align-items:center; width:44px; flex-shrink:0; }
+.wf-spine-top { width:2px; background:var(--border-strong); flex:1; min-height:12px; }
+.wf-spine-bot { width:2px; background:var(--border-strong); flex:1; min-height:12px; }
+.wf-spine-dot { width:14px; height:14px; border-radius:50%; background:var(--bg-surface); border:2px solid var(--border-strong); flex-shrink:0; z-index:1; }
+.wf-entry:first-child .wf-spine-top { visibility:hidden; }
+.wf-card { flex:1; margin:6px 0; background:var(--bg-surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:border-color .15s, box-shadow .15s; }
+.wf-card:hover { border-color:var(--border-strong); box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.wf-card.wf-locked { border-left:3px solid var(--yellow); }
+.wf-card.wf-house { border-left:3px solid var(--green); background:rgba(91,122,94,0.04); }
+.wf-card-hdr { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid rgba(0,0,0,0.05); }
+.wf-pos { width:22px; height:22px; border-radius:50%; background:var(--navy); color:var(--yellow); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--font-mono); }
+.wf-entity-name { font-size:13px; font-weight:600; flex:1; min-width:0; }
+.wf-entity-sub  { font-size:11px; color:var(--text-muted); margin-top:1px; }
+.wf-lock-badge  { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; background:rgba(255,222,0,0.12); color:var(--navy); padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.wf-move-btns { display:flex; flex-direction:column; gap:2px; }
+.wf-move-btn { background:none; border:1px solid var(--border); border-radius:4px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); font-size:10px; transition:all .1s; }
+.wf-move-btn:hover { background:var(--bg-hover); color:var(--text-primary); border-color:var(--border-strong); }
+.wf-move-btn:disabled { opacity:0.3; cursor:default; }
+.wf-del-btn { background:none; border:1px solid transparent; border-radius:4px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); font-size:13px; transition:all .1s; }
+.wf-del-btn:hover { color:var(--red); border-color:rgba(239,68,68,.2); background:var(--red-dim); }
+.wf-card-body { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0; }
+.wf-field { padding:10px 14px; border-right:1px solid rgba(0,0,0,0.05); }
+.wf-field:last-child { border-right:none; }
+.wf-field-label { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+.wf-field-val { font-size:15px; font-weight:700; font-family:var(--font-mono); color:var(--text-primary); }
+.wf-field-val.green { color:var(--green); }
+.wf-field-val.muted { color:var(--text-muted); font-weight:400; font-size:13px; }
+.wf-field-input { background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:5px; padding:4px 8px; font-size:13px; font-family:var(--font-mono); color:var(--text-primary); outline:none; width:80px; }
+.wf-field-input:focus { border-color:var(--yellow); }
+.wf-unit-toggle { display:flex; gap:0; margin-top:4px; }
+.wf-unit-btn { padding:2px 7px; font-size:10px; font-weight:600; border:1px solid var(--border-strong); cursor:pointer; transition:all .1s; background:none; color:var(--text-muted); }
+.wf-unit-btn:first-child { border-radius:4px 0 0 4px; }
+.wf-unit-btn:last-child  { border-radius:0 4px 4px 0; border-left:none; }
+.wf-unit-btn.active { background:var(--navy); color:var(--yellow); border-color:var(--navy); }
+.wf-cascade-arrow { text-align:center; font-size:11px; color:var(--text-muted); padding:2px 0; }
+.wf-add-btn { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg-elevated); border:1px dashed var(--border-strong); border-radius:8px; cursor:pointer; color:var(--text-muted); font-size:12px; font-weight:500; transition:all .15s; margin-top:4px; }
+.wf-add-btn:hover { border-color:var(--yellow); color:var(--text-primary); background:var(--bg-hover); }
+.wf-net-bar { background:var(--bg-elevated); border:1px solid var(--border); border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+.wf-net-label { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+.wf-net-val { font-size:20px; font-weight:700; font-family:var(--font-mono); color:var(--text-primary); }
+.wf-net-input { background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:6px; padding:6px 10px; font-size:16px; font-family:var(--font-mono); color:var(--text-primary); outline:none; width:120px; }
+.wf-net-input:focus { border-color:var(--yellow); }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -5585,6 +5631,7 @@
         <div class="ma-nav-tab" onclick="maTab('reporting',this)">🗂 Authorizations &amp; Reporting</div>
         <div class="ma-nav-tab" onclick="maTab('documents',this)">📄 Documents</div>
         <div class="ma-nav-tab" onclick="maTab('config',this)">⚙ Config &amp; Pricing</div>
+        <div class="ma-nav-tab" onclick="maTab('waterfall',this)">💧 Payout Waterfall</div>
       </div>
 
       <div class="body-row">
@@ -5894,6 +5941,39 @@
               <div class="sc"><div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment</div></div></div><span class="p-badge bg">Live</span></div><div style="padding:10px 16px;display:flex;flex-direction:column;gap:5px;"><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Terminal</span><span style="font-size:11px;font-weight:600;">PAX A920 Pro</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Count</span><span style="font-size:11px;font-family:var(--font-mono);">2 units</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Gateway</span><span style="font-size:11px;">NMI</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Processor</span><span style="font-size:11px;">First Data Omaha</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">First Batch</span><span style="font-size:11px;font-family:var(--font-mono);">Nov 14, 2023</span></div></div></div>
             </div>
           </div><!-- /ma-panel-config -->
+          <div id="ma-panel-waterfall" class="ma-panel" style="display:none;">
+
+            <!-- Net Residual Input -->
+            <div class="wf-net-bar">
+              <div>
+                <div class="wf-net-label">Net Residual Pool (This Month)</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Gross volume minus processor fees, chargebacks, and Twill platform fee</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <span style="font-size:14px;color:var(--text-muted);">$</span>
+                <input class="wf-net-input" id="wf-net-pool" type="number" value="4820" min="0" step="10" oninput="wfRecalc(this.closest('.ma-panel'))">
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);">$218K</div>
+              </div>
+            </div>
+
+            <!-- Waterfall entries (rendered by JS) -->
+            <div class="wf-container" id="wf-entries"></div>
+
+            <!-- Add Entity button -->
+            <div class="wf-add-btn" onclick="wfAddEntry(this.closest('.ma-panel'))">
+              <span style="font-size:18px;line-height:1;">+</span>
+              Add partner or rep to waterfall
+            </div>
+
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;padding:0 2px;">
+              &#9432; Entities are paid sequentially from the net residual pool. Each entity's % applies to the remaining balance after those above. The submitting partner and assigned rep are locked at positions 1 and 2.
+            </div>
+
+          </div><!-- /ma-panel-waterfall -->
 
         </div><!-- /ma-main -->
 
@@ -10214,6 +10294,7 @@
         <div class="ma-nav-tab" onclick="maTab('reporting',this)">🗂 Authorizations &amp; Reporting</div>
         <div class="ma-nav-tab" onclick="maTab('documents',this)">📄 Documents</div>
         <div class="ma-nav-tab" onclick="maTab('config',this)">⚙ Config &amp; Pricing</div>
+        <div class="ma-nav-tab" onclick="maTab('waterfall',this)">💧 Payout Waterfall</div>
       </div>
 
       <div class="body-row">
@@ -10523,6 +10604,39 @@
               <div class="sc"><div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment</div></div></div><span class="p-badge bg">Live</span></div><div style="padding:10px 16px;display:flex;flex-direction:column;gap:5px;"><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Terminal</span><span style="font-size:11px;font-weight:600;">PAX A920 Pro</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Count</span><span style="font-size:11px;font-family:var(--font-mono);">2 units</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Gateway</span><span style="font-size:11px;">NMI</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Processor</span><span style="font-size:11px;">First Data Omaha</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">First Batch</span><span style="font-size:11px;font-family:var(--font-mono);">Nov 14, 2023</span></div></div></div>
             </div>
           </div><!-- /ma-panel-config -->
+          <div id="ma-panel-waterfall" class="ma-panel" style="display:none;">
+
+            <!-- Net Residual Input -->
+            <div class="wf-net-bar">
+              <div>
+                <div class="wf-net-label">Net Residual Pool (This Month)</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Gross volume minus processor fees, chargebacks, and Twill platform fee</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <span style="font-size:14px;color:var(--text-muted);">$</span>
+                <input class="wf-net-input" id="wf-net-pool" type="number" value="4820" min="0" step="10" oninput="wfRecalc(this.closest('.ma-panel'))">
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);">$218K</div>
+              </div>
+            </div>
+
+            <!-- Waterfall entries (rendered by JS) -->
+            <div class="wf-container" id="wf-entries"></div>
+
+            <!-- Add Entity button -->
+            <div class="wf-add-btn" onclick="wfAddEntry(this.closest('.ma-panel'))">
+              <span style="font-size:18px;line-height:1;">+</span>
+              Add partner or rep to waterfall
+            </div>
+
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;padding:0 2px;">
+              &#9432; Entities are paid sequentially from the net residual pool. Each entity's % applies to the remaining balance after those above. The submitting partner and assigned rep are locked at positions 1 and 2.
+            </div>
+
+          </div><!-- /ma-panel-waterfall -->
 
         </div><!-- /ma-main -->
 
@@ -14238,11 +14352,12 @@ function maChartPeriod(period, btn) {
 function maTab(panel, btn) {
   document.querySelectorAll('.ma-nav-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['overview','reporting','documents','config'].forEach(p => {
+  ['overview','reporting','documents','config','waterfall'].forEach(p => {
     const el = document.getElementById('ma-panel-' + p);
     if (el) el.style.display = p === panel ? 'flex' : 'none';
   });
   if (panel === 'overview') setTimeout(initMaChart, 50);
+  if (panel === 'waterfall') setTimeout(function() { wfInit(document.getElementById('ma-panel-waterfall')); }, 50);
 }
 
 function maTxTab(tab, btn) {
@@ -17616,6 +17731,7 @@ function initResCharts() {
         <div class="ma-nav-tab" onclick="maTab('reporting',this)">🗂 Authorizations &amp; Reporting</div>
         <div class="ma-nav-tab" onclick="maTab('documents',this)">📄 Documents</div>
         <div class="ma-nav-tab" onclick="maTab('config',this)">⚙ Config &amp; Pricing</div>
+        <div class="ma-nav-tab" onclick="maTab('waterfall',this)">💧 Payout Waterfall</div>
       </div>
 
       <div class="body-row">
@@ -17925,6 +18041,39 @@ function initResCharts() {
               <div class="sc"><div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment</div></div></div><span class="p-badge bg">Live</span></div><div style="padding:10px 16px;display:flex;flex-direction:column;gap:5px;"><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Terminal</span><span style="font-size:11px;font-weight:600;">PAX A920 Pro</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Count</span><span style="font-size:11px;font-family:var(--font-mono);">2 units</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Gateway</span><span style="font-size:11px;">NMI</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Processor</span><span style="font-size:11px;">First Data Omaha</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">First Batch</span><span style="font-size:11px;font-family:var(--font-mono);">Nov 14, 2023</span></div></div></div>
             </div>
           </div><!-- /ma-panel-config -->
+          <div id="ma-panel-waterfall" class="ma-panel" style="display:none;">
+
+            <!-- Net Residual Input -->
+            <div class="wf-net-bar">
+              <div>
+                <div class="wf-net-label">Net Residual Pool (This Month)</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Gross volume minus processor fees, chargebacks, and Twill platform fee</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <span style="font-size:14px;color:var(--text-muted);">$</span>
+                <input class="wf-net-input" id="wf-net-pool" type="number" value="4820" min="0" step="10" oninput="wfRecalc(this.closest('.ma-panel'))">
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);">$218K</div>
+              </div>
+            </div>
+
+            <!-- Waterfall entries (rendered by JS) -->
+            <div class="wf-container" id="wf-entries"></div>
+
+            <!-- Add Entity button -->
+            <div class="wf-add-btn" onclick="wfAddEntry(this.closest('.ma-panel'))">
+              <span style="font-size:18px;line-height:1;">+</span>
+              Add partner or rep to waterfall
+            </div>
+
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;padding:0 2px;">
+              &#9432; Entities are paid sequentially from the net residual pool. Each entity's % applies to the remaining balance after those above. The submitting partner and assigned rep are locked at positions 1 and 2.
+            </div>
+
+          </div><!-- /ma-panel-waterfall -->
 
         </div><!-- /ma-main -->
 
@@ -20268,6 +20417,7 @@ function initResCharts() {
         <div class="ma-nav-tab" onclick="maTab('reporting',this)">🗂 Authorizations &amp; Reporting</div>
         <div class="ma-nav-tab" onclick="maTab('documents',this)">📄 Documents</div>
         <div class="ma-nav-tab" onclick="maTab('config',this)">⚙ Config &amp; Pricing</div>
+        <div class="ma-nav-tab" onclick="maTab('waterfall',this)">💧 Payout Waterfall</div>
       </div>
 
       <div class="body-row">
@@ -20577,6 +20727,39 @@ function initResCharts() {
               <div class="sc"><div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment</div></div></div><span class="p-badge bg">Live</span></div><div style="padding:10px 16px;display:flex;flex-direction:column;gap:5px;"><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Terminal</span><span style="font-size:11px;font-weight:600;">PAX A920 Pro</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Count</span><span style="font-size:11px;font-family:var(--font-mono);">2 units</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Gateway</span><span style="font-size:11px;">NMI</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Processor</span><span style="font-size:11px;">First Data Omaha</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">First Batch</span><span style="font-size:11px;font-family:var(--font-mono);">Nov 14, 2023</span></div></div></div>
             </div>
           </div><!-- /ma-panel-config -->
+          <div id="ma-panel-waterfall" class="ma-panel" style="display:none;">
+
+            <!-- Net Residual Input -->
+            <div class="wf-net-bar">
+              <div>
+                <div class="wf-net-label">Net Residual Pool (This Month)</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Gross volume minus processor fees, chargebacks, and Twill platform fee</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <span style="font-size:14px;color:var(--text-muted);">$</span>
+                <input class="wf-net-input" id="wf-net-pool" type="number" value="4820" min="0" step="10" oninput="wfRecalc(this.closest('.ma-panel'))">
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);">$218K</div>
+              </div>
+            </div>
+
+            <!-- Waterfall entries (rendered by JS) -->
+            <div class="wf-container" id="wf-entries"></div>
+
+            <!-- Add Entity button -->
+            <div class="wf-add-btn" onclick="wfAddEntry(this.closest('.ma-panel'))">
+              <span style="font-size:18px;line-height:1;">+</span>
+              Add partner or rep to waterfall
+            </div>
+
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;padding:0 2px;">
+              &#9432; Entities are paid sequentially from the net residual pool. Each entity's % applies to the remaining balance after those above. The submitting partner and assigned rep are locked at positions 1 and 2.
+            </div>
+
+          </div><!-- /ma-panel-waterfall -->
 
         </div><!-- /ma-main -->
 
@@ -22921,6 +23104,7 @@ function initResCharts() {
         <div class="ma-nav-tab" onclick="maTab('reporting',this)">🗂 Authorizations &amp; Reporting</div>
         <div class="ma-nav-tab" onclick="maTab('documents',this)">📄 Documents</div>
         <div class="ma-nav-tab" onclick="maTab('config',this)">⚙ Config &amp; Pricing</div>
+        <div class="ma-nav-tab" onclick="maTab('waterfall',this)">💧 Payout Waterfall</div>
       </div>
 
       <div class="body-row">
@@ -23230,6 +23414,39 @@ function initResCharts() {
               <div class="sc"><div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment</div></div></div><span class="p-badge bg">Live</span></div><div style="padding:10px 16px;display:flex;flex-direction:column;gap:5px;"><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Terminal</span><span style="font-size:11px;font-weight:600;">PAX A920 Pro</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Count</span><span style="font-size:11px;font-family:var(--font-mono);">2 units</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Gateway</span><span style="font-size:11px;">NMI</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Processor</span><span style="font-size:11px;">First Data Omaha</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">First Batch</span><span style="font-size:11px;font-family:var(--font-mono);">Nov 14, 2023</span></div></div></div>
             </div>
           </div><!-- /ma-panel-config -->
+          <div id="ma-panel-waterfall" class="ma-panel" style="display:none;">
+
+            <!-- Net Residual Input -->
+            <div class="wf-net-bar">
+              <div>
+                <div class="wf-net-label">Net Residual Pool (This Month)</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Gross volume minus processor fees, chargebacks, and Twill platform fee</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <span style="font-size:14px;color:var(--text-muted);">$</span>
+                <input class="wf-net-input" id="wf-net-pool" type="number" value="4820" min="0" step="10" oninput="wfRecalc(this.closest('.ma-panel'))">
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);">$218K</div>
+              </div>
+            </div>
+
+            <!-- Waterfall entries (rendered by JS) -->
+            <div class="wf-container" id="wf-entries"></div>
+
+            <!-- Add Entity button -->
+            <div class="wf-add-btn" onclick="wfAddEntry(this.closest('.ma-panel'))">
+              <span style="font-size:18px;line-height:1;">+</span>
+              Add partner or rep to waterfall
+            </div>
+
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;padding:0 2px;">
+              &#9432; Entities are paid sequentially from the net residual pool. Each entity's % applies to the remaining balance after those above. The submitting partner and assigned rep are locked at positions 1 and 2.
+            </div>
+
+          </div><!-- /ma-panel-waterfall -->
 
         </div><!-- /ma-main -->
 
@@ -25573,6 +25790,7 @@ function initResCharts() {
         <div class="ma-nav-tab" onclick="maTab('reporting',this)">🗂 Authorizations &amp; Reporting</div>
         <div class="ma-nav-tab" onclick="maTab('documents',this)">📄 Documents</div>
         <div class="ma-nav-tab" onclick="maTab('config',this)">⚙ Config &amp; Pricing</div>
+        <div class="ma-nav-tab" onclick="maTab('waterfall',this)">💧 Payout Waterfall</div>
       </div>
 
       <div class="body-row">
@@ -25882,6 +26100,39 @@ function initResCharts() {
               <div class="sc"><div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment</div></div></div><span class="p-badge bg">Live</span></div><div style="padding:10px 16px;display:flex;flex-direction:column;gap:5px;"><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Terminal</span><span style="font-size:11px;font-weight:600;">PAX A920 Pro</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Count</span><span style="font-size:11px;font-family:var(--font-mono);">2 units</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Gateway</span><span style="font-size:11px;">NMI</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Processor</span><span style="font-size:11px;">First Data Omaha</span></div><div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">First Batch</span><span style="font-size:11px;font-family:var(--font-mono);">Nov 14, 2023</span></div></div></div>
             </div>
           </div><!-- /ma-panel-config -->
+          <div id="ma-panel-waterfall" class="ma-panel" style="display:none;">
+
+            <!-- Net Residual Input -->
+            <div class="wf-net-bar">
+              <div>
+                <div class="wf-net-label">Net Residual Pool (This Month)</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Gross volume minus processor fees, chargebacks, and Twill platform fee</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <span style="font-size:14px;color:var(--text-muted);">$</span>
+                <input class="wf-net-input" id="wf-net-pool" type="number" value="4820" min="0" step="10" oninput="wfRecalc(this.closest('.ma-panel'))">
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);">$218K</div>
+              </div>
+            </div>
+
+            <!-- Waterfall entries (rendered by JS) -->
+            <div class="wf-container" id="wf-entries"></div>
+
+            <!-- Add Entity button -->
+            <div class="wf-add-btn" onclick="wfAddEntry(this.closest('.ma-panel'))">
+              <span style="font-size:18px;line-height:1;">+</span>
+              Add partner or rep to waterfall
+            </div>
+
+            <div style="font-size:11px;color:var(--text-muted);margin-top:8px;padding:0 2px;">
+              &#9432; Entities are paid sequentially from the net residual pool. Each entity's % applies to the remaining balance after those above. The submitting partner and assigned rep are locked at positions 1 and 2.
+            </div>
+
+          </div><!-- /ma-panel-waterfall -->
 
         </div><!-- /ma-main -->
 
@@ -27189,6 +27440,253 @@ function toggleRepAccordion(e, row) {
     row.classList.add('open');
     next.style.display = '';
   }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAYOUT WATERFALL
+   ═══════════════════════════════════════════════════════ */
+
+// Default waterfall entries per merchant (seeded on init)
+function wfDefaultEntries() {
+  return [
+    { id: 'e1', name: 'Apex Elite',   sub: 'Submitting Partner · PTR-0042', type:'partner', initials:'AE', color:'#6B839B', rate: 1.20, unit:'pct', locked:true  },
+    { id: 'e2', name: 'James Carter', sub: 'Assigned Rep · USR-001',         type:'rep',     initials:'JC', color:'#6366F1', rate: 0.80, unit:'pct', locked:true  },
+  ];
+}
+
+let _wfNextId = 10;
+
+function wfInit(panel) {
+  if (!panel) return;
+  var container = panel.querySelector('.wf-container');
+  if (!container) return;
+  // Only init if empty
+  if (container.children.length === 0) {
+    container._entries = wfDefaultEntries();
+    wfRender(panel);
+  }
+}
+
+function wfRender(panel) {
+  var container = panel.querySelector('.wf-container');
+  var poolInput = panel.querySelector('.wf-net-input');
+  if (!container || !poolInput) return;
+
+  var entries = container._entries || [];
+  var pool = parseFloat(poolInput.value) || 0;
+
+  // Calculate cascade
+  var remaining = pool;
+  var calced = entries.map(function(e) {
+    var rate = e.unit === 'bp' ? e.rate / 10000 : e.rate / 100;
+    var payout = Math.round(remaining * rate * 100) / 100;
+    var result = { entry: e, payout: payout, inputPool: remaining };
+    remaining = Math.round((remaining - payout) * 100) / 100;
+    return result;
+  });
+  var house = Math.max(0, Math.round(remaining * 100) / 100);
+
+  // Render
+  var html = '';
+  calced.forEach(function(c, i) {
+    var e = c.entry;
+    var isFirst = i === 0;
+    var isLast  = i === calced.length - 1;
+    var rateDisp = e.unit === 'bp' ? e.rate + ' bp' : e.rate.toFixed(2) + '%';
+    var lockedAttr = e.locked ? 'wf-locked' : '';
+
+    html += '<div class="wf-entry" data-wf-id="' + e.id + '">';
+    // Spine
+    html += '<div class="wf-spine">'
+      + '<div class="wf-spine-top"></div>'
+      + '<div class="wf-spine-dot"></div>'
+      + '<div class="wf-spine-bot"></div>'
+      + '</div>';
+    // Card
+    html += '<div class="wf-card ' + lockedAttr + '">';
+    // Header
+    html += '<div class="wf-card-hdr">'
+      + '<div class="wf-pos">' + (i+1) + '</div>'
+      + '<div class="p-avatar" style="background:' + e.color + ';width:26px;height:26px;font-size:10px;flex-shrink:0;">' + e.initials + '</div>'
+      + '<div style="flex:1;min-width:0;">'
+      +   '<div class="wf-entity-name">' + e.name + '</div>'
+      +   '<div class="wf-entity-sub">' + e.sub + '</div>'
+      + '</div>'
+      + (e.locked ? '<span class="wf-lock-badge">🔒 Locked</span>' : '')
+      + '<div style="display:flex;align-items:center;gap:6px;">'
+      + '<div class="wf-move-btns">'
+      +   '<button class="wf-move-btn" onclick="wfMove(this,\'' + e.id + '\',-1)" ' + (isFirst?'disabled':'') + ' title="Move up">▲</button>'
+      +   '<button class="wf-move-btn" onclick="wfMove(this,\'' + e.id + '\',1)"  ' + (isLast?'disabled':'') + ' title="Move down">▼</button>'
+      + '</div>'
+      + (!e.locked ? '<button class="wf-del-btn" onclick="wfDelete(this,\'' + e.id + '\')" title="Remove">✕</button>' : '')
+      + '</div>'
+      + '</div>';
+
+    // Body — 4 fields: Rate, Input Pool, Payout, Remaining
+    html += '<div class="wf-card-body">'
+      // Rate (editable)
+      + '<div class="wf-field">'
+      +   '<div class="wf-field-label">Rate</div>'
+      +   '<input class="wf-field-input" type="number" step="0.01" min="0" value="' + e.rate + '" data-wf-rate="' + e.id + '" oninput="wfUpdateRate(this,\'' + e.id + '\')">'
+      +   '<div class="wf-unit-toggle">'
+      +     '<button class="wf-unit-btn ' + (e.unit==='pct'?'active':'') + '" onclick="wfSetUnit(this,\'' + e.id + '\',\'pct\')">%</button>'
+      +     '<button class="wf-unit-btn ' + (e.unit==='bp'?'active':'') + '" onclick="wfSetUnit(this,\'' + e.id + '\',\'bp\')">bp</button>'
+      +   '</div>'
+      + '</div>'
+      // Input pool
+      + '<div class="wf-field">'
+      +   '<div class="wf-field-label">Pool In</div>'
+      +   '<div class="wf-field-val">$' + c.inputPool.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>'
+      +   '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">available before</div>'
+      + '</div>'
+      // Payout
+      + '<div class="wf-field">'
+      +   '<div class="wf-field-label">Payout</div>'
+      +   '<div class="wf-field-val green">$' + c.payout.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>'
+      +   '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">' + rateDisp + ' of pool</div>'
+      + '</div>'
+      // Remaining
+      + '<div class="wf-field">'
+      +   '<div class="wf-field-label">Remaining</div>'
+      +   '<div class="wf-field-val' + (isLast?' muted':' ') + '">$' + Math.max(0, c.inputPool - c.payout).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>'
+      +   '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">flows to next</div>'
+      + '</div>'
+      + '</div>';
+
+    html += '</div></div>'; // /wf-card /wf-entry
+  });
+
+  // House row
+  html += '<div class="wf-entry">'
+    + '<div class="wf-spine"><div class="wf-spine-top"></div><div class="wf-spine-dot" style="background:var(--green);border-color:var(--green);"></div><div class="wf-spine-bot" style="visibility:hidden;"></div></div>'
+    + '<div class="wf-card wf-house">'
+    +   '<div class="wf-card-hdr">'
+    +     '<div class="wf-pos" style="background:var(--green);">' + (calced.length+1) + '</div>'
+    +     '<div class="p-avatar" style="background:var(--green);width:26px;height:26px;font-size:10px;flex-shrink:0;">TW</div>'
+    +     '<div style="flex:1;min-width:0;"><div class="wf-entity-name">Twill (House)</div><div class="wf-entity-sub">Remainder after all payouts</div></div>'
+    +     '<span class="wf-lock-badge" style="background:rgba(91,122,94,0.15);color:var(--green);">🏠 House</span>'
+    +   '</div>'
+    +   '<div class="wf-card-body">'
+    +     '<div class="wf-field"><div class="wf-field-label">Rate</div><div class="wf-field-val muted">Remainder</div></div>'
+    +     '<div class="wf-field"><div class="wf-field-label">Pool In</div><div class="wf-field-val">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+    +     '<div class="wf-field"><div class="wf-field-label">Payout</div><div class="wf-field-val green">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+    +     '<div class="wf-field"><div class="wf-field-label">Remaining</div><div class="wf-field-val muted">$0.00</div></div>'
+    +   '</div>'
+    + '</div></div>';
+
+  container.innerHTML = html;
+  container._entries = entries;
+}
+
+function wfRecalc(panel) {
+  if (panel) wfRender(panel);
+}
+
+function wfGetPanel(el) {
+  return el.closest('.ma-panel');
+}
+
+function wfGetContainer(el) {
+  return wfGetPanel(el).querySelector('.wf-container');
+}
+
+function wfMove(btn, id, dir) {
+  var container = wfGetContainer(btn);
+  var entries = container._entries;
+  var idx = entries.findIndex(function(e){return e.id===id;});
+  if (idx < 0) return;
+  var newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= entries.length) return;
+  // Locked entries at 0 and 1 — can't move locked entries, can't move unlocked past locked
+  if (entries[newIdx] && entries[newIdx].locked) return;
+  if (entries[idx].locked) return;
+  var tmp = entries[idx];
+  entries[idx] = entries[newIdx];
+  entries[newIdx] = tmp;
+  wfRender(wfGetPanel(btn));
+}
+
+function wfDelete(btn, id) {
+  var container = wfGetContainer(btn);
+  container._entries = container._entries.filter(function(e){return e.id!==id;});
+  wfRender(wfGetPanel(btn));
+}
+
+function wfUpdateRate(input, id) {
+  var container = wfGetContainer(input);
+  var e = container._entries.find(function(e){return e.id===id;});
+  if (e) {
+    e.rate = parseFloat(input.value) || 0;
+    // Don't re-render (loses focus) — just recalc display
+    wfRender(wfGetPanel(input));
+    // Re-focus the same input
+    var refocused = wfGetPanel(input).querySelector('[data-wf-rate="' + id + '"]');
+    if (refocused) { refocused.focus(); var v=refocused.value; refocused.value=''; refocused.value=v; }
+  }
+}
+
+function wfSetUnit(btn, id, unit) {
+  var container = wfGetContainer(btn);
+  var e = container._entries.find(function(e){return e.id===id;});
+  if (e) {
+    e.unit = unit;
+    wfRender(wfGetPanel(btn));
+  }
+}
+
+function wfAddEntry(panel) {
+  var container = panel.querySelector('.wf-container');
+  // Show inline picker overlay
+  var existing = panel.querySelector('.wf-picker');
+  if (existing) { existing.remove(); return; }
+
+  var opts = [
+    { name:'Apex Elite',      initials:'AE', color:'#6B839B', type:'partner', sub:'Partner · PTR-0042' },
+    { name:'NovaPay',         initials:'NV', color:'#5B7A5E', type:'partner', sub:'Partner · PTR-0038' },
+    { name:'Summit Lending',  initials:'SL', color:'#8C7A5E', type:'partner', sub:'Partner · PTR-0031' },
+    { name:'Rivermark',       initials:'RM', color:'#A67C5B', type:'partner', sub:'Partner · PTR-0027' },
+    { name:'Coastal Commerce',initials:'CC', color:'#9B6B5B', type:'partner', sub:'Partner · PTR-0019' },
+    { name:'James Carter',    initials:'JC', color:'#6366F1', type:'rep',     sub:'Rep · USR-001' },
+    { name:'Sara Reyes',      initials:'SR', color:'#5B7A5E', type:'rep',     sub:'Rep · USR-002' },
+    { name:'Dan Mitchell',    initials:'DM', color:'#6B839B', type:'rep',     sub:'Rep · USR-003' },
+    { name:'Tara Patel',      initials:'TP', color:'#A67C5B', type:'rep',     sub:'Rep · USR-006' },
+  ];
+
+  var picker = document.createElement('div');
+  picker.className = 'wf-picker';
+  picker.style.cssText = 'background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:8px;display:flex;flex-direction:column;gap:2px;margin-top:4px;';
+
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:4px 8px 8px;border-bottom:1px solid var(--border);margin-bottom:4px;';
+  hdr.textContent = 'Add to Waterfall';
+  picker.appendChild(hdr);
+
+  opts.forEach(function(o) {
+    var already = container._entries.find(function(e){return e.name===o.name;});
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;' + (already?'opacity:0.4;pointer-events:none;':'');
+    row.onmouseover = function(){this.style.background='var(--bg-hover)';};
+    row.onmouseout  = function(){this.style.background='';};
+    row.innerHTML = '<div class="p-avatar" style="background:'+o.color+';width:22px;height:22px;font-size:9px;flex-shrink:0;">'+o.initials+'</div>'
+      + '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;">'+o.name+'</div><div style="font-size:10px;color:var(--text-muted);">'+o.sub+'</div></div>'
+      + (already ? '<span style="font-size:10px;color:var(--text-muted);">Added</span>' : '');
+    if (!already) {
+      row.onclick = function() {
+        container._entries.push({ id:'e'+(++_wfNextId), name:o.name, sub:o.sub, type:o.type, initials:o.initials, color:o.color, rate:0.50, unit:'pct', locked:false });
+        picker.remove();
+        wfRender(panel);
+      };
+    }
+    picker.appendChild(row);
+  });
+
+  panel.insertBefore(picker, panel.querySelector('.wf-add-btn'));
+  // Click outside to close
+  setTimeout(function(){
+    document.addEventListener('click', function close(ev){
+      if (!picker.contains(ev.target)) { picker.remove(); document.removeEventListener('click',close); }
+    });
+  }, 100);
 }
 </script>
 <style id="alerts-css">
