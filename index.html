@@ -6592,18 +6592,23 @@
             <div style="display:flex;align-items:center;gap:12px;">
               <div>
                 <div style="font-size:14px;font-weight:600;font-family:var(--font-ui);color:var(--text-primary);" id="res-modal-title">ABC Corp — Merchant Detail</div>
-                <div style="font-size:11px;color:var(--text-secondary);font-family:var(--font-data);margin-top:2px;">MID: 4521889100248 · Fiserv · Agent: A. Fry · Boarded Jan 2024</div>
+                <div style="font-size:11px;color:var(--text-secondary);font-family:var(--font-data);margin-top:2px;" id="res-modal-meta">MID: 4521889100248 · Fiserv · Agent: A. Fry · Boarded Jan 2024</div>
               </div>
-              <span class="p-badge badge-amber">Watch</span>
-              <span class="p-badge badge-warn" style="font-size:10px;">Fee Mismatch</span>
+              <span class="p-badge badge-amber" id="res-modal-health-badge">Watch</span>
+              <span class="p-badge badge-warn" style="font-size:10px;" id="res-modal-fee-badge">Fee Mismatch</span>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
+              <!-- Tab switcher inside modal -->
+              <div style="display:flex;gap:0;border:1px solid var(--border-strong);border-radius:7px;overflow:hidden;margin-right:8px;">
+                <button id="res-modal-tab-data" style="padding:4px 12px;font-size:11px;font-weight:500;background:var(--navy);color:var(--yellow);border:none;cursor:pointer;" onclick="resMerchTabSwitch('data')">📊 Statement Data</button>
+                <button id="res-modal-tab-waterfall" style="padding:4px 12px;font-size:11px;font-weight:500;background:none;color:var(--text-secondary);border:none;cursor:pointer;" onclick="resMerchTabSwitch('waterfall')">💧 Payout Waterfall</button>
+              </div>
               <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">Download CSV</button>
               <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="document.getElementById('res-merchant-modal').style.display='none'">✕</button>
             </div>
           </div>
-          <!-- Modal Table (scrollable both ways) -->
-          <div style="flex:1;overflow:auto;padding:0;" class="res-modal-scroll">
+          <!-- Modal body: data table OR waterfall -->
+          <div id="res-modal-panel-data" style="flex:1;overflow:auto;padding:0;" class="res-modal-scroll">
             <table class="res-table" style="font-size:11px;white-space:nowrap;">
               <thead><tr>
                 <th style="text-align:left;position:sticky;top:0;left:0;background:var(--bg-surface);z-index:3;min-width:70px;">Month</th>
@@ -7955,6 +7960,52 @@
               </div>
             </div>
           </div>
+
+        </div>
+
+          <!-- Waterfall panel (hidden by default) -->
+          <div id="res-modal-panel-waterfall" style="flex:1;overflow-y:auto;padding:20px 24px;display:none;flex-direction:column;gap:14px;">
+
+            <!-- Waterfall header bar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:600;" id="res-wf-merch-name">ABC Corp</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Mar 2026 payout waterfall · Net residual pool after processor fees</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:5px 14px;gap:6px;" onclick="resGoToWaterfallEdit()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.1 1.9a2 2 0 012.8 2.8L5.7 14H2v-3.7L12.1 1.9z"/></svg>
+                Edit Payouts
+              </button>
+            </div>
+
+            <!-- Net pool bar -->
+            <div class="wf-net-bar" style="margin-bottom:0;">
+              <div>
+                <div class="wf-net-label">Net Residual Pool</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">After processor costs &amp; Twill platform fee</div>
+              </div>
+              <div style="margin-left:auto;display:flex;align-items:baseline;gap:6px;">
+                <span style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);" id="res-wf-pool">$4,820</span>
+                <span style="font-size:12px;color:var(--text-muted);">available</span>
+              </div>
+              <div style="margin-left:20px;padding-left:20px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Processing Vol</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);" id="res-wf-vol">$84,200</div>
+              </div>
+              <div style="margin-left:16px;padding-left:16px;border-left:1px solid var(--border);">
+                <div class="wf-net-label">Net Income</div>
+                <div style="font-size:15px;font-weight:700;font-family:var(--font-mono);color:var(--green);" id="res-wf-net">$2,410</div>
+              </div>
+            </div>
+
+            <!-- Waterfall (read-only view) -->
+            <div class="wf-container" id="res-wf-entries"></div>
+
+            <div style="font-size:11px;color:var(--text-muted);padding:0 2px;">
+              &#9432; This waterfall is read-only here. Click <strong>Edit Payouts</strong> above to modify the waterfall on the merchant page.
+            </div>
+
+          </div><!-- /waterfall panel -->
 
         </div>
       </div>
@@ -15155,6 +15206,111 @@ function resFilterMerchantTable() {
 function showMerchantDetail(name) {
   document.getElementById('res-modal-title').textContent = name + ' — Merchant Detail';
   document.getElementById('res-merchant-modal').style.display = 'flex';
+  // Store current merchant name for waterfall link
+  document.getElementById('res-merchant-modal')._currentMerchant = name;
+  // Default to data tab
+  resMerchTabSwitch('data');
+  // Render waterfall (read-only)
+  var wfName = document.getElementById('res-wf-merch-name');
+  if (wfName) wfName.textContent = name;
+  // Seed mock data based on merchant name hash
+  var pool = 2000 + (name.length * 317 % 3800);
+  var vol  = '$' + (40 + name.length * 5) + 'K';
+  var net  = '$' + Math.round(pool * 0.58);
+  var poolEl = document.getElementById('res-wf-pool');
+  var volEl  = document.getElementById('res-wf-vol');
+  var netEl  = document.getElementById('res-wf-net');
+  if (poolEl) poolEl.textContent = '$' + pool.toLocaleString();
+  if (volEl)  volEl.textContent  = vol;
+  if (netEl)  netEl.textContent  = net;
+  // Render read-only waterfall
+  var container = document.getElementById('res-wf-entries');
+  if (container) {
+    // Use default waterfall entries, seeded
+    var entries = wfDefaultEntries();
+    // Add a random third entry for variety
+    var extras = [
+      { id:'ex1', name:'Sara Reyes', sub:'Rep · USR-002', type:'rep', initials:'SR', color:'#5B7A5E', rate:0.40, unit:'pct', locked:false },
+      { id:'ex2', name:'Rivermark',  sub:'Partner · PTR-0027', type:'partner', initials:'RM', color:'#A67C5B', rate:30, unit:'bp', locked:false },
+    ];
+    if (name.length % 2 === 0) entries.push(extras[0]);
+    else entries.push(extras[1]);
+
+    // Calculate cascade
+    var remaining = pool;
+    var calced = entries.map(function(e) {
+      var rate = e.unit === 'bp' ? e.rate / 10000 : e.rate / 100;
+      var payout = Math.round(remaining * rate * 100) / 100;
+      var inputPool = remaining;
+      remaining = Math.round((remaining - payout) * 100) / 100;
+      return { entry:e, payout:payout, inputPool:inputPool };
+    });
+    var house = Math.max(0, Math.round(remaining * 100) / 100);
+
+    var h = '';
+    calced.forEach(function(c, i) {
+      var e = c.entry;
+      var rateDisp = e.unit === 'bp' ? e.rate + ' bp' : e.rate.toFixed(2) + '%';
+      var lockedAttr = e.locked ? 'wf-locked' : '';
+      h += '<div class="wf-entry">'
+        + '<div class="wf-spine"><div class="wf-spine-top"></div><div class="wf-spine-dot"></div><div class="wf-spine-bot"></div></div>'
+        + '<div class="wf-card ' + lockedAttr + '">'
+        + '<div class="wf-card-hdr">'
+        + '<div class="wf-pos">' + (i+1) + '</div>'
+        + '<div class="p-avatar" style="background:' + e.color + ';width:26px;height:26px;font-size:10px;flex-shrink:0;">' + e.initials + '</div>'
+        + '<div style="flex:1;min-width:0;"><div class="wf-entity-name">' + e.name + '</div><div class="wf-entity-sub">' + e.sub + '</div></div>'
+        + (e.locked ? '<span class="wf-lock-badge">🔒 Locked</span>' : '<span style="font-size:10px;color:var(--text-muted);">' + (e.type === 'partner' ? 'Partner' : 'Rep') + '</span>')
+        + '</div>'
+        + '<div class="wf-card-body">'
+        + '<div class="wf-field"><div class="wf-field-label">Rate</div><div class="wf-field-val" style="font-size:16px;">' + rateDisp + '</div></div>'
+        + '<div class="wf-field"><div class="wf-field-label">Pool In</div><div class="wf-field-val">$' + c.inputPool.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+        + '<div class="wf-field"><div class="wf-field-label">Payout</div><div class="wf-field-val green">$' + c.payout.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+        + '<div class="wf-field"><div class="wf-field-label">Remaining</div><div class="wf-field-val">$' + Math.max(0,c.inputPool-c.payout).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+        + '</div></div></div>';
+    });
+    // House
+    h += '<div class="wf-entry">'
+      + '<div class="wf-spine"><div class="wf-spine-top"></div><div class="wf-spine-dot" style="background:var(--green);border-color:var(--green);"></div><div class="wf-spine-bot" style="visibility:hidden;"></div></div>'
+      + '<div class="wf-card wf-house">'
+      + '<div class="wf-card-hdr"><div class="wf-pos" style="background:var(--green);">' + (calced.length+1) + '</div>'
+      + '<div class="p-avatar" style="background:var(--green);width:26px;height:26px;font-size:10px;flex-shrink:0;">TW</div>'
+      + '<div style="flex:1;min-width:0;"><div class="wf-entity-name">Twill (House)</div><div class="wf-entity-sub">Remainder after all payouts</div></div>'
+      + '<span class="wf-lock-badge" style="background:rgba(91,122,94,0.15);color:var(--green);">🏠 House</span>'
+      + '</div>'
+      + '<div class="wf-card-body">'
+      + '<div class="wf-field"><div class="wf-field-label">Rate</div><div class="wf-field-val muted">Remainder</div></div>'
+      + '<div class="wf-field"><div class="wf-field-label">Pool In</div><div class="wf-field-val">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+      + '<div class="wf-field"><div class="wf-field-label">Payout</div><div class="wf-field-val green">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+      + '<div class="wf-field"><div class="wf-field-label">Remaining</div><div class="wf-field-val muted">$0.00</div></div>'
+      + '</div></div></div>';
+
+    container.innerHTML = h;
+  }
+}
+
+function resMerchTabSwitch(tab) {
+  var dataPanel = document.getElementById('res-modal-panel-data');
+  var wfPanel   = document.getElementById('res-modal-panel-waterfall');
+  var dataBtn   = document.getElementById('res-modal-tab-data');
+  var wfBtn     = document.getElementById('res-modal-tab-waterfall');
+  if (!dataPanel || !wfPanel) return;
+  var isData = tab === 'data';
+  dataPanel.style.display = isData ? 'block' : 'none';
+  wfPanel.style.display   = !isData ? 'flex' : 'none';
+  if (dataBtn) { dataBtn.style.background = isData ? 'var(--navy)' : 'none'; dataBtn.style.color = isData ? 'var(--yellow)' : 'var(--text-secondary)'; }
+  if (wfBtn)   { wfBtn.style.background   = !isData ? 'var(--navy)' : 'none'; wfBtn.style.color   = !isData ? 'var(--yellow)' : 'var(--text-secondary)'; }
+}
+
+function resGoToWaterfallEdit() {
+  // Close modal and navigate to merchant's Payout Waterfall tab
+  document.getElementById('res-merchant-modal').style.display = 'none';
+  var name = document.getElementById('res-merchant-modal')._currentMerchant || '';
+  // Navigate to merchant active view and open waterfall tab
+  showView('merchant-active', document.getElementById('nav-merchants'));
+  setTimeout(function() {
+    var wfTab = document.querySelector('.ma-nav-tab:last-child');
+    if (wfTab) wfTab.click();
+  }, 200);
 }
 
 function resFilterProcessor(val) {
