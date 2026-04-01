@@ -2353,12 +2353,42 @@
       <div class="body-row" style="flex-direction:column;overflow:auto;">
         <div style="padding:20px 24px 32px;display:flex;flex-direction:column;gap:14px;">
 
-          <!-- KPI strip -->
-          <div class="m-portfolio-summary" style="padding:16px 0 0;">
+          <!-- KPI strip — sales + comp metrics -->
+          <div class="m-portfolio-summary" style="padding:16px 0 0;grid-template-columns:repeat(9,1fr);">
             <div class="m-summary-stat" style="padding-left:20px;">
+              <div class="m-stat-label">Active Merchants</div>
+              <div class="m-stat-value" style="color:var(--green);" id="ud-kpi-active">34</div>
+              <div class="m-stat-sub">Under this rep</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">In Pipeline</div>
+              <div class="m-stat-value" style="color:var(--blue);" id="ud-kpi-pipe">8</div>
+              <div class="m-stat-sub">Pending activation</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Closed MTD</div>
+              <div class="m-stat-value" id="ud-kpi-closed">3</div>
+              <div class="m-stat-sub">New this month</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Avg TTV</div>
+              <div class="m-stat-value" id="ud-kpi-ttv">6.2d</div>
+              <div class="m-stat-sub">Time to first txn</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">MTD Volume</div>
+              <div class="m-stat-value" id="ud-kpi-vol">$412K</div>
+              <div class="m-stat-sub">Portfolio this month</div>
+            </div>
+            <div class="m-summary-stat">
+              <div class="m-stat-label">Churn Rate</div>
+              <div class="m-stat-value" style="color:var(--amber);" id="ud-kpi-churn">1.8%</div>
+              <div class="m-stat-sub">Trailing 90 days</div>
+            </div>
+            <div class="m-summary-stat">
               <div class="m-stat-label">MTD Earned</div>
               <div class="m-stat-value" style="color:var(--green);" id="ud-kpi-earned">$3,240</div>
-              <div class="m-stat-sub">Residuals this month</div>
+              <div class="m-stat-sub">Residuals</div>
             </div>
             <div class="m-summary-stat">
               <div class="m-stat-label">Residual %</div>
@@ -2366,24 +2396,48 @@
               <div class="m-stat-sub">Base rate</div>
             </div>
             <div class="m-summary-stat">
-              <div class="m-stat-label">Up-front Bonus</div>
-              <div class="m-stat-value" id="ud-kpi-bonus">$2,500</div>
-              <div class="m-stat-sub">Per new merchant</div>
-            </div>
-            <div class="m-summary-stat">
-              <div class="m-stat-label">Partner Overrides</div>
-              <div class="m-stat-value" id="ud-kpi-povr">4</div>
-              <div class="m-stat-sub">Active assignments</div>
-            </div>
-            <div class="m-summary-stat">
-              <div class="m-stat-label">Merchant Overrides</div>
-              <div class="m-stat-value" id="ud-kpi-movr">7</div>
-              <div class="m-stat-sub">Direct assignments</div>
-            </div>
-            <div class="m-summary-stat">
               <div class="m-stat-label">YTD Earned</div>
               <div class="m-stat-value" id="ud-kpi-ytd">$18,400</div>
               <div class="m-stat-sub">This year</div>
+            </div>
+          </div>
+
+          <!-- Sales metrics row: pipeline funnel + monthly closes chart -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+            <!-- Merchant Pipeline stages -->
+            <div class="sc gray" style="margin-bottom:0;">
+              <div class="sc-hdr gray">
+                <div class="sc-hdr-left"><span class="sc-icon">&#8594;</span>
+                  <div><div class="sc-title">Merchant Pipeline</div><div class="sc-desc" id="ud-pipe-desc">8 in progress</div></div>
+                </div>
+              </div>
+              <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;" id="ud-pipeline-stages">
+                <!-- populated by JS -->
+              </div>
+            </div>
+
+            <!-- Monthly closes + volume trend -->
+            <div class="sc gray" style="margin-bottom:0;">
+              <div class="sc-hdr gray">
+                <div class="sc-hdr-left"><span class="sc-icon">&#9650;</span>
+                  <div><div class="sc-title">Performance — Last 6 Months</div></div>
+                </div>
+              </div>
+              <div style="padding:16px 20px;height:180px;"><canvas id="ud-perf-chart"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Managed Partners tile -->
+          <div class="sc gray" style="margin-bottom:0;">
+            <div class="sc-hdr gray">
+              <div class="sc-hdr-left"><span class="sc-icon">&#9670;</span>
+                <div><div class="sc-title">Managed Partners</div><div class="sc-desc">Partners this rep is responsible for</div></div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="addManagedPartnerRow()">+ Add Partner</button>
+            </div>
+            <div style="padding:0 16px 12px;" id="ud-managed-partners">
+              <!-- populated by JS -->
             </div>
           </div>
 
@@ -26687,25 +26741,48 @@ function openAlertByMerchant(merchantName) {
 const usersData = [
   { id:'USR-001', name:'James Carter',  initials:'JC', color:'#6366F1', dept:'Sales',     type:'Owner', email:'james@twill.io', phone:'(310) 555-0182', joined:'Jan 8, 2025',
     seeRes:true, payouts:true, resPct:'1.20%', bonus:'$2,500', cycle:'Net 30', earned:'$3,240', ytd:'$18,400',
+    active:34, pipeline:8, closedMtd:3, ttv:'6.2d', vol:'$412K', churn:'1.8%',
+    pipeStages:[{label:'Lead',count:3},{label:'Applied',count:2},{label:'Underwriting',count:1},{label:'Boarding',count:2}],
+    perfCloses:[1,2,3,2,4,3], perfVol:[280,310,370,340,400,412],
+    managedPartners:[{name:'Apex Elite',id:'PTR-0042',merchants:218,vol:'$921K',color:'#6B839B',initials:'AE'},{name:'NovaPay',id:'PTR-0038',merchants:157,vol:'$641K',color:'#5B7A5E',initials:'NV'}],
     partnerOverrides:[{name:'Apex Elite',pct:'1.40%'},{name:'NovaPay',pct:'1.25%'},{name:'Summit Lending',pct:'1.10%'},{name:'Rivermark',pct:'1.00%'}],
     merchantOverrides:[{name:'Harbor Bistro',pct:'1.60%'},{name:'Lakeview Dental',pct:'1.45%'},{name:'Green Valley Market',pct:'1.35%'}] },
   { id:'USR-002', name:'Sara Reyes',    initials:'SR', color:'#5B7A5E', dept:'Sales',     type:'Rep',   email:'sara@twill.io',  phone:'(424) 555-0044', joined:'Mar 15, 2025',
     seeRes:true, payouts:true, resPct:'0.85%', bonus:'$1,000', cycle:'Net 30', earned:'$1,820', ytd:'$9,200',
+    active:19, pipeline:4, closedMtd:2, ttv:'7.1d', vol:'$188K', churn:'2.4%',
+    pipeStages:[{label:'Lead',count:2},{label:'Applied',count:1},{label:'Underwriting',count:1},{label:'Boarding',count:0}],
+    perfCloses:[1,1,2,1,3,2], perfVol:[110,130,155,140,180,188],
+    managedPartners:[{name:'NovaPay',id:'PTR-0038',merchants:157,vol:'$641K',color:'#5B7A5E',initials:'NV'}],
     partnerOverrides:[{name:'NovaPay',pct:'0.90%'},{name:'Rivermark',pct:'0.80%'}],
     merchantOverrides:[] },
   { id:'USR-003', name:'Dan Mitchell',  initials:'DM', color:'#6B839B', dept:'Operations',type:'Rep',   email:'dan@twill.io',   phone:'(213) 555-0091', joined:'Jun 2, 2024',
-    seeRes:true, payouts:true, resPct:'0.70%', bonus:null,     cycle:'Net 45', earned:'$940',  ytd:'$6,100',
+    seeRes:true, payouts:true, resPct:'0.70%', bonus:null, cycle:'Net 45', earned:'$940', ytd:'$6,100',
+    active:12, pipeline:2, closedMtd:1, ttv:'8.4d', vol:'$143K', churn:'1.2%',
+    pipeStages:[{label:'Lead',count:1},{label:'Applied',count:1},{label:'Underwriting',count:0},{label:'Boarding',count:0}],
+    perfCloses:[0,1,1,2,1,1], perfVol:[90,105,120,130,138,143],
+    managedPartners:[{name:'Summit Lending',id:'PTR-0031',merchants:184,vol:'$784K',color:'#8C7A5E',initials:'SL'}],
     partnerOverrides:[{name:'Summit Lending',pct:'0.75%'}],
     merchantOverrides:[{name:'Pines Auto Group',pct:'0.80%'}] },
   { id:'USR-004', name:'Mike Wright',   initials:'MW', color:'#FFDE00', dept:'Executive', type:'Owner', email:'mike@twill.io',  phone:'(310) 555-0001', joined:'Jan 1, 2024',
     seeRes:true, payouts:true, resPct:'1.50%', bonus:'$5,000', cycle:'Net 30', earned:'$6,100', ytd:'$38,400',
+    active:94, pipeline:21, closedMtd:7, ttv:'5.8d', vol:'$3.1M', churn:'1.4%',
+    pipeStages:[{label:'Lead',count:8},{label:'Applied',count:6},{label:'Underwriting',count:4},{label:'Boarding',count:3}],
+    perfCloses:[4,5,6,7,8,7], perfVol:[2200,2500,2700,2900,3000,3100],
+    managedPartners:[{name:'Apex Elite',id:'PTR-0042',merchants:218,vol:'$921K',color:'#6B839B',initials:'AE'},{name:'NovaPay',id:'PTR-0038',merchants:157,vol:'$641K',color:'#5B7A5E',initials:'NV'},{name:'Summit Lending',id:'PTR-0031',merchants:184,vol:'$784K',color:'#8C7A5E',initials:'SL'},{name:'Rivermark',id:'PTR-0027',merchants:132,vol:'$512K',color:'#A67C5B',initials:'RM'},{name:'Coastal Commerce',id:'PTR-0019',merchants:94,vol:'$391K',color:'#9B6B5B',initials:'CC'}],
     partnerOverrides:[{name:'All Partners',pct:'1.50%'}],
     merchantOverrides:[] },
   { id:'USR-005', name:'Blake Chen',    initials:'BC', color:'#9B6B5B', dept:'Support',   type:'Rep',   email:'blake@twill.io', phone:'(818) 555-0072', joined:'Sep 19, 2024',
     seeRes:false, payouts:false, resPct:null, bonus:null, cycle:null, earned:'$0', ytd:'$0',
+    active:0, pipeline:0, closedMtd:0, ttv:'—', vol:'—', churn:'—',
+    pipeStages:[], perfCloses:[0,0,0,0,0,0], perfVol:[0,0,0,0,0,0],
+    managedPartners:[],
     partnerOverrides:[], merchantOverrides:[] },
   { id:'USR-006', name:'Tara Patel',    initials:'TP', color:'#A67C5B', dept:'Sales',     type:'Rep',   email:'tara@twill.io',  phone:'(562) 555-0033', joined:'Feb 11, 2024',
-    seeRes:true, payouts:true, resPct:'0.60%', bonus:'$500',   cycle:'Net 30', earned:'$720',  ytd:'$4,520',
+    seeRes:true, payouts:true, resPct:'0.60%', bonus:'$500', cycle:'Net 30', earned:'$720', ytd:'$4,520',
+    active:8, pipeline:3, closedMtd:1, ttv:'9.0d', vol:'$62K', churn:'3.1%',
+    pipeStages:[{label:'Lead',count:2},{label:'Applied',count:1},{label:'Boarding',count:0},{label:'Underwriting',count:0}],
+    perfCloses:[0,1,0,1,1,1], perfVol:[40,45,52,55,60,62],
+    managedPartners:[{name:'Coastal Commerce',id:'PTR-0019',merchants:94,vol:'$391K',color:'#9B6B5B',initials:'CC'}],
     partnerOverrides:[{name:'Coastal Commerce',pct:'0.65%'}],
     merchantOverrides:[{name:'Metro Print Shop',pct:'0.70%'}] },
 ];
@@ -26733,12 +26810,64 @@ function openUserDetail(name) {
   const badge = document.getElementById('ud-type-badge');
   if (badge) { badge.textContent = u.type; badge.className = 'p-badge ' + (u.type === 'Owner' ? 'bb' : ''); badge.style.background = u.type === 'Owner' ? '' : 'rgba(91,122,94,0.12)'; badge.style.color = u.type === 'Owner' ? '' : '#5B7A5E'; }
   setEl('ud-meta', u.id + ' \u00b7 ' + u.dept);
+  setEl('ud-kpi-active', u.active || '0');
+  setEl('ud-kpi-pipe', u.pipeline || '0');
+  setEl('ud-kpi-closed', u.closedMtd || '0');
+  setEl('ud-kpi-ttv', u.ttv || '—');
+  setEl('ud-kpi-vol', u.vol || '—');
+  setEl('ud-kpi-churn', u.churn || '—');
   setEl('ud-kpi-earned', u.earned);
   setEl('ud-kpi-res', u.resPct || '—');
-  setEl('ud-kpi-bonus', u.bonus || '—');
-  setEl('ud-kpi-povr', u.partnerOverrides.length);
-  setEl('ud-kpi-movr', u.merchantOverrides.length);
   setEl('ud-kpi-ytd', u.ytd);
+
+  // Pipeline stages
+  var pipeEl = document.getElementById('ud-pipeline-stages');
+  var pipeDesc = document.getElementById('ud-pipe-desc');
+  if (pipeEl) {
+    if (!u.pipeStages || !u.pipeStages.length) {
+      pipeEl.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">No pipeline activity</div>';
+    } else {
+      var maxCount = Math.max.apply(null, u.pipeStages.map(function(s){return s.count;})) || 1;
+      pipeEl.innerHTML = u.pipeStages.map(function(s) {
+        var pct = Math.round((s.count / maxCount) * 100);
+        return '<div style="display:flex;align-items:center;gap:12px;">'
+          + '<div style="width:88px;font-size:11px;color:var(--text-secondary);flex-shrink:0;">' + s.label + '</div>'
+          + '<div style="flex:1;height:8px;background:var(--bg-hover);border-radius:4px;overflow:hidden;">'
+          + '<div style="width:' + pct + '%;height:100%;background:var(--navy);border-radius:4px;"></div></div>'
+          + '<div style="width:24px;text-align:right;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text-primary);">' + s.count + '</div>'
+          + '</div>';
+      }).join('');
+    }
+    if (pipeDesc) pipeDesc.textContent = (u.pipeline || 0) + ' in progress';
+  }
+
+  // Managed partners
+  var mpEl = document.getElementById('ud-managed-partners');
+  if (mpEl) {
+    if (!u.managedPartners || !u.managedPartners.length) {
+      mpEl.innerHTML = '<div style="padding:12px 0;font-size:12px;color:var(--text-muted);">No partners assigned — click + Add Partner to assign one.</div>';
+    } else {
+      mpEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
+        + '<thead><tr style="border-bottom:1px solid var(--border);">'
+        + '<th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;letter-spacing:.05em;">Partner</th>'
+        + '<th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;">Merchants</th>'
+        + '<th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;">MTD Vol</th>'
+        + '<th style="width:32px;"></th>'
+        + '</tr></thead><tbody>'
+        + u.managedPartners.map(function(p) {
+          return '<tr style="border-bottom:1px solid var(--border);">'
+            + '<td style="padding:9px 0;"><div style="display:flex;align-items:center;gap:8px;">'
+            + '<div class="p-avatar" style="background:' + p.color + ';width:22px;height:22px;font-size:9px;flex-shrink:0;">' + p.initials + '</div>'
+            + '<div><div style="font-size:13px;font-weight:500;">' + p.name + '</div>'
+            + '<div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">' + p.id + '</div></div>'
+            + '</div></td>'
+            + '<td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;">' + p.merchants + '</td>'
+            + '<td style="padding:9px 0;text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--green);">' + p.vol + '</td>'
+            + '<td style="text-align:center;"><button class="ud-del-row" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>'
+            + '</tr>';
+        }).join('') + '</tbody></table>';
+    }
+  }
   setEl('ud-email', u.email);
   setEl('ud-phone', u.phone);
   setEl('ud-dept', u.dept);
@@ -26770,19 +26899,40 @@ function openUserDetail(name) {
   if (mRows) mRows.innerHTML = buildRows(u.merchantOverrides, 'var(--blue)');
 
   setTimeout(function() {
-    const ctx = document.getElementById('ud-residuals-chart');
+    var ctx = document.getElementById('ud-perf-chart');
     if (!ctx || typeof Chart === 'undefined') return;
     if (ctx._chartInstance) ctx._chartInstance.destroy();
-    const months = ['Oct','Nov','Dec','Jan','Feb','Mar'];
-    const base = parseFloat((u.resPct||'0').replace('%','')) || 0;
-    const data = months.map(function() { return Math.round(base * 1000 * (0.7 + Math.random()*0.6) * 10) / 10; });
+    var months = ['Oct','Nov','Dec','Jan','Feb','Mar'];
     ctx._chartInstance = new Chart(ctx, {
       type: 'bar',
-      data: { labels: months, datasets: [{ data: data, backgroundColor: 'rgba(34,46,72,0.18)', borderColor: 'rgba(34,46,72,0.5)', borderWidth: 1, borderRadius: 3 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: '#787774', font: { size: 10 } } }, y: { grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false }, ticks: { color: '#787774', font: { size: 10 }, callback: function(v) { return '$' + v; } } } } }
+      data: { labels: months, datasets: [
+        { label: 'Closes', data: u.perfCloses || [0,0,0,0,0,0], backgroundColor: 'rgba(34,46,72,0.7)', borderRadius: 3, yAxisID: 'y1' },
+        { label: 'Volume ($K)', data: (u.perfVol || [0,0,0,0,0,0]).map(function(v){return v > 1000 ? Math.round(v/1000*10)/10 : v;}), type:'line', borderColor:'var(--yellow)', borderWidth:2, pointRadius:3, pointBackgroundColor:'var(--yellow)', tension:0.3, fill:false, yAxisID:'y2' }
+      ]},
+      options: { responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:true, position:'top', labels:{ boxWidth:10, font:{size:10}, color:'#787774' } } },
+        scales:{
+          x:{ grid:{display:false}, border:{display:false}, ticks:{color:'#787774',font:{size:10}} },
+          y1:{ position:'left', grid:{color:'rgba(0,0,0,0.05)'}, border:{display:false}, ticks:{color:'#787774',font:{size:10},stepSize:1} },
+          y2:{ position:'right', grid:{display:false}, border:{display:false}, ticks:{color:'#787774',font:{size:10}, callback:function(v){return '$'+v+'K';}} }
+        }
+      }
     });
   }, 80);
 
+  setTimeout(function() {
+    var ctx2 = document.getElementById('ud-residuals-chart');
+    if (!ctx2 || typeof Chart === 'undefined') return;
+    if (ctx2._chartInstance) ctx2._chartInstance.destroy();
+    var months = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+    var base = parseFloat((u.resPct||'0').replace('%','')) || 0;
+    var data = months.map(function() { return Math.round(base * 1000 * (0.7 + Math.random()*0.6) * 10) / 10; });
+    ctx2._chartInstance = new Chart(ctx2, {
+      type:'bar',
+      data:{labels:months,datasets:[{data:data,backgroundColor:'rgba(91,122,94,0.25)',borderColor:'var(--green)',borderWidth:1,borderRadius:3}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#787774',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},border:{display:false},ticks:{color:'#787774',font:{size:10},callback:function(v){return '$'+v;}}}}}
+    });
+  }, 120);
   showView('user-detail', null);
 }
 
@@ -26885,6 +27035,26 @@ document.addEventListener('click', function(e) {
     e.target.closest('tr').remove();
   }
 });
+
+function addManagedPartnerRow() {
+  var el = document.getElementById('ud-managed-partners');
+  if (!el) return;
+  var tbl = el.querySelector('table');
+  if (!tbl) {
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse;"><thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;letter-spacing:.05em;">Partner</th><th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;">Merchants</th><th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);padding:8px 0;text-transform:uppercase;">MTD Vol</th><th style="width:32px;"></th></tr></thead><tbody id="ud-mp-rows"></tbody></table>';
+    tbl = el.querySelector('table');
+  }
+  var tbody = tbl.querySelector('tbody') || tbl;
+  var partners = ['Apex Elite','NovaPay','Summit Lending','Rivermark','Coastal Commerce'];
+  var opts = partners.map(function(p){return '<option>'+p+'</option>';}).join('');
+  var tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid var(--border)';
+  tr.innerHTML = '<td style="padding:7px 0;"><select style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:5px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-ui);outline:none;">'+opts+'</select></td>'
+    + '<td style="padding:7px 0;text-align:right;font-size:12px;color:var(--text-muted);">—</td>'
+    + '<td style="padding:7px 0;text-align:right;font-size:12px;color:var(--text-muted);">—</td>'
+    + '<td style="text-align:center;"><button class="ud-del-row" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;">&#10005;</button></td>';
+  tbody.appendChild(tr);
+}
 </script>
 <style id="alerts-css">
 /* ── Alerts view: amber accent header ─── */
