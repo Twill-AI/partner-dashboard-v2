@@ -1618,9 +1618,9 @@
           <div class="card">
             <div class="card-header"><div><div class="card-title">Alerts</div><div class="card-sub">9 merchants with active alerts</div></div><button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="showView('alerts', document.getElementById('nav-alerts'))">View All</button></div>
             <div class="card-body scroll">
-              <div class="alert-item" onclick="navToMerchant('Harbor Bistro')"><div class="alert-icon chargeback">⚠️</div><div class="alert-meta"><div class="alert-merchant">Harbor Bistro <span class="p-badge badge-warn">Chargeback</span></div><div class="alert-desc">CB ratio 1.8% · Coastal</div></div><div class="alert-time">4m ago</div></div>
+              <div class="alert-item" onclick="openAlertByMerchant('Harbor Bistro')"><div class="alert-icon chargeback">⚠️</div><div class="alert-meta"><div class="alert-merchant">Harbor Bistro <span class="p-badge badge-warn">Chargeback</span></div><div class="alert-desc">CB ratio 1.8% · Coastal</div></div><div class="alert-time">4m ago</div></div>
               <div class="alert-item" onclick="openAlertByMerchant('Pines Auto Group')"><div class="alert-icon batch">🕐</div><div class="alert-meta"><div class="alert-merchant">Pines Auto Group <span class="p-badge badge-amber">No Batch</span></div><div class="alert-desc">No batch in 3 days · Apex Elite</div></div><div class="alert-time">18m ago</div></div>
-              <div class="alert-item" onclick="navToMerchant('Green Valley Market')"><div class="alert-icon volume">📉</div><div class="alert-meta"><div class="alert-merchant">Green Valley Market <span class="p-badge badge-purple">Vol Drop</span></div><div class="alert-desc">Volume down 42% WoW · NovaPay</div></div><div class="alert-time">1h ago</div></div>
+              <div class="alert-item" onclick="openAlertByMerchant('Green Valley Market')"><div class="alert-icon volume">📉</div><div class="alert-meta"><div class="alert-merchant">Green Valley Market <span class="p-badge badge-purple">Vol Drop</span></div><div class="alert-desc">Volume down 42% WoW · NovaPay</div></div><div class="alert-time">1h ago</div></div>
               <div class="alert-item" onclick="openAlertByMerchant('Lakeview Dental')"><div class="alert-icon auth">🔵</div><div class="alert-meta"><div class="alert-merchant">Lakeview Dental <span class="p-badge badge-blue">Auth Rate</span></div><div class="alert-desc">Auth rate dropped to 88% · Summit</div></div><div class="alert-time">2h ago</div></div>
               <div class="alert-item" onclick="openAlertByMerchant('Metro Print Shop')"><div class="alert-icon chargeback">⚠️</div><div class="alert-meta"><div class="alert-merchant">Metro Print Shop <span class="p-badge badge-warn">Chargeback</span></div><div class="alert-desc">2 new chargebacks today · Rivermark</div></div><div class="alert-time">3h ago</div></div>
               <div class="alert-item" onclick="openAlertByMerchant('Sunrise Cafe')"><div class="alert-icon batch">🕐</div><div class="alert-meta"><div class="alert-merchant">Sunrise Cafe <span class="p-badge badge-amber">No Batch</span></div><div class="alert-desc">No batch in 5 days · Apex Elite</div></div><div class="alert-time">4h ago</div></div>
@@ -26158,21 +26158,22 @@ document.addEventListener('keydown', function(e) {
 function openAlertByMerchant(merchantName) {
   showView('alerts', document.getElementById('nav-alerts'));
   setTimeout(function() {
-    renderAlertList(null);
-    setTimeout(function() {
-      var rows = document.querySelectorAll('.alert-trow');
-      var matched = false;
-      rows.forEach(function(row) {
-        var sub = row.querySelector('.alert-trow-sub');
-        if (sub && sub.textContent.includes(merchantName)) {
-          row.click();
-          row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          matched = true;
-        }
-      });
-      if (!matched && rows.length) rows[0].click();
-    }, 80);
-  }, 40);
+    var rows = document.querySelectorAll('#alert-list .alert-trow');
+    var matched = false;
+    rows.forEach(function(row) {
+      if (matched) return;
+      var title = row.querySelector('.alert-trow-title');
+      var sub   = row.querySelector('.alert-trow-sub');
+      var inTitle = title && title.textContent.includes(merchantName);
+      var inSub   = sub   && sub.textContent.includes(merchantName);
+      if (inTitle || inSub) {
+        row.click();
+        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        matched = true;
+      }
+    });
+    if (!matched && rows.length) rows[0].click();
+  }, 80);
 }
 
 /* Auto-open first alert when Alerts view becomes visible */
