@@ -1459,6 +1459,16 @@
 .wf-net-val { font-size:20px; font-weight:700; font-family:var(--font-mono); color:var(--text-primary); }
 .wf-net-input { background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:6px; padding:6px 10px; font-size:16px; font-family:var(--font-mono); color:var(--text-primary); outline:none; width:120px; }
 .wf-net-input:focus { border-color:var(--yellow); }
+
+/* ── Residuals merchant accordion ─────────────── */
+.res-merch-accordion td { background: rgba(34,46,72,0.02); }
+.res-merch-wf-panel { padding: 16px 20px 20px 40px; }
+.res-merch-wf-panel .wf-card { font-size: 12px; }
+.res-merch-wf-panel .wf-card-body { grid-template-columns: repeat(4, 1fr); }
+.res-merch-wf-panel .wf-card-hdr { padding: 9px 12px; }
+.res-merch-wf-panel .wf-field { padding: 8px 12px; }
+.res-merch-wf-panel .wf-field-val { font-size: 13px; }
+tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg); color: var(--yellow); }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -6531,6 +6541,7 @@
               <table class="res-table" id="res-merchant-table">
                 <thead>
                   <tr>
+                    <th style="text-align:left;width:22px;"></th>
                     <th style="text-align:left;">Merchant</th>
                     <th>Processor</th>
                     <th>Volume</th>
@@ -6543,21 +6554,36 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr data-health="risk" data-proc="Fiserv" data-audit="1"><td style="text-align:left;"><strong>JoeCo Enterprises</strong></td><td>Fiserv</td><td>$28,100</td><td style="color:var(--red);">-67%</td><td>$890</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>S. Kim</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('JoeCo Enterprises')">View</button></td></tr>
-                  <tr data-health="risk" data-proc="Paysafe" data-audit="0"><td style="text-align:left;"><strong>Bright Star Auto</strong></td><td>Paysafe</td><td>$0</td><td style="color:var(--red);">-100%</td><td>$0</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span style="color:var(--text-muted);">—</span></td><td>A. Fry</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Bright Star Auto')">View</button></td></tr>
-                  <tr data-health="risk" data-proc="Paysafe" data-audit="0"><td style="text-align:left;"><strong>Summit Fitness</strong></td><td>Paysafe</td><td>$0</td><td style="color:var(--red);">-100%</td><td>$0</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span style="color:var(--text-muted);">—</span></td><td>L. Pierce</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Summit Fitness')">View</button></td></tr>
-                  <tr data-health="risk" data-proc="TSYS" data-audit="1"><td style="text-align:left;"><strong>Oceanview Grill</strong></td><td>TSYS</td><td>$12,400</td><td style="color:var(--red);">-41%</td><td>$340</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>D. Martinez</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Oceanview Grill')">View</button></td></tr>
-                  <tr data-health="watch" data-proc="Fiserv" data-audit="1"><td style="text-align:left;"><strong>ABC Corp</strong></td><td>Fiserv</td><td>$84,200</td><td style="color:var(--red);">-34%</td><td>$2,410</td><td><span class="p-badge badge-amber">Watch</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>A. Fry</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('ABC Corp')">View</button></td></tr>
-                  <tr data-health="watch" data-proc="Paysafe" data-audit="0"><td style="text-align:left;"><strong>Valley Pet Care</strong></td><td>Paysafe</td><td>$18,900</td><td style="color:var(--red);">-22%</td><td>$610</td><td><span class="p-badge badge-amber">Watch</span></td><td><span style="color:var(--text-muted);">—</span></td><td>M. Reed</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Valley Pet Care')">View</button></td></tr>
-                  <tr data-health="watch" data-proc="TSYS" data-audit="0"><td style="text-align:left;"><strong>Golden Gate Bakery</strong></td><td>TSYS</td><td>$31,200</td><td style="color:var(--red);">-18%</td><td>$1,120</td><td><span class="p-badge badge-amber">Watch</span></td><td><span style="color:var(--text-muted);">—</span></td><td>T. Chaviza</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Golden Gate Bakery')">View</button></td></tr>
-                  <tr data-health="watch" data-proc="WorldPay" data-audit="1"><td style="text-align:left;"><strong>Downtown Deli</strong></td><td>WorldPay</td><td>$22,100</td><td style="color:var(--red);">-15%</td><td>$780</td><td><span class="p-badge badge-amber">Watch</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>J. Wilson</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Downtown Deli')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="TSYS" data-audit="0"><td style="text-align:left;"><strong>Hobbies Mini Mart</strong></td><td>TSYS</td><td>$1,240,000</td><td style="color:var(--green);">+2.1%</td><td style="color:var(--green);">$15,330</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>L. Pierce</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Hobbies Mini Mart')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="Fiserv" data-audit="1"><td style="text-align:left;"><strong>Merchant Demo Corp</strong></td><td>Fiserv</td><td>$892,000</td><td style="color:var(--green);">+3.4%</td><td style="color:var(--green);">$4,912</td><td><span class="p-badge badge-green">Healthy</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>A. Fry</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Merchant Demo Corp')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="TSYS" data-audit="1"><td style="text-align:left;"><strong>Gorgeous Cosmetics</strong></td><td>TSYS</td><td>$410,000</td><td style="color:var(--green);">+1.8%</td><td style="color:var(--green);">$3,744</td><td><span class="p-badge badge-green">Healthy</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>T. Chaviza</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Gorgeous Cosmetics')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="Paysafe" data-audit="0"><td style="text-align:left;"><strong>Addicted Convenience</strong></td><td>Paysafe</td><td>$186,000</td><td style="color:var(--green);">+0.9%</td><td style="color:var(--green);">$2,418</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>M. Reed</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Addicted Convenience')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="TSYS" data-audit="0"><td style="text-align:left;"><strong>Best Travel Agency</strong></td><td>TSYS</td><td>$205,000</td><td style="color:var(--green);">+4.2%</td><td style="color:var(--green);">$2,311</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>L. Pierce</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Best Travel Agency')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="WorldPay" data-audit="0"><td style="text-align:left;"><strong>Lakeside Dental</strong></td><td>WorldPay</td><td>$178,000</td><td style="color:var(--green);">+1.2%</td><td style="color:var(--green);">$2,189</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>R. Johnson</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Lakeside Dental')">View</button></td></tr>
-                  <tr data-health="healthy" data-proc="Fiserv" data-audit="0"><td style="text-align:left;"><strong>Metro Auto Parts</strong></td><td>Fiserv</td><td>$152,000</td><td style="color:var(--green);">+2.8%</td><td style="color:var(--green);">$1,870</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>J. Wilson</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="showMerchantDetail('Metro Auto Parts')">View</button></td></tr>
+                  <tr data-health="risk" data-proc="Fiserv" data-audit="1" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>JoeCo Enterprises</strong></td><td>Fiserv</td><td>$28,100</td><td style="color:var(--red);">-67%</td><td>$890</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>S. Kim</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('JoeCo Enterprises')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="JoeCo Enterprises" data-pool="3589"></div></td></tr>
+                  <tr data-health="risk" data-proc="Paysafe" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Bright Star Auto</strong></td><td>Paysafe</td><td>$0</td><td style="color:var(--red);">-100%</td><td>$0</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span style="color:var(--text-muted);">—</span></td><td>A. Fry</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Bright Star Auto')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Bright Star Auto" data-pool="3272"></div></td></tr>
+                  <tr data-health="risk" data-proc="Paysafe" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Summit Fitness</strong></td><td>Paysafe</td><td>$0</td><td style="color:var(--red);">-100%</td><td>$0</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span style="color:var(--text-muted);">—</span></td><td>L. Pierce</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Summit Fitness')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Summit Fitness" data-pool="2638"></div></td></tr>
+                  <tr data-health="risk" data-proc="TSYS" data-audit="1" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Oceanview Grill</strong></td><td>TSYS</td><td>$12,400</td><td style="color:var(--red);">-41%</td><td>$340</td><td><span class="p-badge badge-warn">At Risk</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>D. Martinez</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Oceanview Grill')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Oceanview Grill" data-pool="2955"></div></td></tr>
+                  <tr data-health="watch" data-proc="Fiserv" data-audit="1" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>ABC Corp</strong></td><td>Fiserv</td><td>$84,200</td><td style="color:var(--red);">-34%</td><td>$2,410</td><td><span class="p-badge badge-amber">Watch</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>A. Fry</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('ABC Corp')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="ABC Corp" data-pool="4536"></div></td></tr>
+                  <tr data-health="watch" data-proc="Paysafe" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Valley Pet Care</strong></td><td>Paysafe</td><td>$18,900</td><td style="color:var(--red);">-22%</td><td>$610</td><td><span class="p-badge badge-amber">Watch</span></td><td><span style="color:var(--text-muted);">—</span></td><td>M. Reed</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Valley Pet Care')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Valley Pet Care" data-pool="2955"></div></td></tr>
+                  <tr data-health="watch" data-proc="TSYS" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Golden Gate Bakery</strong></td><td>TSYS</td><td>$31,200</td><td style="color:var(--red);">-18%</td><td>$1,120</td><td><span class="p-badge badge-amber">Watch</span></td><td><span style="color:var(--text-muted);">—</span></td><td>T. Chaviza</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Golden Gate Bakery')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Golden Gate Bakery" data-pool="3906"></div></td></tr>
+                  <tr data-health="watch" data-proc="WorldPay" data-audit="1" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Downtown Deli</strong></td><td>WorldPay</td><td>$22,100</td><td style="color:var(--red);">-15%</td><td>$780</td><td><span class="p-badge badge-amber">Watch</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>J. Wilson</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Downtown Deli')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Downtown Deli" data-pool="2321"></div></td></tr>
+                  <tr data-health="healthy" data-proc="TSYS" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Hobbies Mini Mart</strong></td><td>TSYS</td><td>$1,240,000</td><td style="color:var(--green);">+2.1%</td><td style="color:var(--green);">$15,330</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>L. Pierce</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Hobbies Mini Mart')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Hobbies Mini Mart" data-pool="3589"></div></td></tr>
+                  <tr data-health="healthy" data-proc="Fiserv" data-audit="1" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Merchant Demo Corp</strong></td><td>Fiserv</td><td>$892,000</td><td style="color:var(--green);">+3.4%</td><td style="color:var(--green);">$4,912</td><td><span class="p-badge badge-green">Healthy</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>A. Fry</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Merchant Demo Corp')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Merchant Demo Corp" data-pool="3906"></div></td></tr>
+                  <tr data-health="healthy" data-proc="TSYS" data-audit="1" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Gorgeous Cosmetics</strong></td><td>TSYS</td><td>$410,000</td><td style="color:var(--green);">+1.8%</td><td style="color:var(--green);">$3,744</td><td><span class="p-badge badge-green">Healthy</span></td><td><span class="p-badge badge-warn" style="font-size:10px;">Mismatch</span></td><td>T. Chaviza</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Gorgeous Cosmetics')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Gorgeous Cosmetics" data-pool="3906"></div></td></tr>
+                  <tr data-health="healthy" data-proc="Paysafe" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Addicted Convenience</strong></td><td>Paysafe</td><td>$186,000</td><td style="color:var(--green);">+0.9%</td><td style="color:var(--green);">$2,418</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>M. Reed</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Addicted Convenience')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Addicted Convenience" data-pool="4540"></div></td></tr>
+                  <tr data-health="healthy" data-proc="TSYS" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Best Travel Agency</strong></td><td>TSYS</td><td>$205,000</td><td style="color:var(--green);">+4.2%</td><td style="color:var(--green);">$2,311</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>L. Pierce</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Best Travel Agency')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Best Travel Agency" data-pool="3906"></div></td></tr>
+                  <tr data-health="healthy" data-proc="WorldPay" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Lakeside Dental</strong></td><td>WorldPay</td><td>$178,000</td><td style="color:var(--green);">+1.2%</td><td style="color:var(--green);">$2,189</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>R. Johnson</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Lakeside Dental')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Lakeside Dental" data-pool="2955"></div></td></tr>
+                  <tr data-health="healthy" data-proc="Fiserv" data-audit="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Metro Auto Parts</strong></td><td>Fiserv</td><td>$152,000</td><td style="color:var(--green);">+2.8%</td><td style="color:var(--green);">$1,870</td><td><span class="p-badge badge-green">Healthy</span></td><td><span style="color:var(--text-muted);">—</span></td><td>J. Wilson</td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();showMerchantDetail('Metro Auto Parts')">View</button></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Metro Auto Parts" data-pool="3272"></div></td></tr>
                 </tbody>
               </table>
             </div>
@@ -6683,6 +6709,12 @@
                 <th style="position:sticky;top:0;background:var(--bg-elevated);z-index:2;">Agent Split %</th>
                 <th style="position:sticky;top:0;background:var(--bg-elevated);z-index:2;">Agent Net Split</th>
                 <th style="position:sticky;top:0;background:var(--bg-elevated);z-index:2;border-left:2px solid rgba(0,0,0,0.08);">V/MC/D+Amex BIN% Sub</th>
+                <th style="position:sticky;top:0;background:rgba(34,46,72,0.06);z-index:2;border-left:3px solid rgba(34,46,72,0.2);color:var(--yellow);white-space:nowrap;">💧 #1 Partner</th>
+                <th style="position:sticky;top:0;background:rgba(34,46,72,0.06);z-index:2;color:var(--yellow);white-space:nowrap;">Payout #1</th>
+                <th style="position:sticky;top:0;background:rgba(34,46,72,0.06);z-index:2;color:var(--yellow);white-space:nowrap;">💧 #2 Rep</th>
+                <th style="position:sticky;top:0;background:rgba(34,46,72,0.06);z-index:2;color:var(--yellow);white-space:nowrap;">Payout #2</th>
+                <th style="position:sticky;top:0;background:rgba(34,46,72,0.06);z-index:2;color:var(--yellow);white-space:nowrap;">Remaining</th>
+                <th style="position:sticky;top:0;background:rgba(34,46,72,0.06);z-index:2;color:var(--green);white-space:nowrap;">🏠 House</th>
                 <th style="position:sticky;top:0;background:var(--bg-elevated);z-index:2;">V/MC/D BIN% Sub</th>
                 <th style="position:sticky;top:0;background:var(--bg-elevated);z-index:2;">Amex BIN% Sub</th>
                 <th style="position:sticky;top:0;background:var(--bg-elevated);z-index:2;">PIN Dbt% Sub</th>
@@ -6751,7 +6783,7 @@
                   <td style="border-left:2px solid rgba(0,0,0,0.05);">$428</td><td>$321</td><td>$107</td><td>$67</td><td>$429</td><td>$322</td><td>$107</td><td>$67</td><td>$19</td><td>$10</td><td>$107</td><td>$0</td><td>$23</td><td>$61</td><td>$8</td><td>$14</td><td>$18</td><td>$92</td><td>$21</td><td>$0</td><td>$43</td><td>$11</td><td>$60</td><td>$71</td><td>$5</td><td>$18</td><td>$48</td><td>$68</td>
                   <td style="border-left:2px solid rgba(0,0,0,0.05);font-weight:600;">$1,227</td><td style="font-weight:600;">$818</td><td>60%</td><td>$491</td>
                   <td style="border-left:2px solid rgba(0,0,0,0.05);color:var(--green);font-weight:600;">$545</td><td style="color:var(--green);font-weight:600;">$327</td>
-                </tr>
+                <td style="background:rgba(34,46,72,0.04);border-left:3px solid rgba(34,46,72,0.2);font-weight:500;white-space:nowrap;font-size:11px;">Apex Elite</td><td style="background:rgba(34,46,72,0.04);font-family:var(--font-mono);font-size:11px;color:var(--green);">$2,160</td><td style="background:rgba(34,46,72,0.04);font-weight:500;white-space:nowrap;font-size:11px;">James Carter</td><td style="background:rgba(34,46,72,0.04);font-family:var(--font-mono);font-size:11px;color:var(--green);">$844</td><td style="background:rgba(34,46,72,0.04);font-family:var(--font-mono);font-size:11px;">$1,214</td><td style="background:rgba(34,46,72,0.04);font-family:var(--font-mono);font-size:11px;color:var(--green);">$1,214</td></tr>
               </tbody>
             </table>
           </div>
@@ -27979,6 +28011,93 @@ function wfCancelEdit(panel) {
   if (status) { status.innerHTML = '<span style="font-size:13px;">🔒</span> Waterfall is locked — click Edit to make changes'; }
   wfRender(panel);
   wfUpdateLockState(panel);
+}
+
+/* ── Res merchants accordion ─────────────────── */
+function resMerchToggle(row) {
+  var accordion = row.nextElementSibling;
+  if (!accordion || !accordion.classList.contains('res-merch-accordion')) return;
+  var isOpen = accordion.style.display !== 'none';
+  // Close all others
+  document.querySelectorAll('.res-merch-accordion').forEach(function(a) { a.style.display = 'none'; });
+  document.querySelectorAll('#res-merchant-table tr').forEach(function(r) { r.classList.remove('res-merch-open'); });
+  if (isOpen) return; // toggle off
+  accordion.style.display = '';
+  row.classList.add('res-merch-open');
+  // Render waterfall if not yet rendered
+  var panel = accordion.querySelector('.res-merch-wf-panel');
+  if (panel && !panel._rendered) {
+    panel._rendered = true;
+    var name = panel.dataset.merchant || '';
+    var pool = parseFloat(panel.dataset.pool) || 2000;
+    resMerchRenderWaterfall(panel, name, pool);
+  }
+}
+
+function resMerchRenderWaterfall(panel, name, pool) {
+  var entries = wfDefaultEntries();
+  // Deterministically add a third entry
+  var extras = [
+    { id:'ex1', name:'Sara Reyes', sub:'Rep · USR-002', type:'rep', initials:'SR', color:'#5B7A5E', rate:0.40, unit:'pct', locked:false },
+    { id:'ex2', name:'Dan Mitchell', sub:'Rep · USR-003', type:'rep', initials:'DM', color:'#6B839B', rate:30, unit:'bp', locked:false },
+  ];
+  if (name.length % 2 === 0) entries.push(extras[0]);
+
+  var remaining = pool;
+  var calced = entries.map(function(e) {
+    var rate = e.unit === 'bp' ? e.rate / 10000 : e.rate / 100;
+    var payout = Math.round(remaining * rate * 100) / 100;
+    var inputPool = remaining;
+    remaining = Math.round((remaining - payout) * 100) / 100;
+    return { entry:e, payout:payout, inputPool:inputPool };
+  });
+  var house = Math.max(0, Math.round(remaining * 100) / 100);
+
+  var h = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'
+    + '<div><div style="font-size:12px;font-weight:600;">' + name + ' — Payout Waterfall</div>'
+    + '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Net pool: <strong style="font-family:var(--font-mono);">$' + pool.toLocaleString() + '</strong> · Mar 2026</div></div>'
+    + '<button class="btn btn-ghost" style="font-size:11px;padding:4px 12px;" data-mname="' + name + '" onclick="event.stopPropagation();showMerchantDetail(this.dataset.mname)">📊 Full Detail →</button>'
+    + '</div>'
+    + '<div class="wf-container">';
+
+  calced.forEach(function(c, i) {
+    var e = c.entry;
+    var rateDisp = e.unit === 'bp' ? e.rate + ' bp' : e.rate.toFixed(2) + '%';
+    h += '<div class="wf-entry">'
+      + '<div class="wf-spine"><div class="wf-spine-top"></div><div class="wf-spine-dot"></div><div class="wf-spine-bot"></div></div>'
+      + '<div class="wf-card ' + (e.locked ? 'wf-locked' : '') + '">'
+      + '<div class="wf-card-hdr">'
+      + '<div class="wf-pos">' + (i+1) + '</div>'
+      + '<div class="p-avatar" style="background:' + e.color + ';width:22px;height:22px;font-size:9px;flex-shrink:0;">' + e.initials + '</div>'
+      + '<div style="flex:1;min-width:0;"><div class="wf-entity-name" style="font-size:12px;">' + e.name + '</div><div class="wf-entity-sub">' + e.sub + '</div></div>'
+      + (e.locked ? '<span class="wf-lock-badge">🔒</span>' : '')
+      + '</div>'
+      + '<div class="wf-card-body">'
+      + '<div class="wf-field"><div class="wf-field-label">Rate</div><div class="wf-field-val">' + rateDisp + '</div></div>'
+      + '<div class="wf-field"><div class="wf-field-label">Pool In</div><div class="wf-field-val">$' + c.inputPool.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+      + '<div class="wf-field"><div class="wf-field-label">Payout</div><div class="wf-field-val green">$' + c.payout.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+      + '<div class="wf-field"><div class="wf-field-label">Remaining</div><div class="wf-field-val">$' + Math.max(0,c.inputPool-c.payout).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+      + '</div></div></div>';
+  });
+
+  // House
+  h += '<div class="wf-entry">'
+    + '<div class="wf-spine"><div class="wf-spine-top"></div><div class="wf-spine-dot" style="background:var(--green);border-color:var(--green);"></div><div class="wf-spine-bot" style="visibility:hidden;"></div></div>'
+    + '<div class="wf-card wf-house"><div class="wf-card-hdr">'
+    + '<div class="wf-pos" style="background:var(--green);">' + (calced.length+1) + '</div>'
+    + '<div class="p-avatar" style="background:var(--green);width:22px;height:22px;font-size:9px;flex-shrink:0;">TW</div>'
+    + '<div style="flex:1;min-width:0;"><div class="wf-entity-name" style="font-size:12px;">Twill (House)</div><div class="wf-entity-sub">Remainder</div></div>'
+    + '<span class="wf-lock-badge" style="background:rgba(91,122,94,0.15);color:var(--green);">🏠</span>'
+    + '</div>'
+    + '<div class="wf-card-body">'
+    + '<div class="wf-field"><div class="wf-field-label">Rate</div><div class="wf-field-val muted">Remainder</div></div>'
+    + '<div class="wf-field"><div class="wf-field-label">Pool In</div><div class="wf-field-val">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+    + '<div class="wf-field"><div class="wf-field-label">Payout</div><div class="wf-field-val green">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+    + '<div class="wf-field"><div class="wf-field-label">Remaining</div><div class="wf-field-val muted">$0.00</div></div>'
+    + '</div></div></div>';
+
+  h += '</div>'; // /wf-container
+  panel.innerHTML = h;
 }
 </script>
 <style id="alerts-css">
