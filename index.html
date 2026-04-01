@@ -3836,6 +3836,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <span class="p-badge ba" style="margin-left:4px;">● Pending</span>
           <span class="p-badge bm">Medium Risk</span>
           <span class="p-badge bp">Awaiting Docs</span>
+          <div style="width:1px;height:20px;background:var(--border-strong);margin:0 4px;flex-shrink:0;"></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;position:relative;" id="md-assign-bar"><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'partner','md')" title="Reassign partner"><span class="ap-av" style="background:#8C7A5E;">SL</span><span><div class="ap-label">Partner</div><div class="ap-name">Summit Lending</div></span><span class="ap-edit">✎</span></span><div class="assign-sep"></div><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'rep','md')" title="Reassign rep"><span class="ap-av" style="background:#5B7A5E;">SR</span><span><div class="ap-label">Rep</div><div class="ap-name">Sara Reyes</div></span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'md')" title="Add another rep">+ Rep</button></div>
         </div>
         <div class="topbar-right">
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
@@ -5512,6 +5514,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <div class="dr-topbar-name" id="dr-name">Pacific Coast Retail</div>
           <div class="dr-topbar-sub" id="dr-sub">Summit Lending · Medium Risk · MID: Pending</div>
         </div>
+        <div style="display:inline-flex;align-items:center;gap:6px;position:relative;" id="dr-assign-bar"><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'partner','dr')" title="Reassign partner"><span class="ap-av" style="background:#8C7A5E;">SL</span><span><div class="ap-label">Partner</div><div class="ap-name">Summit Lending</div></span><span class="ap-edit">✎</span></span><div class="assign-sep"></div><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'rep','dr')" title="Reassign rep"><span class="ap-av" style="background:#6366F1;">JC</span><span><div class="ap-label">Rep</div><div class="ap-name">James Carter</div></span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'dr')" title="Add another rep">+ Rep</button></div>
         <span class="p-badge" id="dr-status-badge" style="font-size:11px;">Underwriting</span>
         <div class="dr-days warn" id="dr-days">⏱ 5 days in stage</div>
         <div class="dr-topbar-actions">
@@ -5629,6 +5632,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <span class="p-badge bg">Active</span>
         <span class="p-badge bb">MID: 7823-4491-0012</span>
         <span class="p-badge bm">First Data Omaha</span>
+        <div style="width:1px;height:20px;background:var(--border-strong);margin:0 4px;flex-shrink:0;"></div>
+        <div style="display:inline-flex;align-items:center;gap:6px;position:relative;" id="ma-assign-bar"><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'partner','ma')" title="Reassign partner"><span class="ap-av" style="background:#6B839B;">AE</span><span><div class="ap-label">Partner</div><div class="ap-name">Apex Elite</div></span><span class="ap-edit">✎</span></span><div class="assign-sep"></div><span class="assign-pill" style="position:relative;" onclick="assignDropdown(this,'rep','ma')" title="Reassign rep"><span class="ap-av" style="background:#6366F1;">JC</span><span><div class="ap-label">Rep</div><div class="ap-name">James Carter</div></span><span class="ap-edit">✎</span></span><button class="assign-add-btn" onclick="assignAddRep(this,'ma')" title="Add another rep">+ Rep</button></div>
         <div style="flex:1;"></div>
         <button style="padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">↓ Export</button>
         <button style="padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">⚙ Settings</button>
@@ -28099,6 +28104,116 @@ function resMerchRenderWaterfall(panel, name, pool) {
   h += '</div>'; // /wf-container
   panel.innerHTML = h;
 }
+
+/* ── Merchant assignment (partner / rep) ──────── */
+const _assignPartners = [
+  { name:'Apex Elite',       initials:'AE', color:'#6B839B' },
+  { name:'NovaPay',          initials:'NV', color:'#5B7A5E' },
+  { name:'Summit Lending',   initials:'SL', color:'#8C7A5E' },
+  { name:'Rivermark',        initials:'RM', color:'#A67C5B' },
+  { name:'Coastal Commerce', initials:'CC', color:'#9B6B5B' },
+];
+const _assignReps = [
+  { name:'James Carter', initials:'JC', color:'#6366F1' },
+  { name:'Sara Reyes',   initials:'SR', color:'#5B7A5E' },
+  { name:'Dan Mitchell', initials:'DM', color:'#6B839B' },
+  { name:'Tara Patel',   initials:'TP', color:'#A67C5B' },
+  { name:'Blake Chen',   initials:'BC', color:'#9B6B5B' },
+];
+
+function assignDropdown(pill, type, context) {
+  // Close any existing
+  document.querySelectorAll('.assign-dropdown').forEach(function(d){d.remove();});
+
+  var list = type === 'partner' ? _assignPartners : _assignReps;
+  var dd = document.createElement('div');
+  dd.className = 'assign-dropdown';
+  dd.innerHTML = '<div class="assign-dropdown-hdr">Reassign ' + (type === 'partner' ? 'Partner' : 'Rep') + '</div>';
+
+  list.forEach(function(item) {
+    var opt = document.createElement('div');
+    opt.className = 'assign-dd-opt';
+    opt.innerHTML = '<div class="p-avatar" style="background:' + item.color + ';width:22px;height:22px;font-size:9px;flex-shrink:0;">' + item.initials + '</div>'
+      + '<span style="font-size:12px;font-weight:500;">' + item.name + '</span>';
+    opt.onclick = function() {
+      // Update the pill
+      var av = pill.querySelector('.ap-av');
+      var nm = pill.querySelector('.ap-name');
+      if (av) { av.style.background = item.color; av.textContent = item.initials; }
+      if (nm) nm.textContent = item.name;
+      dd.remove();
+      // Toast
+      assignToast((type === 'partner' ? 'Partner' : 'Rep') + ' reassigned to ' + item.name);
+    };
+    dd.appendChild(opt);
+  });
+
+  pill.style.position = 'relative';
+  pill.appendChild(dd);
+
+  // Click outside to close
+  setTimeout(function(){
+    document.addEventListener('click', function close(ev){
+      if (!dd.contains(ev.target) && ev.target !== pill) { dd.remove(); document.removeEventListener('click', close); }
+    });
+  }, 50);
+}
+
+function assignAddRep(btn, context) {
+  // Close existing
+  document.querySelectorAll('.assign-dropdown').forEach(function(d){d.remove();});
+
+  var bar = btn.closest('[id$="-assign-bar"]') || btn.parentElement;
+  var dd = document.createElement('div');
+  dd.className = 'assign-dropdown';
+  dd.style.left = 'auto';
+  dd.style.right = '0';
+  dd.innerHTML = '<div class="assign-dropdown-hdr">Add Additional Rep</div>';
+
+  _assignReps.forEach(function(item) {
+    var opt = document.createElement('div');
+    opt.className = 'assign-dd-opt';
+    opt.innerHTML = '<div class="p-avatar" style="background:' + item.color + ';width:22px;height:22px;font-size:9px;flex-shrink:0;">' + item.initials + '</div>'
+      + '<span style="font-size:12px;font-weight:500;">' + item.name + '</span>'
+      + '<span style="margin-left:auto;font-size:10px;color:var(--text-muted);">+ Add</span>';
+    opt.onclick = function() {
+      // Insert a new rep pill before the + Rep button
+      var newPill = document.createElement('span');
+      newPill.className = 'assign-pill';
+      newPill.style.position = 'relative';
+      newPill.innerHTML = '<span class="ap-av" style="background:' + item.color + ';">' + item.initials + '</span>'
+        + '<span><div class="ap-label">Rep</div><div class="ap-name">' + item.name + '</div></span>'
+        + '<span class="ap-edit" data-remove="1" title="Remove" style="color:var(--red);">✕</span>';
+      newPill.onclick = function(e) {
+        if (e.target.dataset && e.target.dataset.remove) { this.previousElementSibling && this.previousElementSibling.classList.contains('assign-sep') ? this.previousElementSibling.remove() : null; this.remove(); return; }
+        assignDropdown(this, 'rep', context);
+      };
+      var sep = document.createElement('div');
+      sep.className = 'assign-sep';
+      bar.insertBefore(sep, btn);
+      bar.insertBefore(newPill, btn);
+      dd.remove();
+      assignToast(item.name + ' added as additional rep');
+    };
+    dd.appendChild(opt);
+  });
+
+  btn.style.position = 'relative';
+  btn.appendChild(dd);
+  setTimeout(function(){
+    document.addEventListener('click', function close(ev){
+      if (!dd.contains(ev.target) && ev.target !== btn) { dd.remove(); document.removeEventListener('click', close); }
+    });
+  }, 50);
+}
+
+function assignToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--yellow);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;pointer-events:none;font-family:var(--font-ui);box-shadow:0 4px 16px rgba(0,0,0,.25);';
+  t.textContent = '✓ ' + msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){t.remove();},400); }, 2000);
+}
 </script>
 <style id="alerts-css">
 /* ── Alerts view: amber accent header ─── */
@@ -28258,3 +28373,21 @@ function resMerchRenderWaterfall(panel, name, pool) {
 </body>
 </html>
 <!-- cache-bust:1773827400 -->
+/* ── Merchant header assignment pills ─────────── */
+.assign-pill { display:inline-flex; align-items:center; gap:6px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:20px; padding:3px 10px 3px 4px; font-size:11px; cursor:pointer; transition:all .12s; user-select:none; }
+.assign-pill:hover { border-color:var(--yellow); background:var(--bg-hover); }
+.assign-pill .ap-av { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; flex-shrink:0; }
+.assign-pill .ap-label { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); }
+.assign-pill .ap-name { font-weight:600; color:var(--text-primary); }
+.assign-pill .ap-edit { font-size:10px; color:var(--text-muted); margin-left:2px; }
+.assign-sep { width:1px; height:16px; background:var(--border-strong); margin:0 2px; flex-shrink:0; }
+.assign-add-btn { display:inline-flex; align-items:center; gap:5px; background:none; border:1px dashed var(--border-strong); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--text-muted); cursor:pointer; transition:all .12s; }
+.assign-add-btn:hover { border-color:var(--yellow); color:var(--text-primary); }
+
+/* Re-assign dropdown */
+.assign-dropdown { position:absolute; top:calc(100% + 6px); left:0; min-width:220px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:9px; box-shadow:0 8px 24px rgba(0,0,0,.18); z-index:800; overflow:hidden; }
+.assign-dropdown-hdr { padding:8px 12px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); border-bottom:1px solid var(--border); }
+.assign-dd-opt { display:flex; align-items:center; gap:8px; padding:8px 12px; cursor:pointer; transition:background .1s; font-size:12px; }
+.assign-dd-opt:hover { background:var(--bg-hover); }
+.assign-dd-sep { height:1px; background:var(--border); margin:2px 0; }
+
