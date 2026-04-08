@@ -4074,13 +4074,13 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Pricing →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
-        <div class="step-panel" id="step-5">
+        <div class="step-panel" id="step-8">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 5 · Complete</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Complete</span>
             <span class="step-hdr-title">Pricing Configuration</span>
           </div>
           <div class="sc amber">
@@ -4125,7 +4125,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               </div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(4)">← Processing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(6)">Documents →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← UW Review</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(9)">Submit →</button></div></div>
         </div>
 
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -4377,7 +4377,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Pricing</button>
+            <button class="btn btn-ghost" onclick="goStep(8)">← Pricing</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">1 required missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
@@ -4816,18 +4816,18 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(6)">← Documents</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
             <div class="fnr">
               <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
-              <button class="btn btn-primary" onclick="goStep(8)">Solutions →</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
             </div>
           </div>
         </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
-        <div class="step-panel" id="step-8">
+        <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 8 · Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
             <span class="step-hdr-title">Recommended Solutions</span>
           </div>
 
@@ -5173,7 +5173,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Rate Model</span><span style="font-size:11px;">Interchange Plus</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Markup</span><span style="font-size:11px;font-family:var(--font-mono);">0.25% + $0.10</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);">Monthly Fee</span><span style="font-size:11px;font-family:var(--font-mono);">$15.00</span></div>
-                    <button onclick="goStep(5)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
+                    <button onclick="goStep(8)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
                   </div>
                 </div>
               </div>
@@ -5261,7 +5261,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
                   <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:11px;color:var(--text-muted);">CB Threshold</span><span style="font-size:11px;font-family:var(--font-mono);">1.0%</span></div>
                   <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="font-size:11px;color:var(--text-muted);">Volume Ceiling</span><span style="font-size:11px;font-family:var(--font-mono);">$500K/mo</span></div>
                 </div>
-                <button onclick="goStep(8)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
+                <button onclick="goStep(5)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
               </div>
             </div>
 
@@ -5367,7 +5367,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(8)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -8834,13 +8834,13 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Pricing →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
-        <div class="step-panel" id="step-5">
+        <div class="step-panel" id="step-8">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 5 · Complete</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Complete</span>
             <span class="step-hdr-title">Pricing Configuration</span>
           </div>
           <div class="sc amber">
@@ -8885,7 +8885,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               </div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(4)">← Processing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(6)">Documents →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← UW Review</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(9)">Submit →</button></div></div>
         </div>
 
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -9137,7 +9137,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Pricing</button>
+            <button class="btn btn-ghost" onclick="goStep(8)">← Pricing</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">1 required missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
@@ -9576,18 +9576,18 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(6)">← Documents</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
             <div class="fnr">
               <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
-              <button class="btn btn-primary" onclick="goStep(8)">Solutions →</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
             </div>
           </div>
         </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
-        <div class="step-panel" id="step-8">
+        <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 8 · Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
             <span class="step-hdr-title">Recommended Solutions</span>
           </div>
 
@@ -9933,7 +9933,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Rate Model</span><span style="font-size:11px;">Interchange Plus</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Markup</span><span style="font-size:11px;font-family:var(--font-mono);">0.25% + $0.10</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);">Monthly Fee</span><span style="font-size:11px;font-family:var(--font-mono);">$15.00</span></div>
-                    <button onclick="goStep(5)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
+                    <button onclick="goStep(8)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
                   </div>
                 </div>
               </div>
@@ -10021,7 +10021,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
                   <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:11px;color:var(--text-muted);">CB Threshold</span><span style="font-size:11px;font-family:var(--font-mono);">1.0%</span></div>
                   <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="font-size:11px;color:var(--text-muted);">Volume Ceiling</span><span style="font-size:11px;font-family:var(--font-mono);">$500K/mo</span></div>
                 </div>
-                <button onclick="goStep(8)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
+                <button onclick="goStep(5)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
               </div>
             </div>
 
@@ -10127,7 +10127,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(8)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -16407,13 +16407,13 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Pricing →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
-        <div class="step-panel" id="step-5">
+        <div class="step-panel" id="step-8">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 5 · Complete</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Complete</span>
             <span class="step-hdr-title">Pricing Configuration</span>
           </div>
           <div class="sc amber">
@@ -16458,7 +16458,7 @@ function initResCharts() {
               </div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(4)">← Processing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(6)">Documents →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← UW Review</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(9)">Submit →</button></div></div>
         </div>
 
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -16710,7 +16710,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Pricing</button>
+            <button class="btn btn-ghost" onclick="goStep(8)">← Pricing</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">1 required missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
@@ -17149,18 +17149,18 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(6)">← Documents</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
             <div class="fnr">
               <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
-              <button class="btn btn-primary" onclick="goStep(8)">Solutions →</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
             </div>
           </div>
         </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
-        <div class="step-panel" id="step-8">
+        <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 8 · Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
             <span class="step-hdr-title">Recommended Solutions</span>
           </div>
 
@@ -17506,7 +17506,7 @@ function initResCharts() {
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Rate Model</span><span style="font-size:11px;">Interchange Plus</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Markup</span><span style="font-size:11px;font-family:var(--font-mono);">0.25% + $0.10</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);">Monthly Fee</span><span style="font-size:11px;font-family:var(--font-mono);">$15.00</span></div>
-                    <button onclick="goStep(5)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
+                    <button onclick="goStep(8)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
                   </div>
                 </div>
               </div>
@@ -17594,7 +17594,7 @@ function initResCharts() {
                   <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:11px;color:var(--text-muted);">CB Threshold</span><span style="font-size:11px;font-family:var(--font-mono);">1.0%</span></div>
                   <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="font-size:11px;color:var(--text-muted);">Volume Ceiling</span><span style="font-size:11px;font-family:var(--font-mono);">$500K/mo</span></div>
                 </div>
-                <button onclick="goStep(8)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
+                <button onclick="goStep(5)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
               </div>
             </div>
 
@@ -17700,7 +17700,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(8)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -19114,13 +19114,13 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Pricing →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
-        <div class="step-panel" id="step-5">
+        <div class="step-panel" id="step-8">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 5 · Complete</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Complete</span>
             <span class="step-hdr-title">Pricing Configuration</span>
           </div>
           <div class="sc amber">
@@ -19165,7 +19165,7 @@ function initResCharts() {
               </div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(4)">← Processing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(6)">Documents →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← UW Review</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(9)">Submit →</button></div></div>
         </div>
 
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -19417,7 +19417,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Pricing</button>
+            <button class="btn btn-ghost" onclick="goStep(8)">← Pricing</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">1 required missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
@@ -19856,18 +19856,18 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(6)">← Documents</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
             <div class="fnr">
               <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
-              <button class="btn btn-primary" onclick="goStep(8)">Solutions →</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
             </div>
           </div>
         </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
-        <div class="step-panel" id="step-8">
+        <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 8 · Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
             <span class="step-hdr-title">Recommended Solutions</span>
           </div>
 
@@ -20213,7 +20213,7 @@ function initResCharts() {
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Rate Model</span><span style="font-size:11px;">Interchange Plus</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Markup</span><span style="font-size:11px;font-family:var(--font-mono);">0.25% + $0.10</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);">Monthly Fee</span><span style="font-size:11px;font-family:var(--font-mono);">$15.00</span></div>
-                    <button onclick="goStep(5)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
+                    <button onclick="goStep(8)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
                   </div>
                 </div>
               </div>
@@ -20301,7 +20301,7 @@ function initResCharts() {
                   <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:11px;color:var(--text-muted);">CB Threshold</span><span style="font-size:11px;font-family:var(--font-mono);">1.0%</span></div>
                   <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="font-size:11px;color:var(--text-muted);">Volume Ceiling</span><span style="font-size:11px;font-family:var(--font-mono);">$500K/mo</span></div>
                 </div>
-                <button onclick="goStep(8)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
+                <button onclick="goStep(5)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
               </div>
             </div>
 
@@ -20407,7 +20407,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(8)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -21822,13 +21822,13 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Pricing →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
-        <div class="step-panel" id="step-5">
+        <div class="step-panel" id="step-8">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 5 · Complete</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Complete</span>
             <span class="step-hdr-title">Pricing Configuration</span>
           </div>
           <div class="sc amber">
@@ -21873,7 +21873,7 @@ function initResCharts() {
               </div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(4)">← Processing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(6)">Documents →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← UW Review</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(9)">Submit →</button></div></div>
         </div>
 
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -22125,7 +22125,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Pricing</button>
+            <button class="btn btn-ghost" onclick="goStep(8)">← Pricing</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">1 required missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
@@ -22564,18 +22564,18 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(6)">← Documents</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
             <div class="fnr">
               <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
-              <button class="btn btn-primary" onclick="goStep(8)">Solutions →</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
             </div>
           </div>
         </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
-        <div class="step-panel" id="step-8">
+        <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 8 · Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
             <span class="step-hdr-title">Recommended Solutions</span>
           </div>
 
@@ -22921,7 +22921,7 @@ function initResCharts() {
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Rate Model</span><span style="font-size:11px;">Interchange Plus</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Markup</span><span style="font-size:11px;font-family:var(--font-mono);">0.25% + $0.10</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);">Monthly Fee</span><span style="font-size:11px;font-family:var(--font-mono);">$15.00</span></div>
-                    <button onclick="goStep(5)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
+                    <button onclick="goStep(8)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
                   </div>
                 </div>
               </div>
@@ -23009,7 +23009,7 @@ function initResCharts() {
                   <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:11px;color:var(--text-muted);">CB Threshold</span><span style="font-size:11px;font-family:var(--font-mono);">1.0%</span></div>
                   <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="font-size:11px;color:var(--text-muted);">Volume Ceiling</span><span style="font-size:11px;font-family:var(--font-mono);">$500K/mo</span></div>
                 </div>
-                <button onclick="goStep(8)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
+                <button onclick="goStep(5)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
               </div>
             </div>
 
@@ -23115,7 +23115,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(8)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -24529,13 +24529,13 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Pricing →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
-        <div class="step-panel" id="step-5">
+        <div class="step-panel" id="step-8">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 5 · Complete</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Complete</span>
             <span class="step-hdr-title">Pricing Configuration</span>
           </div>
           <div class="sc amber">
@@ -24580,7 +24580,7 @@ function initResCharts() {
               </div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(4)">← Processing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(6)">Documents →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← UW Review</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(9)">Submit →</button></div></div>
         </div>
 
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -24832,7 +24832,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Pricing</button>
+            <button class="btn btn-ghost" onclick="goStep(8)">← Pricing</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">1 required missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
@@ -25271,18 +25271,18 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(6)">← Documents</button>
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
             <div class="fnr">
               <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
-              <button class="btn btn-primary" onclick="goStep(8)">Solutions →</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
             </div>
           </div>
         </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
-        <div class="step-panel" id="step-8">
+        <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 8 · Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
             <span class="step-hdr-title">Recommended Solutions</span>
           </div>
 
@@ -25628,7 +25628,7 @@ function initResCharts() {
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Rate Model</span><span style="font-size:11px;">Interchange Plus</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:13px;color:var(--text-secondary);">Markup</span><span style="font-size:11px;font-family:var(--font-mono);">0.25% + $0.10</span></div>
                     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);">Monthly Fee</span><span style="font-size:11px;font-family:var(--font-mono);">$15.00</span></div>
-                    <button onclick="goStep(5)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
+                    <button onclick="goStep(8)" style="margin-top:6px;width:100%;padding:5px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:var(--font-ui);">✎ Edit Pricing</button>
                   </div>
                 </div>
               </div>
@@ -25716,7 +25716,7 @@ function initResCharts() {
                   <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);"><span style="font-size:11px;color:var(--text-muted);">CB Threshold</span><span style="font-size:11px;font-family:var(--font-mono);">1.0%</span></div>
                   <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="font-size:11px;color:var(--text-muted);">Volume Ceiling</span><span style="font-size:11px;font-family:var(--font-mono);">$500K/mo</span></div>
                 </div>
-                <button onclick="goStep(8)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
+                <button onclick="goStep(5)" style="width:100%;padding:6px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;font-family:var(--font-ui);">← Change Solution</button>
               </div>
             </div>
 
@@ -25822,7 +25822,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(8)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
             <div class="fnr"></div>
           </div>
         </div>
