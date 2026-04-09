@@ -766,14 +766,6 @@
   .sn-prog-lbl strong{font-size:12px;color:var(--amber);font-family:var(--font-mono);}
   .sn-prog-track{height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;}
   .sn-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--amber),#FBB740);}
-  /* Drag-and-drop upload zone */
-  .dropzone { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; border:2px dashed var(--border-strong); border-radius:10px; text-align:center; cursor:pointer; transition:all .2s; margin-bottom:20px; }
-  .dropzone:hover { background:var(--bg-hover); border-color:var(--yellow); }
-  .dropzone.dragover { background:var(--bg-selected); border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,222,0,0.2); }
-  .dropzone-icon { font-size:38px; color:var(--text-muted); margin-bottom:10px; }
-  .dropzone-text { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:4px; }
-  .dropzone-subtext { font-size:13px; color:var(--text-secondary); }
-  .dropzone-file-input { display:none; }
   .step-item{display:flex;align-items:flex-start;gap:9px;padding:8px 6px;border-radius:7px;cursor:pointer;transition:background .1s;margin-bottom:2px;}
   .step-item:hover{background:var(--bg-hover);}
   .step-item.active{background:var(--bg-selected);}
@@ -3920,18 +3912,18 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
           <div class="step-num sn-curr">6</div>
-          <div class="step-info"><div class="step-title">Requirements &amp; Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
+          <div class="step-info"><div class="step-title">Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
         </div>
         <div class="step-conn" style="background:var(--amber);opacity:.4;"></div>
         
         <div class="step-item" id="si-7" onclick="goStep(7)">
           <div class="step-num sn-todo">✦</div>
-          <div class="step-info"><div class="step-title">Pricing &amp; Equipment</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
+          <div class="step-info"><div class="step-title">Pricing</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item" id="si-8" onclick="goStep(8)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Review &amp; Send</div><div class="step-sub">Send for signature</div></div>
+          <div class="step-info"><div class="step-title">Submit</div><div class="step-sub">Send for signature</div></div>
         </div>
 
         <div style="margin-top:auto;padding-top:16px;">
@@ -4085,59 +4077,48 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="step-panel" id="step-7">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 7 · Complete</span>
-            <span class="step-hdr-title">Pricing &amp; Equipment Configuration</span>
+            <span class="step-hdr-title">Pricing Configuration</span>
           </div>
-
           <div class="sc amber">
-            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; POS Configuration</div><div class="sc-desc">Select terminals, gateways, and software for the solution</div></div></div></div>
-            <div id="selected-equipment-list" style="padding:10px 16px 14px;">
-              <!-- Dynamically added equipment will go here -->
-              <div class="equip-item">
-                <div class="equip-icon">📱</div>
-                <div>
-                  <div class="equip-name">PAX A920 Pro</div>
-                  <div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $25.00</div>
-                  <div class="price-line">Upfront: $299.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
-              </div>
-              <div class="equip-item">
-                <div class="equip-icon">🔌</div>
-                <div>
-                  <div class="equip-name">NMI Virtual Terminal</div>
-                  <div class="equip-sub">Online + MOTO processing via NMI Gateway</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $10.00</div>
-                  <div class="price-line">Upfront: $0.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Rate Model</div><div class="sc-desc">Choose how processing fees are structured</div></div></div></div>
+            <div style="padding:10px 16px 14px;">
+              <div class="price-tabs">
+                <div class="price-tab">Flat Rate</div>
+                <div class="price-tab active">Interchange Plus</div>
+                <div class="price-tab">Tiered</div>
+                <div class="price-tab">Surcharge</div>
               </div>
             </div>
+            <div class="fg">
+              <div class="fgroup"><label class="flabel">Markup Rate <span class="freq">*</span></label><input class="finput filled" value="0.25%"></div>
+              <div class="fgroup"><label class="flabel">Per Transaction Fee <span class="freq">*</span></label><input class="finput filled" value="$0.10"></div>
+              <div class="fgroup"><label class="flabel">Monthly Fee</label><input class="finput filled" value="$15.00"></div>
+              <div class="fgroup"><label class="flabel">Batch Settlement Fee</label><input class="finput filled" value="$0.05"></div>
+              <div class="fgroup"><label class="flabel">Statement Fee</label><input class="finput filled" value="$10.00"></div>
+              <div class="fgroup"><label class="flabel">Annual Fee</label><input class="finput filled" value="$0.00"></div>
+            </div>
+          </div>
+          <div class="sc amber">
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Software</div><div class="sc-desc">Select terminal or integration type</div></div></div></div>
+            <div class="equip-card selected">
+              <div class="equip-icon">📱</div>
+              <div><div class="equip-name">PAX A920 Pro</div><div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div></div>
+              <div class="esel on">✓</div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🖥</div>
+              <div><div class="equip-name">Dejavoo QD4</div><div class="equip-sub">Countertop terminal · Chip + Tap + Swipe</div></div>
+              <div class="esel off"></div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🔌</div>
+              <div><div class="equip-name">Virtual Terminal (API)</div><div class="equip-sub">NMI gateway · Online + MOTO</div></div>
+              <div class="esel off"></div>
+            </div>
             <div style="padding:12px 16px;border-top:1px solid var(--border);">
-              <div class="fg single" style="padding:0;margin-bottom:10px;">
-                <select class="finput fselect filled" id="add-equipment-select">
-                  <option value="">+ Add Equipment or Software...</option>
-                  <option value="pax_a80">PAX A80 Countertop (Monthly: $15, Upfront: $199)</option>
-                  <option value="clover_mini">Clover Mini POS (Monthly: $39, Upfront: $499)</option>
-                  <option value="shopify_integration">Shopify Integration (Monthly: $20)</option>
-                  <option value="chargeback_protection">Chargeback Protection (Monthly: $50)</option>
-                </select>
+              <div class="fg single" style="padding:0;">
+                <div class="fgroup"><label class="flabel">Gateway</label><select class="finput fselect filled"><option selected>NMI</option><option>Authorize.net</option><option>Stripe</option></select></div>
               </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">AI suggests: Chargeback Protection for high-risk; Loyalty Program for retail.</div>
             </div>
           </div>
           <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(8)">Submit →</button></div></div>
@@ -4147,16 +4128,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="step-panel active" id="step-6">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--amber-dim);color:var(--amber);">Step 6 · Action Required</span>
-            <span class="step-hdr-title">Requirements &amp; Documents</span>
+            <span class="step-hdr-title">Documents</span>
             <span class="p-badge br" style="margin-left:4px;">1 Required Missing</span>
-          </div>
-
-          <!-- DRAG & DROP UPLOAD ZONE -->
-          <div class="dropzone" id="document-dropzone">
-            <input type="file" id="dropzone-file-input" class="dropzone-file-input" multiple>
-            <div class="dropzone-icon">🗄️</div>
-            <div class="dropzone-text">Drag &amp; drop documents here</div>
-            <div class="dropzone-subtext">or click to <span style="text-decoration:underline;">browse files</span> (PDF, JPG, PNG, HEIC · Max 10 MB per file)</div>
           </div>
 
           <!-- ── AI MERCHANT CLASSIFICATION BANNER ── -->
@@ -5099,90 +5072,32 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- ═══ STEP 9: SUBMIT ═══ -->
         <div class="step-panel" id="step-8">
           <div class="step-hdr">
-                        <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Ready to Send</span>
-            <span class="step-hdr-title">Review &amp; Send Application</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Submit</span>
+            <span class="step-hdr-title">Review &amp; Send for Signature</span>
           </div>
 
-          <!-- ── AI PRE-SUBMISSION REPORT ── -->
-          <div class="sc blue" style="margin-bottom:16px;">
-            <div class="sc-hdr blue"><div class="sc-hdr-left"><span class="sc-icon">✅</span><div><div class="sc-title">AI Pre-Submission Report</div><div class="sc-desc">Readiness checklist based on all available data</div></div></div></div>
-            <!-- SCORE ROW (from old UW Review) -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:16px;">
-              <!-- Risk Score -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
-                <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
-                  <span>0 High</span><span>100 Low</span>
-                </div>
-              </div>
-              <!-- Confidence -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
-                </div>
-                <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
-              </div>
-              <!-- Approval Outlook -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
-                <div style="font-size:20px;margin:4px 0;">🟢</div>
-                <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
-                <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
-                <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
-              </div>
-              <!-- Data Coverage -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
-              </div>
-            </div>
-
-            <!-- ISSUES & GAPS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px;">⚠ Issues &amp; Gaps</div>
+          <!-- ── AI PRE-SUBMIT CHECK ── -->
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(255,222,0,.04));border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">AI Pre-Submit Check</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--red);font-size:11px;flex-shrink:0;margin-top:1px;">✗</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Owner ID for Sarah Chen not yet received.</strong> As the 60% majority owner, her government-issued photo ID is required by all matched processors before submission. Application cannot be submitted without this. 16 days since last nudge.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Application fields complete — all required sections filled</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Volume delta between stated amount and bank deposits.</strong> Bank shows ~$28K/mo in Square deposits against a stated $85K monthly volume. This is unexplained without a processing statement. Likely split across multiple bank accounts or cash sales, but processors will ask.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Solution selected — First Data Omaha · IC+ 0.25% + $0.10</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No processing history on file.</strong> Not a hard block for standard retail, but adds a confidence penalty. First Data may issue a provisional approval with a lower volume ceiling until history is established.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Equipment configured — PAX A920 Pro × 1 + NMI Gateway</span></div>
                 </div>
-              </div>
-            </div>
-
-            <!-- WEBSITE ANALYSIS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:8px;">🌐 Website Analysis</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clean UI/UX, clear product catalog.</strong> E-commerce appears fully functional with secure checkout.</div>
+                <div id="ai-flag-id" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Owner ID (Sarah Chen) not yet uploaded — suggest requesting during DocuSign flow. <em style="color:var(--text-muted);">Not blocking this submission.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-id').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">I'll handle this</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clear pricing visible, no hidden fees.</strong> Returns policy clearly stated.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No explicit privacy policy link found in footer.</strong> Could be a minor underwriting flag.</div>
+                <div id="ai-flag-stmt" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Processing statement not uploaded — helps with First Data approval confidence. Request post-signature if merchant can't provide now. <em style="color:var(--text-muted);">Not blocking.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-stmt').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Acknowledge</button>
                 </div>
               </div>
             </div>
@@ -8753,18 +8668,18 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
           <div class="step-num sn-curr">6</div>
-          <div class="step-info"><div class="step-title">Requirements &amp; Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
+          <div class="step-info"><div class="step-title">Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
         </div>
         <div class="step-conn" style="background:var(--amber);opacity:.4;"></div>
         
         <div class="step-item" id="si-7" onclick="goStep(7)">
           <div class="step-num sn-todo">✦</div>
-          <div class="step-info"><div class="step-title">Pricing &amp; Equipment</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
+          <div class="step-info"><div class="step-title">Pricing</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item" id="si-8" onclick="goStep(8)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Review &amp; Send</div><div class="step-sub">Send for signature</div></div>
+          <div class="step-info"><div class="step-title">Submit</div><div class="step-sub">Send for signature</div></div>
         </div>
 
         <div style="margin-top:auto;padding-top:16px;">
@@ -8918,59 +8833,48 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="step-panel" id="step-7">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 7 · Complete</span>
-            <span class="step-hdr-title">Pricing &amp; Equipment Configuration</span>
+            <span class="step-hdr-title">Pricing Configuration</span>
           </div>
-
           <div class="sc amber">
-            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; POS Configuration</div><div class="sc-desc">Select terminals, gateways, and software for the solution</div></div></div></div>
-            <div id="selected-equipment-list" style="padding:10px 16px 14px;">
-              <!-- Dynamically added equipment will go here -->
-              <div class="equip-item">
-                <div class="equip-icon">📱</div>
-                <div>
-                  <div class="equip-name">PAX A920 Pro</div>
-                  <div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $25.00</div>
-                  <div class="price-line">Upfront: $299.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
-              </div>
-              <div class="equip-item">
-                <div class="equip-icon">🔌</div>
-                <div>
-                  <div class="equip-name">NMI Virtual Terminal</div>
-                  <div class="equip-sub">Online + MOTO processing via NMI Gateway</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $10.00</div>
-                  <div class="price-line">Upfront: $0.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Rate Model</div><div class="sc-desc">Choose how processing fees are structured</div></div></div></div>
+            <div style="padding:10px 16px 14px;">
+              <div class="price-tabs">
+                <div class="price-tab">Flat Rate</div>
+                <div class="price-tab active">Interchange Plus</div>
+                <div class="price-tab">Tiered</div>
+                <div class="price-tab">Surcharge</div>
               </div>
             </div>
+            <div class="fg">
+              <div class="fgroup"><label class="flabel">Markup Rate <span class="freq">*</span></label><input class="finput filled" value="0.25%"></div>
+              <div class="fgroup"><label class="flabel">Per Transaction Fee <span class="freq">*</span></label><input class="finput filled" value="$0.10"></div>
+              <div class="fgroup"><label class="flabel">Monthly Fee</label><input class="finput filled" value="$15.00"></div>
+              <div class="fgroup"><label class="flabel">Batch Settlement Fee</label><input class="finput filled" value="$0.05"></div>
+              <div class="fgroup"><label class="flabel">Statement Fee</label><input class="finput filled" value="$10.00"></div>
+              <div class="fgroup"><label class="flabel">Annual Fee</label><input class="finput filled" value="$0.00"></div>
+            </div>
+          </div>
+          <div class="sc amber">
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Software</div><div class="sc-desc">Select terminal or integration type</div></div></div></div>
+            <div class="equip-card selected">
+              <div class="equip-icon">📱</div>
+              <div><div class="equip-name">PAX A920 Pro</div><div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div></div>
+              <div class="esel on">✓</div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🖥</div>
+              <div><div class="equip-name">Dejavoo QD4</div><div class="equip-sub">Countertop terminal · Chip + Tap + Swipe</div></div>
+              <div class="esel off"></div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🔌</div>
+              <div><div class="equip-name">Virtual Terminal (API)</div><div class="equip-sub">NMI gateway · Online + MOTO</div></div>
+              <div class="esel off"></div>
+            </div>
             <div style="padding:12px 16px;border-top:1px solid var(--border);">
-              <div class="fg single" style="padding:0;margin-bottom:10px;">
-                <select class="finput fselect filled" id="add-equipment-select">
-                  <option value="">+ Add Equipment or Software...</option>
-                  <option value="pax_a80">PAX A80 Countertop (Monthly: $15, Upfront: $199)</option>
-                  <option value="clover_mini">Clover Mini POS (Monthly: $39, Upfront: $499)</option>
-                  <option value="shopify_integration">Shopify Integration (Monthly: $20)</option>
-                  <option value="chargeback_protection">Chargeback Protection (Monthly: $50)</option>
-                </select>
+              <div class="fg single" style="padding:0;">
+                <div class="fgroup"><label class="flabel">Gateway</label><select class="finput fselect filled"><option selected>NMI</option><option>Authorize.net</option><option>Stripe</option></select></div>
               </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">AI suggests: Chargeback Protection for high-risk; Loyalty Program for retail.</div>
             </div>
           </div>
           <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(8)">Submit →</button></div></div>
@@ -8980,16 +8884,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="step-panel active" id="step-6">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--amber-dim);color:var(--amber);">Step 6 · Action Required</span>
-            <span class="step-hdr-title">Requirements &amp; Documents</span>
+            <span class="step-hdr-title">Documents</span>
             <span class="p-badge br" style="margin-left:4px;">1 Required Missing</span>
-          </div>
-
-          <!-- DRAG & DROP UPLOAD ZONE -->
-          <div class="dropzone" id="document-dropzone">
-            <input type="file" id="dropzone-file-input" class="dropzone-file-input" multiple>
-            <div class="dropzone-icon">🗄️</div>
-            <div class="dropzone-text">Drag &amp; drop documents here</div>
-            <div class="dropzone-subtext">or click to <span style="text-decoration:underline;">browse files</span> (PDF, JPG, PNG, HEIC · Max 10 MB per file)</div>
           </div>
 
           <!-- ── AI MERCHANT CLASSIFICATION BANNER ── -->
@@ -9932,90 +9828,32 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- ═══ STEP 9: SUBMIT ═══ -->
         <div class="step-panel" id="step-8">
           <div class="step-hdr">
-                        <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Ready to Send</span>
-            <span class="step-hdr-title">Review &amp; Send Application</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Submit</span>
+            <span class="step-hdr-title">Review &amp; Send for Signature</span>
           </div>
 
-          <!-- ── AI PRE-SUBMISSION REPORT ── -->
-          <div class="sc blue" style="margin-bottom:16px;">
-            <div class="sc-hdr blue"><div class="sc-hdr-left"><span class="sc-icon">✅</span><div><div class="sc-title">AI Pre-Submission Report</div><div class="sc-desc">Readiness checklist based on all available data</div></div></div></div>
-            <!-- SCORE ROW (from old UW Review) -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:16px;">
-              <!-- Risk Score -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
-                <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
-                  <span>0 High</span><span>100 Low</span>
-                </div>
-              </div>
-              <!-- Confidence -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
-                </div>
-                <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
-              </div>
-              <!-- Approval Outlook -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
-                <div style="font-size:20px;margin:4px 0;">🟢</div>
-                <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
-                <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
-                <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
-              </div>
-              <!-- Data Coverage -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
-              </div>
-            </div>
-
-            <!-- ISSUES & GAPS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px;">⚠ Issues &amp; Gaps</div>
+          <!-- ── AI PRE-SUBMIT CHECK ── -->
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(255,222,0,.04));border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">AI Pre-Submit Check</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--red);font-size:11px;flex-shrink:0;margin-top:1px;">✗</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Owner ID for Sarah Chen not yet received.</strong> As the 60% majority owner, her government-issued photo ID is required by all matched processors before submission. Application cannot be submitted without this. 16 days since last nudge.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Application fields complete — all required sections filled</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Volume delta between stated amount and bank deposits.</strong> Bank shows ~$28K/mo in Square deposits against a stated $85K monthly volume. This is unexplained without a processing statement. Likely split across multiple bank accounts or cash sales, but processors will ask.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Solution selected — First Data Omaha · IC+ 0.25% + $0.10</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No processing history on file.</strong> Not a hard block for standard retail, but adds a confidence penalty. First Data may issue a provisional approval with a lower volume ceiling until history is established.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Equipment configured — PAX A920 Pro × 1 + NMI Gateway</span></div>
                 </div>
-              </div>
-            </div>
-
-            <!-- WEBSITE ANALYSIS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:8px;">🌐 Website Analysis</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clean UI/UX, clear product catalog.</strong> E-commerce appears fully functional with secure checkout.</div>
+                <div id="ai-flag-id" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Owner ID (Sarah Chen) not yet uploaded — suggest requesting during DocuSign flow. <em style="color:var(--text-muted);">Not blocking this submission.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-id').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">I'll handle this</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clear pricing visible, no hidden fees.</strong> Returns policy clearly stated.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No explicit privacy policy link found in footer.</strong> Could be a minor underwriting flag.</div>
+                <div id="ai-flag-stmt" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Processing statement not uploaded — helps with First Data approval confidence. Request post-signature if merchant can't provide now. <em style="color:var(--text-muted);">Not blocking.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-stmt').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Acknowledge</button>
                 </div>
               </div>
             </div>
@@ -14393,102 +14231,6 @@ function toggleInfoGroup(hdr) {
   else body.style.maxHeight = '0';
 }
 
-// Drag and drop functionality
-document.addEventListener('DOMContentLoaded', () => {
-  const dropzone = document.getElementById('document-dropzone');
-  const fileInput = document.getElementById('dropzone-file-input');
-
-  if (dropzone && fileInput) {
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropzone.classList.add('dragover');
-    });
-    dropzone.addEventListener('dragleave', () => {
-      dropzone.classList.remove('dragover');
-    });
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-      // Handle file uploads here
-      const files = e.dataTransfer.files;
-      handleFiles(files);
-    });
-    fileInput.addEventListener('change', (e) => {
-      const files = e.target.files;
-      handleFiles(files);
-    });
-
-    function handleFiles(files) {
-      console.log('Files to upload:', files);
-      // Mock upload process and add to document list
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        // Simulate adding to the document list below
-        // This is where actual backend upload would happen
-        const mockDocList = document.querySelector('#step-6 .sc .document-list'); // Assuming a container for docs
-        if (mockDocList) {
-          const newDocRow = document.createElement('div');
-          newDocRow.className = 'document-item'; // Example class
-          newDocRow.innerHTML = `
-            <div style="display:grid;grid-template-columns:28px 1fr 110px 140px 90px 32px;gap:0;padding:11px 16px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.05);">
-              <div style="font-size:14px;">📄</div>
-              <div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <input value="${file.name}" style="font-size:12px;font-weight:600;color:var(--text-primary);background:transparent;border:none;outline:none;border-bottom:1px dashed transparent;font-family:var(--font-ui);width:100%;max-width:240px;" readonly>
-                </div>
-                <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">Uploaded: ${new Date().toLocaleDateString()}</div>
-              </div>
-              <div><span style="font-size:12px;font-weight:700;color:var(--green);background:var(--green-dim);padding:2px 7px;border-radius:4px;">Uploaded</span></div>
-              <div style="font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${file.name}<br><span style="color:var(--text-muted);">${(file.size / 1024 / 1024).toFixed(2)} MB</span></div>
-              <div style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;"></span><span style="font-size:11px;font-weight:600;color:var(--green);">Uploaded</span></div>
-              <div style="color:var(--text-muted);font-size:14px;cursor:pointer;text-align:center;">⋯</div>
-            </div>
-          `;
-          // Append to the list, e.g., to the custom-doc-rows or a new document-list container
-          // For now, let's assume custom-doc-rows as a simple target
-          const customDocRows = document.getElementById('custom-doc-rows');
-          if (customDocRows) customDocRows.appendChild(newDocRow);
-        }
-      }
-    }
-  }
-});
-
-function addDocRow() {
-  const newDocLabel = document.getElementById('new-doc-label').value;
-  const newDocReq = document.getElementById('new-doc-req').value;
-  if (!newDocLabel) return;
-
-  const customDocRows = document.getElementById('custom-doc-rows');
-  if (customDocRows) {
-    const newDoc = document.createElement('div');
-    newDoc.className = 'document-item'; // Use a generic class
-    newDoc.innerHTML = `
-      <div style="display:grid;grid-template-columns:28px 1fr 110px 140px 90px 32px;gap:0;padding:11px 16px;align-items:center;border-bottom:1px solid rgba(0,0,0,0.05);background:rgba(255,222,0,.03);">
-        <div style="font-size:14px;">📝</div>
-        <div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input value="${newDocLabel}" style="font-size:12px;font-weight:600;color:var(--text-primary);background:transparent;border:none;outline:none;border-bottom:1px dashed transparent;font-family:var(--font-ui);width:100%;max-width:240px;" readonly>
-          </div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">Requirement added by user</div>
-        </div>
-        <div><span style="font-size:12px;font-weight:700;color:var(--amber);background:var(--amber-dim);padding:2px 7px;border-radius:4px;">${newDocReq}</span></div>
-        <div>
-          <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:11px;color:var(--text-secondary);font-family:var(--font-ui);">
-            <span>↑</span> Upload
-            <input type="file" style="display:none;">
-          </label>
-        </div>
-        <div style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span><span style="font-size:11px;font-weight:600;color:var(--amber);">Pending</span></div>
-        <div style="color:var(--text-muted);font-size:14px;cursor:pointer;text-align:center;">⋯</div>
-      </div>
-    `;
-    customDocRows.appendChild(newDoc);
-  }
-  document.getElementById('new-doc-label').value = ''; // Clear input
-}
-
 function goStep(n) {
   document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
   const panel = document.getElementById('step-' + n);
@@ -16495,18 +16237,18 @@ function initResCharts() {
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
           <div class="step-num sn-curr">6</div>
-          <div class="step-info"><div class="step-title">Requirements &amp; Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
+          <div class="step-info"><div class="step-title">Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
         </div>
         <div class="step-conn" style="background:var(--amber);opacity:.4;"></div>
         
         <div class="step-item" id="si-7" onclick="goStep(7)">
           <div class="step-num sn-todo">✦</div>
-          <div class="step-info"><div class="step-title">Pricing &amp; Equipment</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
+          <div class="step-info"><div class="step-title">Pricing</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item" id="si-8" onclick="goStep(8)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Review &amp; Send</div><div class="step-sub">Send for signature</div></div>
+          <div class="step-info"><div class="step-title">Submit</div><div class="step-sub">Send for signature</div></div>
         </div>
 
         <div style="margin-top:auto;padding-top:16px;">
@@ -16660,59 +16402,48 @@ function initResCharts() {
         <div class="step-panel" id="step-7">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 7 · Complete</span>
-            <span class="step-hdr-title">Pricing &amp; Equipment Configuration</span>
+            <span class="step-hdr-title">Pricing Configuration</span>
           </div>
-
           <div class="sc amber">
-            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; POS Configuration</div><div class="sc-desc">Select terminals, gateways, and software for the solution</div></div></div></div>
-            <div id="selected-equipment-list" style="padding:10px 16px 14px;">
-              <!-- Dynamically added equipment will go here -->
-              <div class="equip-item">
-                <div class="equip-icon">📱</div>
-                <div>
-                  <div class="equip-name">PAX A920 Pro</div>
-                  <div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $25.00</div>
-                  <div class="price-line">Upfront: $299.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
-              </div>
-              <div class="equip-item">
-                <div class="equip-icon">🔌</div>
-                <div>
-                  <div class="equip-name">NMI Virtual Terminal</div>
-                  <div class="equip-sub">Online + MOTO processing via NMI Gateway</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $10.00</div>
-                  <div class="price-line">Upfront: $0.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Rate Model</div><div class="sc-desc">Choose how processing fees are structured</div></div></div></div>
+            <div style="padding:10px 16px 14px;">
+              <div class="price-tabs">
+                <div class="price-tab">Flat Rate</div>
+                <div class="price-tab active">Interchange Plus</div>
+                <div class="price-tab">Tiered</div>
+                <div class="price-tab">Surcharge</div>
               </div>
             </div>
+            <div class="fg">
+              <div class="fgroup"><label class="flabel">Markup Rate <span class="freq">*</span></label><input class="finput filled" value="0.25%"></div>
+              <div class="fgroup"><label class="flabel">Per Transaction Fee <span class="freq">*</span></label><input class="finput filled" value="$0.10"></div>
+              <div class="fgroup"><label class="flabel">Monthly Fee</label><input class="finput filled" value="$15.00"></div>
+              <div class="fgroup"><label class="flabel">Batch Settlement Fee</label><input class="finput filled" value="$0.05"></div>
+              <div class="fgroup"><label class="flabel">Statement Fee</label><input class="finput filled" value="$10.00"></div>
+              <div class="fgroup"><label class="flabel">Annual Fee</label><input class="finput filled" value="$0.00"></div>
+            </div>
+          </div>
+          <div class="sc amber">
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Software</div><div class="sc-desc">Select terminal or integration type</div></div></div></div>
+            <div class="equip-card selected">
+              <div class="equip-icon">📱</div>
+              <div><div class="equip-name">PAX A920 Pro</div><div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div></div>
+              <div class="esel on">✓</div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🖥</div>
+              <div><div class="equip-name">Dejavoo QD4</div><div class="equip-sub">Countertop terminal · Chip + Tap + Swipe</div></div>
+              <div class="esel off"></div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🔌</div>
+              <div><div class="equip-name">Virtual Terminal (API)</div><div class="equip-sub">NMI gateway · Online + MOTO</div></div>
+              <div class="esel off"></div>
+            </div>
             <div style="padding:12px 16px;border-top:1px solid var(--border);">
-              <div class="fg single" style="padding:0;margin-bottom:10px;">
-                <select class="finput fselect filled" id="add-equipment-select">
-                  <option value="">+ Add Equipment or Software...</option>
-                  <option value="pax_a80">PAX A80 Countertop (Monthly: $15, Upfront: $199)</option>
-                  <option value="clover_mini">Clover Mini POS (Monthly: $39, Upfront: $499)</option>
-                  <option value="shopify_integration">Shopify Integration (Monthly: $20)</option>
-                  <option value="chargeback_protection">Chargeback Protection (Monthly: $50)</option>
-                </select>
+              <div class="fg single" style="padding:0;">
+                <div class="fgroup"><label class="flabel">Gateway</label><select class="finput fselect filled"><option selected>NMI</option><option>Authorize.net</option><option>Stripe</option></select></div>
               </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">AI suggests: Chargeback Protection for high-risk; Loyalty Program for retail.</div>
             </div>
           </div>
           <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(8)">Submit →</button></div></div>
@@ -16722,16 +16453,8 @@ function initResCharts() {
         <div class="step-panel active" id="step-6">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--amber-dim);color:var(--amber);">Step 6 · Action Required</span>
-            <span class="step-hdr-title">Requirements &amp; Documents</span>
+            <span class="step-hdr-title">Documents</span>
             <span class="p-badge br" style="margin-left:4px;">1 Required Missing</span>
-          </div>
-
-          <!-- DRAG & DROP UPLOAD ZONE -->
-          <div class="dropzone" id="document-dropzone">
-            <input type="file" id="dropzone-file-input" class="dropzone-file-input" multiple>
-            <div class="dropzone-icon">🗄️</div>
-            <div class="dropzone-text">Drag &amp; drop documents here</div>
-            <div class="dropzone-subtext">or click to <span style="text-decoration:underline;">browse files</span> (PDF, JPG, PNG, HEIC · Max 10 MB per file)</div>
           </div>
 
           <!-- ── AI MERCHANT CLASSIFICATION BANNER ── -->
@@ -17674,90 +17397,32 @@ function initResCharts() {
         <!-- ═══ STEP 9: SUBMIT ═══ -->
         <div class="step-panel" id="step-8">
           <div class="step-hdr">
-                        <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Ready to Send</span>
-            <span class="step-hdr-title">Review &amp; Send Application</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Submit</span>
+            <span class="step-hdr-title">Review &amp; Send for Signature</span>
           </div>
 
-          <!-- ── AI PRE-SUBMISSION REPORT ── -->
-          <div class="sc blue" style="margin-bottom:16px;">
-            <div class="sc-hdr blue"><div class="sc-hdr-left"><span class="sc-icon">✅</span><div><div class="sc-title">AI Pre-Submission Report</div><div class="sc-desc">Readiness checklist based on all available data</div></div></div></div>
-            <!-- SCORE ROW (from old UW Review) -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:16px;">
-              <!-- Risk Score -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
-                <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
-                  <span>0 High</span><span>100 Low</span>
-                </div>
-              </div>
-              <!-- Confidence -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
-                </div>
-                <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
-              </div>
-              <!-- Approval Outlook -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
-                <div style="font-size:20px;margin:4px 0;">🟢</div>
-                <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
-                <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
-                <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
-              </div>
-              <!-- Data Coverage -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
-              </div>
-            </div>
-
-            <!-- ISSUES & GAPS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px;">⚠ Issues &amp; Gaps</div>
+          <!-- ── AI PRE-SUBMIT CHECK ── -->
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(255,222,0,.04));border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">AI Pre-Submit Check</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--red);font-size:11px;flex-shrink:0;margin-top:1px;">✗</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Owner ID for Sarah Chen not yet received.</strong> As the 60% majority owner, her government-issued photo ID is required by all matched processors before submission. Application cannot be submitted without this. 16 days since last nudge.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Application fields complete — all required sections filled</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Volume delta between stated amount and bank deposits.</strong> Bank shows ~$28K/mo in Square deposits against a stated $85K monthly volume. This is unexplained without a processing statement. Likely split across multiple bank accounts or cash sales, but processors will ask.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Solution selected — First Data Omaha · IC+ 0.25% + $0.10</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No processing history on file.</strong> Not a hard block for standard retail, but adds a confidence penalty. First Data may issue a provisional approval with a lower volume ceiling until history is established.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Equipment configured — PAX A920 Pro × 1 + NMI Gateway</span></div>
                 </div>
-              </div>
-            </div>
-
-            <!-- WEBSITE ANALYSIS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:8px;">🌐 Website Analysis</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clean UI/UX, clear product catalog.</strong> E-commerce appears fully functional with secure checkout.</div>
+                <div id="ai-flag-id" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Owner ID (Sarah Chen) not yet uploaded — suggest requesting during DocuSign flow. <em style="color:var(--text-muted);">Not blocking this submission.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-id').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">I'll handle this</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clear pricing visible, no hidden fees.</strong> Returns policy clearly stated.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No explicit privacy policy link found in footer.</strong> Could be a minor underwriting flag.</div>
+                <div id="ai-flag-stmt" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Processing statement not uploaded — helps with First Data approval confidence. Request post-signature if merchant can't provide now. <em style="color:var(--text-muted);">Not blocking.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-stmt').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Acknowledge</button>
                 </div>
               </div>
             </div>
@@ -19275,18 +18940,18 @@ function initResCharts() {
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
           <div class="step-num sn-curr">6</div>
-          <div class="step-info"><div class="step-title">Requirements &amp; Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
+          <div class="step-info"><div class="step-title">Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
         </div>
         <div class="step-conn" style="background:var(--amber);opacity:.4;"></div>
         
         <div class="step-item" id="si-7" onclick="goStep(7)">
           <div class="step-num sn-todo">✦</div>
-          <div class="step-info"><div class="step-title">Pricing &amp; Equipment</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
+          <div class="step-info"><div class="step-title">Pricing</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item" id="si-8" onclick="goStep(8)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Review &amp; Send</div><div class="step-sub">Send for signature</div></div>
+          <div class="step-info"><div class="step-title">Submit</div><div class="step-sub">Send for signature</div></div>
         </div>
 
         <div style="margin-top:auto;padding-top:16px;">
@@ -19440,59 +19105,48 @@ function initResCharts() {
         <div class="step-panel" id="step-7">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 7 · Complete</span>
-            <span class="step-hdr-title">Pricing &amp; Equipment Configuration</span>
+            <span class="step-hdr-title">Pricing Configuration</span>
           </div>
-
           <div class="sc amber">
-            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; POS Configuration</div><div class="sc-desc">Select terminals, gateways, and software for the solution</div></div></div></div>
-            <div id="selected-equipment-list" style="padding:10px 16px 14px;">
-              <!-- Dynamically added equipment will go here -->
-              <div class="equip-item">
-                <div class="equip-icon">📱</div>
-                <div>
-                  <div class="equip-name">PAX A920 Pro</div>
-                  <div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $25.00</div>
-                  <div class="price-line">Upfront: $299.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
-              </div>
-              <div class="equip-item">
-                <div class="equip-icon">🔌</div>
-                <div>
-                  <div class="equip-name">NMI Virtual Terminal</div>
-                  <div class="equip-sub">Online + MOTO processing via NMI Gateway</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $10.00</div>
-                  <div class="price-line">Upfront: $0.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Rate Model</div><div class="sc-desc">Choose how processing fees are structured</div></div></div></div>
+            <div style="padding:10px 16px 14px;">
+              <div class="price-tabs">
+                <div class="price-tab">Flat Rate</div>
+                <div class="price-tab active">Interchange Plus</div>
+                <div class="price-tab">Tiered</div>
+                <div class="price-tab">Surcharge</div>
               </div>
             </div>
+            <div class="fg">
+              <div class="fgroup"><label class="flabel">Markup Rate <span class="freq">*</span></label><input class="finput filled" value="0.25%"></div>
+              <div class="fgroup"><label class="flabel">Per Transaction Fee <span class="freq">*</span></label><input class="finput filled" value="$0.10"></div>
+              <div class="fgroup"><label class="flabel">Monthly Fee</label><input class="finput filled" value="$15.00"></div>
+              <div class="fgroup"><label class="flabel">Batch Settlement Fee</label><input class="finput filled" value="$0.05"></div>
+              <div class="fgroup"><label class="flabel">Statement Fee</label><input class="finput filled" value="$10.00"></div>
+              <div class="fgroup"><label class="flabel">Annual Fee</label><input class="finput filled" value="$0.00"></div>
+            </div>
+          </div>
+          <div class="sc amber">
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Software</div><div class="sc-desc">Select terminal or integration type</div></div></div></div>
+            <div class="equip-card selected">
+              <div class="equip-icon">📱</div>
+              <div><div class="equip-name">PAX A920 Pro</div><div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div></div>
+              <div class="esel on">✓</div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🖥</div>
+              <div><div class="equip-name">Dejavoo QD4</div><div class="equip-sub">Countertop terminal · Chip + Tap + Swipe</div></div>
+              <div class="esel off"></div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🔌</div>
+              <div><div class="equip-name">Virtual Terminal (API)</div><div class="equip-sub">NMI gateway · Online + MOTO</div></div>
+              <div class="esel off"></div>
+            </div>
             <div style="padding:12px 16px;border-top:1px solid var(--border);">
-              <div class="fg single" style="padding:0;margin-bottom:10px;">
-                <select class="finput fselect filled" id="add-equipment-select">
-                  <option value="">+ Add Equipment or Software...</option>
-                  <option value="pax_a80">PAX A80 Countertop (Monthly: $15, Upfront: $199)</option>
-                  <option value="clover_mini">Clover Mini POS (Monthly: $39, Upfront: $499)</option>
-                  <option value="shopify_integration">Shopify Integration (Monthly: $20)</option>
-                  <option value="chargeback_protection">Chargeback Protection (Monthly: $50)</option>
-                </select>
+              <div class="fg single" style="padding:0;">
+                <div class="fgroup"><label class="flabel">Gateway</label><select class="finput fselect filled"><option selected>NMI</option><option>Authorize.net</option><option>Stripe</option></select></div>
               </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">AI suggests: Chargeback Protection for high-risk; Loyalty Program for retail.</div>
             </div>
           </div>
           <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(8)">Submit →</button></div></div>
@@ -19502,16 +19156,8 @@ function initResCharts() {
         <div class="step-panel active" id="step-6">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--amber-dim);color:var(--amber);">Step 6 · Action Required</span>
-            <span class="step-hdr-title">Requirements &amp; Documents</span>
+            <span class="step-hdr-title">Documents</span>
             <span class="p-badge br" style="margin-left:4px;">1 Required Missing</span>
-          </div>
-
-          <!-- DRAG & DROP UPLOAD ZONE -->
-          <div class="dropzone" id="document-dropzone">
-            <input type="file" id="dropzone-file-input" class="dropzone-file-input" multiple>
-            <div class="dropzone-icon">🗄️</div>
-            <div class="dropzone-text">Drag &amp; drop documents here</div>
-            <div class="dropzone-subtext">or click to <span style="text-decoration:underline;">browse files</span> (PDF, JPG, PNG, HEIC · Max 10 MB per file)</div>
           </div>
 
           <!-- ── AI MERCHANT CLASSIFICATION BANNER ── -->
@@ -20454,90 +20100,32 @@ function initResCharts() {
         <!-- ═══ STEP 9: SUBMIT ═══ -->
         <div class="step-panel" id="step-8">
           <div class="step-hdr">
-                        <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Ready to Send</span>
-            <span class="step-hdr-title">Review &amp; Send Application</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Submit</span>
+            <span class="step-hdr-title">Review &amp; Send for Signature</span>
           </div>
 
-          <!-- ── AI PRE-SUBMISSION REPORT ── -->
-          <div class="sc blue" style="margin-bottom:16px;">
-            <div class="sc-hdr blue"><div class="sc-hdr-left"><span class="sc-icon">✅</span><div><div class="sc-title">AI Pre-Submission Report</div><div class="sc-desc">Readiness checklist based on all available data</div></div></div></div>
-            <!-- SCORE ROW (from old UW Review) -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:16px;">
-              <!-- Risk Score -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
-                <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
-                  <span>0 High</span><span>100 Low</span>
-                </div>
-              </div>
-              <!-- Confidence -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
-                </div>
-                <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
-              </div>
-              <!-- Approval Outlook -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
-                <div style="font-size:20px;margin:4px 0;">🟢</div>
-                <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
-                <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
-                <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
-              </div>
-              <!-- Data Coverage -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
-              </div>
-            </div>
-
-            <!-- ISSUES & GAPS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px;">⚠ Issues &amp; Gaps</div>
+          <!-- ── AI PRE-SUBMIT CHECK ── -->
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(255,222,0,.04));border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">AI Pre-Submit Check</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--red);font-size:11px;flex-shrink:0;margin-top:1px;">✗</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Owner ID for Sarah Chen not yet received.</strong> As the 60% majority owner, her government-issued photo ID is required by all matched processors before submission. Application cannot be submitted without this. 16 days since last nudge.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Application fields complete — all required sections filled</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Volume delta between stated amount and bank deposits.</strong> Bank shows ~$28K/mo in Square deposits against a stated $85K monthly volume. This is unexplained without a processing statement. Likely split across multiple bank accounts or cash sales, but processors will ask.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Solution selected — First Data Omaha · IC+ 0.25% + $0.10</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No processing history on file.</strong> Not a hard block for standard retail, but adds a confidence penalty. First Data may issue a provisional approval with a lower volume ceiling until history is established.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Equipment configured — PAX A920 Pro × 1 + NMI Gateway</span></div>
                 </div>
-              </div>
-            </div>
-
-            <!-- WEBSITE ANALYSIS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:8px;">🌐 Website Analysis</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clean UI/UX, clear product catalog.</strong> E-commerce appears fully functional with secure checkout.</div>
+                <div id="ai-flag-id" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Owner ID (Sarah Chen) not yet uploaded — suggest requesting during DocuSign flow. <em style="color:var(--text-muted);">Not blocking this submission.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-id').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">I'll handle this</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clear pricing visible, no hidden fees.</strong> Returns policy clearly stated.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No explicit privacy policy link found in footer.</strong> Could be a minor underwriting flag.</div>
+                <div id="ai-flag-stmt" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Processing statement not uploaded — helps with First Data approval confidence. Request post-signature if merchant can't provide now. <em style="color:var(--text-muted);">Not blocking.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-stmt').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Acknowledge</button>
                 </div>
               </div>
             </div>
@@ -22056,18 +21644,18 @@ function initResCharts() {
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
           <div class="step-num sn-curr">6</div>
-          <div class="step-info"><div class="step-title">Requirements &amp; Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
+          <div class="step-info"><div class="step-title">Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
         </div>
         <div class="step-conn" style="background:var(--amber);opacity:.4;"></div>
         
         <div class="step-item" id="si-7" onclick="goStep(7)">
           <div class="step-num sn-todo">✦</div>
-          <div class="step-info"><div class="step-title">Pricing &amp; Equipment</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
+          <div class="step-info"><div class="step-title">Pricing</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item" id="si-8" onclick="goStep(8)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Review &amp; Send</div><div class="step-sub">Send for signature</div></div>
+          <div class="step-info"><div class="step-title">Submit</div><div class="step-sub">Send for signature</div></div>
         </div>
 
         <div style="margin-top:auto;padding-top:16px;">
@@ -22221,59 +21809,48 @@ function initResCharts() {
         <div class="step-panel" id="step-7">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 7 · Complete</span>
-            <span class="step-hdr-title">Pricing &amp; Equipment Configuration</span>
+            <span class="step-hdr-title">Pricing Configuration</span>
           </div>
-
           <div class="sc amber">
-            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; POS Configuration</div><div class="sc-desc">Select terminals, gateways, and software for the solution</div></div></div></div>
-            <div id="selected-equipment-list" style="padding:10px 16px 14px;">
-              <!-- Dynamically added equipment will go here -->
-              <div class="equip-item">
-                <div class="equip-icon">📱</div>
-                <div>
-                  <div class="equip-name">PAX A920 Pro</div>
-                  <div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $25.00</div>
-                  <div class="price-line">Upfront: $299.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
-              </div>
-              <div class="equip-item">
-                <div class="equip-icon">🔌</div>
-                <div>
-                  <div class="equip-name">NMI Virtual Terminal</div>
-                  <div class="equip-sub">Online + MOTO processing via NMI Gateway</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $10.00</div>
-                  <div class="price-line">Upfront: $0.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Rate Model</div><div class="sc-desc">Choose how processing fees are structured</div></div></div></div>
+            <div style="padding:10px 16px 14px;">
+              <div class="price-tabs">
+                <div class="price-tab">Flat Rate</div>
+                <div class="price-tab active">Interchange Plus</div>
+                <div class="price-tab">Tiered</div>
+                <div class="price-tab">Surcharge</div>
               </div>
             </div>
+            <div class="fg">
+              <div class="fgroup"><label class="flabel">Markup Rate <span class="freq">*</span></label><input class="finput filled" value="0.25%"></div>
+              <div class="fgroup"><label class="flabel">Per Transaction Fee <span class="freq">*</span></label><input class="finput filled" value="$0.10"></div>
+              <div class="fgroup"><label class="flabel">Monthly Fee</label><input class="finput filled" value="$15.00"></div>
+              <div class="fgroup"><label class="flabel">Batch Settlement Fee</label><input class="finput filled" value="$0.05"></div>
+              <div class="fgroup"><label class="flabel">Statement Fee</label><input class="finput filled" value="$10.00"></div>
+              <div class="fgroup"><label class="flabel">Annual Fee</label><input class="finput filled" value="$0.00"></div>
+            </div>
+          </div>
+          <div class="sc amber">
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Software</div><div class="sc-desc">Select terminal or integration type</div></div></div></div>
+            <div class="equip-card selected">
+              <div class="equip-icon">📱</div>
+              <div><div class="equip-name">PAX A920 Pro</div><div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div></div>
+              <div class="esel on">✓</div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🖥</div>
+              <div><div class="equip-name">Dejavoo QD4</div><div class="equip-sub">Countertop terminal · Chip + Tap + Swipe</div></div>
+              <div class="esel off"></div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🔌</div>
+              <div><div class="equip-name">Virtual Terminal (API)</div><div class="equip-sub">NMI gateway · Online + MOTO</div></div>
+              <div class="esel off"></div>
+            </div>
             <div style="padding:12px 16px;border-top:1px solid var(--border);">
-              <div class="fg single" style="padding:0;margin-bottom:10px;">
-                <select class="finput fselect filled" id="add-equipment-select">
-                  <option value="">+ Add Equipment or Software...</option>
-                  <option value="pax_a80">PAX A80 Countertop (Monthly: $15, Upfront: $199)</option>
-                  <option value="clover_mini">Clover Mini POS (Monthly: $39, Upfront: $499)</option>
-                  <option value="shopify_integration">Shopify Integration (Monthly: $20)</option>
-                  <option value="chargeback_protection">Chargeback Protection (Monthly: $50)</option>
-                </select>
+              <div class="fg single" style="padding:0;">
+                <div class="fgroup"><label class="flabel">Gateway</label><select class="finput fselect filled"><option selected>NMI</option><option>Authorize.net</option><option>Stripe</option></select></div>
               </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">AI suggests: Chargeback Protection for high-risk; Loyalty Program for retail.</div>
             </div>
           </div>
           <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(8)">Submit →</button></div></div>
@@ -22283,16 +21860,8 @@ function initResCharts() {
         <div class="step-panel active" id="step-6">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--amber-dim);color:var(--amber);">Step 6 · Action Required</span>
-            <span class="step-hdr-title">Requirements &amp; Documents</span>
+            <span class="step-hdr-title">Documents</span>
             <span class="p-badge br" style="margin-left:4px;">1 Required Missing</span>
-          </div>
-
-          <!-- DRAG & DROP UPLOAD ZONE -->
-          <div class="dropzone" id="document-dropzone">
-            <input type="file" id="dropzone-file-input" class="dropzone-file-input" multiple>
-            <div class="dropzone-icon">🗄️</div>
-            <div class="dropzone-text">Drag &amp; drop documents here</div>
-            <div class="dropzone-subtext">or click to <span style="text-decoration:underline;">browse files</span> (PDF, JPG, PNG, HEIC · Max 10 MB per file)</div>
           </div>
 
           <!-- ── AI MERCHANT CLASSIFICATION BANNER ── -->
@@ -23235,90 +22804,32 @@ function initResCharts() {
         <!-- ═══ STEP 9: SUBMIT ═══ -->
         <div class="step-panel" id="step-8">
           <div class="step-hdr">
-                        <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Ready to Send</span>
-            <span class="step-hdr-title">Review &amp; Send Application</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Submit</span>
+            <span class="step-hdr-title">Review &amp; Send for Signature</span>
           </div>
 
-          <!-- ── AI PRE-SUBMISSION REPORT ── -->
-          <div class="sc blue" style="margin-bottom:16px;">
-            <div class="sc-hdr blue"><div class="sc-hdr-left"><span class="sc-icon">✅</span><div><div class="sc-title">AI Pre-Submission Report</div><div class="sc-desc">Readiness checklist based on all available data</div></div></div></div>
-            <!-- SCORE ROW (from old UW Review) -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:16px;">
-              <!-- Risk Score -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
-                <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
-                  <span>0 High</span><span>100 Low</span>
-                </div>
-              </div>
-              <!-- Confidence -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
-                </div>
-                <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
-              </div>
-              <!-- Approval Outlook -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
-                <div style="font-size:20px;margin:4px 0;">🟢</div>
-                <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
-                <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
-                <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
-              </div>
-              <!-- Data Coverage -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
-              </div>
-            </div>
-
-            <!-- ISSUES & GAPS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px;">⚠ Issues &amp; Gaps</div>
+          <!-- ── AI PRE-SUBMIT CHECK ── -->
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(255,222,0,.04));border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">AI Pre-Submit Check</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--red);font-size:11px;flex-shrink:0;margin-top:1px;">✗</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Owner ID for Sarah Chen not yet received.</strong> As the 60% majority owner, her government-issued photo ID is required by all matched processors before submission. Application cannot be submitted without this. 16 days since last nudge.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Application fields complete — all required sections filled</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Volume delta between stated amount and bank deposits.</strong> Bank shows ~$28K/mo in Square deposits against a stated $85K monthly volume. This is unexplained without a processing statement. Likely split across multiple bank accounts or cash sales, but processors will ask.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Solution selected — First Data Omaha · IC+ 0.25% + $0.10</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No processing history on file.</strong> Not a hard block for standard retail, but adds a confidence penalty. First Data may issue a provisional approval with a lower volume ceiling until history is established.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Equipment configured — PAX A920 Pro × 1 + NMI Gateway</span></div>
                 </div>
-              </div>
-            </div>
-
-            <!-- WEBSITE ANALYSIS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:8px;">🌐 Website Analysis</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clean UI/UX, clear product catalog.</strong> E-commerce appears fully functional with secure checkout.</div>
+                <div id="ai-flag-id" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Owner ID (Sarah Chen) not yet uploaded — suggest requesting during DocuSign flow. <em style="color:var(--text-muted);">Not blocking this submission.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-id').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">I'll handle this</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clear pricing visible, no hidden fees.</strong> Returns policy clearly stated.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No explicit privacy policy link found in footer.</strong> Could be a minor underwriting flag.</div>
+                <div id="ai-flag-stmt" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Processing statement not uploaded — helps with First Data approval confidence. Request post-signature if merchant can't provide now. <em style="color:var(--text-muted);">Not blocking.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-stmt').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Acknowledge</button>
                 </div>
               </div>
             </div>
@@ -24836,18 +24347,18 @@ function initResCharts() {
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
           <div class="step-num sn-curr">6</div>
-          <div class="step-info"><div class="step-title">Requirements &amp; Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
+          <div class="step-info"><div class="step-title">Documents</div><div class="step-sub" style="color:var(--amber);">2 of 5 missing</div></div>
         </div>
         <div class="step-conn" style="background:var(--amber);opacity:.4;"></div>
         
         <div class="step-item" id="si-7" onclick="goStep(7)">
           <div class="step-num sn-todo">✦</div>
-          <div class="step-info"><div class="step-title">Pricing &amp; Equipment</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
+          <div class="step-info"><div class="step-title">Pricing</div><div class="step-sub">IC+ · PAX A920 Pro</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item" id="si-8" onclick="goStep(8)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Review &amp; Send</div><div class="step-sub">Send for signature</div></div>
+          <div class="step-info"><div class="step-title">Submit</div><div class="step-sub">Send for signature</div></div>
         </div>
 
         <div style="margin-top:auto;padding-top:16px;">
@@ -25001,59 +24512,48 @@ function initResCharts() {
         <div class="step-panel" id="step-7">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 7 · Complete</span>
-            <span class="step-hdr-title">Pricing &amp; Equipment Configuration</span>
+            <span class="step-hdr-title">Pricing Configuration</span>
           </div>
-
           <div class="sc amber">
-            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; POS Configuration</div><div class="sc-desc">Select terminals, gateways, and software for the solution</div></div></div></div>
-            <div id="selected-equipment-list" style="padding:10px 16px 14px;">
-              <!-- Dynamically added equipment will go here -->
-              <div class="equip-item">
-                <div class="equip-icon">📱</div>
-                <div>
-                  <div class="equip-name">PAX A920 Pro</div>
-                  <div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $25.00</div>
-                  <div class="price-line">Upfront: $299.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
-              </div>
-              <div class="equip-item">
-                <div class="equip-icon">🔌</div>
-                <div>
-                  <div class="equip-name">NMI Virtual Terminal</div>
-                  <div class="equip-sub">Online + MOTO processing via NMI Gateway</div>
-                </div>
-                <div class="equip-pricing">
-                  <div class="price-line">Monthly: $10.00</div>
-                  <div class="price-line">Upfront: $0.00</div>
-                </div>
-                <select class="finput fselect" style="width:120px;margin-right:8px;">
-                  <option>Bill Merchant</option>
-                  <option>Bill Partner</option>
-                  <option>Bill ISO</option>
-                </select>
-                <button class="btn btn-ghost" style="font-size:11px;padding:5px 8px;">✕ Remove</button>
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Rate Model</div><div class="sc-desc">Choose how processing fees are structured</div></div></div></div>
+            <div style="padding:10px 16px 14px;">
+              <div class="price-tabs">
+                <div class="price-tab">Flat Rate</div>
+                <div class="price-tab active">Interchange Plus</div>
+                <div class="price-tab">Tiered</div>
+                <div class="price-tab">Surcharge</div>
               </div>
             </div>
+            <div class="fg">
+              <div class="fgroup"><label class="flabel">Markup Rate <span class="freq">*</span></label><input class="finput filled" value="0.25%"></div>
+              <div class="fgroup"><label class="flabel">Per Transaction Fee <span class="freq">*</span></label><input class="finput filled" value="$0.10"></div>
+              <div class="fgroup"><label class="flabel">Monthly Fee</label><input class="finput filled" value="$15.00"></div>
+              <div class="fgroup"><label class="flabel">Batch Settlement Fee</label><input class="finput filled" value="$0.05"></div>
+              <div class="fgroup"><label class="flabel">Statement Fee</label><input class="finput filled" value="$10.00"></div>
+              <div class="fgroup"><label class="flabel">Annual Fee</label><input class="finput filled" value="$0.00"></div>
+            </div>
+          </div>
+          <div class="sc amber">
+            <div class="sc-hdr amber"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Software</div><div class="sc-desc">Select terminal or integration type</div></div></div></div>
+            <div class="equip-card selected">
+              <div class="equip-icon">📱</div>
+              <div><div class="equip-name">PAX A920 Pro</div><div class="equip-sub">Android terminal · NFC · Wifi · 4G · Touchscreen</div></div>
+              <div class="esel on">✓</div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🖥</div>
+              <div><div class="equip-name">Dejavoo QD4</div><div class="equip-sub">Countertop terminal · Chip + Tap + Swipe</div></div>
+              <div class="esel off"></div>
+            </div>
+            <div class="equip-card">
+              <div class="equip-icon">🔌</div>
+              <div><div class="equip-name">Virtual Terminal (API)</div><div class="equip-sub">NMI gateway · Online + MOTO</div></div>
+              <div class="esel off"></div>
+            </div>
             <div style="padding:12px 16px;border-top:1px solid var(--border);">
-              <div class="fg single" style="padding:0;margin-bottom:10px;">
-                <select class="finput fselect filled" id="add-equipment-select">
-                  <option value="">+ Add Equipment or Software...</option>
-                  <option value="pax_a80">PAX A80 Countertop (Monthly: $15, Upfront: $199)</option>
-                  <option value="clover_mini">Clover Mini POS (Monthly: $39, Upfront: $499)</option>
-                  <option value="shopify_integration">Shopify Integration (Monthly: $20)</option>
-                  <option value="chargeback_protection">Chargeback Protection (Monthly: $50)</option>
-                </select>
+              <div class="fg single" style="padding:0;">
+                <div class="fgroup"><label class="flabel">Gateway</label><select class="finput fselect filled"><option selected>NMI</option><option>Authorize.net</option><option>Stripe</option></select></div>
               </div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">AI suggests: Chargeback Protection for high-risk; Loyalty Program for retail.</div>
             </div>
           </div>
           <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(8)">Submit →</button></div></div>
@@ -25063,16 +24563,8 @@ function initResCharts() {
         <div class="step-panel active" id="step-6">
           <div class="step-hdr">
             <span class="step-chip" style="background:var(--amber-dim);color:var(--amber);">Step 6 · Action Required</span>
-            <span class="step-hdr-title">Requirements &amp; Documents</span>
+            <span class="step-hdr-title">Documents</span>
             <span class="p-badge br" style="margin-left:4px;">1 Required Missing</span>
-          </div>
-
-          <!-- DRAG & DROP UPLOAD ZONE -->
-          <div class="dropzone" id="document-dropzone">
-            <input type="file" id="dropzone-file-input" class="dropzone-file-input" multiple>
-            <div class="dropzone-icon">🗄️</div>
-            <div class="dropzone-text">Drag &amp; drop documents here</div>
-            <div class="dropzone-subtext">or click to <span style="text-decoration:underline;">browse files</span> (PDF, JPG, PNG, HEIC · Max 10 MB per file)</div>
           </div>
 
           <!-- ── AI MERCHANT CLASSIFICATION BANNER ── -->
@@ -26015,90 +25507,32 @@ function initResCharts() {
         <!-- ═══ STEP 9: SUBMIT ═══ -->
         <div class="step-panel" id="step-8">
           <div class="step-hdr">
-                        <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Ready to Send</span>
-            <span class="step-hdr-title">Review &amp; Send Application</span>
+            <span class="step-chip" style="background:var(--green-dim);color:var(--green);">Step 8 · Submit</span>
+            <span class="step-hdr-title">Review &amp; Send for Signature</span>
           </div>
 
-          <!-- ── AI PRE-SUBMISSION REPORT ── -->
-          <div class="sc blue" style="margin-bottom:16px;">
-            <div class="sc-hdr blue"><div class="sc-hdr-left"><span class="sc-icon">✅</span><div><div class="sc-title">AI Pre-Submission Report</div><div class="sc-desc">Readiness checklist based on all available data</div></div></div></div>
-            <!-- SCORE ROW (from old UW Review) -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;padding:16px;">
-              <!-- Risk Score -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
-                <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
-                  <span>0 High</span><span>100 Low</span>
-                </div>
-              </div>
-              <!-- Confidence -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
-                <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
-                <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
-                <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
-                  <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
-                </div>
-                <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
-              </div>
-              <!-- Approval Outlook -->
-              <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
-                <div style="font-size:20px;margin:4px 0;">🟢</div>
-                <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
-                <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
-                <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
-              </div>
-              <!-- Data Coverage -->
-              <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
-              </div>
-            </div>
-
-            <!-- ISSUES & GAPS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:8px;">⚠ Issues &amp; Gaps</div>
+          <!-- ── AI PRE-SUBMIT CHECK ── -->
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(255,222,0,.04));border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">AI Pre-Submit Check</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--red);font-size:11px;flex-shrink:0;margin-top:1px;">✗</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Owner ID for Sarah Chen not yet received.</strong> As the 60% majority owner, her government-issued photo ID is required by all matched processors before submission. Application cannot be submitted without this. 16 days since last nudge.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Application fields complete — all required sections filled</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Volume delta between stated amount and bank deposits.</strong> Bank shows ~$28K/mo in Square deposits against a stated $85K monthly volume. This is unexplained without a processing statement. Likely split across multiple bank accounts or cash sales, but processors will ask.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Solution selected — First Data Omaha · IC+ 0.25% + $0.10</span></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No processing history on file.</strong> Not a hard block for standard retail, but adds a confidence penalty. First Data may issue a provisional approval with a lower volume ceiling until history is established.</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="color:var(--green);font-weight:700;">✓</span><span style="font-size:11px;color:var(--text-secondary);">Equipment configured — PAX A920 Pro × 1 + NMI Gateway</span></div>
                 </div>
-              </div>
-            </div>
-
-            <!-- WEBSITE ANALYSIS -->
-            <div style="padding:14px 16px;border-top:1px solid var(--border-strong);">
-              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:8px;">🌐 Website Analysis</div>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clean UI/UX, clear product catalog.</strong> E-commerce appears fully functional with secure checkout.</div>
+                <div id="ai-flag-id" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Owner ID (Sarah Chen) not yet uploaded — suggest requesting during DocuSign flow. <em style="color:var(--text-muted);">Not blocking this submission.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-id').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">I'll handle this</button>
                 </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Clear pricing visible, no hidden fees.</strong> Returns policy clearly stated.</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <span style="color:var(--amber);font-size:11px;flex-shrink:0;margin-top:1px;">⚠</span>
-                  <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No explicit privacy policy link found in footer.</strong> Could be a minor underwriting flag.</div>
+                <div id="ai-flag-stmt" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:6px;">
+                  <div style="display:flex;align-items:flex-start;gap:7px;"><span style="color:var(--amber);font-weight:700;flex-shrink:0;">⚠</span><div style="font-size:11px;color:var(--text-secondary);">Processing statement not uploaded — helps with First Data approval confidence. Request post-signature if merchant can't provide now. <em style="color:var(--text-muted);">Not blocking.</em></div></div>
+                  <button onclick="document.getElementById('ai-flag-stmt').style.display='none'" style="flex-shrink:0;padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Acknowledge</button>
                 </div>
               </div>
             </div>

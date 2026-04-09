@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twill — Font Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:#F7F5F0; color:#37352F;
+    font-family:'Inter',-apple-system,sans-serif;
+    font-size:13px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:40px;
+  }
+  h1 { font-family:'Inter'; font-size:24px; font-weight:600; letter-spacing:-0.03em; margin-bottom:8px; color:#222E48; }
+  .intro { color:#787774; font-size:14px; margin-bottom:40px; max-width:700px; line-height:1.6; }
+  .intro strong { color:#37352F; }
+
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-bottom:48px; }
+  .option { background:#FFFFFF; border-radius:12px; padding:32px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+  .option-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid rgba(0,0,0,0.06); }
+  .option-name { font-size:18px; font-weight:600; color:#222E48; }
+  .option-meta { font-size:11px; color:#A09E9A; }
+  .option-who { font-size:11px; color:#787774; margin-top:2px; }
+
+  /* Simulated dashboard sections */
+  .sim-nav { display:flex; gap:16px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(0,0,0,0.04); }
+  .sim-nav span { font-size:13px; color:#A09E9A; cursor:default; }
+  .sim-nav span.active { color:#37352F; font-weight:500; border-bottom:2px solid #FFDE00; padding-bottom:10px; margin-bottom:-13px; }
+
+  .sim-kpi { display:flex; gap:0; margin-bottom:24px; }
+  .sim-kpi-item { flex:1; }
+  .sim-kpi-label { font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:#A09E9A; margin-bottom:6px; }
+  .sim-kpi-value { font-family:'JetBrains Mono'; font-size:22px; font-weight:500; color:#37352F; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+  .sim-kpi-delta { font-size:11px; color:#2D7A4F; margin-top:4px; }
+
+  .sim-section-title { font-size:13px; color:#37352F; margin-bottom:12px; }
+  .sim-table { width:100%; border-collapse:collapse; }
+  .sim-table th { text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:#A09E9A; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+  .sim-table th.r { text-align:right; }
+  .sim-table td { font-size:13px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.03); color:#37352F; }
+  .sim-table td.r { text-align:right; font-family:'JetBrains Mono'; font-size:12px; font-variant-numeric:tabular-nums; }
+  .sim-table td.muted { color:#787774; }
+  .sim-table td.pos { color:#2D7A4F; }
+
+  .sim-label { display:inline-block; font-size:10px; padding:2px 6px; border-radius:3px; }
+  .sim-label.green { background:rgba(45,122,79,0.08); color:#2D7A4F; }
+  .sim-label.amber { background:rgba(154,103,0,0.07); color:#9A6700; }
+
+  .note { background:#FDFCFA; border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:20px 24px; margin-bottom:40px; }
+  .note-title { font-size:13px; font-weight:600; margin-bottom:6px; color:#222E48; }
+  .note-text { font-size:13px; color:#787774; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<h1>Font Comparison — Twill Portal</h1>
+<p class="intro">
+  Same dashboard content rendered in 5 different interface fonts. Each option uses the candidate font for <strong>headings, nav, labels, and section titles</strong>. Numbers always use <strong>JetBrains Mono</strong> with tabular numerals. Body/data text uses <strong>Inter</strong> in all options.
+</p>
+
+<div class="note">
+  <div class="note-title">What to look for</div>
+  <div class="note-text">Which one feels the calmest? The most premium? The easiest to scan? Pay attention to the nav items, section titles, table headers, and KPI labels — that's where the interface font shows most.</div>
+</div>
+
+<div class="grid">
+
+  <!-- OPTION A: Inter (single font system) -->
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-name" style="font-family:'Inter';">A · Inter</div>
+        <div class="option-who">Used by: Linear, Figma, GitHub</div>
+      </div>
+      <div class="option-meta">Safe, proven, invisible</div>
+    </div>
+    <div class="sim-nav">
+      <span style="font-family:'Inter';font-weight:500;" class="active">Dashboard</span>
+      <span style="font-family:'Inter';">Residuals</span>
+      <span style="font-family:'Inter';">Merchants</span>
+      <span style="font-family:'Inter';">Tickets</span>
+    </div>
+    <div class="sim-kpi">
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Inter';">Active Partners</div><div class="sim-kpi-value">14</div><div class="sim-kpi-delta">↑ 2 this month</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Inter';">MTD Volume</div><div class="sim-kpi-value">$4.2M</div><div class="sim-kpi-delta">↑ 11%</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Inter';">Residuals</div><div class="sim-kpi-value">$38.4K</div><div class="sim-kpi-delta">↑ 8.3%</div></div>
+    </div>
+    <div class="sim-section-title" style="font-family:'Inter';font-weight:500;">Processing Volume</div>
+    <table class="sim-table">
+      <thead><tr><th style="font-family:'Inter';">Processor</th><th class="r" style="font-family:'Inter';">Net Income</th><th class="r" style="font-family:'Inter';">Margin</th><th style="font-family:'Inter';">Status</th></tr></thead>
+      <tbody>
+        <tr><td>TSYS</td><td class="r">$412,291</td><td class="r muted">0.40%</td><td><span class="sim-label green" style="font-family:'Inter';">Active</span></td></tr>
+        <tr><td>Fiserv</td><td class="r">$231,104</td><td class="r muted">0.38%</td><td><span class="sim-label green" style="font-family:'Inter';">Active</span></td></tr>
+        <tr><td>Paysafe</td><td class="r">$128,441</td><td class="r pos">0.44%</td><td><span class="sim-label amber" style="font-family:'Inter';">Review</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- OPTION B: DM Sans -->
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-name" style="font-family:'DM Sans';">B · DM Sans</div>
+        <div class="option-who">Used by: Stripe, Loom · In Twill brand guide</div>
+      </div>
+      <div class="option-meta">Geometric, calm, clean</div>
+    </div>
+    <div class="sim-nav">
+      <span style="font-family:'DM Sans';font-weight:500;" class="active">Dashboard</span>
+      <span style="font-family:'DM Sans';">Residuals</span>
+      <span style="font-family:'DM Sans';">Merchants</span>
+      <span style="font-family:'DM Sans';">Tickets</span>
+    </div>
+    <div class="sim-kpi">
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'DM Sans';">Active Partners</div><div class="sim-kpi-value">14</div><div class="sim-kpi-delta">↑ 2 this month</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'DM Sans';">MTD Volume</div><div class="sim-kpi-value">$4.2M</div><div class="sim-kpi-delta">↑ 11%</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'DM Sans';">Residuals</div><div class="sim-kpi-value">$38.4K</div><div class="sim-kpi-delta">↑ 8.3%</div></div>
+    </div>
+    <div class="sim-section-title" style="font-family:'DM Sans';font-weight:500;">Processing Volume</div>
+    <table class="sim-table">
+      <thead><tr><th style="font-family:'DM Sans';">Processor</th><th class="r" style="font-family:'DM Sans';">Net Income</th><th class="r" style="font-family:'DM Sans';">Margin</th><th style="font-family:'DM Sans';">Status</th></tr></thead>
+      <tbody>
+        <tr><td>TSYS</td><td class="r">$412,291</td><td class="r muted">0.40%</td><td><span class="sim-label green" style="font-family:'DM Sans';">Active</span></td></tr>
+        <tr><td>Fiserv</td><td class="r">$231,104</td><td class="r muted">0.38%</td><td><span class="sim-label green" style="font-family:'DM Sans';">Active</span></td></tr>
+        <tr><td>Paysafe</td><td class="r">$128,441</td><td class="r pos">0.44%</td><td><span class="sim-label amber" style="font-family:'DM Sans';">Review</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- OPTION C: Plus Jakarta Sans -->
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-name" style="font-family:'Plus Jakarta Sans';">C · Plus Jakarta Sans</div>
+        <div class="option-who">Used by: Gumroad, Framer · Modern fintech favorite</div>
+      </div>
+      <div class="option-meta">Warm, modern, slightly rounded</div>
+    </div>
+    <div class="sim-nav">
+      <span style="font-family:'Plus Jakarta Sans';font-weight:500;" class="active">Dashboard</span>
+      <span style="font-family:'Plus Jakarta Sans';">Residuals</span>
+      <span style="font-family:'Plus Jakarta Sans';">Merchants</span>
+      <span style="font-family:'Plus Jakarta Sans';">Tickets</span>
+    </div>
+    <div class="sim-kpi">
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Plus Jakarta Sans';">Active Partners</div><div class="sim-kpi-value">14</div><div class="sim-kpi-delta">↑ 2 this month</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Plus Jakarta Sans';">MTD Volume</div><div class="sim-kpi-value">$4.2M</div><div class="sim-kpi-delta">↑ 11%</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Plus Jakarta Sans';">Residuals</div><div class="sim-kpi-value">$38.4K</div><div class="sim-kpi-delta">↑ 8.3%</div></div>
+    </div>
+    <div class="sim-section-title" style="font-family:'Plus Jakarta Sans';font-weight:600;">Processing Volume</div>
+    <table class="sim-table">
+      <thead><tr><th style="font-family:'Plus Jakarta Sans';">Processor</th><th class="r" style="font-family:'Plus Jakarta Sans';">Net Income</th><th class="r" style="font-family:'Plus Jakarta Sans';">Margin</th><th style="font-family:'Plus Jakarta Sans';">Status</th></tr></thead>
+      <tbody>
+        <tr><td>TSYS</td><td class="r">$412,291</td><td class="r muted">0.40%</td><td><span class="sim-label green" style="font-family:'Plus Jakarta Sans';">Active</span></td></tr>
+        <tr><td>Fiserv</td><td class="r">$231,104</td><td class="r muted">0.38%</td><td><span class="sim-label green" style="font-family:'Plus Jakarta Sans';">Active</span></td></tr>
+        <tr><td>Paysafe</td><td class="r">$128,441</td><td class="r pos">0.44%</td><td><span class="sim-label amber" style="font-family:'Plus Jakarta Sans';">Review</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- OPTION D: Public Sans -->
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-name" style="font-family:'Public Sans';">D · Public Sans</div>
+        <div class="option-who">Used by: US Government (USWDS) · Trusted by fintech</div>
+      </div>
+      <div class="option-meta">Neutral, reliable, institutional</div>
+    </div>
+    <div class="sim-nav">
+      <span style="font-family:'Public Sans';font-weight:600;" class="active">Dashboard</span>
+      <span style="font-family:'Public Sans';">Residuals</span>
+      <span style="font-family:'Public Sans';">Merchants</span>
+      <span style="font-family:'Public Sans';">Tickets</span>
+    </div>
+    <div class="sim-kpi">
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Public Sans';">Active Partners</div><div class="sim-kpi-value">14</div><div class="sim-kpi-delta">↑ 2 this month</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Public Sans';">MTD Volume</div><div class="sim-kpi-value">$4.2M</div><div class="sim-kpi-delta">↑ 11%</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Public Sans';">Residuals</div><div class="sim-kpi-value">$38.4K</div><div class="sim-kpi-delta">↑ 8.3%</div></div>
+    </div>
+    <div class="sim-section-title" style="font-family:'Public Sans';font-weight:600;">Processing Volume</div>
+    <table class="sim-table">
+      <thead><tr><th style="font-family:'Public Sans';">Processor</th><th class="r" style="font-family:'Public Sans';">Net Income</th><th class="r" style="font-family:'Public Sans';">Margin</th><th style="font-family:'Public Sans';">Status</th></tr></thead>
+      <tbody>
+        <tr><td>TSYS</td><td class="r">$412,291</td><td class="r muted">0.40%</td><td><span class="sim-label green" style="font-family:'Public Sans';">Active</span></td></tr>
+        <tr><td>Fiserv</td><td class="r">$231,104</td><td class="r muted">0.38%</td><td><span class="sim-label green" style="font-family:'Public Sans';">Active</span></td></tr>
+        <tr><td>Paysafe</td><td class="r">$128,441</td><td class="r pos">0.44%</td><td><span class="sim-label amber" style="font-family:'Public Sans';">Review</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- OPTION E: Outfit -->
+  <div class="option" style="grid-column:span 2; max-width:calc(50% - 16px);">
+    <div class="option-header">
+      <div>
+        <div class="option-name" style="font-family:'Outfit';">E · Outfit</div>
+        <div class="option-who">Modern geometric · Used by fintech startups</div>
+      </div>
+      <div class="option-meta">Clean, contemporary, slightly warm</div>
+    </div>
+    <div class="sim-nav">
+      <span style="font-family:'Outfit';font-weight:500;" class="active">Dashboard</span>
+      <span style="font-family:'Outfit';">Residuals</span>
+      <span style="font-family:'Outfit';">Merchants</span>
+      <span style="font-family:'Outfit';">Tickets</span>
+    </div>
+    <div class="sim-kpi">
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Outfit';">Active Partners</div><div class="sim-kpi-value">14</div><div class="sim-kpi-delta">↑ 2 this month</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Outfit';">MTD Volume</div><div class="sim-kpi-value">$4.2M</div><div class="sim-kpi-delta">↑ 11%</div></div>
+      <div class="sim-kpi-item"><div class="sim-kpi-label" style="font-family:'Outfit';">Residuals</div><div class="sim-kpi-value">$38.4K</div><div class="sim-kpi-delta">↑ 8.3%</div></div>
+    </div>
+    <div class="sim-section-title" style="font-family:'Outfit';font-weight:500;">Processing Volume</div>
+    <table class="sim-table">
+      <thead><tr><th style="font-family:'Outfit';">Processor</th><th class="r" style="font-family:'Outfit';">Net Income</th><th class="r" style="font-family:'Outfit';">Margin</th><th style="font-family:'Outfit';">Status</th></tr></thead>
+      <tbody>
+        <tr><td>TSYS</td><td class="r">$412,291</td><td class="r muted">0.40%</td><td><span class="sim-label green" style="font-family:'Outfit';">Active</span></td></tr>
+        <tr><td>Fiserv</td><td class="r">$231,104</td><td class="r muted">0.38%</td><td><span class="sim-label green" style="font-family:'Outfit';">Active</span></td></tr>
+        <tr><td>Paysafe</td><td class="r">$128,441</td><td class="r pos">0.44%</td><td><span class="sim-label amber" style="font-family:'Outfit';">Review</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="note">
+  <div class="note-title">My take</div>
+  <div class="note-text">
+    <strong>A · Inter</strong> — safest choice. What Linear, Figma, and most premium SaaS products use. Invisible in the best way. Zero personality but zero friction.<br><br>
+    <strong>B · DM Sans</strong> — already in Twill's brand guidelines. Geometric and calm. Slightly more character than Inter. Good continuity with existing brand materials.<br><br>
+    <strong>C · Plus Jakarta Sans</strong> — my personal recommendation. Warmer and more modern than Inter, slightly rounded terminals that feel approachable without being soft. Pairs beautifully with Inter for data. Very popular in fintech right now.<br><br>
+    <strong>D · Public Sans</strong> — institutional trust. Feels like a bank, in a good way. Neutral and reliable. Great for B2B where credibility matters more than personality.<br><br>
+    <strong>E · Outfit</strong> — contemporary geometric. Clean and modern. More personality than Inter but less warm than Plus Jakarta. Good middle ground.
+  </div>
+</div>
+
+</body>
+</html>
