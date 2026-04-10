@@ -3915,7 +3915,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
         <div class="step-item" id="si-5" onclick="goStep(5)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Solutions</div><div class="step-sub">3 recommended</div></div>
+          <div class="step-info"><div class="step-title">Solution Builder</div><div class="step-sub">3 recommended</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
@@ -4078,7 +4078,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solution Builder →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
@@ -4850,8 +4850,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
-            <span class="step-hdr-title">Recommended Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+            <span class="step-hdr-title">Solution Builder</span>
           </div>
 
           <!-- Tab bar + search + view toggle -->
@@ -5448,7 +5448,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -8748,7 +8748,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
         <div class="step-item" id="si-5" onclick="goStep(5)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Solutions</div><div class="step-sub">3 recommended</div></div>
+          <div class="step-info"><div class="step-title">Solution Builder</div><div class="step-sub">3 recommended</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
@@ -8911,7 +8911,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solution Builder →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
@@ -9683,8 +9683,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
-            <span class="step-hdr-title">Recommended Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+            <span class="step-hdr-title">Solution Builder</span>
           </div>
 
           <!-- Tab bar + search + view toggle -->
@@ -10281,7 +10281,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -12741,6 +12741,7 @@ function navigateToMerchant(name, status) {
     showView('merchant-active', null);
     setTimeout(initMaChart, 50);
   } else {
+    _currentSBMerchant = name;
     document.getElementById('md-merchant-name').textContent = name;
     const thread = document.getElementById('chatThread');
     if (thread && alertsHTML) {
@@ -12752,6 +12753,10 @@ function navigateToMerchant(name, status) {
       setTimeout(() => thread.scrollTop = thread.scrollHeight, 50);
     }
     showView('merchant-detail', null);
+    // Render Solution Builder for lead-status merchants
+    if (status === 'lead') {
+      setTimeout(() => renderSolutionBuilder(name), 50);
+    }
   }
 }
 
@@ -14498,6 +14503,11 @@ function goStep(n) {
   if (si) si.classList.add('active');
   const fc = document.querySelector('#view-merchant-detail .form-content');
   if (fc) fc.scrollTop = 0;
+  // Re-render Solution Builder for lead merchants when navigating to step 5
+  if (n === 5 && _currentSBMerchant) {
+    const m = merchantData.find(x => x.name === _currentSBMerchant);
+    if (m && m.status === 'lead') renderSolutionBuilder(_currentSBMerchant);
+  }
 }
 
 function cfSwitch(el) {
@@ -14711,6 +14721,551 @@ function expandCard(id) {
   if (header) {
     header.style.cursor = 'default';
     header.removeAttribute('onclick');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   SOLUTION BUILDER v2 — Next Best Action Architecture
+   ══════════════════════════════════════════════════ */
+
+const SB_PROFILES = {
+  'Fresh Brew Coffee Co.': {
+    type:'restaurant', mcc:'5812', mccLabel:'Eating Places & Restaurants',
+    aiClass:'Coffee Shop / Quick-Service Restaurant', appCompletion:42,
+    risk:'Low', confidence:72, outlook:'Favorable', coverage:45,
+    aiSources: [
+      { type:'app', label:'Application Data', pct:42, detail:'Business info, owner details partially complete' },
+      { type:'chat', label:'Chat History', pct:15, detail:'1 inbound inquiry — owner asked about rates' },
+      { type:'transcript', label:'Call Transcripts', pct:0, detail:'No calls recorded yet' },
+      { type:'web', label:'Web Presence', pct:80, detail:'freshbrewcoffee.com found — WordPress + WooCommerce detected' },
+    ],
+    aiInsights: [
+      { icon:'🌐', text:'Website detected: <strong>freshbrewcoffee.com</strong> — WordPress + WooCommerce. Online ordering likely active.', source:'Web Scan', auto:true },
+      { icon:'📍', text:'Google Business listing found — <strong>4.6★ rating, 280 reviews</strong>. Single location, Downtown Portland.', source:'Web Scan', auto:true },
+      { icon:'💬', text:'Owner mentioned "switching from Square" in initial inquiry — <strong>price sensitivity likely</strong>.', source:'Chat History', auto:true },
+      { icon:'⚠️', text:'No call transcript uploaded — discovery call would increase confidence from 72% → ~88%.', source:'AI Analysis', auto:false },
+    ],
+    questions: [
+      { id:'q1', q:'What POS system are you currently using?', why:'Determines terminal compatibility and migration path', priority:'critical', aiPrefill:'Square (mentioned switching away)', aiSource:'Chat', category:'Operations' },
+      { id:'q2', q:'How many transactions do you process per month?', why:'Sets volume tier for processor pricing', priority:'critical', aiPrefill:'', category:'Volume' },
+      { id:'q3', q:'Do you need online ordering integrated with in-store?', why:'Determines if omnichannel solution needed vs. standalone terminal', priority:'high', aiPrefill:'Likely yes — WooCommerce store detected', aiSource:'Web Scan', category:'Features' },
+      { id:'q4', q:'What features matter most? (tipping, loyalty, inventory, reporting)', why:'Filters solution set to what merchant actually needs', priority:'high', aiPrefill:'', category:'Features' },
+      { id:'q5', q:'Do you have a chargeback mitigation provider?', why:'Risk assessment — affects processor selection for QSR', priority:'medium', aiPrefill:'', category:'Risk' },
+      { id:'q6', q:'Any existing gateway or payment integration?', why:'Migration complexity — affects timeline and solution', priority:'medium', aiPrefill:'Square ecosystem — will need full migration', aiSource:'Chat', category:'Technical' },
+      { id:'q7', q:'How many terminals / checkout stations do you need?', why:'Equipment quote — affects pricing and setup', priority:'high', aiPrefill:'', category:'Equipment' },
+    ],
+    solutions: [
+      {
+        id:'sol1', name:'First Data Omaha + PAX A920 Pro', fit:85, badge:'Best Match', risk:'Low', type:'Card Present',
+        approval:'24–48 hrs', pricing:'IC+ 0.25% + $0.10', terminal:'PAX A920 Pro', gateway:'NMI',
+        shortWhy:'Best fit for QSR switching from Square — competitive IC+ beats flat-rate at their volume.',
+        whyWorks: [
+          { point:'IC+ pricing saves ~30% vs. Square\'s flat 2.6% + $0.10 at estimated volume', source:'Pricing Engine', hasData:true },
+          { point:'PAX A920 Pro has built-in tipping — critical for coffee shop counter service', source:'Equipment DB', hasData:true },
+          { point:'NMI gateway covers WooCommerce integration for online orders', source:'Web Scan — WooCommerce detected', hasData:true },
+          { point:'MCC 5812 standard restaurant — no addendum, fast approval', source:'Compliance Engine', hasData:true },
+        ],
+        risks: [
+          { point:'Volume estimate is based on chat context only — need confirmation', severity:'medium' },
+          { point:'If they need Toast-level POS features, terminal-only may underserve', severity:'low' },
+        ],
+        marketing: [
+          { name:'First Data Product Sheet', icon:'📄', type:'PDF' },
+          { name:'IC+ vs Flat Rate Comparison', icon:'📊', type:'PDF' },
+          { name:'PAX A920 Pro Features', icon:'📱', type:'PDF' },
+        ],
+        setupSteps: ['Submit application','UW review (24-48 hrs)','Terminal ships (2-3 days)','NMI credentials sent','Live processing — est. Day 5'],
+      },
+      {
+        id:'sol2', name:'Clover Station Duo', fit:78, badge:'', risk:'Low', type:'Card Present + POS',
+        approval:'3–5 days', pricing:'Tiered / Custom', terminal:'Clover Station Duo', gateway:'Built-in',
+        shortWhy:'All-in-one POS with built-in ordering, tipping, loyalty — higher cost but more features.',
+        whyWorks: [
+          { point:'All-in-one POS designed for restaurants — tipping, tabs, order management built in', source:'Equipment DB', hasData:true },
+          { point:'Online ordering module available — could replace WooCommerce dependency', source:'Product Knowledge', hasData:false },
+          { point:'Clover App Market for loyalty programs and inventory', source:'Product Knowledge', hasData:false },
+        ],
+        risks: [
+          { point:'Higher monthly cost ($14.95+/mo) vs. terminal-only solution', severity:'medium' },
+          { point:'Locked into Fiserv ecosystem — less flexibility long term', severity:'medium' },
+          { point:'Longer approval timeline (3-5 days vs 24-48 hrs)', severity:'low' },
+        ],
+        marketing: [
+          { name:'Clover Station Duo Overview', icon:'📄', type:'PDF' },
+          { name:'Clover for Restaurants', icon:'☕', type:'PDF' },
+        ],
+        setupSteps: ['Submit application','UW review (3-5 days)','Clover ships pre-configured','Merchant self-setup or field install','Live processing — est. Day 8-10'],
+      },
+      {
+        id:'sol3', name:'Square for Restaurants', fit:52, badge:'', risk:'Low', type:'Flat Rate',
+        approval:'Instant', pricing:'2.6% + $0.10 flat', terminal:'Square Terminal', gateway:'Built-in',
+        shortWhy:'They\'re already on Square — minimal migration but higher long-term cost.',
+        whyWorks: [
+          { point:'Zero migration effort — merchant is already familiar with the ecosystem', source:'Chat History', hasData:true },
+          { point:'Instant approval — could be processing same day', source:'Product Knowledge', hasData:true },
+        ],
+        risks: [
+          { point:'Flat-rate 2.6% + $0.10 costs ~30% more than IC+ at estimated volume', severity:'high' },
+          { point:'Merchant explicitly mentioned wanting to switch away from Square', severity:'high' },
+          { point:'No residual opportunity for partner', severity:'high' },
+        ],
+        marketing: [],
+        setupSteps: ['Already active — no migration needed'],
+      },
+    ],
+  },
+  'Harborlight Dental': {
+    type:'healthcare', mcc:'8021', mccLabel:'Dentists & Orthodontists',
+    aiClass:'Healthcare — Dental Practice', appCompletion:28,
+    risk:'Low', confidence:58, outlook:'Favorable', coverage:32,
+    aiSources: [
+      { type:'app', label:'Application Data', pct:28, detail:'Business name and owner only' },
+      { type:'chat', label:'Chat History', pct:0, detail:'No messages yet — partner referral' },
+      { type:'transcript', label:'Call Transcripts', pct:0, detail:'No calls recorded' },
+      { type:'web', label:'Web Presence', pct:60, detail:'harborlightdental.com found — custom site' },
+    ],
+    aiInsights: [
+      { icon:'🌐', text:'Website detected: <strong>harborlightdental.com</strong> — custom site, no online booking payment detected.', source:'Web Scan', auto:true },
+      { icon:'🏥', text:'Healthcare MCC 8021 — <strong>recurring billing likely needed</strong> for payment plans.', source:'AI Analysis', auto:true },
+      { icon:'📋', text:'Partner referral from NovaPay — no discovery data yet. <strong>Confidence very low.</strong>', source:'System', auto:false },
+    ],
+    questions: [
+      { id:'q1', q:'What practice management software do they use?', why:'Determines integration path for payment posting', priority:'critical', aiPrefill:'', category:'Operations' },
+      { id:'q2', q:'Do they offer payment plans or recurring billing?', why:'Drives gateway and recurring billing feature selection', priority:'critical', aiPrefill:'Likely — standard for dental practices', aiSource:'AI Analysis', category:'Features' },
+      { id:'q3', q:'Average transaction amount?', why:'Affects interchange optimization strategy', priority:'high', aiPrefill:'', category:'Volume' },
+      { id:'q4', q:'Do they accept payments online or only in-office?', why:'Determines if ecom gateway needed', priority:'high', aiPrefill:'No online payment detected on website', aiSource:'Web Scan', category:'Technical' },
+      { id:'q5', q:'Current processor and reason for switching?', why:'Competitive context for pricing', priority:'high', aiPrefill:'', category:'Operations' },
+    ],
+    solutions: [
+      { id:'sol1', name:'First Data Omaha', fit:76, badge:'Best Match', risk:'Low', type:'Card Present', approval:'24–48 hrs', pricing:'IC+ Schedule', terminal:'PAX A920 Pro', gateway:'NMI', shortWhy:'Reliable IC+ for healthcare with NMI for patient portal payments.', whyWorks:[{point:'IC+ optimized for healthcare transaction sizes',source:'Pricing Engine',hasData:false}], risks:[{point:'Low confidence — need more data to validate fit',severity:'medium'}], marketing:[{name:'First Data Healthcare Sheet',icon:'📄',type:'PDF'}], setupSteps:['Submit','UW Review','Terminal Ships','Go Live'] },
+      { id:'sol2', name:'TSYS + NMI Recurring', fit:71, badge:'', risk:'Low', type:'Card Present + Recurring', approval:'3–5 days', pricing:'IC+ Custom', terminal:'Verifone VX520', gateway:'NMI', shortWhy:'Strong healthcare vertical with native recurring billing for payment plans.', whyWorks:[{point:'Built-in recurring billing for patient payment plans',source:'Product Knowledge',hasData:false}], risks:[{point:'Longer approval and no web data to confirm needs',severity:'medium'}], marketing:[], setupSteps:['Submit','UW Review','Setup','Go Live'] },
+    ],
+  },
+  '_default': {
+    type:'retail', mcc:'5999', mccLabel:'Miscellaneous Retail',
+    aiClass:'General Retail / Services', appCompletion:25,
+    risk:'Low', confidence:45, outlook:'Needs Data', coverage:25,
+    aiSources: [
+      { type:'app', label:'Application Data', pct:25, detail:'Minimal info collected' },
+      { type:'chat', label:'Chat History', pct:0, detail:'No messages' },
+      { type:'transcript', label:'Call Transcripts', pct:0, detail:'None uploaded' },
+      { type:'web', label:'Web Presence', pct:0, detail:'Not scanned yet' },
+    ],
+    aiInsights: [
+      { icon:'⚠️', text:'Very low data coverage — <strong>need discovery call or merchant intake</strong> before recommending solutions.', source:'System', auto:false },
+    ],
+    questions: [
+      { id:'q1', q:'What type of business is this?', why:'Drives entire solution recommendation', priority:'critical', aiPrefill:'', category:'Discovery' },
+      { id:'q2', q:'Card-present, ecommerce, or both?', why:'Determines processor + gateway needs', priority:'critical', aiPrefill:'', category:'Discovery' },
+      { id:'q3', q:'Estimated monthly processing volume?', why:'Sets pricing tier', priority:'critical', aiPrefill:'', category:'Volume' },
+      { id:'q4', q:'Current processor and reason for switching?', why:'Competitive context', priority:'high', aiPrefill:'', category:'Operations' },
+      { id:'q5', q:'What features matter most?', why:'Filters solutions', priority:'high', aiPrefill:'', category:'Features' },
+    ],
+    solutions: [
+      { id:'sol1', name:'First Data Omaha', fit:65, badge:'Likely Match', risk:'Low', type:'Card Present', approval:'24–48 hrs', pricing:'IC+ Schedule', terminal:'PAX A920 Pro', gateway:'NMI', shortWhy:'Default recommendation — needs more data to confirm fit.', whyWorks:[{point:'Broad MCC coverage and fast approvals',source:'Product Knowledge',hasData:false}], risks:[{point:'Low confidence — solution may change significantly with more data',severity:'high'}], marketing:[{name:'First Data Overview',icon:'📄',type:'PDF'}], setupSteps:['Gather data','Submit','UW Review','Go Live'] },
+    ],
+  },
+};
+
+let _currentSBMerchant = null;
+let _sbSelectedQuestions = new Set();
+
+function renderSolutionBuilder(merchantName) {
+  const m = merchantData.find(x => x.name === merchantName);
+  if (!m || m.status !== 'lead') return;
+
+  _currentSBMerchant = merchantName;
+  _sbSelectedQuestions = new Set();
+  const P = SB_PROFILES[merchantName] || SB_PROFILES['_default'];
+
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+  const panel = activeView.querySelector('#step-5');
+  if (!panel) return;
+
+  const confColor = P.confidence >= 70 ? '#22C55E' : P.confidence >= 50 ? '#F59E0B' : '#EF4444';
+  const riskColor = P.risk==='Low' ? '#22C55E' : P.risk==='Medium' ? '#F59E0B' : '#EF4444';
+
+  // Questions
+  const criticalQs = P.questions.filter(q => q.priority === 'critical');
+  const otherQs = P.questions.filter(q => q.priority !== 'critical');
+
+  function qRow(q) {
+    const hasPrefill = q.aiPrefill && q.aiPrefill.length > 0;
+    const priBadge = q.priority === 'critical' ? `<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(239,68,68,.1);color:#EF4444;text-transform:uppercase;letter-spacing:.05em;">Required</span>`
+      : q.priority === 'high' ? `<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(245,158,11,.1);color:#F59E0B;text-transform:uppercase;letter-spacing:.05em;">Important</span>`
+      : `<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--bg-elevated);color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Optional</span>`;
+    return `<div class="sb-q-row" data-qid="${q.id}" style="display:flex;align-items:flex-start;gap:0;padding:0;border-bottom:1px solid rgba(0,0,0,0.04);">
+      <label style="display:flex;align-items:center;justify-content:center;width:40px;flex-shrink:0;padding-top:14px;cursor:pointer;">
+        <input type="checkbox" class="sb-q-check" data-qid="${q.id}" onchange="sbToggleQ('${q.id}')" style="width:15px;height:15px;accent-color:var(--yellow);cursor:pointer;">
+      </label>
+      <div style="flex:1;padding:10px 14px 10px 0;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);">${q.q}</span>
+          ${priBadge}
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;">${q.why}</div>
+        ${hasPrefill ? `<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 8px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.12);border-radius:5px;margin-bottom:5px;font-size:10px;">
+          <span>🤖</span>
+          <span style="color:var(--text-primary);">${q.aiPrefill}</span>
+          ${q.aiSource ? `<span style="color:var(--purple);background:rgba(139,92,246,.1);padding:1px 4px;border-radius:3px;font-size:9px;">${q.aiSource}</span>` : ''}
+        </div>` : ''}
+        <input class="sb-q-input" data-qid="${q.id}" placeholder="Type answer or leave for merchant…" value="${hasPrefill ? q.aiPrefill : ''}" style="width:100%;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:6px 10px;color:var(--text-primary);font-size:11px;font-family:var(--font-ui);outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'">
+      </div>
+    </div>`;
+  }
+
+  // Solution cards
+  function solCard(s, idx) {
+    const fitColor = s.fit >= 80 ? '#22C55E' : s.fit >= 65 ? '#F59E0B' : '#EF4444';
+    const fitBorder = s.fit >= 80 ? 'rgba(34,197,94,.3)' : s.fit >= 65 ? 'rgba(245,158,11,.25)' : 'rgba(239,68,68,.15)';
+    const fitBg = s.fit >= 80 ? 'rgba(34,197,94,.04)' : 'transparent';
+    const badgeHTML = s.badge ? `<span style="background:rgba(255,222,0,.15);color:#B8A000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⭐ ${s.badge}</span>` : '';
+    const isFirst = idx === 0;
+
+    const whyRows = s.whyWorks.map(w => `<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;">
+      <span style="color:${w.hasData ? '#22C55E' : 'var(--text-muted)'};font-size:11px;flex-shrink:0;margin-top:1px;">${w.hasData ? '✓' : '○'}</span>
+      <div style="flex:1;font-size:11px;color:var(--text-${w.hasData?'primary':'secondary'});">${w.point}${w.source ? ` <span style="font-size:9px;color:var(--purple);background:rgba(139,92,246,.08);padding:1px 4px;border-radius:3px;">${w.source}</span>` : ''}</div>
+    </div>`).join('');
+    const riskRows = s.risks.map(r => `<div style="display:flex;align-items:flex-start;gap:7px;padding:4px 0;">
+      <span style="color:${r.severity==='high'?'#EF4444':r.severity==='medium'?'#F59E0B':'var(--text-muted)'};font-size:10px;flex-shrink:0;margin-top:2px;">●</span>
+      <span style="font-size:11px;color:var(--text-secondary);">${r.point}</span>
+    </div>`).join('');
+    const matRows = s.marketing.map(mt => `<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-secondary);" onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='var(--border-strong)'">${mt.icon} ${mt.name} <span style="color:var(--text-muted);font-size:9px;">${mt.type}</span></div>`).join('');
+    const timelineHTML = s.setupSteps.map((st,i) => `<span style="font-size:10px;color:${i===s.setupSteps.length-1?'#22C55E':'var(--text-secondary)'};">${i>0?' → ':''}${st}</span>`).join('');
+
+    return `<div class="sb-sol-card" data-sol="${s.id}" style="background:${fitBg};border:${isFirst?'2':'1'}px solid ${fitBorder};border-radius:10px;overflow:hidden;margin-bottom:10px;transition:all .2s;">
+      <!-- Header — always visible -->
+      <div style="padding:14px 16px;cursor:pointer;" onclick="sbToggleSol('${s.id}')">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+              <span style="font-size:14px;font-weight:700;letter-spacing:-.2px;">${s.name}</span>
+              ${badgeHTML}
+              <span class="p-badge bb" style="font-size:9px;">${s.type}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.45;margin-bottom:6px;">${s.shortWhy}</div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span style="font-size:10px;color:var(--text-muted);">Approval: <strong style="color:var(--text-primary);">${s.approval}</strong></span>
+              <span style="color:var(--border);">|</span>
+              <span style="font-size:10px;color:var(--text-muted);">Pricing: <strong style="color:var(--text-primary);font-family:var(--font-mono);">${s.pricing}</strong></span>
+              ${s.terminal ? `<span style="color:var(--border);">|</span><span style="font-size:10px;color:var(--text-muted);">Terminal: <strong style="color:var(--text-primary);">${s.terminal}</strong></span>` : ''}
+              ${s.gateway ? `<span style="color:var(--border);">|</span><span style="font-size:10px;color:var(--text-muted);">Gateway: <strong style="color:var(--text-primary);">${s.gateway}</strong></span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+            <div style="font-size:22px;font-weight:800;font-family:var(--font-mono);color:${fitColor};line-height:1;">${s.fit}%</div>
+            <div style="font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">match</div>
+            <span class="sb-sol-chevron" id="chev-${s.id}" style="font-size:10px;color:var(--text-muted);transition:transform .2s;margin-top:2px;">▼</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expanded detail -->
+      <div class="sb-sol-detail" id="detail-${s.id}" style="display:none;border-top:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+          <div style="padding:14px 16px;border-right:1px solid var(--border);">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#22C55E;margin-bottom:8px;">✓ Why this works</div>
+            ${whyRows}
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#EF4444;margin-bottom:8px;">⚠ Considerations</div>
+            ${riskRows}
+          </div>
+        </div>
+        ${s.marketing.length > 0 ? `<div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Materials:</span>
+          ${matRows}
+          <button onclick="sbSendSlick('${s.id}')" style="margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border-strong)'">📤 Send to Merchant</button>
+        </div>` : ''}
+        <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-right:4px;">Timeline:</span>
+          ${timelineHTML}
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="padding:8px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg-elevated);">
+        <button onclick="sbSendSolToChat('${s.id}')" style="padding:4px 10px;background:transparent;border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:10px;cursor:pointer;font-family:var(--font-ui);" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border-strong)';this.style.color='var(--text-muted)'">💬 Send to Chat</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;">+ Considering</button>
+          <button class="btn btn-primary" style="font-size:10px;padding:4px 12px;" onclick="sbSelectSolution('${s.id}')">Select Solution →</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // AI insights relevant to solution selection only (no web presence)
+  const solInsights = P.aiInsights.filter(i => i.source !== 'Web Scan');
+
+  panel.innerHTML = `
+    <div class="step-hdr" style="margin-bottom:4px;">
+      <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+      <span class="step-hdr-title" style="display:flex;align-items:center;gap:10px;">Solution Builder
+        <span style="font-size:11px;font-weight:500;color:var(--text-muted);">Goal: <span style="color:var(--yellow);font-weight:700;">Send for Signature</span></span>
+      </span>
+    </div>
+
+    <!-- ── CONTEXT BAR — compact merchant context ── -->
+    <div style="display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;">🧠</span>
+        <span style="font-size:11px;font-weight:600;color:var(--text-primary);">${P.aiClass}</span>
+        <span style="font-size:10px;color:var(--text-muted);">· MCC ${P.mcc}</span>
+      </div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:10px;color:var(--text-muted);">Risk:</span>
+        <span style="font-size:11px;font-weight:700;color:${riskColor};">${P.risk}</span>
+      </div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:10px;color:var(--text-muted);">Confidence:</span>
+        <span style="font-size:11px;font-weight:700;color:${confColor};">${P.confidence}%</span>
+      </div>
+      <div style="width:1px;height:20px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:10px;color:var(--text-muted);">App:</span>
+        <span style="font-size:11px;font-weight:700;color:var(--text-primary);">${P.appCompletion}% filled</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+        <label style="display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--bg-elevated);border:1px dashed rgba(139,92,246,.3);border-radius:6px;cursor:pointer;font-size:10px;font-weight:600;color:var(--purple);" onclick="sbUploadTranscript()">🎙️ Upload Transcript</label>
+      </div>
+    </div>
+
+    ${solInsights.length > 0 ? `<!-- ── AI INSIGHTS — compact, solution-relevant only ── -->
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+      ${solInsights.map(i => `<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--bg-surface);border:1px solid ${i.auto?'rgba(34,197,94,.12)':'rgba(245,158,11,.12)'};border-radius:6px;font-size:11px;">
+        <span style="font-size:12px;flex-shrink:0;">${i.icon}</span>
+        <span style="color:var(--text-secondary);flex:1;line-height:1.4;">${i.text}</span>
+        <span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${i.auto?'rgba(34,197,94,.06)':'rgba(245,158,11,.06)'};color:${i.auto?'#22C55E':'#F59E0B'};flex-shrink:0;">${i.source}</span>
+      </div>`).join('')}
+    </div>` : ''}
+
+    <!-- ── SOLUTIONS — the main event ── -->
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Select a Solution</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:10px;color:var(--text-muted);">Click card to expand details</span>
+          <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted);cursor:pointer;padding:3px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;"><input type="checkbox" style="accent-color:var(--yellow);cursor:pointer;" onchange="sbToggleAutomate(this)"> <span style="font-weight:600;">Auto-select</span></label>
+        </div>
+      </div>
+      ${P.solutions.map((s, i) => solCard(s, i)).join('')}
+    </div>
+
+    <!-- ── DISCOVERY QUESTIONS — supporting section ── -->
+    <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;">💡</span>
+          <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Need more info to decide?</span>
+          <span style="font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-dim);padding:2px 7px;border-radius:10px;">${P.questions.length} questions</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted);cursor:pointer;"><input type="checkbox" style="accent-color:var(--yellow);cursor:pointer;" onchange="sbAutoDiscovery(this)"> <span style="font-weight:600;">Auto-ask</span></label>
+        </div>
+      </div>
+
+      <div style="padding:6px 16px;background:var(--bg-elevated);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" onchange="sbSelectAllQ(this)" style="accent-color:var(--yellow);cursor:pointer;">
+          <span style="font-size:10px;font-weight:600;color:var(--text-secondary);">Select all</span>
+        </label>
+        <div style="display:flex;gap:5px;">
+          <button onclick="sbSendToChat()" class="btn btn-ghost" style="font-size:10px;padding:3px 8px;">💬 Send to Chat</button>
+          <button onclick="sbSendToMerchant()" class="btn btn-primary" style="font-size:10px;padding:3px 8px;">📩 Send to Merchant</button>
+        </div>
+      </div>
+
+      ${criticalQs.map(q => qRow(q)).join('')}
+
+      ${otherQs.length > 0 ? `<div style="padding:7px 16px;border-top:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--bg-elevated);" onclick="sbToggleMoreQs(this)">
+        <span style="font-size:10px;font-weight:600;color:var(--text-secondary);">+ ${otherQs.length} more questions</span>
+        <span style="font-size:10px;color:var(--text-muted);">Show ▼</span>
+      </div>
+      <div id="sb-more-qs" style="display:none;">
+        ${otherQs.map(q => qRow(q)).join('')}
+      </div>` : ''}
+    </div>
+
+    <!-- Navigation -->
+    <div class="form-nav">
+      <button class="btn btn-ghost" onclick="goStep(7)">← Pricing</button>
+      <div class="fnr">
+        <button class="btn btn-primary" onclick="goStep(9)">Review &amp; Submit →</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Solution Builder interactions ── */
+function sbToggleSol(solId) {
+  const detail = document.getElementById('detail-' + solId);
+  const chev = document.getElementById('chev-' + solId);
+  if (!detail) return;
+  const isHidden = detail.style.display === 'none';
+  detail.style.display = isHidden ? 'block' : 'none';
+  if (chev) chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+function sbToggleQ(qid) {
+  const cb = document.querySelector(`.sb-q-check[data-qid="${qid}"]`);
+  if (cb && cb.checked) _sbSelectedQuestions.add(qid);
+  else _sbSelectedQuestions.delete(qid);
+}
+
+function sbSelectAllQ(masterCb) {
+  const checks = document.querySelectorAll('.sb-q-check');
+  checks.forEach(cb => { cb.checked = masterCb.checked; sbToggleQ(cb.dataset.qid); });
+  if (masterCb.checked) checks.forEach(cb => _sbSelectedQuestions.add(cb.dataset.qid));
+  else _sbSelectedQuestions.clear();
+}
+
+function sbToggleMoreQs(el) {
+  const more = document.getElementById('sb-more-qs');
+  if (!more) return;
+  const isHidden = more.style.display === 'none';
+  more.style.display = isHidden ? 'block' : 'none';
+  el.querySelector('span:last-child').textContent = isHidden ? 'Hide ▲' : 'Show ▼';
+}
+
+function sbSendToChat() {
+  if (_sbSelectedQuestions.size === 0) return;
+  const P = SB_PROFILES[_currentSBMerchant] || SB_PROFILES['_default'];
+  const qs = P.questions.filter(q => _sbSelectedQuestions.has(q.id));
+  const msg = `Hi ${_currentSBMerchant} team,\n\nTo put together the best processing solution for you, I have a few quick questions:\n\n${qs.map((q,i) => `${i+1}. ${q.q}`).join('\n')}\n\nNo rush — just want to make sure we set you up with the right fit. Let me know when you have a chance!`;
+  const ta = document.getElementById('chatInput');
+  if (ta) {
+    ta.value = msg;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
+    ta.focus();
+    ta.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+  // Flash success
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓ Loaded into chat';
+  btn.style.background = 'rgba(34,197,94,.1)';
+  btn.style.borderColor = '#22C55E';
+  btn.style.color = '#22C55E';
+  setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+}
+
+function sbSendToMerchant() {
+  if (_sbSelectedQuestions.size === 0) return;
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓ Sent to merchant portal';
+  btn.style.background = 'rgba(34,197,94,.15)';
+  setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2500);
+}
+
+function sbSendSolToChat(solId) {
+  const P = SB_PROFILES[_currentSBMerchant] || SB_PROFILES['_default'];
+  const sol = P.solutions.find(s => s.id === solId);
+  if (!sol) return;
+  const msg = `Hi ${_currentSBMerchant} team,\n\nBased on what I know about your business, I'd recommend **${sol.name}** as your processing solution.\n\n${sol.shortWhy}\n\n• Approval: ${sol.approval}\n• Pricing: ${sol.pricing}\n${sol.terminal ? '• Terminal: ' + sol.terminal + '\n' : ''}${sol.gateway ? '• Gateway: ' + sol.gateway + '\n' : ''}\nWould you like me to send over more details or a product sheet?`;
+  const ta = document.getElementById('chatInput');
+  if (ta) { ta.value = msg; ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 200) + 'px'; ta.focus(); }
+  const btn = event.currentTarget;
+  btn.innerHTML = '✓ Loaded';
+  btn.style.color = '#22C55E';
+  setTimeout(() => { btn.innerHTML = '💬 Send to Chat'; btn.style.color = ''; }, 2000);
+}
+
+function sbSendSlick(solId) {
+  const btn = event.currentTarget;
+  btn.innerHTML = '✓ Marketing materials sent to merchant';
+  btn.style.color = '#22C55E';
+  setTimeout(() => { btn.innerHTML = '📤 Send to Merchant'; btn.style.color = ''; }, 2500);
+}
+
+function sbSelectSolution(solId) {
+  const P = SB_PROFILES[_currentSBMerchant] || SB_PROFILES['_default'];
+  const sol = P.solutions.find(s => s.id === solId);
+  if (!sol) return;
+  const card = document.querySelector(`.sb-sol-card[data-sol="${solId}"]`);
+  if (card) { card.style.borderColor = '#22C55E'; card.style.borderWidth = '2px'; }
+  const btn = event.currentTarget;
+  btn.innerHTML = '✓ Selected';
+  btn.style.background = '#22C55E';
+  btn.disabled = true;
+}
+
+function sbUploadTranscript() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.txt,.pdf,.docx,.mp3,.wav,.m4a';
+  inp.onchange = function() {
+    if (inp.files.length) {
+      // Simulate processing
+      const lbl = event.target.closest ? event.target.closest('label') : null;
+      const src = document.querySelector('[data-src="transcript"]') || document.querySelectorAll('.sb-sol-card')[0]?.closest('#step-5');
+      // Show processing state on the upload area
+      const uploadArea = document.querySelector('[onclick="sbUploadTranscript()"]');
+      if (uploadArea) {
+        uploadArea.innerHTML = '🎙️ Processing transcript… <span style="font-size:10px;color:var(--text-muted);">AI analyzing call notes</span>';
+        uploadArea.style.borderColor = '#22C55E';
+        uploadArea.style.color = '#22C55E';
+        setTimeout(() => {
+          uploadArea.innerHTML = '✓ Transcript analyzed — 4 new insights extracted <span style="font-size:10px;color:var(--text-muted);">Confidence +18%</span>';
+        }, 2000);
+      }
+    }
+  };
+  inp.click();
+}
+
+function sbRunWebScan() {
+  const btn = event.currentTarget;
+  btn.innerHTML = '🌐 Scanning… <span style="font-size:10px;color:var(--text-muted);">checking web presence</span>';
+  btn.style.color = 'var(--purple)';
+  setTimeout(() => {
+    btn.innerHTML = '✓ Scan complete — 2 new data points';
+    btn.style.color = '#22C55E';
+    btn.style.borderColor = '#22C55E';
+    setTimeout(() => { btn.innerHTML = '🌐 Re-scan Web Presence'; btn.style.color = 'var(--purple)'; btn.style.borderColor = 'rgba(139,92,246,.25)'; }, 2500);
+  }, 1500);
+}
+
+function sbToggleAutomate(cb) {
+  const label = cb.closest('div').querySelector('.btn-primary') || cb.closest('div').parentElement.querySelector('.btn-primary');
+  if (cb.checked) {
+    // Show automation confirmation
+    const nbaCta = cb.closest('div').parentElement.querySelector('.btn-primary');
+    if (nbaCta) { nbaCta.innerHTML = '🤖 Automation Active'; nbaCta.style.background = 'var(--purple)'; }
+  } else {
+    const P = SB_PROFILES[_currentSBMerchant] || SB_PROFILES['_default'];
+    const nbaCta = cb.closest('div').parentElement.querySelector('.btn-primary');
+    if (nbaCta) { nbaCta.innerHTML = P.confidence >= 70 ? 'Select Best Solution →' : P.confidence >= 50 ? 'Send Questions to Merchant →' : 'Schedule Discovery Call →'; nbaCta.style.background = ''; }
+  }
+}
+
+function sbAutoDiscovery(cb) {
+  const panel = cb.closest('div').closest('[style*=border-radius]');
+  if (cb.checked && panel) {
+    const bar = panel.querySelector('[style*=bg-elevated]');
+    if (bar) {
+      const note = document.createElement('div');
+      note.style.cssText = 'padding:8px 18px;background:rgba(139,92,246,.06);border-bottom:1px solid rgba(139,92,246,.15);font-size:11px;color:var(--purple);display:flex;align-items:center;gap:6px;';
+      note.innerHTML = '🤖 <strong>Auto-discovery enabled</strong> — AI will ask these questions conversationally in the merchant portal as context becomes available.';
+      bar.parentElement.insertBefore(note, bar.nextSibling);
+    }
+  }
+}
+
+function sbExecuteNBA() {
+  const P = SB_PROFILES[_currentSBMerchant] || SB_PROFILES['_default'];
+  if (P.confidence >= 70) {
+    // Auto-select best solution
+    const best = P.solutions[0];
+    if (best) sbSelectSolution(best.id);
+  } else if (P.confidence >= 50) {
+    // Select all critical questions and send to merchant
+    document.querySelectorAll('.sb-q-check').forEach(cb => { cb.checked = true; _sbSelectedQuestions.add(cb.dataset.qid); });
+    sbSendToMerchant();
   }
 }
 
@@ -16490,7 +17045,7 @@ function initResCharts() {
 
         <div class="step-item" id="si-5" onclick="goStep(5)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Solutions</div><div class="step-sub">3 recommended</div></div>
+          <div class="step-info"><div class="step-title">Solution Builder</div><div class="step-sub">3 recommended</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
@@ -16653,7 +17208,7 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solution Builder →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
@@ -17425,8 +17980,8 @@ function initResCharts() {
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
-            <span class="step-hdr-title">Recommended Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+            <span class="step-hdr-title">Solution Builder</span>
           </div>
 
           <!-- Tab bar + search + view toggle -->
@@ -18023,7 +18578,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -19270,7 +19825,7 @@ function initResCharts() {
 
         <div class="step-item" id="si-5" onclick="goStep(5)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Solutions</div><div class="step-sub">3 recommended</div></div>
+          <div class="step-info"><div class="step-title">Solution Builder</div><div class="step-sub">3 recommended</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
@@ -19433,7 +19988,7 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solution Builder →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
@@ -20205,8 +20760,8 @@ function initResCharts() {
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
-            <span class="step-hdr-title">Recommended Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+            <span class="step-hdr-title">Solution Builder</span>
           </div>
 
           <!-- Tab bar + search + view toggle -->
@@ -20803,7 +21358,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -22051,7 +22606,7 @@ function initResCharts() {
 
         <div class="step-item" id="si-5" onclick="goStep(5)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Solutions</div><div class="step-sub">3 recommended</div></div>
+          <div class="step-info"><div class="step-title">Solution Builder</div><div class="step-sub">3 recommended</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
@@ -22214,7 +22769,7 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solution Builder →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
@@ -22986,8 +23541,8 @@ function initResCharts() {
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
-            <span class="step-hdr-title">Recommended Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+            <span class="step-hdr-title">Solution Builder</span>
           </div>
 
           <!-- Tab bar + search + view toggle -->
@@ -23584,7 +24139,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr"></div>
           </div>
         </div>
@@ -24831,7 +25386,7 @@ function initResCharts() {
 
         <div class="step-item" id="si-5" onclick="goStep(5)">
           <div class="step-num sn-todo">◈</div>
-          <div class="step-info"><div class="step-title">Solutions</div><div class="step-sub">3 recommended</div></div>
+          <div class="step-info"><div class="step-title">Solution Builder</div><div class="step-sub">3 recommended</div></div>
         </div>
         <div class="step-conn"></div>
         <div class="step-item active" id="si-6" onclick="goStep(6)">
@@ -24994,7 +25549,7 @@ function initResCharts() {
               <div class="fgroup"><label class="flabel">Total</label><input class="finput" value="100% ✓" style="color:var(--green);" readonly></div>
             </div>
           </div>
-          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solutions →</button></div></div>
+          <div class="form-nav"><button class="btn btn-ghost" onclick="goStep(3)">← Officers</button><div class="fnr"><button class="btn btn-primary" onclick="goStep(5)">Solution Builder →</button></div></div>
         </div>
 
         <!-- ═══ STEP 5: PRICING ═══ -->
@@ -25766,8 +26321,8 @@ function initResCharts() {
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
           <div class="step-hdr">
-            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solutions</span>
-            <span class="step-hdr-title">Recommended Solutions</span>
+            <span class="step-chip" style="background:var(--blue-dim);color:var(--blue);">Step 5 · Solution Builder</span>
+            <span class="step-hdr-title">Solution Builder</span>
           </div>
 
           <!-- Tab bar + search + view toggle -->
@@ -26364,7 +26919,7 @@ function initResCharts() {
           </div>
 
           <div class="form-nav">
-            <button class="btn btn-ghost" onclick="goStep(5)">← Solutions</button>
+            <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr"></div>
           </div>
         </div>
