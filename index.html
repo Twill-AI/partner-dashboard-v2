@@ -1304,6 +1304,10 @@
   @keyframes tkt-pulse { 0%,100%{background:transparent;} 50%{background:rgba(201,168,0,0.08);} }
   .tkt-indicator-item .att-dot { width:6px; height:6px; border-radius:50%; background:var(--yellow); flex-shrink:0; animation:tkt-glow 1.5s ease-in-out infinite; }
   @keyframes tkt-glow { 0%,100%{opacity:0.5;} 50%{opacity:1;box-shadow:0 0 4px var(--yellow);} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes shimmer { 0%{transform:translateX(-100%);} 100%{transform:translateX(100%);} }
 
   /* Reminder priority style */
   .itkt-status.reminder { background:rgba(140,122,94,0.12); color:var(--purple); }
@@ -15186,12 +15190,38 @@ function sbSelectSolution(solId) {
   const P = SB_PROFILES[_currentSBMerchant] || SB_PROFILES['_default'];
   const sol = P.solutions.find(s => s.id === solId);
   if (!sol) return;
+  // Deselect others first
+  document.querySelectorAll('.sb-sol-card').forEach(c => { c.style.borderColor = ''; c.style.borderWidth = ''; });
+  document.querySelectorAll('.sb-sol-card .btn-primary').forEach(b => { b.innerHTML = 'Select Solution →'; b.style.background = ''; b.disabled = false; });
   const card = document.querySelector(`.sb-sol-card[data-sol="${solId}"]`);
   if (card) { card.style.borderColor = '#22C55E'; card.style.borderWidth = '2px'; }
   const btn = event.currentTarget;
   btn.innerHTML = '✓ Selected';
   btn.style.background = '#22C55E';
   btn.disabled = true;
+
+  // Show floating Send for Signature CTA
+  let cta = document.getElementById('sb-sig-cta');
+  if (!cta) {
+    cta = document.createElement('div');
+    cta.id = 'sb-sig-cta';
+    cta.style.cssText = 'position:fixed;bottom:0;left:260px;right:0;z-index:999;padding:14px 28px;background:linear-gradient(135deg,#09091A 0%,#1a1a2e 100%);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;animation:slideUp .3s ease;';
+    cta.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#22C55E,#16a34a);display:flex;align-items:center;justify-content:center;font-size:16px;">✓</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">Solution selected — ready to send</div>
+          <div style="font-size:11px;color:var(--text-muted);">Application will be sent to Sarah Chen via DocuSign for e-signature</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="document.getElementById('sb-sig-cta').remove();" class="btn btn-ghost" style="padding:8px 16px;font-size:12px;">Cancel</button>
+        <button onclick="startOnboardingDemo()" style="padding:10px 28px;background:var(--yellow);border:none;border-radius:8px;color:#09091A;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-ui);display:flex;align-items:center;gap:8px;transition:all .15s;">
+          <span>✍️</span> Send for Signature
+        </button>
+      </div>`;
+    document.body.appendChild(cta);
+  }
 }
 
 function sbUploadTranscript() {
@@ -15268,6 +15298,837 @@ function sbExecuteNBA() {
     sbSendToMerchant();
   }
 }
+
+/* ══════════════════════════════════════════════════
+   ONBOARDING AGENT — Full-screen chat demo engine
+   Fresh Brew Coffee Co.: Lead → Signature → UW → Approved
+   ══════════════════════════════════════════════════ */
+
+let _demoStep = 0;
+let _demoRunning = false;
+let _demoTimer = null;
+let _demoPaused = false;
+let _demoStatus = 'signature'; // signature, underwriting, approved
+
+const DEMO_EVENTS = [
+  // ─── SIGNATURE STAGE ───
+  { type:'status', status:'signature', label:'Sent for Signature', delay:0 },
+  { type:'sys', color:'var(--green)', text:'Application package sent to sarah@freshbrewcoffee.com for e-signature', delay:800 },
+  { type:'sys', color:'var(--blue)', text:'Solution: First Data Omaha + PAX A920 Pro · IC+ 0.25% + $0.10 · NMI Gateway', delay:600 },
+  { type:'ai', text:'Hi Sarah! Your merchant processing agreement for Fresh Brew Coffee Co. is ready for review and signature.\n\nI\'ve attached the full application with:\n• <strong>First Data Omaha</strong> processing — IC+ pricing at 0.25% + $0.10\n• <strong>PAX A920 Pro</strong> terminal with built-in tipping\n• <strong>NMI Gateway</strong> for your WooCommerce online orders\n\nPlease review everything and sign when ready. I\'m here if you have any questions!', mode:'out', delay:1200 },
+  { type:'sys', color:'var(--text-muted)', text:'Follow-up sequence scheduled: Day 1, 2, 3, 5, 7', delay:500 },
+  { type:'ai', text:'Application sent. Follow-up automation is active — I\'ll nudge Sarah if she hasn\'t signed within 24 hours. Estimated time to signature: 1-2 days based on similar QSR merchants.', mode:'int', delay:1000 },
+
+  // Day 1 — Merchant asks question
+  { type:'divider', label:'Next Day · Mar 12', delay:1500 },
+  { type:'sys', color:'var(--amber)', text:'Auto follow-up Day 1 — checking in with merchant', delay:600 },
+  { type:'ai', text:'Hi Sarah, just checking in! Did you have a chance to review the agreement? Let me know if you have any questions about the pricing or setup. Happy to hop on a quick call if that\'s easier.', mode:'out', delay:800 },
+  { type:'merchant', sender:'Sarah Chen', text:'Hi! Yes I\'m looking at it now. Quick question — what exactly does IC+ pricing mean? My current Square rate is just a flat 2.6% so I want to make sure I understand the difference.', delay:2000 },
+  { type:'ai-thinking', text:'Analyzing question... Sarah is asking about IC+ vs flat-rate pricing. She\'s on Square at 2.6%. Let me explain in terms she\'ll understand with her estimated volume.', delay:1000 },
+  { type:'ai', text:'Great question! Here\'s the simple version:\n\n<strong>Square\'s 2.6%</strong> = same rate on every transaction, regardless of card type.\n\n<strong>IC+ (Interchange Plus)</strong> = you pay the actual Visa/MC wholesale rate + our small markup (0.25% + $0.10).\n\nFor a coffee shop like yours doing ~$40K/month:\n• Square cost: ~$1,040/mo\n• IC+ estimated cost: ~$720/mo\n\nThat\'s roughly <strong>$320/month in savings</strong> — about $3,800/year. The savings come because most of your transactions are debit cards and small tickets, which have very low interchange rates that Square charges full price for.\n\nWant me to send you a detailed breakdown?', mode:'out', delay:1500 },
+  { type:'merchant', sender:'Sarah Chen', text:'Wow that\'s a big difference! No I get it now. Let me finish reviewing and sign today.', delay:2000 },
+  { type:'ai', text:'Sarah is responding positively to pricing explanation. Confidence in signature today: high.', mode:'int', delay:800 },
+
+  // Merchant signs
+  { type:'divider', label:'2 hours later', delay:1500 },
+  { type:'sys', color:'var(--green)', text:'✅ E-signature received from Sarah Chen (100% owner)', delay:800 },
+  { type:'ai-thinking', text:'Signature received! Running application completeness check...', delay:800 },
+  { type:'ai', text:'Signature received! Checking application completeness...\n\n✅ Business info — complete\n✅ Owner info (Sarah Chen, 100%) — complete\n✅ Processing details — complete\n✅ Pricing — confirmed\n⚠️ <strong>Missing: 3 months bank statements</strong>\n⚠️ <strong>Missing: Voided check or bank letter</strong>\n\nRequesting from merchant now.', mode:'int', delay:1200 },
+  { type:'ai', text:'Awesome, thanks for signing Sarah! We\'re almost ready to submit to underwriting. I just need two more things:\n\n1. <strong>Last 3 months of bank statements</strong> for the business account\n2. <strong>A voided check</strong> or bank letter confirming the account\n\nYou can upload them right here in this chat, or I can send you a secure upload link. Once I have these, I\'ll submit everything to underwriting — typical approval is 24-48 hours!', mode:'out', delay:1200 },
+
+  // Merchant uploads docs
+  { type:'merchant', sender:'Sarah Chen', text:'Here you go! I have the statements from my Chase business account and a voided check.', delay:2500 },
+  { type:'merchant-doc', sender:'Sarah Chen', docs:['FreshBrew_BankStmt_Jan2026.pdf','FreshBrew_BankStmt_Feb2026.pdf','FreshBrew_BankStmt_Mar2026.pdf','VoidedCheck_Chase.pdf'], delay:800 },
+  { type:'ai-thinking', text:'4 documents received. Analyzing bank statements and voided check...', delay:1200 },
+  { type:'ai', text:'Documents analyzed:\n\n<strong>Bank Statements (3 months):</strong>\n✅ Account holder matches: Fresh Brew Coffee Co.\n✅ Average monthly deposits: $38,200 — consistent with $40K stated volume\n✅ No NSF/overdraft flags\n✅ Consistent daily deposits suggest card processing revenue\n\n<strong>Voided Check:</strong>\n✅ Chase Business Checking confirmed\n✅ Routing/Account numbers captured\n\n📋 <strong>Application is now 100% complete.</strong> Submitting to First Data Omaha underwriting.', mode:'int', delay:1500 },
+  { type:'ai', text:'Perfect, Sarah! Everything looks great. I\'ve submitted your complete application package to underwriting.', mode:'out', delay:800 },
+
+  // ─── EQUIPMENT CHANGE SCENARIO ───
+  { type:'divider', label:'30 minutes later', delay:1500 },
+  { type:'merchant', sender:'Sarah Chen', text:'Hey quick question — I realized I\'m going to need a second terminal. We do a lot of catering and farmers market events, so I need something mobile I can take on the go. The countertop one won\'t work for that. Can we add a portable one?', delay:2500 },
+  { type:'ai-thinking', text:'Sarah needs a mobile terminal for off-site events. Current equipment: 1× PAX A920 Pro (countertop). For mobile/outdoor use, the PAX A77 is the best fit — Bluetooth, compact, long battery life. Let me check if we can add this to the application before it goes to UW.', delay:1200 },
+  { type:'ai', text:'<strong>📲 Equipment change detected.</strong>\n\nSarah needs mobile payment capability for catering and farmers markets. Current setup only has a countertop terminal.\n\n<strong>Recommendation:</strong> Add 1× <strong>PAX A77</strong> ($20/mo, $249 upfront) — it\'s Bluetooth, pocket-sized, and has a 12-hour battery. Perfect for outdoor events.\n\nApplication hasn\'t entered UW review yet, so we can update equipment now without delay. Updating the order.', mode:'int', delay:1500 },
+  { type:'equip-change', change:{ action:'add', id:'pax_a77', qty:1 }, label:'AI RECOMMENDED', reason:'Added PAX A77 mobile terminal for catering/farmers market events. Updated before UW submission — no delay to processing.', delay:800 },
+  { type:'ai', text:'Absolutely Sarah! Great call on the mobile terminal. I\'ve added a <strong>PAX A77</strong> to your order — it\'s a compact Bluetooth terminal with a 12-hour battery, perfect for farmers markets and catering events.\n\nYour updated equipment:\n📱 <strong>PAX A920 Pro</strong> — for your counter\n📲 <strong>PAX A77</strong> — for events on the go\n🔌 <strong>NMI Gateway</strong> — for online orders\n\nI\'ve updated the application before it goes to underwriting, so there\'s no delay. Your monthly equipment cost goes from $35 to $55, and there\'s a one-time cost of $249 for the A77.\n\nHere\'s what happens next:\n1. ⏳ Underwriting review (typically 24-48 hours)\n2. 📦 Both terminals ship once approved (2-3 days)\n3. 🔑 NMI gateway credentials emailed\n4. ☕ You\'re live!\n\nI\'ll keep you updated every step of the way.', mode:'out', delay:1500 },
+  { type:'merchant', sender:'Sarah Chen', text:'That\'s perfect, thank you! The A77 sounds like exactly what I need. Can\'t wait to stop lugging around the Square reader 😂', delay:2000 },
+
+  // ─── UNDERWRITING STAGE ───
+  { type:'status', status:'underwriting', label:'In Underwriting', delay:1500 },
+  { type:'sys', color:'var(--purple)', text:'Application submitted to First Data Omaha underwriting · Ref #FD-2026-78234', delay:800 },
+  { type:'divider', label:'Next Day · Mar 13', delay:1500 },
+
+  // UW pend comes in
+  { type:'processor', sender:'First Data UW', text:'<strong>Underwriting Pend Notice — Ref #FD-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\nMCC: 5812\n\nThe following items are required before approval:\n\n1. <strong>Business License</strong> — Please provide current city/county business license.\n2. <strong>Ownership Clarification</strong> — Application lists Sarah Chen at 100% ownership, however the Secretary of State filing shows Fresh Brew Coffee LLC with two members listed. Please clarify ownership structure and provide any amendments if applicable.\n\nPlease respond within 5 business days.\n\n— First Data Underwriting Team', delay:2000 },
+  { type:'ai-thinking', text:'UW pend received. Analyzing requirements against available data...\n\n1. Business License — not in our files, need from merchant.\n2. Ownership — UW found a discrepancy. Let me check the SOS filing...', delay:1500 },
+  { type:'ai', text:'<strong>🔍 UW Pend Analysis:</strong>\n\n<strong>1. Business License</strong> — We don\'t have this on file. Need to request from Sarah.\n\n<strong>2. Ownership Discrepancy</strong> — This is interesting. The SOS filing shows Fresh Brew Coffee LLC was formed with two members. The application lists Sarah Chen at 100%. Possible scenarios:\n• Second member may have been bought out\n• Could be an operating agreement vs. formation docs difference\n• May need an amendment or letter of explanation\n\n<strong>Recommended action:</strong> Ask Sarah to clarify the ownership structure and provide the business license. If the second member was bought out, a simple amendment or letter will satisfy this.\n\n<em>This is a routine pend — not a red flag. Typical resolution: 1-2 days.</em>', mode:'int', delay:1800 },
+  { type:'ai', text:'Hi Sarah! Good news — underwriting is reviewing your application and just needs two quick items:\n\n1. 📄 <strong>Your current business license</strong> (city or county)\n2. 📋 <strong>Ownership clarification</strong> — the state filing shows Fresh Brew Coffee LLC was originally formed with two members, but your application lists you as 100% owner. Can you confirm? If there was a change in ownership, a brief letter explaining it will work.\n\nYou can upload the docs right here or snap a photo — whatever\'s easiest!', mode:'out', delay:1500 },
+
+  // Merchant responds
+  { type:'merchant', sender:'Sarah Chen', text:'Oh right — my mom was originally on the LLC when I started it 4 years ago but she transferred her share to me in 2024. I have the amendment and my business license. Uploading now!', delay:2500 },
+  { type:'merchant-doc', sender:'Sarah Chen', docs:['FreshBrew_BusinessLicense_2026.pdf','LLC_Amendment_OwnershipTransfer_2024.pdf'], delay:800 },
+  { type:'ai-thinking', text:'Documents received. Analyzing against UW requirements...\n\n1. Business License — checking validity...\n2. LLC Amendment — checking if it resolves ownership discrepancy...', delay:1200 },
+  { type:'ai', text:'<strong>✅ UW Pend Resolution:</strong>\n\n<strong>1. Business License:</strong>\n✅ City of Portland Business License — current through Dec 2026\n✅ Business name matches: Fresh Brew Coffee LLC\n\n<strong>2. Ownership Amendment:</strong>\n✅ LLC Amendment filed June 2024 with Oregon Secretary of State\n✅ Transfer of 30% membership interest from Linda Chen to Sarah Chen\n✅ Sarah Chen confirmed as 100% sole member effective June 15, 2024\n✅ Amendment is notarized and state-filed — this fully satisfies the UW pend\n\n<strong>All underwriting requirements satisfied.</strong> Sending response to processor now.', mode:'int', delay:1500 },
+
+  // Send to processor
+  { type:'processor-out', sender:'Twill AI', text:'<strong>Re: Pend Response — Ref #FD-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\n\nPlease find attached documentation addressing both pend items:\n\n1. <strong>Business License</strong> — City of Portland Business License, current through December 2026. (attached)\n\n2. <strong>Ownership Clarification</strong> — The LLC was originally formed with two members (Sarah Chen 70%, Linda Chen 30%). Ownership was fully transferred to Sarah Chen via LLC Amendment filed with the Oregon Secretary of State on June 15, 2024. Sarah Chen is the sole member at 100%. Amendment document attached.\n\nAll items have been verified. Please proceed with underwriting review.\n\nBest regards,\nTwill Processing Team', delay:1500 },
+  { type:'sys', color:'var(--green)', text:'✅ UW pend response sent to First Data with 2 supporting documents', delay:600 },
+  { type:'ai', text:'Great news Sarah! I\'ve reviewed your documents and sent everything to underwriting. Your business license and the ownership amendment fully address their questions. You should hear back within 24 hours. I\'ll let you know the moment we have a decision! 🎉', mode:'out', delay:1200 },
+  { type:'ai', text:'All UW pends resolved and response sent to First Data. Documents verified — ownership chain is clean. Expecting approval decision within 24 hours. No further action needed from merchant.', mode:'int', delay:1000 },
+
+  // ─── APPROVAL ───
+  { type:'divider', label:'Next Day · Mar 14', delay:2000 },
+  { type:'processor', sender:'First Data UW', text:'<strong>APPROVAL NOTICE — Ref #FD-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\nMID: 4812-7823-0034\nStatus: <strong style="color:#22C55E;">APPROVED</strong>\n\nTerminal deployment authorized.\nGateway credentials will be emailed within 24 hours.\n\nPlease proceed with equipment deployment.\n\n— First Data Underwriting Team', delay:2000 },
+  { type:'status', status:'approved', label:'Approved!', delay:500 },
+  { type:'sys', color:'var(--green)', text:'🎉 APPLICATION APPROVED — MID: 4812-7823-0034 assigned', delay:800 },
+  { type:'ai', text:'<strong>🎉 Fresh Brew Coffee Co. is APPROVED!</strong>\n\nMID: 4812-7823-0034\nProcessor: First Data Omaha\n\nStarting deployment sequence:\n1. ✅ MID assigned\n2. 📱 PAX A920 Pro (counter) — ordering now, ships in 2-3 days\n3. 📲 PAX A77 (mobile) — ordering now, ships in 2-3 days\n4. 🔌 NMI gateway credentials — will be emailed within 24 hours\n5. 📅 Scheduling activation support\n\nNotifying merchant now.', mode:'int', delay:1500 },
+  { type:'ai', text:'Sarah, amazing news — <strong>you\'re approved!</strong> 🎉\n\nHere\'s what happens next:\n\n📦 Your equipment is being shipped to:\n2847 NW Thurman St, Portland, OR 97210\n\n📱 <strong>PAX A920 Pro</strong> (for your counter)\n📲 <strong>PAX A77</strong> (for farmers markets & catering)\nExpected delivery: 2-3 business days\n\n🔑 Your <strong>NMI gateway login</strong> for online order payments will be emailed within 24 hours.\n\nOnce your terminals arrive, I\'ll walk you through the 10-minute setup for each — it\'s really easy. You\'ll be processing your first transaction before your next coffee roast! ☕\n\nCongratulations!', mode:'out', delay:1500 },
+
+  { type:'end', delay:1000 },
+];
+
+function startOnboardingDemo() {
+  _demoStep = 0;
+  _demoRunning = true;
+  _demoPaused = false;
+  _demoStatus = 'signature';
+
+  // Remove floating CTA if present
+  const cta = document.getElementById('sb-sig-cta');
+  if (cta) cta.remove();
+
+  // Update merchant data status
+  const m = merchantData.find(x => x.name === 'Fresh Brew Coffee Co.');
+  if (m) m.status = 'signature';
+
+  // Build full-screen chat view
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+
+  activeView.innerHTML = buildDemoView();
+
+  // Start processing events
+  advanceDemo();
+}
+
+function buildDemoView() {
+  return `
+  <div style="display:flex;flex-direction:column;height:100vh;background:var(--bg-base);">
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg-surface);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="cursor:pointer;font-size:14px;color:var(--text-muted);" onclick="resetDemo()">←</div>
+        <div style="font-size:15px;font-weight:700;letter-spacing:-.2px;">Fresh Brew Coffee Co.</div>
+        <div id="demo-status-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(167,139,250,.12);color:#A78BFA;text-transform:uppercase;letter-spacing:.05em;">Sent for Signature</div>
+        <div style="font-size:11px;color:var(--text-muted);">Sarah Chen · MCC 5812 · First Data Omaha</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="demo-auto-indicator" style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);font-size:10px;font-weight:600;color:#22C55E;">
+          <span style="width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;"></span> Agent Active
+        </div>
+        <button onclick="toggleDemoPause()" id="demo-pause-btn" style="padding:5px 12px;border:1px solid var(--border-strong);border-radius:6px;background:transparent;color:var(--text-secondary);font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font-ui);">⏸ Pause</button>
+        <button onclick="resetDemo()" style="padding:5px 12px;border:1px solid var(--border-strong);border-radius:6px;background:transparent;color:var(--text-muted);font-size:10px;cursor:pointer;font-family:var(--font-ui);">↺ Reset Demo</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <!-- Collapsible left rail -->
+      <div id="demo-rail" style="width:260px;border-right:1px solid var(--border);background:var(--bg-surface);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px;">Progress</div>
+          <div id="demo-progress-steps" style="display:flex;flex-direction:column;gap:0;">
+            <div class="demo-pstep active" id="dp-sig" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;background:rgba(167,139,250,.08);"><span style="width:20px;height:20px;border-radius:50%;background:var(--yellow);color:var(--text-inverse);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">1</span><div><div style="font-size:11px;font-weight:600;">Sent for Signature</div><div style="font-size:10px;color:var(--text-muted);" id="dp-sig-sub">Awaiting merchant</div></div></div>
+            <div style="width:1px;height:12px;background:var(--border);margin-left:18px;"></div>
+            <div class="demo-pstep" id="dp-uw" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;opacity:.5;"><span style="width:20px;height:20px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">2</span><div><div style="font-size:11px;font-weight:600;color:var(--text-secondary);">Underwriting</div><div style="font-size:10px;color:var(--text-muted);" id="dp-uw-sub">Pending</div></div></div>
+            <div style="width:1px;height:12px;background:var(--border);margin-left:18px;"></div>
+            <div class="demo-pstep" id="dp-app" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;opacity:.5;"><span style="width:20px;height:20px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">3</span><div><div style="font-size:11px;font-weight:600;color:var(--text-secondary);">Approval</div><div style="font-size:10px;color:var(--text-muted);" id="dp-app-sub">Pending</div></div></div>
+            <div style="width:1px;height:12px;background:var(--border);margin-left:18px;"></div>
+            <div class="demo-pstep" id="dp-act" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;opacity:.5;"><span style="width:20px;height:20px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">4</span><div><div style="font-size:11px;font-weight:600;color:var(--text-secondary);">Activation</div><div style="font-size:10px;color:var(--text-muted);">Pending</div></div></div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:6px;">Solution</div>
+          <div style="font-size:11px;font-weight:600;margin-bottom:2px;">First Data Omaha</div>
+          <div style="font-size:10px;color:var(--text-secondary);">IC+ 0.25% + $0.10 · NMI Gateway</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">Est. savings vs Square: $3,800/yr</div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);" id="demo-equipment-rail">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Equipment</div>
+            <button onclick="openEquipmentEditor()" style="font-size:9px;font-weight:600;padding:2px 8px;border:1px solid var(--border-strong);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">✏️ Edit</button>
+          </div>
+          <div id="demo-equipment-list">
+            <div class="demo-equip-row" data-equip-id="pax_a920" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+              <span style="font-size:14px;">📱</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:10px;font-weight:600;color:var(--text-primary);">PAX A920 Pro</div>
+                <div style="font-size:9px;color:var(--text-muted);">Countertop · NFC · 4G</div>
+              </div>
+              <div style="font-size:10px;font-weight:600;color:var(--text-secondary);">×1</div>
+            </div>
+            <div class="demo-equip-row" data-equip-id="nmi_gateway" style="display:flex;align-items:center;gap:8px;padding:6px 0;">
+              <span style="font-size:14px;">🔌</span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:10px;font-weight:600;color:var(--text-primary);">NMI Gateway</div>
+                <div style="font-size:9px;color:var(--text-muted);">Online orders</div>
+              </div>
+              <div style="font-size:10px;font-weight:600;color:var(--text-secondary);">×1</div>
+            </div>
+          </div>
+          <div style="margin-top:6px;padding:4px 8px;background:rgba(34,197,94,.06);border-radius:4px;font-size:9px;color:var(--text-muted);">
+            Monthly: <strong style="color:var(--text-primary);">$35.00</strong> · Upfront: <strong style="color:var(--text-primary);">$299.00</strong>
+          </div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px;">Application</div>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:10px;">
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Owner</span><span>Sarah Chen (100%)</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">MCC</span><span>5812 — Restaurants</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Est. Volume</span><span>$40K/mo</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Risk</span><span style="color:#22C55E;">Low</span></div>
+            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Location</span><span>Portland, OR</span></div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px;" id="demo-docs-label">Documents (0)</div>
+          <div id="demo-docs-list" style="display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--text-secondary);">
+            <div style="color:var(--text-muted);font-style:italic;">No documents yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main chat area -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Chat tabs -->
+        <div style="display:flex;align-items:center;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--bg-surface);gap:0;">
+          <div class="demo-chat-tab active" data-tab="all" onclick="demoChatTab('all',this)" style="padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--yellow);color:var(--text-primary);">All</div>
+          <div class="demo-chat-tab" data-tab="merchant" onclick="demoChatTab('merchant',this)" style="padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-secondary);">Merchant</div>
+          <div class="demo-chat-tab" data-tab="internal" onclick="demoChatTab('internal',this)" style="padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-secondary);">Internal</div>
+          <div class="demo-chat-tab" data-tab="processor" onclick="demoChatTab('processor',this)" style="padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-secondary);display:none;" id="demo-proc-tab">Processor</div>
+          <div style="flex:1;"></div>
+          <div style="font-size:10px;color:var(--text-muted);" id="demo-event-counter">Event 0 / ${DEMO_EVENTS.length}</div>
+        </div>
+
+        <!-- Chat thread -->
+        <div id="demo-thread" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:4px;">
+          <div class="dsep"><div class="dsep-lbl" style="font-size:10px;background:var(--bg-elevated);padding:3px 12px;border-radius:10px;color:var(--text-muted);font-weight:600;">Today · Mar 11, 2026</div></div>
+        </div>
+
+        <!-- Chat input -->
+        <div style="border-top:1px solid var(--border);background:var(--bg-surface);padding:10px 20px 14px;">
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <div class="demo-mode-btn active" id="dm-int" onclick="demoSetMode('int')" style="padding:4px 10px;font-size:10px;font-weight:600;border-radius:5px;cursor:pointer;background:rgba(255,222,0,.12);color:var(--yellow);border:1px solid rgba(255,222,0,.25);">Internal</div>
+            <div class="demo-mode-btn" id="dm-out" onclick="demoSetMode('out')" style="padding:4px 10px;font-size:10px;font-weight:600;border-radius:5px;cursor:pointer;background:transparent;color:var(--text-secondary);border:1px solid var(--border-strong);">Merchant</div>
+            <div class="demo-mode-btn" id="dm-proc" onclick="demoSetMode('proc')" style="padding:4px 10px;font-size:10px;font-weight:600;border-radius:5px;cursor:pointer;background:transparent;color:var(--text-secondary);border:1px solid var(--border-strong);display:none;" id="demo-proc-mode">📧 Processor</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <textarea id="demo-chat-input" placeholder="Type your internal note…" rows="2" style="flex:1;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:12px;font-family:var(--font-ui);outline:none;resize:none;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'"></textarea>
+            <button onclick="demoSendMessage()" style="padding:8px 16px;background:var(--yellow);border:none;border-radius:8px;color:var(--text-inverse);font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;">→</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+            <span style="font-size:12px;cursor:pointer;" title="Attach file">📎</span>
+            <span style="font-size:12px;cursor:pointer;" title="Mention">@</span>
+            <span style="font-size:12px;cursor:pointer;" title="Templates">⚡</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function advanceDemo() {
+  if (!_demoRunning || _demoPaused) return;
+  if (_demoStep >= DEMO_EVENTS.length) { _demoRunning = false; return; }
+
+  const evt = DEMO_EVENTS[_demoStep];
+  _demoStep++;
+
+  // Update event counter
+  const counter = document.getElementById('demo-event-counter');
+  if (counter) counter.textContent = `Event ${_demoStep} / ${DEMO_EVENTS.length}`;
+
+  // Process event
+  processEvent(evt);
+
+  // Schedule next event
+  if (_demoStep < DEMO_EVENTS.length && evt.type !== 'end') {
+    const next = DEMO_EVENTS[_demoStep];
+    _demoTimer = setTimeout(advanceDemo, next.delay || 1000);
+  }
+}
+
+function processEvent(evt) {
+  const thread = document.getElementById('demo-thread');
+  if (!thread) return;
+
+  switch (evt.type) {
+    case 'status':
+      _demoStatus = evt.status;
+      updateDemoStatus(evt.status, evt.label);
+      break;
+
+    case 'sys':
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-card" data-filter="all internal" style="margin:8px 24px;padding:10px 14px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:10px;animation:fadeSlide .3s ease;">
+          <div style="width:28px;height:28px;border-radius:8px;background:${evt.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <div style="width:8px;height:8px;border-radius:50%;background:${evt.color};"></div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);">${evt.text}</div>
+          </div>
+          <div style="font-size:9px;color:var(--text-muted);flex-shrink:0;">${timeNow()}</div>
+        </div>`);
+      break;
+
+    case 'divider':
+      thread.insertAdjacentHTML('beforeend', `<div class="dsep" data-filter="all merchant internal processor"><div class="dsep-lbl" style="font-size:10px;background:var(--bg-elevated);padding:3px 12px;border-radius:10px;color:var(--text-muted);font-weight:600;">${evt.label}</div></div>`);
+      break;
+
+    case 'ai': {
+      const isInternal = evt.mode === 'int';
+      const aiFilter = isInternal ? 'all internal' : 'all merchant';
+      const bubbleBg = isInternal ? 'rgba(255,222,0,.06)' : 'rgba(34,197,94,.08)';
+      const bubbleBorder = isInternal ? 'rgba(255,222,0,.2)' : 'rgba(34,197,94,.25)';
+      const modeLabel = isInternal
+        ? '<span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(255,222,0,.15);color:var(--yellow);letter-spacing:.03em;">INTERNAL NOTE</span>'
+        : '<span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(34,197,94,.12);color:#22C55E;letter-spacing:.03em;">→ MERCHANT</span>';
+
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-msg demo-msg-right" data-filter="${aiFilter}" style="display:flex;flex-direction:column;align-items:flex-end;padding:4px 20px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            ${modeLabel}
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="max-width:75%;padding:10px 14px;border-radius:16px 16px 4px 16px;background:${bubbleBg};border:1px solid ${bubbleBorder};font-size:12px;line-height:1.5;color:var(--text-primary);">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">
+              <span style="font-size:10px;">🤖</span>
+              <span style="font-size:10px;font-weight:700;color:var(--text-secondary);">Twill AI</span>
+            </div>
+            ${evt.text}
+          </div>
+        </div>`);
+      break;
+    }
+
+    case 'ai-thinking':
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-card" data-filter="all internal" style="margin:8px 24px;padding:12px 16px;background:linear-gradient(135deg,rgba(139,92,246,.04),rgba(99,102,241,.06));border:1px solid rgba(139,92,246,.15);border-radius:12px;animation:fadeSlide .3s ease;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.4),transparent);animation:shimmer 2s infinite;"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#8B5CF6,#6366F1);display:flex;align-items:center;justify-content:center;font-size:10px;">🤖</div>
+            <span style="font-size:10px;font-weight:700;color:#A78BFA;">AI Analysis</span>
+            <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(139,92,246,.12);color:#A78BFA;letter-spacing:.03em;">ANALYZING</span>
+            <span style="flex:1;"></span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="font-size:11px;line-height:1.6;color:var(--text-secondary);padding-left:30px;">${evt.text}</div>
+        </div>`);
+      break;
+
+    case 'merchant':
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-msg demo-msg-left" data-filter="all merchant" style="display:flex;flex-direction:column;align-items:flex-start;padding:4px 20px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:#6B839B;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;">SC</div>
+            <span style="font-size:10px;font-weight:600;color:var(--text-primary);">${evt.sender}</span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="max-width:75%;padding:10px 14px;border-radius:16px 16px 16px 4px;background:var(--bg-elevated);border:1px solid var(--border);font-size:12px;line-height:1.5;color:var(--text-primary);margin-left:26px;">${evt.text}</div>
+        </div>`);
+      break;
+
+    case 'merchant-doc': {
+      const docItems = evt.docs.map(d => {
+        const ext = d.split('.').pop().toUpperCase();
+        const icon = ext === 'PDF' ? '📑' : '📄';
+        return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-base);border:1px solid var(--border);border-radius:8px;">
+          <span style="font-size:16px;">${icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d}</div>
+            <div style="font-size:9px;color:var(--text-muted);">${ext} · Just uploaded</div>
+          </div>
+          <div style="font-size:9px;color:#22C55E;font-weight:600;">✓</div>
+        </div>`;
+      }).join('');
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-card" data-filter="all merchant" style="margin:8px 24px;padding:12px 16px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:22px;height:22px;border-radius:6px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;font-size:11px;">📤</div>
+            <span style="font-size:10px;font-weight:700;color:var(--text-primary);">Documents Uploaded</span>
+            <span style="font-size:9px;color:var(--text-muted);">by ${evt.sender}</span>
+            <span style="flex:1;"></span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">${docItems}</div>
+        </div>`);
+      updateDemoDocs(evt.docs);
+      break;
+    }
+
+    case 'processor': {
+      // Show processor tab if hidden
+      const procTab = document.getElementById('demo-proc-tab');
+      if (procTab) procTab.style.display = 'block';
+      const procMode = document.getElementById('dm-proc');
+      if (procMode) procMode.style.display = 'block';
+
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-msg demo-msg-left" data-filter="all processor" style="display:flex;flex-direction:column;align-items:flex-start;padding:4px 20px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;">FD</div>
+            <span style="font-size:10px;font-weight:600;color:var(--text-primary);">${evt.sender}</span>
+            <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(167,139,250,.12);color:#A78BFA;letter-spacing:.03em;">PROCESSOR</span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="max-width:75%;padding:10px 14px;border-radius:16px 16px 16px 4px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);font-size:12px;line-height:1.5;color:var(--text-primary);margin-left:26px;">${evt.text}</div>
+        </div>`);
+      break;
+    }
+
+    case 'processor-out':
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-msg demo-msg-right" data-filter="all processor" style="display:flex;flex-direction:column;align-items:flex-end;padding:4px 20px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(167,139,250,.12);color:#A78BFA;letter-spacing:.03em;">→ PROCESSOR</span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="max-width:75%;padding:10px 14px;border-radius:16px 16px 4px 16px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);font-size:12px;line-height:1.5;color:var(--text-primary);">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">
+              <span style="font-size:10px;">🤖</span>
+              <span style="font-size:10px;font-weight:700;color:var(--text-secondary);">Twill AI</span>
+            </div>
+            ${evt.text}
+          </div>
+        </div>`);
+      break;
+
+    case 'equip-change': {
+      // Process the equipment change
+      processEquipmentChange(evt.change);
+      const totals = calcEquipmentTotals();
+      const items = _demoEquipment.map(eq => {
+        const cat = EQUIPMENT_CATALOG.find(c => c.id === eq.id);
+        return cat ? `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;"><span>${cat.icon}</span><span style="font-weight:600;">${cat.name}</span><span style="color:var(--text-muted);">×${eq.qty}</span></div>` : '';
+      }).filter(Boolean).join('');
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-card" data-filter="all internal" style="margin:8px 24px;padding:12px 16px;background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.15);border-radius:12px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:22px;height:22px;border-radius:6px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;font-size:11px;">🛠️</div>
+            <span style="font-size:10px;font-weight:700;color:#3B82F6;">Equipment Change</span>
+            <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,.1);color:#3B82F6;letter-spacing:.03em;">${evt.label || 'UPDATED'}</span>
+            <span style="flex:1;"></span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="padding-left:30px;">
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">${evt.reason || ''}</div>
+            <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:10px;">${items}
+              <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);color:var(--text-muted);">Monthly: <strong style="color:var(--text-primary);">$${totals.monthly.toFixed(2)}</strong> · Upfront: <strong style="color:var(--text-primary);">$${totals.upfront.toFixed(2)}</strong></div>
+            </div>
+          </div>
+        </div>`);
+      break;
+    }
+
+    case 'end':
+      thread.insertAdjacentHTML('beforeend', `
+        <div style="text-align:center;padding:32px 20px;" data-filter="all merchant internal processor">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;">🎉</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Merchant Approved</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;max-width:320px;margin-left:auto;margin-right:auto;">Fresh Brew Coffee Co. went from lead to approved in the time it takes to brew a pour-over.</div>
+          <button onclick="resetDemo()" style="padding:10px 24px;background:var(--yellow);border:none;border-radius:8px;color:#09091A;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-ui);">↺ Reset & Run Again</button>
+        </div>`);
+      _demoRunning = false;
+      break;
+  }
+
+  // Scroll to bottom
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function updateDemoStatus(status, label) {
+  const badge = document.getElementById('demo-status-badge');
+  if (badge) {
+    badge.textContent = label;
+    if (status === 'underwriting') {
+      badge.style.background = 'rgba(167,139,250,.12)';
+      badge.style.color = '#A78BFA';
+    } else if (status === 'approved') {
+      badge.style.background = 'rgba(34,197,94,.12)';
+      badge.style.color = '#22C55E';
+    }
+  }
+
+  // Update progress rail
+  if (status === 'underwriting') {
+    const sig = document.getElementById('dp-sig');
+    if (sig) { sig.style.background = 'rgba(34,197,94,.08)'; sig.querySelector('span').style.background = '#22C55E'; }
+    const sigSub = document.getElementById('dp-sig-sub');
+    if (sigSub) sigSub.textContent = '✓ Signed';
+    const uw = document.getElementById('dp-uw');
+    if (uw) { uw.style.opacity = '1'; uw.style.background = 'rgba(167,139,250,.08)'; uw.querySelector('span').style.background = '#A78BFA'; uw.querySelector('span').style.border = 'none'; uw.querySelector('span').style.color = '#fff'; }
+    const uwSub = document.getElementById('dp-uw-sub');
+    if (uwSub) uwSub.textContent = 'In review';
+  } else if (status === 'approved') {
+    const uw = document.getElementById('dp-uw');
+    if (uw) { uw.style.background = 'rgba(34,197,94,.08)'; uw.querySelector('span').style.background = '#22C55E'; }
+    const uwSub = document.getElementById('dp-uw-sub');
+    if (uwSub) uwSub.textContent = '✓ Complete';
+    const app = document.getElementById('dp-app');
+    if (app) { app.style.opacity = '1'; app.style.background = 'rgba(34,197,94,.12)'; app.querySelector('span').style.background = '#22C55E'; app.querySelector('span').style.border = 'none'; app.querySelector('span').style.color = '#fff'; }
+    const appSub = document.getElementById('dp-app-sub');
+    if (appSub) { appSub.textContent = '✓ Approved!'; appSub.style.color = '#22C55E'; appSub.style.fontWeight = '700'; }
+  }
+}
+
+let _demoDocs = [];
+function updateDemoDocs(newDocs) {
+  _demoDocs = _demoDocs.concat(newDocs);
+  const label = document.getElementById('demo-docs-label');
+  const list = document.getElementById('demo-docs-list');
+  if (label) label.textContent = `Documents (${_demoDocs.length})`;
+  if (list) list.innerHTML = _demoDocs.map(d => `<div style="display:flex;align-items:center;gap:5px;padding:4px 0;"><span style="font-size:11px;">📄</span><span style="font-size:10px;color:var(--text-primary);">${d}</span></div>`).join('');
+}
+
+function timeNow() {
+  return new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+}
+
+function toggleDemoPause() {
+  _demoPaused = !_demoPaused;
+  const btn = document.getElementById('demo-pause-btn');
+  const indicator = document.getElementById('demo-auto-indicator');
+  if (_demoPaused) {
+    if (btn) btn.innerHTML = '▶ Resume';
+    if (indicator) { indicator.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#F59E0B;"></span> Paused'; indicator.style.background = 'rgba(245,158,11,.08)'; indicator.style.borderColor = 'rgba(245,158,11,.2)'; indicator.style.color = '#F59E0B'; }
+    clearTimeout(_demoTimer);
+  } else {
+    if (btn) btn.innerHTML = '⏸ Pause';
+    if (indicator) { indicator.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite;"></span> Agent Active'; indicator.style.background = 'rgba(34,197,94,.08)'; indicator.style.borderColor = 'rgba(34,197,94,.2)'; indicator.style.color = '#22C55E'; }
+    advanceDemo();
+  }
+}
+
+function demoChatTab(tab, el) {
+  document.querySelectorAll('.demo-chat-tab').forEach(t => { t.style.borderBottomColor = 'transparent'; t.style.color = 'var(--text-secondary)'; });
+  el.style.borderBottomColor = 'var(--yellow)';
+  el.style.color = 'var(--text-primary)';
+
+  const thread = document.getElementById('demo-thread');
+  if (!thread) return;
+  thread.querySelectorAll('[data-filter]').forEach(msg => {
+    const filters = msg.dataset.filter.split(' ');
+    msg.style.display = (tab === 'all' || filters.includes(tab)) ? '' : 'none';
+  });
+}
+
+function demoSetMode(mode) {
+  ['int','out','proc'].forEach(m => {
+    const btn = document.getElementById('dm-' + m);
+    if (btn) {
+      if (m === mode) {
+        btn.style.background = m==='int' ? 'rgba(255,222,0,.12)' : m==='out' ? 'rgba(34,197,94,.08)' : 'rgba(167,139,250,.12)';
+        btn.style.color = m==='int' ? 'var(--yellow)' : m==='out' ? '#22C55E' : '#A78BFA';
+        btn.style.borderColor = m==='int' ? 'rgba(255,222,0,.25)' : m==='out' ? 'rgba(34,197,94,.25)' : 'rgba(167,139,250,.25)';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-secondary)';
+        btn.style.borderColor = 'var(--border-strong)';
+      }
+    }
+  });
+  const input = document.getElementById('demo-chat-input');
+  if (input) input.placeholder = mode==='int' ? 'Type your internal note…' : mode==='out' ? 'Type your message to the merchant…' : 'Type your message to the processor…';
+}
+
+function demoSendMessage() {
+  const input = document.getElementById('demo-chat-input');
+  if (!input || !input.value.trim()) return;
+  const text = input.value.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  const intBtn = document.getElementById('dm-int');
+  const outBtn = document.getElementById('dm-out');
+  const procBtn = document.getElementById('dm-proc');
+  let mode = 'int';
+  if (outBtn && outBtn.style.color === 'rgb(34, 197, 94)') mode = 'out';
+  if (procBtn && procBtn.style.color === 'rgb(167, 139, 250)') mode = 'proc';
+
+  const modeLabel = mode==='int' ? '<span class="amode int">Internal</span>' : mode==='out' ? '<span class="amode out">→ Merchant</span>' : '<span class="amode" style="background:rgba(167,139,250,.15);color:#A78BFA;">→ Processor</span>';
+  const filter = mode==='int' ? 'all internal' : mode==='out' ? 'all merchant' : 'all processor';
+  const bubCls = mode==='int' ? 'int' : mode==='out' ? 'out' : '';
+  const bubStyle = mode==='proc' ? 'border-color:rgba(167,139,250,.25);background:rgba(139,92,246,.03);' : '';
+
+  const thread = document.getElementById('demo-thread');
+  if (thread) {
+    thread.insertAdjacentHTML('beforeend', `<div class="act" data-filter="${filter}">
+      <div class="ah">
+        <div class="aav" style="background:var(--yellow);color:var(--text-inverse);">MA</div>
+        <span class="aname">Master Admin (You)</span>
+        ${modeLabel}
+        <span class="atime">${timeNow()}</span>
+      </div>
+      <div class="abub ${bubCls}" style="${bubStyle}">${text}</div>
+    </div>`);
+    thread.scrollTop = thread.scrollHeight;
+  }
+  input.value = '';
+}
+
+// ═══ EQUIPMENT MANAGEMENT ═══
+
+const EQUIPMENT_CATALOG = [
+  { id:'pax_a920', name:'PAX A920 Pro', icon:'📱', desc:'Countertop · NFC · 4G', monthly:25, upfront:299, type:'terminal' },
+  { id:'pax_a77', name:'PAX A77', icon:'📲', desc:'Mobile · Bluetooth · NFC', monthly:20, upfront:249, type:'terminal' },
+  { id:'pax_a80', name:'PAX A80', icon:'🖥️', desc:'Countertop · Ethernet · NFC', monthly:15, upfront:199, type:'terminal' },
+  { id:'clover_flex', name:'Clover Flex 3', icon:'📱', desc:'Handheld · LTE · NFC · Camera', monthly:35, upfront:499, type:'terminal' },
+  { id:'clover_mini', name:'Clover Mini', icon:'🖥️', desc:'Countertop POS · Touchscreen', monthly:39, upfront:599, type:'terminal' },
+  { id:'nmi_gateway', name:'NMI Gateway', icon:'🔌', desc:'Online orders · Virtual terminal', monthly:10, upfront:0, type:'gateway' },
+  { id:'authorize_net', name:'Authorize.net', icon:'🔌', desc:'Gateway · eCommerce · Recurring', monthly:25, upfront:0, type:'gateway' },
+  { id:'cb_protection', name:'Chargeback Protection', icon:'🛡️', desc:'Alert + deflection · Ethoca/Verifi', monthly:50, upfront:0, type:'addon' },
+  { id:'loyalty', name:'Loyalty Program', icon:'⭐', desc:'Points · rewards · repeat visits', monthly:29, upfront:0, type:'addon' },
+];
+
+let _demoEquipment = [
+  { id:'pax_a920', qty:1 },
+  { id:'nmi_gateway', qty:1 },
+];
+
+function openEquipmentEditor() {
+  // Remove existing modal if present
+  const existing = document.getElementById('equip-editor-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'equip-editor-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);animation:fadeSlide .2s ease;';
+  modal.innerHTML = buildEquipmentEditorHTML();
+  document.body.appendChild(modal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeEquipmentEditor(); });
+}
+
+function closeEquipmentEditor() {
+  const modal = document.getElementById('equip-editor-modal');
+  if (modal) modal.remove();
+}
+
+function buildEquipmentEditorHTML() {
+  const currentItems = _demoEquipment.map(eq => {
+    const cat = EQUIPMENT_CATALOG.find(c => c.id === eq.id);
+    if (!cat) return '';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;" data-equip-editor-id="${eq.id}">
+        <span style="font-size:20px;">${cat.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-primary);">${cat.name}</div>
+          <div style="font-size:10px;color:var(--text-muted);">${cat.desc}</div>
+          <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">$${cat.monthly}/mo · $${cat.upfront} upfront</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button onclick="equipQtyChange('${eq.id}',-1)" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-base);color:var(--text-secondary);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+          <span style="font-size:13px;font-weight:700;min-width:20px;text-align:center;" id="equip-qty-${eq.id}">${eq.qty}</span>
+          <button onclick="equipQtyChange('${eq.id}',1)" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-base);color:var(--text-secondary);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+        </div>
+        <button onclick="equipRemove('${eq.id}')" style="padding:4px 8px;border:none;background:rgba(239,68,68,.08);border-radius:4px;color:#EF4444;font-size:10px;font-weight:600;cursor:pointer;">Remove</button>
+      </div>`;
+  }).join('');
+
+  const available = EQUIPMENT_CATALOG.filter(c => !_demoEquipment.find(e => e.id === c.id));
+  const catalogItems = available.map(cat => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='var(--bg-elevated)'" onmouseleave="this.style.background=''" onclick="equipAdd('${cat.id}')">
+      <span style="font-size:16px;">${cat.icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-primary);">${cat.name}</div>
+        <div style="font-size:9px;color:var(--text-muted);">${cat.desc}</div>
+      </div>
+      <div style="font-size:10px;color:var(--text-secondary);">$${cat.monthly}/mo</div>
+      <div style="font-size:10px;color:#22C55E;font-weight:600;">+ Add</div>
+    </div>`).join('');
+
+  const totals = calcEquipmentTotals();
+
+  return `
+    <div style="width:520px;max-height:80vh;background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Equipment Configuration</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Fresh Brew Coffee Co. · First Data Omaha</div>
+        </div>
+        <button onclick="closeEquipmentEditor()" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--border-strong);background:transparent;color:var(--text-muted);font-size:14px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:16px 20px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Current Equipment</div>
+        <div id="equip-editor-current" style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;">
+          ${currentItems || '<div style="padding:12px;text-align:center;font-size:11px;color:var(--text-muted);">No equipment configured</div>'}
+        </div>
+
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Add Equipment</div>
+        <div id="equip-editor-catalog" style="display:flex;flex-direction:column;gap:2px;">
+          ${catalogItems || '<div style="padding:12px;text-align:center;font-size:11px;color:var(--text-muted);">All equipment added</div>'}
+        </div>
+      </div>
+
+      <div style="padding:14px 20px;border-top:1px solid var(--border);background:var(--bg-elevated);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--text-muted);">Monthly: <strong style="color:var(--text-primary);">$${totals.monthly.toFixed(2)}</strong></div>
+          <div style="font-size:11px;color:var(--text-muted);">Upfront: <strong style="color:var(--text-primary);">$${totals.upfront.toFixed(2)}</strong></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="closeEquipmentEditor()" class="btn btn-ghost" style="flex:1;padding:8px;font-size:12px;">Cancel</button>
+          <button onclick="saveEquipmentChanges()" style="flex:1;padding:8px;background:var(--yellow);border:none;border-radius:8px;color:#09091A;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-ui);">Save Changes</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function calcEquipmentTotals() {
+  let monthly = 0, upfront = 0;
+  _demoEquipment.forEach(eq => {
+    const cat = EQUIPMENT_CATALOG.find(c => c.id === eq.id);
+    if (cat) { monthly += cat.monthly * eq.qty; upfront += cat.upfront * eq.qty; }
+  });
+  return { monthly, upfront };
+}
+
+function equipQtyChange(id, delta) {
+  const eq = _demoEquipment.find(e => e.id === id);
+  if (!eq) return;
+  eq.qty = Math.max(1, Math.min(10, eq.qty + delta));
+  const span = document.getElementById('equip-qty-' + id);
+  if (span) span.textContent = eq.qty;
+  // Update totals in modal
+  refreshEquipmentEditorTotals();
+}
+
+function equipRemove(id) {
+  _demoEquipment = _demoEquipment.filter(e => e.id !== id);
+  // Rebuild the modal content
+  const modal = document.getElementById('equip-editor-modal');
+  if (modal) modal.innerHTML = buildEquipmentEditorHTML();
+}
+
+function equipAdd(id) {
+  if (_demoEquipment.find(e => e.id === id)) return;
+  _demoEquipment.push({ id, qty:1 });
+  const modal = document.getElementById('equip-editor-modal');
+  if (modal) modal.innerHTML = buildEquipmentEditorHTML();
+}
+
+function refreshEquipmentEditorTotals() {
+  const totals = calcEquipmentTotals();
+  const modal = document.getElementById('equip-editor-modal');
+  if (!modal) return;
+  const footer = modal.querySelector('[style*="border-top"]');
+  if (footer) {
+    const spans = footer.querySelectorAll('strong');
+    if (spans[0]) spans[0].textContent = '$' + totals.monthly.toFixed(2);
+    if (spans[1]) spans[1].textContent = '$' + totals.upfront.toFixed(2);
+  }
+}
+
+function saveEquipmentChanges() {
+  refreshEquipmentRail();
+  closeEquipmentEditor();
+
+  // If demo is running, inject an equipment change event into the chat
+  if (_demoRunning || _demoStatus) {
+    const thread = document.getElementById('demo-thread');
+    if (thread) {
+      const items = _demoEquipment.map(eq => {
+        const cat = EQUIPMENT_CATALOG.find(c => c.id === eq.id);
+        return cat ? `${cat.icon} ${cat.name} ×${eq.qty}` : '';
+      }).filter(Boolean).join(' · ');
+      const totals = calcEquipmentTotals();
+      thread.insertAdjacentHTML('beforeend', `
+        <div class="demo-card" data-filter="all internal" style="margin:8px 24px;padding:12px 16px;background:rgba(255,222,0,.04);border:1px solid rgba(255,222,0,.15);border-radius:12px;animation:fadeSlide .3s ease;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div style="width:22px;height:22px;border-radius:6px;background:rgba(255,222,0,.12);display:flex;align-items:center;justify-content:center;font-size:11px;">🛠️</div>
+            <span style="font-size:10px;font-weight:700;color:var(--yellow);">Equipment Updated</span>
+            <span style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(255,222,0,.1);color:var(--yellow);letter-spacing:.03em;">MANUAL CHANGE</span>
+            <span style="flex:1;"></span>
+            <span style="font-size:9px;color:var(--text-muted);">${timeNow()}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-primary);line-height:1.6;padding-left:30px;">
+            ${items}<br>
+            <span style="color:var(--text-muted);">Monthly: $${totals.monthly.toFixed(2)} · Upfront: $${totals.upfront.toFixed(2)}</span>
+          </div>
+        </div>`);
+      thread.scrollTop = thread.scrollHeight;
+    }
+  }
+}
+
+function refreshEquipmentRail() {
+  const list = document.getElementById('demo-equipment-list');
+  if (!list) return;
+  list.innerHTML = _demoEquipment.map(eq => {
+    const cat = EQUIPMENT_CATALOG.find(c => c.id === eq.id);
+    if (!cat) return '';
+    return `
+      <div class="demo-equip-row" data-equip-id="${eq.id}" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+        <span style="font-size:14px;">${cat.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:10px;font-weight:600;color:var(--text-primary);">${cat.name}</div>
+          <div style="font-size:9px;color:var(--text-muted);">${cat.desc}</div>
+        </div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);">×${eq.qty}</div>
+      </div>`;
+  }).join('');
+
+  // Update totals
+  const totals = calcEquipmentTotals();
+  const rail = document.getElementById('demo-equipment-rail');
+  if (rail) {
+    const totalDiv = rail.querySelector('[style*="rgba(34,197,94"]');
+    if (totalDiv) totalDiv.innerHTML = `Monthly: <strong style="color:var(--text-primary);">$${totals.monthly.toFixed(2)}</strong> · Upfront: <strong style="color:var(--text-primary);">$${totals.upfront.toFixed(2)}</strong>`;
+  }
+}
+
+// Process equipment changes from demo events
+function processEquipmentChange(change) {
+  if (change.action === 'add') {
+    const existing = _demoEquipment.find(e => e.id === change.id);
+    if (existing) { existing.qty += (change.qty || 1); }
+    else { _demoEquipment.push({ id: change.id, qty: change.qty || 1 }); }
+  } else if (change.action === 'remove') {
+    _demoEquipment = _demoEquipment.filter(e => e.id !== change.id);
+  } else if (change.action === 'replace') {
+    _demoEquipment = _demoEquipment.filter(e => e.id !== change.oldId);
+    _demoEquipment.push({ id: change.newId, qty: change.qty || 1 });
+  }
+  refreshEquipmentRail();
+}
+
+function resetDemo() {
+  _demoRunning = false;
+  _demoPaused = false;
+  _demoStep = 0;
+  _demoDocs = [];
+  _demoEquipment = [{ id:'pax_a920', qty:1 }, { id:'nmi_gateway', qty:1 }];
+  clearTimeout(_demoTimer);
+
+  // Remove floating CTA if present
+  const cta = document.getElementById('sb-sig-cta');
+  if (cta) cta.remove();
+
+  // Reset merchant status back to lead
+  const m = merchantData.find(x => x.name === 'Fresh Brew Coffee Co.');
+  if (m) m.status = 'lead';
+
+  // Reload page and navigate back to Fresh Brew Solution Builder
+  // Store intent in sessionStorage so we can pick it up after reload
+  sessionStorage.setItem('demo-reset-target', 'Fresh Brew Coffee Co.');
+  location.reload();
+}
+
+// On page load, check if we need to navigate to a reset target
+window.addEventListener('load', function() {
+  const target = sessionStorage.getItem('demo-reset-target');
+  if (target) {
+    sessionStorage.removeItem('demo-reset-target');
+    setTimeout(() => {
+      navigateToMerchant(target, 'lead');
+      setTimeout(() => goStep(5), 100);
+    }, 200);
+  }
+});
 
 function copyEmail() {
   const t = "Hi Sarah,\nI've been reviewing Pacific Coast Retail's processing needs. Based on your volume and setup I'd recommend First Data with IC+ pricing — should save you ~30% vs. Square's flat 2.6%...";
