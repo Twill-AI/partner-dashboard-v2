@@ -926,6 +926,65 @@
   .syst{font-size:11px;color:var(--text-muted);}
   .systt{font-size:13px;color:var(--text-secondary);margin-left:auto;}
   .ch-inp{border-top:1px solid var(--border);background:var(--bg-surface);flex-shrink:0;}
+
+/* ═══ PARTNER CHAT EXPANSION (BroadcastChannel demo) ═══ */
+.body-row { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+#view-merchant-detail .steps-nav { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.5s; }
+#view-merchant-detail .form-content { transition: opacity 0.3s ease, flex 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+#view-merchant-detail .chat-aside { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+.partner-chat-expanded .steps-nav { width:0!important; padding:0!important; opacity:0!important; overflow:hidden!important; border:none!important; }
+.partner-chat-expanded .form-content { flex:0!important; opacity:0!important; overflow:hidden!important; padding:0!important; }
+.partner-chat-expanded .chat-aside { width:100%!important; border-left:none!important; }
+.partner-chat-expanded .ch-hdr { justify-content:center; padding:0 20px; }
+.partner-chat-expanded .cf { display:none!important; }
+.partner-chat-expanded .tkt-indicator, .partner-chat-expanded .tkt-pills, .partner-chat-expanded .tkt-input-bar, .partner-chat-expanded .tkt-connected, .partner-chat-expanded .tkt-indicator-list { display:none!important; }
+.partner-chat-expanded .ch-thread { padding:16px 0; max-width:680px; margin:0 auto; width:100%; }
+.partner-chat-expanded .act { padding:6px 20px; }
+.partner-chat-expanded .abub { font-size:13px; padding:10px 14px; max-width:520px; }
+.partner-chat-expanded .aav { width:24px; height:24px; font-size:9px; }
+.partner-chat-expanded .aname { font-size:12px; }
+.partner-chat-expanded .ch-inp { max-width:680px; margin:0 auto; width:100%; }
+.partner-chat-expanded .ta-wrap { padding:12px 20px 16px; }
+.partner-chat-expanded .chat-ta { min-height:56px; font-size:13px; padding:10px 48px 10px 14px; }
+.partner-chat-expanded .mode-row { display:none!important; }
+.partner-chat-expanded .dsep { display:none!important; }
+.partner-chat-expanded .act.sys { display:none!important; }
+
+/* User bubble (right-aligned) in partner expanded mode */
+.partner-chat-expanded .act.user-msg .abub { background:var(--navy); color:#fff; border-color:var(--navy-dark); margin-left:auto; margin-right:0; }
+.partner-chat-expanded .act.user-msg .ah { flex-direction:row-reverse; }
+.partner-chat-expanded .act.user-msg .atime { margin-left:0; margin-right:auto; }
+
+/* Merchant bubble in partner view */
+.partner-chat-expanded .act.merchant-msg .abub { background:rgba(91,122,94,0.06); border-color:rgba(91,122,94,0.2); }
+
+/* Partner control buttons */
+.partner-controls { display:flex; gap:8px; padding:10px 20px; justify-content:center; border-top:1px solid var(--border); background:var(--bg-surface); max-width:680px; margin:0 auto; width:100%; }
+.partner-ctrl-btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-ui); border:1px solid; transition:all .15s; }
+.partner-ctrl-btn.pend { background:var(--amber-dim); color:var(--amber); border-color:rgba(166,124,91,0.3); }
+.partner-ctrl-btn.pend:hover { background:rgba(166,124,91,0.15); }
+.partner-ctrl-btn.approve { background:var(--green-dim); color:var(--green); border-color:rgba(91,122,94,0.3); }
+.partner-ctrl-btn.approve:hover { background:rgba(91,122,94,0.15); }
+.partner-ctrl-btn.reset { background:var(--red-dim); color:var(--red); border-color:rgba(180,67,42,0.15); }
+.partner-ctrl-btn.reset:hover { background:rgba(180,67,42,0.12); }
+
+/* Typing indicator for partner */
+.typing-indicator { display:inline-flex; gap:4px; padding:10px 14px; }
+.typing-indicator span { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:typingBounce 1.2s infinite; }
+.typing-indicator span:nth-child(2) { animation-delay:0.15s; }
+.typing-indicator span:nth-child(3) { animation-delay:0.3s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
+
+/* Confetti for partner */
+.confetti-wrap { position:fixed; top:0; left:0; right:0; bottom:0; pointer-events:none; z-index:9999; }
+.confetti { position:absolute; width:8px; height:8px; border-radius:2px; animation:confettiFall 2.5s ease-out forwards; }
+@keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+
+/* Notification badge in partner chat */
+.partner-notification { padding:8px 14px; background:var(--blue-dim); border:1px solid rgba(107,131,155,0.2); border-radius:8px; margin:6px 20px; font-size:12px; color:var(--blue); display:flex; align-items:center; gap:8px; }
+.partner-notification .pn-icon { font-size:14px; }
+
   .mode-row{display:flex;align-items:center;gap:2px;padding:8px 10px 4px;}
   .mbtn{padding:4px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .1s;}
   .mbtn.int-on{background:var(--yellow-dim);color:var(--yellow);border-color:rgba(255,222,0,.25);}
@@ -15162,16 +15221,172 @@ function promptCustomEquip() {
 
 function sendForSignature() {
   const btn = event.currentTarget || event.target;
-  btn.textContent = '✓ Sent to sarah@pacificcoastretail.com';
+  btn.textContent = '✓ Signature request sent';
   btn.style.background = 'var(--green)';
   btn.style.cursor = 'default';
   btn.disabled = true;
+
+  // Broadcast to merchant portal
+  if (window.twillBC) {
+    window.twillBC.postMessage({type: 'signature_sent', data: {timestamp: Date.now(), merchant: 'Fresh Brew Coffee Co.'}});
+  }
+
+  // Expand partner chat to full screen
   setTimeout(() => {
-    btn.innerHTML = '✍️ Send for Signature';
-    btn.style.background = 'var(--yellow)';
-    btn.style.cursor = 'pointer';
-    btn.disabled = false;
-  }, 3000);
+    expandPartnerChat();
+  }, 800);
+}
+
+function expandPartnerChat() {
+  // Find the active merchant detail view
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+
+  const bodyRow = activeView.querySelector('.body-row');
+  if (bodyRow) bodyRow.classList.add('partner-chat-expanded');
+
+  // Get the chat thread and clear it
+  const chatThread = activeView.querySelector('.ch-thread');
+  if (!chatThread) return;
+  chatThread.innerHTML = '';
+
+  // Update header
+  const chTitle = activeView.querySelector('.ch-title');
+  if (chTitle) chTitle.innerHTML = '💬 Shared Thread · Fresh Brew Coffee Co.';
+
+  // Hide mode row and ticket stuff
+  const modeRow = activeView.querySelector('.mode-row');
+  if (modeRow) modeRow.style.display = 'none';
+
+  // Replace input placeholder
+  const chatInput = activeView.querySelector('.chat-ta');
+  if (chatInput) chatInput.placeholder = 'Message the shared thread...';
+
+  // Add partner control buttons before the input
+  const chInp = activeView.querySelector('.ch-inp');
+  if (chInp) {
+    const controls = document.createElement('div');
+    controls.className = 'partner-controls';
+    controls.id = 'partnerControls';
+    controls.innerHTML = '<button class="partner-ctrl-btn pend" onclick="triggerUWPend()">⚠️ Simulate UW Pend</button>' +
+      '<button class="partner-ctrl-btn approve" onclick="triggerApproval()">✅ Simulate Approval</button>' +
+      '<button class="partner-ctrl-btn reset" onclick="partnerResetDemo()">↺ Reset Demo</button>';
+    chInp.parentNode.insertBefore(controls, chInp);
+  }
+
+  // Start partner's view of the shared thread
+  startPartnerSharedThread();
+}
+
+async function pwait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function partnerAddMessage(sender, html, options = {}) {
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+  const thread = activeView.querySelector('.ch-thread');
+  if (!thread) return;
+
+  const act = document.createElement('div');
+  let className = 'act';
+  if (options.userMsg) className += ' user-msg';
+  if (options.merchantMsg) className += ' merchant-msg';
+  act.className = className;
+
+  const now = new Date();
+  const time = now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+
+  let avatarStyle, avatarText, name;
+  if (options.userMsg) {
+    avatarStyle = 'background:var(--yellow);color:var(--text-inverse);';
+    avatarText = 'MW';
+    name = 'You (Partner)';
+  } else if (options.merchantMsg) {
+    avatarStyle = 'background:var(--green);color:#fff;';
+    avatarText = 'SC';
+    name = 'Sarah Chen';
+  } else {
+    avatarStyle = 'background:var(--navy);color:var(--yellow);';
+    avatarText = 'T';
+    name = 'Twill AI';
+  }
+
+  act.innerHTML = '<div class="ah">' +
+    '<div class="aav" style="' + avatarStyle + '">' + avatarText + '</div>' +
+    '<span class="aname">' + name + '</span>' +
+    '<span class="atime">' + time + '</span>' +
+    '</div>' +
+    '<div class="abub">' + html + '</div>';
+
+  thread.appendChild(act);
+  thread.scrollTop = thread.scrollHeight;
+  return act;
+}
+
+function partnerAddTyping() {
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+  const thread = activeView.querySelector('.ch-thread');
+  if (!thread) return;
+  const act = document.createElement('div');
+  act.className = 'act typing-act';
+  act.innerHTML = '<div class="ah"><div class="aav" style="background:var(--navy);color:var(--yellow);">T</div><span class="aname">Twill AI</span></div>' +
+    '<div class="abub"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+  thread.appendChild(act);
+  thread.scrollTop = thread.scrollHeight;
+  return act;
+}
+
+function partnerRemoveTyping() {
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+  const t = activeView.querySelector('.typing-act');
+  if (t) t.remove();
+}
+
+function partnerAddNotification(html) {
+  const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
+  if (!activeView) return;
+  const thread = activeView.querySelector('.ch-thread');
+  if (!thread) return;
+  const notif = document.createElement('div');
+  notif.className = 'partner-notification';
+  notif.innerHTML = html;
+  thread.appendChild(notif);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function startPartnerSharedThread() {
+  await pwait(500);
+
+  // AI message: signature sent
+  partnerAddMessage('ai', '📨 <strong>Signature request sent</strong> to Sarah Chen (sarah@pacificcoastretail.com)<br><br>The merchant processing agreement for First Data Omaha has been delivered via DocuSign. You\'ll see their activity here in real-time.');
+
+  await pwait(1000);
+  partnerAddNotification('<span class="pn-icon">👀</span> <span>Sarah Chen opened the signature request</span>');
+
+  await pwait(1500);
+  partnerAddNotification('<span class="pn-icon">📜</span> <span>Sarah is reviewing the proposal...</span>');
+
+  // Now we wait for the merchant to actually sign — that comes via BroadcastChannel
+}
+
+function partnerLaunchConfetti() {
+  const wrap = document.createElement('div');
+  wrap.className = 'confetti-wrap';
+  document.body.appendChild(wrap);
+  const colors = ['#C9A800','#5B7A5E','#6B839B','#A67C5B','#222E48','#D1A400'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = Math.random() * 0.8 + 's';
+    c.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    c.style.width = (5 + Math.random() * 6) + 'px';
+    c.style.height = (5 + Math.random() * 6) + 'px';
+    wrap.appendChild(c);
+  }
+  setTimeout(() => wrap.remove(), 4000);
 }
 
 function addDocRow() {
@@ -31322,6 +31537,144 @@ function assignToast(msg) {
 
 </body>
 </html>
+<script>
+// ═══ BROADCASTCHANNEL — PARTNER PORTAL ═══
+window.twillBC = new BroadcastChannel('twill-demo');
+
+window.twillBC.onmessage = function(e) {
+  const {type, data} = e.data;
+
+  if (type === 'merchant_signed') {
+    // Merchant signed the agreement!
+    handleMerchantSigned();
+  }
+
+  if (type === 'doc_uploaded') {
+    handleDocUploaded(data);
+  }
+
+  if (type === 'questionnaire_answer') {
+    handleQuestionnaireAnswer(data);
+  }
+
+  if (type === 'questionnaire_done') {
+    handleQuestionnaireDone();
+  }
+
+  if (type === 'uw_response') {
+    handleUWResponse(data);
+  }
+
+  if (type === 'reset') {
+    location.reload();
+  }
+};
+
+async function handleMerchantSigned() {
+  await pwait(800);
+  partnerAddNotification('<span class="pn-icon">🎉</span> <strong>Sarah Chen signed the agreement!</strong>');
+
+  await pwait(600);
+  const t = partnerAddTyping();
+  await pwait(800);
+  partnerRemoveTyping();
+
+  partnerAddMessage('ai', '🎉 <strong>Congratulations!</strong> Sarah Chen has signed the Merchant Processing Agreement!<br><br>The application for Fresh Brew Coffee Co. is now moving to the next phase. Here\'s what\'s happening on the merchant side:');
+
+  await pwait(1000);
+  const t2 = partnerAddTyping();
+  await pwait(700);
+  partnerRemoveTyping();
+
+  partnerAddMessage('ai', 'I\'m now working with Sarah to collect any remaining documents and complete the underwriting questionnaire. You\'ll see everything here in real-time.<br><br>' +
+    '<div style="font-size:11px;color:var(--text-muted);padding:8px 12px;background:var(--bg-elevated);border-radius:6px;border:1px solid var(--border);">' +
+    '💡 <strong>Transparency mode:</strong> All AI messages sent to the merchant appear here so you have full visibility into the onboarding process.</div>');
+}
+
+async function handleDocUploaded(data) {
+  await pwait(400);
+  partnerAddNotification('<span class="pn-icon">📄</span> <strong>Document received:</strong> ' + (data.doc || 'Unknown document'));
+
+  await pwait(500);
+  partnerAddMessage('ai', '✅ <strong>Document verified:</strong> ' + (data.doc || 'Document') + '<br><span style="font-size:11px;color:var(--text-muted);">Auto-verified and matched to application. No action needed from you.</span>');
+}
+
+async function handleQuestionnaireAnswer(data) {
+  await pwait(300);
+  partnerAddMessage('merchant', '→ ' + (data.answer || 'Response'), {merchantMsg: true});
+}
+
+async function handleQuestionnaireDone() {
+  await pwait(800);
+  partnerAddNotification('<span class="pn-icon">✅</span> <strong>All questionnaires completed</strong> — application is ready for underwriting review');
+
+  await pwait(600);
+  partnerAddMessage('ai', '📋 All merchant questionnaires are complete. The First Data Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
+    '<strong>Application status:</strong> Ready for UW review<br>' +
+    '<span style="font-size:11px;color:var(--text-muted);">Use the buttons below to simulate underwriting actions.</span>');
+}
+
+// ═══ UW PEND (triggered by partner) ═══
+function triggerUWPend() {
+  if (window.twillBC) {
+    window.twillBC.postMessage({type: 'uw_pend', data: {
+      message: 'Our underwriting team noticed a discrepancy in the stated monthly volume vs. bank deposits.',
+      question: 'Can you confirm your average monthly revenue including cash sales?',
+      timestamp: Date.now()
+    }});
+  }
+
+  partnerAddNotification('<span class="pn-icon">⚠️</span> <strong>UW Pend sent to merchant</strong> — question about volume discrepancy');
+
+  partnerAddMessage('ai', '⚠️ <strong>Underwriting Pend</strong> — Volume Verification<br><br>' +
+    'Bank deposits show ~$28K/mo against a stated $85K volume. Sending clarification request to merchant...<br>' +
+    '<span style="font-size:11px;color:var(--text-muted);">Waiting for merchant response...</span>');
+
+  // Disable the pend button
+  const pendBtn = document.querySelector('.partner-ctrl-btn.pend');
+  if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; pendBtn.textContent = '⚠️ Pend Sent'; }
+}
+
+async function handleUWResponse(data) {
+  await pwait(500);
+  partnerAddMessage('merchant', data.answer || 'Response from merchant', {merchantMsg: true});
+
+  await pwait(400);
+  partnerAddMessage('ai', '📬 <strong>Merchant responded to UW pend.</strong> Response forwarded to underwriting team for review.');
+}
+
+// ═══ APPROVAL (triggered by partner) ═══
+function triggerApproval() {
+  if (window.twillBC) {
+    window.twillBC.postMessage({type: 'approved', data: {timestamp: Date.now()}});
+  }
+
+  // Partner celebration
+  partnerLaunchConfetti();
+
+  partnerAddMessage('ai', '🎉🎉🎉 <strong style="font-size:16px;">APPLICATION APPROVED!</strong> 🎉🎉🎉<br><br>' +
+    'Fresh Brew Coffee Co. has been approved by First Data Omaha!<br><br>' +
+    '<div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">' +
+      '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">✓</span> <strong>MID:</strong> 4847-XXXX-8821</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">✓</span> <strong>Terminal:</strong> PAX A920 Pro shipping today</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">✓</span> <strong>Go-live ETA:</strong> 2-3 business days</div>' +
+    '</div>');
+
+  // Disable approve button
+  const approveBtn = document.querySelector('.partner-ctrl-btn.approve');
+  if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.5'; approveBtn.textContent = '✅ Approved'; }
+  const pendBtn = document.querySelector('.partner-ctrl-btn.pend');
+  if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; }
+}
+
+// ═══ RESET DEMO ═══
+function partnerResetDemo() {
+  if (window.twillBC) {
+    window.twillBC.postMessage({type: 'reset', data: {}});
+  }
+  location.reload();
+}
+</script>
 <!-- cache-bust:1773827400 -->
 </body>
 </html>

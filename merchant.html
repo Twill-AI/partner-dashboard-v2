@@ -1043,6 +1043,7 @@
         <span class="p-badge badge-amber">Application</span>
       </div>
       <div class="topbar-right">
+        <button class="btn btn-ghost" onclick="resetDemo()" style="font-size:11px;color:var(--red);">↺ Reset Demo</button>
         <button class="btn btn-ghost" style="padding:6px 8px;" title="Notifications">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
         </button>
@@ -1446,6 +1447,33 @@
 <!-- end shell -->
 
 <script>
+// ═══ BROADCASTCHANNEL — CROSS-TAB SYNC ═══
+const bc = new BroadcastChannel('twill-demo');
+
+bc.onmessage = function(e) {
+  const {type, data} = e.data;
+
+  if (type === 'signature_sent') {
+    // Partner sent the signature request — show notification in chat
+    addMessage('ai', '📩 <strong>Your processing application is ready!</strong><br><br>Your partner Pacific Coast Retail has prepared a custom processing solution for Fresh Brew Coffee Co. Scroll through your proposal above, then proceed to sign when ready.');
+  }
+
+  if (type === 'uw_pend') {
+    // Underwriting has a question
+    handleUWPend(data);
+  }
+
+  if (type === 'approved') {
+    // Application approved!
+    handleApproval();
+  }
+
+  if (type === 'reset') {
+    // Partner triggered reset
+    location.reload();
+  }
+};
+
   // ─── Step Navigation ───
   function goStep(n) {
     // Update panels
@@ -1536,6 +1564,9 @@
       // Update sidebar Application status
       document.querySelector('.nav-status').textContent = 'Signed ✓';
       document.querySelector('.nav-status').style.color = 'var(--green)';
+
+      // Broadcast to partner portal
+      bc.postMessage({type: 'merchant_signed', data: {timestamp: Date.now(), merchant: 'Fresh Brew Coffee Co.'}});
 
       // Start the conversation sequence
       startPostSignConversation();
@@ -1656,6 +1687,7 @@
     // Simulate user uploading
     // (In real app this would wait for actual upload, but for demo we auto-continue)
     addMessage('user', "Here\'s my license 📷", {userMsg: true});
+    bc.postMessage({type: 'doc_uploaded', data: {doc: 'Owner ID - Sarah Chen', timestamp: Date.now()}});
 
     await wait(400);
     const typing4 = addTyping();
@@ -1700,6 +1732,7 @@
     // User reply
     await wait(300);
     addMessage('user', btn.textContent, {userMsg: true});
+    bc.postMessage({type: 'questionnaire_answer', data: {question: q, answer: btn.textContent, timestamp: Date.now()}});
 
     await wait(300);
     const t1 = addTyping();
@@ -1723,6 +1756,7 @@
       );
     } else if (q === 2) {
       addMessage('ai', "Perfect, that\'s all I needed! ✅<br><br>I\'ve filled out the <strong>First Data Retail Questionnaire</strong> and <strong>E-commerce Addendum</strong> based on your answers. These will be included with your application automatically — no extra forms for you to sign. 🎉");
+      bc.postMessage({type: 'questionnaire_done', data: {timestamp: Date.now()}});
 
       await wait(750);
       const t3 = addTyping();
@@ -1767,6 +1801,117 @@
     // In real app, this would upload the file
     // For demo, we just acknowledge
   }
+
+// ═══ UW PEND HANDLING (from partner) ═══
+async function handleUWPend(data) {
+  const thread = document.querySelector('.ch-thread');
+
+  // Make sure we're in expanded chat mode
+  const shell = document.querySelector('.shell');
+  if (!shell.classList.contains('chat-expanded')) {
+    shell.classList.add('chat-expanded');
+  }
+
+  await wait(500);
+  const t1 = addTyping();
+  await wait(800);
+  removeTyping();
+
+  addMessage('ai', '📋 <strong>Quick update from underwriting</strong><br><br>' +
+    (data && data.message ? data.message : 'Our underwriting team has a question about your application:') +
+    '<br><br><strong>' + (data && data.question ? data.question : 'Can you confirm your average monthly revenue including cash sales?') + '</strong>' +
+    '<div class="chat-q-options" style="margin-top:10px;">' +
+      '<button class="chat-q-opt" onclick="respondToUWPend(this, \'$45K-$55K including cash sales\')">💰 $45K-$55K including cash sales</button>' +
+      '<button class="chat-q-opt" onclick="respondToUWPend(this, \'Around $85K — we have multiple deposit accounts\')">🏦 Around $85K — we have multiple deposit accounts</button>' +
+      '<button class="chat-q-opt" onclick="respondToUWPend(this, \'Let me check and get back to you\')">📝 Let me check and get back to you</button>' +
+    '</div>'
+  );
+}
+
+async function respondToUWPend(btn, answer) {
+  btn.parentElement.querySelectorAll('.chat-q-opt').forEach(b => { b.classList.remove('selected'); b.disabled = true; b.style.pointerEvents = 'none'; });
+  btn.classList.add('selected');
+
+  await wait(300);
+  addMessage('user', answer, {userMsg: true});
+
+  // Broadcast response to partner
+  bc.postMessage({type: 'uw_response', data: {answer: answer, timestamp: Date.now()}});
+
+  await wait(400);
+  const t = addTyping();
+  await wait(600);
+  removeTyping();
+
+  addMessage('ai', '✅ <strong>Got it!</strong> I\'ve forwarded your response to the underwriting team. They\'ll review this and we should have an update shortly.<br><br>' +
+    '<div style="font-size:11px;color:var(--text-muted);">Typical response time: 2-4 hours during business hours</div>');
+}
+
+// ═══ APPROVAL CELEBRATION ═══
+async function handleApproval() {
+  const shell = document.querySelector('.shell');
+  if (!shell.classList.contains('chat-expanded')) {
+    shell.classList.add('chat-expanded');
+  }
+
+  await wait(500);
+
+  // Big confetti burst
+  launchConfetti();
+  setTimeout(() => launchConfetti(), 500);
+  setTimeout(() => launchConfetti(), 1200);
+
+  const t1 = addTyping();
+  await wait(1000);
+  removeTyping();
+
+  addMessage('ai', '🎉🎉🎉 <strong style="font-size:16px;">YOU\'RE APPROVED!</strong> 🎉🎉🎉<br><br>' +
+    'Congratulations, Sarah! Fresh Brew Coffee Co.\'s merchant account has been <strong style="color:var(--green);">officially approved</strong> by First Data Omaha!' +
+    '<div class="chat-progress" style="margin:16px 0 8px;">' +
+      '<div class="cp-step"><div class="cp-dot done">✓</div><span style="font-weight:600;color:var(--green);">Signed</span></div>' +
+      '<div class="cp-line done"></div>' +
+      '<div class="cp-step"><div class="cp-dot done">✓</div><span style="font-weight:600;color:var(--green);">Documents</span></div>' +
+      '<div class="cp-line done"></div>' +
+      '<div class="cp-step"><div class="cp-dot done">✓</div><span style="font-weight:600;color:var(--green);">Underwriting</span></div>' +
+      '<div class="cp-line done"></div>' +
+      '<div class="cp-step"><div class="cp-dot done" style="background:var(--yellow);box-shadow:0 0 0 3px rgba(201,168,0,.25);">✓</div><span style="font-weight:600;color:var(--yellow);">Approved!</span></div>' +
+      '<div class="cp-line done"></div>' +
+      '<div class="cp-step"><div class="cp-dot active">5</div><span style="font-weight:600;">Go Live</span></div>' +
+    '</div>'
+  );
+
+  await wait(1200);
+  const t2 = addTyping();
+  await wait(700);
+  removeTyping();
+
+  addMessage('ai', '📦 <strong>Your PAX A920 Pro terminal is shipping today!</strong><br><br>' +
+    'Here\'s what happens next:' +
+    '<div style="margin:10px 0;display:flex;flex-direction:column;gap:8px;">' +
+      '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong>MID activated:</strong> 4847-XXXX-8821</div></div>' +
+      '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong>Terminal shipping</strong> via FedEx — arrives in 2-3 business days</div></div>' +
+      '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--blue);flex-shrink:0;">📧</span><div><strong>Setup guide</strong> sent to sarah@freshbrewcoffee.com</div></div>' +
+      '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--amber);flex-shrink:0;">⏳</span><div><strong>First batch</strong> — you can start processing as soon as the terminal arrives!</div></div>' +
+    '</div>' +
+    '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<button class="chat-schedule-btn" onclick="alert(\'Opening calendar...\')">📅 Schedule Setup Call</button>' +
+      '<button class="chat-upload-btn" onclick="alert(\'Opening tracking...\')">📦 Track Shipment</button>' +
+    '</div>'
+  );
+
+  // Update sidebar status
+  const navStatus = document.querySelector('.nav-status');
+  if (navStatus) {
+    navStatus.textContent = 'Approved ✓';
+    navStatus.style.color = 'var(--green)';
+  }
+}
+
+// ═══ RESET DEMO ═══
+function resetDemo() {
+  bc.postMessage({type: 'reset', data: {}});
+  location.reload();
+}
 
 </script>
 
