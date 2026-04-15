@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twill — Fresh Brew Coffee Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-base:       #F7F5F0;
+    --bg-surface:    #EFECE6;
+    --bg-elevated:   #F2EFEA;
+    --bg-hover:      #EAE7E0;
+    --bg-selected:   #E4E0D8;
+    --border:        rgba(0,0,0,0.04);
+    --border-strong: rgba(0,0,0,0.055);
+    --text-primary:  #111111;
+    --text-secondary:#4B4B4B;
+    --text-muted:    #737373;
+    --text-inverse:  #FFFFFF;
+    --yellow:        #C9A800;
+    --yellow-dim:    rgba(255,222,0,0.12);
+    --navy:          #222E48;
+    --navy-dark:     #161E2D;
+    --gold:          #D1A400;
+    --green:         #5B7A5E;
+    --green-dim:     rgba(91,122,94,0.10);
+    --red:           #9B6B5B;
+    --red-dim:       rgba(180,67,42,0.07);
+    --amber:         #A67C5B;
+    --amber-dim:     rgba(166,124,91,0.08);
+    --blue:          #6B839B;
+    --blue-dim:      rgba(107,131,155,0.08);
+    --purple:        #8C7A5E;
+    --purple-dim:    rgba(140,122,94,0.08);
+    --sidebar-w:     248px;
+    --font-mono:     'JetBrains Mono','SF Mono',monospace;
+    --font-ui:       'Plus Jakarta Sans',-apple-system,sans-serif;
+    --font-data:     'Inter',-apple-system,sans-serif;
+    --font-body:     'Plus Jakarta Sans',-apple-system,sans-serif;
+    --green-mid:     rgba(45,122,79,0.14);
+    --yellow-mid:    rgba(255,222,0,0.14);
+    --steps-w:       200px;
+    --chat-w:        340px;
+  }
+
+  html,body { height:100%; background:var(--bg-base); color:var(--text-primary); font-family:var(--font-data); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; overflow:hidden; }
+
+  .shell { display:flex; height:100vh; }
+
+  /* ─── SIDEBAR ───────────────── */
+  .sidebar { width:var(--sidebar-w); background:var(--bg-base); border-right:1px solid rgba(0,0,0,0.04); display:flex; flex-direction:column; flex-shrink:0; overflow:hidden; }
+  .sidebar-logo { display:flex; align-items:center; gap:12px; padding:20px 18px 16px; }
+  .logo-mark { width:28px; height:28px; background:var(--navy); border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .logo-mark svg { width:16px; height:16px; }
+  .logo-text { font-size:16px; font-weight:600; letter-spacing:-0.02em; font-family:var(--font-ui); color:var(--navy); }
+  .sidebar-section { padding:12px 10px 4px; }
+  .sidebar-label { font-size:11px; font-family:var(--font-ui); font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary); padding:0 12px; margin-bottom:8px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:7px 12px; border-radius:6px; cursor:pointer; color:var(--text-muted); font-size:13px; font-weight:400; font-family:var(--font-body); transition:all 0.1s; text-decoration:none; margin-bottom:1px; border:1px solid transparent; user-select:none; }
+  .nav-item:hover { background:var(--bg-hover); color:var(--text-primary); }
+  .nav-item.active { background:var(--yellow-dim); color:var(--navy); font-weight:600; border-left:3px solid var(--yellow); margin-left:-3px; }
+  .nav-icon { width:16px; height:16px; opacity:0.7; flex-shrink:0; }
+  .nav-item.active .nav-icon { opacity:1; }
+  .nav-item.disabled { opacity:0.4; pointer-events:none; cursor:default; }
+  .sidebar-spacer { flex:1; }
+  .sidebar-user { padding:14px 16px 20px; border-top:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .avatar-sm { width:30px; height:30px; border-radius:50%; background:var(--navy); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; font-family:var(--font-ui); color:var(--yellow); flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:500; font-family:var(--font-body); color:var(--text-primary); }
+  .user-role { font-size:11px; color:var(--text-muted); }
+
+  /* ─── SHARED ────────────────── */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .topbar { height:44px; background:var(--bg-surface); border-bottom:1px solid rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:space-between; padding:0 16px; flex-shrink:0; }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .page-title { font-size:14px; font-weight:600; font-family:var(--font-ui); color:var(--text-primary); letter-spacing:-0.01em; }
+  .topbar-right { display:flex; align-items:center; gap:8px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; border:none; transition:all 0.15s ease; font-family:var(--font-ui); letter-spacing:0; line-height:1; white-space:nowrap; }
+  .btn-ghost { background:transparent; color:var(--text-primary); border:1px solid rgba(0,0,0,0.15); }
+  .btn-ghost:hover { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.25); }
+  .btn-primary { background:var(--navy); color:#fff; border:1px solid var(--navy); }
+  .btn-primary:hover { background:var(--navy-dark); border-color:var(--navy-dark); }
+  .btn-success { background:var(--green-dim); color:var(--green); border:1px solid rgba(34,197,94,0.2); }
+
+  .p-badge { font-size:10px; font-family:var(--font-ui); font-weight:500; padding:3px 7px; border-radius:4px; text-transform:none; letter-spacing:0; }
+  .badge-green  { background:var(--green-dim);  color:var(--green); }
+  .badge-amber  { background:var(--amber-dim);  color:var(--amber); }
+  .badge-blue   { background:var(--blue-dim);   color:var(--blue); }
+  .badge-muted  { background:var(--bg-hover);   color:var(--text-muted); }
+  .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .dot-green { background:var(--green); box-shadow:0 0 0 2px var(--green-dim); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width:3px; height:3px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+
+  /* ─── LAYOUT ────────────────── */
+  .body-row { flex:1; display:flex; min-height:0; overflow:hidden; }
+
+  /* Steps nav */
+  .steps-nav { width:var(--steps-w); flex-shrink:0; background:var(--bg-surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow-y:auto; padding:16px 10px; }
+  .sn-group-hdr { display:flex; align-items:center; justify-content:space-between; padding:4px 6px; margin-bottom:2px; cursor:pointer; border-radius:6px; transition:background .1s; }
+  .sn-group-hdr:hover { background:var(--bg-hover); }
+  .sn-group-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); }
+  .sn-group-badge { font-size:9px; font-weight:700; padding:1px 5px; border-radius:8px; background:rgba(52,211,153,.12); color:var(--green); }
+  .sn-group-chevron { font-size:9px; color:var(--text-muted); transition:transform .2s; }
+  .sn-group-body { overflow:hidden; transition:max-height .25s ease; }
+  .sn-group-body.collapsed { max-height:0 !important; }
+  .sn-divider { height:1px; background:var(--border); margin:8px 6px; }
+  .step-item { display:flex; align-items:flex-start; gap:9px; padding:8px 6px; border-radius:7px; cursor:pointer; transition:background .1s; margin-bottom:2px; }
+  .step-item:hover { background:var(--bg-hover); }
+  .step-item.active { background:var(--bg-selected); }
+  .step-num { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .sn-done { background:var(--green); color:var(--text-inverse); }
+  .sn-curr { background:var(--amber); color:var(--text-inverse); box-shadow:0 0 0 3px rgba(245,158,11,.2); }
+  .sn-todo { background:var(--bg-elevated); border:1px solid var(--border-strong); color:var(--text-muted); }
+  .step-info { flex:1; min-width:0; }
+  .step-title { font-size:12px; font-weight:500; color:var(--text-primary); }
+  .step-item.active .step-title { color:var(--yellow); }
+  .step-sub { font-size:11px; color:var(--text-secondary); margin-top:1px; }
+
+  /* Form area */
+  .form-content { flex:1; min-width:0; overflow-y:auto; padding:0; scroll-behavior:smooth; }
+  .step-panel { display:none; }
+  .step-panel.active { display:block; }
+
+  /* Chat */
+  .chat-aside { width:var(--chat-w); flex-shrink:0; display:flex; flex-direction:column; background:var(--bg-surface); border-left:1px solid var(--border); overflow:hidden; }
+  .ch-hdr { height:52px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; border-bottom:1px solid rgba(0,0,0,0.05); flex-shrink:0; }
+  .ch-title { font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px; }
+  .ch-thread { flex:1; overflow-y:auto; padding:10px 0; display:flex; flex-direction:column; gap:1px; }
+  .act { padding:3px 14px; }
+  .ah { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+  .aav { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; flex-shrink:0; }
+  .aname { font-size:11px; font-weight:600; }
+  .atime { font-size:11px; color:var(--text-secondary); margin-left:auto; }
+  .abub { background:var(--bg-elevated); border:1px solid var(--border); border-radius:8px; padding:8px 11px; font-size:12px; line-height:1.5; margin-left:26px; }
+  .ch-inp { border-top:1px solid var(--border); background:var(--bg-surface); flex-shrink:0; }
+  .ta-wrap { padding:8px 10px; position:relative; }
+  .chat-ta { width:100%; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:8px; padding:9px 42px 9px 11px; color:var(--text-primary); font-size:12px; font-family:var(--font-ui); resize:none; outline:none; line-height:1.5; min-height:68px; transition:border-color .15s; }
+  .chat-ta:focus { border-color:var(--yellow); }
+  .chat-ta::placeholder { color:var(--text-muted); }
+  .send-btn { position:absolute; right:18px; bottom:18px; width:28px; height:28px; border-radius:6px; background:var(--yellow); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; color:var(--text-inverse); }
+
+
+  /* ═══ POST-SIGN CHAT EXPANSION ═══ */
+  .body-row { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+  .steps-nav { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.5s; }
+  .form-content { transition: opacity 0.3s ease, flex 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+  .chat-aside { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+  /* Expanded chat state */
+  .shell.chat-expanded .steps-nav { width:0; padding:0; opacity:0; overflow:hidden; border:none; }
+  .shell.chat-expanded .form-content { flex:0; opacity:0; overflow:hidden; padding:0; }
+  .shell.chat-expanded .chat-aside { width:100%; border-left:none; }
+  .shell.chat-expanded .ch-hdr { justify-content:center; padding:0 20px; }
+
+  /* Chat expanded header */
+  .ch-expanded-title { display:none; font-size:14px; font-weight:600; font-family:var(--font-ui); color:var(--text-primary); }
+  .shell.chat-expanded .ch-expanded-title { display:flex; align-items:center; gap:8px; }
+  .shell.chat-expanded .ch-title svg { display:none; }
+  .shell.chat-expanded .ch-title { font-size:14px; }
+
+  /* Wider bubbles in expanded mode */
+  .shell.chat-expanded .ch-thread { padding:16px 0; max-width:680px; margin:0 auto; width:100%; }
+  .shell.chat-expanded .act { padding:6px 20px; }
+  .shell.chat-expanded .abub { font-size:13px; padding:10px 14px; max-width:520px; }
+  .shell.chat-expanded .aav { width:24px; height:24px; font-size:9px; }
+  .shell.chat-expanded .aname { font-size:12px; }
+  .shell.chat-expanded .ch-inp { max-width:680px; margin:0 auto; width:100%; }
+  .shell.chat-expanded .ta-wrap { padding:12px 20px 16px; }
+  .shell.chat-expanded .chat-ta { min-height:56px; font-size:13px; padding:10px 48px 10px 14px; }
+  .shell.chat-expanded .send-btn { right:28px; bottom:24px; }
+
+  /* User bubble (right-aligned) */
+  .act.user-msg .abub { background:var(--navy); color:#fff; border-color:var(--navy-dark); margin-left:auto; margin-right:0; }
+  .act.user-msg .ah { flex-direction:row-reverse; }
+  .act.user-msg .atime { margin-left:0; margin-right:auto; }
+  .act.user-msg .aav { background:var(--green) !important; color:#fff !important; }
+
+  /* Typing indicator */
+  .typing-indicator { display:inline-flex; gap:4px; padding:10px 14px; }
+  .typing-indicator span { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:typingBounce 1.2s infinite; }
+  .typing-indicator span:nth-child(2) { animation-delay:0.15s; }
+  .typing-indicator span:nth-child(3) { animation-delay:0.3s; }
+  @keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
+
+  /* Upload button in chat */
+  .chat-upload-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; color:var(--text-secondary); font-family:var(--font-ui); margin-top:6px; transition:all .15s; }
+  .chat-upload-btn:hover { background:var(--bg-hover); border-color:var(--yellow); color:var(--text-primary); }
+
+  /* Progress tracker in chat */
+  .chat-progress { display:flex; align-items:center; gap:0; margin:8px 0 4px; }
+  .cp-step { display:flex; align-items:center; gap:6px; font-size:11px; font-family:var(--font-ui); }
+  .cp-dot { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; flex-shrink:0; }
+  .cp-dot.done { background:var(--green); color:#fff; }
+  .cp-dot.active { background:var(--amber); color:#fff; box-shadow:0 0 0 3px rgba(245,158,11,.2); }
+  .cp-dot.todo { background:var(--bg-elevated); border:1px solid var(--border-strong); color:var(--text-muted); }
+  .cp-line { width:24px; height:2px; background:var(--border-strong); margin:0 4px; }
+  .cp-line.done { background:var(--green); }
+
+  /* Confetti burst (simple) */
+  .confetti-wrap { position:fixed; top:0; left:0; right:0; bottom:0; pointer-events:none; z-index:9999; }
+  .confetti { position:absolute; width:8px; height:8px; border-radius:2px; animation:confettiFall 2.5s ease-out forwards; }
+  @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+
+  /* Questionnaire in chat */
+  .chat-q-options { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .chat-q-opt { padding:8px 14px; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:8px; cursor:pointer; font-size:12px; font-family:var(--font-ui); color:var(--text-secondary); transition:all .15s; text-align:left; }
+  .chat-q-opt:hover { background:var(--bg-hover); border-color:var(--yellow); color:var(--text-primary); }
+  .chat-q-opt.selected { background:var(--yellow-dim); border-color:var(--yellow); color:var(--text-primary); font-weight:600; }
+
+  /* Schedule link in chat */
+  .chat-schedule-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; background:linear-gradient(135deg,var(--navy),var(--navy-dark)); color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; font-family:var(--font-ui); margin-top:8px; transition:all .15s; }
+  .chat-schedule-btn:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.15); }
+
+  /* ═══════════════════════════════════════════
+     MERCHANT PROPOSAL STYLES
+  ═══════════════════════════════════════════ */
+
+  /* Hero banner */
+  .proposal-hero {
+    position:relative;
+    width:100%;
+    min-height:280px;
+    background:url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200&q=80') center/cover no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+  .proposal-hero::before {
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(22,30,45,0.55) 0%, rgba(22,30,45,0.82) 100%);
+  }
+  .proposal-hero-inner {
+    position:relative;
+    z-index:1;
+    padding:48px 32px;
+  }
+  .proposal-hero-label {
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.7);
+    margin-bottom:12px;
+    font-family:var(--font-ui);
+  }
+  .proposal-hero h1 {
+    font-size:32px;
+    font-weight:800;
+    font-family:var(--font-ui);
+    color:#fff;
+    letter-spacing:-0.03em;
+    line-height:1.15;
+    margin-bottom:10px;
+  }
+  .proposal-hero-sub {
+    font-size:14px;
+    color:rgba(255,255,255,0.65);
+    font-family:var(--font-body);
+  }
+
+  /* Proposal sections */
+  .proposal-section {
+    padding:36px 32px;
+  }
+  .proposal-section + .proposal-section {
+    border-top:1px solid var(--border);
+  }
+  .proposal-section h2 {
+    font-size:20px;
+    font-weight:700;
+    font-family:var(--font-ui);
+    color:var(--text-primary);
+    letter-spacing:-0.02em;
+    margin-bottom:6px;
+  }
+  .proposal-section h3 {
+    font-size:16px;
+    font-weight:600;
+    font-family:var(--font-ui);
+    color:var(--text-primary);
+    margin-bottom:4px;
+  }
+  .proposal-section .section-sub {
+    font-size:13px;
+    color:var(--text-secondary);
+    margin-bottom:20px;
+    line-height:1.6;
+  }
+
+  /* Problem section */
+  .current-situation {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .current-item {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:13px;
+  }
+  .current-item .ci-icon {
+    font-size:15px;
+    flex-shrink:0;
+  }
+  .current-item .ci-label {
+    flex:1;
+    color:var(--text-secondary);
+  }
+  .current-item .ci-val {
+    font-weight:600;
+    font-family:var(--font-mono);
+    font-size:13px;
+  }
+  .cost-bar-wrap {
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+  }
+  .cost-bar-label {
+    font-size:12px;
+    color:var(--text-muted);
+    margin-bottom:6px;
+  }
+  .cost-bar-track {
+    height:12px;
+    background:var(--bg-hover);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .cost-bar-fill {
+    height:100%;
+    border-radius:6px;
+    background:linear-gradient(90deg, #c46050 0%, #9B6B5B 100%);
+    width:100%;
+    transition:width 0.8s ease;
+  }
+  .cost-bar-amount {
+    display:flex;
+    justify-content:flex-end;
+    margin-top:6px;
+    font-size:18px;
+    font-weight:700;
+    font-family:var(--font-mono);
+    color:var(--red);
+  }
+
+  /* Savings callout */
+  .savings-callout {
+    background:linear-gradient(135deg, #2D7A4F 0%, #3D8B5F 50%, #5B9B6E 100%);
+    border-radius:14px;
+    padding:32px;
+    color:#fff;
+    text-align:center;
+    margin-bottom:24px;
+  }
+  .savings-callout .save-label {
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    opacity:0.75;
+    margin-bottom:4px;
+  }
+  .savings-callout .save-big {
+    font-size:48px;
+    font-weight:800;
+    font-family:var(--font-ui);
+    letter-spacing:-0.03em;
+    line-height:1.1;
+  }
+  .savings-callout .save-yr {
+    font-size:18px;
+    font-weight:500;
+    opacity:0.8;
+    margin-bottom:20px;
+  }
+
+  .compare-row {
+    display:flex;
+    align-items:center;
+    gap:16px;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+  .compare-card {
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:10px;
+    padding:14px 22px;
+    text-align:center;
+    min-width:130px;
+  }
+  .compare-card.old { border-color:rgba(255,100,100,0.3); background:rgba(255,100,100,0.08); }
+  .compare-card.new { border-color:rgba(100,255,150,0.3); background:rgba(100,255,150,0.1); }
+  .compare-card .cc-label {
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    opacity:0.7;
+    margin-bottom:2px;
+  }
+  .compare-card .cc-amount {
+    font-size:24px;
+    font-weight:700;
+    font-family:var(--font-mono);
+    letter-spacing:-0.02em;
+  }
+  .compare-arrow {
+    font-size:22px;
+    opacity:0.6;
+  }
+  .savings-latte {
+    font-size:14px;
+    opacity:0.85;
+    margin-top:4px;
+  }
+
+  /* Solution details */
+  .solution-header {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:20px;
+    padding:14px 18px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+  }
+  .solution-header .sh-title {
+    font-size:16px;
+    font-weight:600;
+    font-family:var(--font-ui);
+    flex:1;
+  }
+  .best-fit-badge {
+    font-size:10px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:4px;
+    background:var(--green-dim);
+    color:var(--green);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .benefits-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:20px;
+  }
+  .benefit-card {
+    padding:16px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    transition:border-color .15s;
+  }
+  .benefit-card:hover {
+    border-color:var(--border-strong);
+  }
+  .benefit-card .bc-icon {
+    font-size:20px;
+    margin-bottom:8px;
+  }
+  .benefit-card .bc-title {
+    font-size:13px;
+    font-weight:600;
+    font-family:var(--font-ui);
+    color:var(--text-primary);
+    margin-bottom:3px;
+  }
+  .benefit-card .bc-desc {
+    font-size:12px;
+    color:var(--text-secondary);
+    line-height:1.5;
+  }
+  .social-proof {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 0;
+    margin-bottom:12px;
+  }
+  .social-proof .sp-text {
+    font-size:12px;
+    color:var(--text-muted);
+    font-weight:500;
+  }
+  .sp-logos {
+    display:flex;
+    gap:6px;
+    align-items:center;
+  }
+  .sp-logo {
+    width:40px;
+    height:14px;
+    background:var(--bg-hover);
+    border-radius:3px;
+  }
+  .rate-toggle {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 0;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:500;
+    color:var(--blue);
+    border:none;
+    background:none;
+    font-family:var(--font-ui);
+  }
+  .rate-toggle:hover { text-decoration:underline; }
+  .rate-details {
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
+  }
+  .rate-details.open {
+    max-height:400px;
+  }
+  .rate-details-inner {
+    padding:12px 16px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-top:8px;
+  }
+  .rate-row {
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+    font-size:12px;
+    border-bottom:1px solid var(--border);
+  }
+  .rate-row:last-child { border-bottom:none; }
+  .rate-row .rr-label { color:var(--text-secondary); }
+  .rate-row .rr-val { font-weight:600; font-family:var(--font-mono); font-size:12px; }
+
+  /* Equipment */
+  .equipment-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .equip-card {
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .equip-img {
+    width:100%;
+    height:140px;
+    object-fit:cover;
+    display:block;
+    background:var(--bg-hover);
+  }
+  .equip-img-placeholder {
+    width:100%;
+    height:140px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--bg-hover);
+    font-size:48px;
+  }
+  .equip-body {
+    padding:14px 16px;
+  }
+  .equip-name {
+    font-size:14px;
+    font-weight:600;
+    font-family:var(--font-ui);
+    margin-bottom:3px;
+  }
+  .equip-specs {
+    font-size:11px;
+    color:var(--text-secondary);
+    margin-bottom:10px;
+    line-height:1.5;
+  }
+  .equip-price {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .equip-price .ep-old {
+    font-size:13px;
+    color:var(--text-muted);
+    text-decoration:line-through;
+  }
+  .equip-price .ep-free {
+    font-size:12px;
+    font-weight:600;
+    color:var(--green);
+    background:var(--green-dim);
+    padding:2px 8px;
+    border-radius:4px;
+  }
+  .qty-control {
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .qty-btn {
+    width:26px;
+    height:26px;
+    border-radius:6px;
+    border:1px solid var(--border-strong);
+    background:var(--bg-elevated);
+    font-size:14px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-primary);
+  }
+  .qty-btn:hover { background:var(--bg-hover); }
+  .qty-val {
+    font-size:13px;
+    font-weight:600;
+    font-family:var(--font-mono);
+    min-width:20px;
+    text-align:center;
+  }
+  .equip-extras {
+    font-size:12px;
+    color:var(--blue);
+    margin-bottom:14px;
+  }
+  .equip-extras a {
+    color:var(--blue);
+    text-decoration:none;
+    cursor:pointer;
+  }
+  .equip-extras a:hover { text-decoration:underline; }
+  .equip-summary {
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 18px;
+  }
+  .equip-summary-row {
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    padding:4px 0;
+  }
+  .equip-summary-row .esr-old {
+    text-decoration:line-through;
+    color:var(--text-muted);
+    margin-right:6px;
+  }
+  .equip-summary-row .esr-new {
+    font-weight:600;
+    color:var(--green);
+  }
+  .equip-summary-note {
+    font-size:11px;
+    color:var(--text-muted);
+    margin-top:8px;
+    font-style:italic;
+  }
+
+  /* Document check */
+  .doc-progress {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .doc-progress-bar {
+    flex:1;
+    height:4px;
+    background:var(--bg-hover);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .doc-progress-fill {
+    height:100%;
+    background:var(--green);
+    border-radius:4px;
+    width:71%;
+  }
+  .doc-progress-text {
+    font-size:12px;
+    color:var(--text-muted);
+    white-space:nowrap;
+  }
+  .doc-list {
+    list-style:none;
+    padding:0;
+    margin:0;
+  }
+  .doc-list li {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 0;
+    font-size:13px;
+    border-bottom:1px solid var(--border);
+  }
+  .doc-list li:last-child { border-bottom:none; }
+  .doc-list .dl-icon {
+    font-size:14px;
+    flex-shrink:0;
+    width:20px;
+    text-align:center;
+  }
+  .doc-list .dl-name {
+    flex:1;
+    color:var(--text-primary);
+  }
+  .doc-list .dl-status-done {
+    color:var(--green);
+    font-size:11px;
+    font-weight:500;
+  }
+  .upload-btn-sm {
+    font-size:11px;
+    padding:3px 10px;
+    border-radius:5px;
+    border:1px solid var(--amber);
+    background:var(--amber-dim);
+    color:var(--amber);
+    cursor:pointer;
+    font-weight:500;
+    font-family:var(--font-ui);
+  }
+  .upload-btn-sm:hover { background:rgba(166,124,91,0.15); }
+  .doc-note {
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:12px;
+    padding:10px 14px;
+    background:var(--bg-surface);
+    border-radius:8px;
+    border:1px solid var(--border);
+  }
+
+  /* CTA section */
+  .cta-section {
+    text-align:center;
+    padding:48px 32px 56px;
+    border-top:1px solid var(--border);
+  }
+  .cta-section h2 {
+    font-size:24px;
+    font-weight:700;
+    font-family:var(--font-ui);
+    letter-spacing:-0.02em;
+    margin-bottom:8px;
+  }
+  .cta-section .cta-sub {
+    font-size:14px;
+    color:var(--text-secondary);
+    margin-bottom:24px;
+  }
+  .btn-cta {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:14px 36px;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:700;
+    font-family:var(--font-ui);
+    cursor:pointer;
+    border:none;
+    background:linear-gradient(135deg, #D1A400 0%, #C9A800 50%, #B89700 100%);
+    color:var(--navy);
+    box-shadow:0 2px 12px rgba(201,168,0,0.25);
+    transition:all .2s;
+    letter-spacing:-0.01em;
+  }
+  .btn-cta:hover {
+    transform:translateY(-1px);
+    box-shadow:0 4px 20px rgba(201,168,0,0.35);
+  }
+  .cta-fine {
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:10px;
+  }
+
+  /* ─── Step 6: Sign ─── */
+  .sign-panel {
+    padding:28px 32px 48px;
+  }
+  .sign-panel .step-chip {
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    padding:2px 8px;
+    border-radius:4px;
+    background:var(--amber-dim);
+    color:var(--amber);
+    display:inline-block;
+    margin-bottom:8px;
+  }
+  .sign-panel h2 {
+    font-size:20px;
+    font-weight:700;
+    font-family:var(--font-ui);
+    color:var(--text-primary);
+    letter-spacing:-0.02em;
+    margin-bottom:4px;
+  }
+  .sign-panel .sign-sub {
+    font-size:13px;
+    color:var(--text-secondary);
+    margin-bottom:24px;
+  }
+  .pdf-viewer {
+    background:#fff;
+    border:1px solid var(--border-strong);
+    border-radius:10px;
+    min-height:350px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px;
+    margin-bottom:24px;
+    position:relative;
+  }
+  .pdf-icon {
+    font-size:40px;
+    margin-bottom:12px;
+    opacity:0.5;
+  }
+  .pdf-title {
+    font-size:14px;
+    font-weight:600;
+    font-family:var(--font-ui);
+    color:var(--text-primary);
+    margin-bottom:4px;
+  }
+  .pdf-page {
+    font-size:12px;
+    color:var(--text-muted);
+    margin-bottom:6px;
+  }
+  .pdf-scroll-hint {
+    font-size:11px;
+    color:var(--text-muted);
+    opacity:0.7;
+  }
+  .sign-area {
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px 24px;
+    margin-bottom:24px;
+  }
+  .sign-area label {
+    font-size:12px;
+    font-weight:600;
+    font-family:var(--font-ui);
+    color:var(--text-secondary);
+    display:block;
+    margin-bottom:8px;
+  }
+  .sig-box {
+    border:2px dashed var(--border-strong);
+    border-radius:8px;
+    height:120px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    margin-bottom:14px;
+    cursor:crosshair;
+  }
+  .sig-box-placeholder {
+    font-size:13px;
+    color:var(--text-muted);
+    font-style:italic;
+  }
+  .sign-input {
+    width:100%;
+    padding:10px 14px;
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    font-size:14px;
+    font-family:var(--font-body);
+    color:var(--text-primary);
+    background:#fff;
+    outline:none;
+    margin-bottom:14px;
+    transition:border-color .15s;
+  }
+  .sign-input:focus { border-color:var(--yellow); }
+  .sign-check {
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:12px;
+    color:var(--text-secondary);
+    line-height:1.5;
+    margin-bottom:0;
+  }
+  .sign-check input[type="checkbox"] {
+    margin-top:2px;
+    flex-shrink:0;
+  }
+  .btn-sign {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:14px 32px;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:700;
+    font-family:var(--font-ui);
+    cursor:pointer;
+    border:none;
+    background:linear-gradient(135deg, #2D7A4F 0%, #5B7A5E 100%);
+    color:#fff;
+    box-shadow:0 2px 12px rgba(91,122,94,0.25);
+    transition:all .2s;
+  }
+  .btn-sign:hover {
+    transform:translateY(-1px);
+    box-shadow:0 4px 20px rgba(91,122,94,0.35);
+  }
+  .sign-footer {
+    text-align:center;
+    margin-top:20px;
+  }
+  .sign-note {
+    font-size:12px;
+    color:var(--text-muted);
+    margin-bottom:14px;
+  }
+  .back-link {
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:13px;
+    color:var(--text-secondary);
+    cursor:pointer;
+    border:none;
+    background:none;
+    font-family:var(--font-ui);
+    font-weight:500;
+  }
+  .back-link:hover { color:var(--text-primary); text-decoration:underline; }
+
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#D1A400" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+      <span class="logo-text">Twill</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Getting Started</div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
+        Application
+        <span style="margin-left:auto;display:flex;align-items:center;gap:4px;"><span class="dot dot-green"></span><span class="nav-status" style="font-size:10px;color:var(--green);">In Progress</span></span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Account</div>
+      <div class="nav-item disabled">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+        Authorizations
+      </div>
+      <div class="nav-item disabled">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        Transactions
+      </div>
+      <div class="nav-item disabled">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+        Batches
+      </div>
+      <div class="nav-item disabled">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M2 12h20"/></svg>
+        Deposits
+      </div>
+      <div class="nav-item disabled">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        Disputes
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Support</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115 2c0 2-3 2-3 4M12 17h.01"/></svg>
+        Help &amp; Chat
+      </div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-user">
+      <div class="avatar-sm">SC</div>
+      <div>
+        <div class="user-name">Sarah Chen</div>
+        <div class="user-role">Fresh Brew Coffee Co.</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="page-title">Fresh Brew Coffee Co.</span>
+        <span class="p-badge badge-amber">Application</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost" style="padding:6px 8px;" title="Notifications">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </button>
+        <div class="avatar-sm" style="width:26px;height:26px;font-size:10px;">SC</div>
+      </div>
+    </header>
+
+    <div class="body-row">
+
+      <!-- STEPS NAV -->
+      <nav class="steps-nav">
+        <!-- Collapsible info gathering group -->
+        <div class="sn-group-hdr" onclick="toggleInfoGroup()">
+          <span class="sn-group-label">Info Gathering</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span class="sn-group-badge">4/4</span>
+            <span class="sn-group-chevron" id="igChevron">&#9660;</span>
+          </span>
+        </div>
+        <div class="sn-group-body collapsed" id="igBody" style="max-height:300px;">
+          <div class="step-item">
+            <div class="step-num sn-done">&#10003;</div>
+            <div class="step-info"><div class="step-title">Business Info</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num sn-done">&#10003;</div>
+            <div class="step-info"><div class="step-title">Banking</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num sn-done">&#10003;</div>
+            <div class="step-info"><div class="step-title">Officers</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num sn-done">&#10003;</div>
+            <div class="step-info"><div class="step-title">Processing</div></div>
+          </div>
+        </div>
+
+        <div class="sn-divider"></div>
+
+        <!-- Step 5 -->
+        <div class="step-item active" id="stepNav5" onclick="goStep(5)">
+          <div class="step-num sn-curr">5</div>
+          <div class="step-info">
+            <div class="step-title">Review Your Proposal</div>
+            <div class="step-sub">Custom solution for your business</div>
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step-item" id="stepNav6" onclick="goStep(6)">
+          <div class="step-num sn-todo">6</div>
+          <div class="step-info">
+            <div class="step-title">Sign &amp; Submit</div>
+            <div class="step-sub">Complete your application</div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- ═══ FORM CONTENT ═══ -->
+      <div class="form-content" id="formContent">
+
+        <!-- ═══════════════════════════════════════
+             STEP 5 — REVIEW YOUR PROPOSAL
+        ═══════════════════════════════════════ -->
+        <div class="step-panel active" id="panel5">
+
+          <!-- Section 1: Hero -->
+          <div class="proposal-hero">
+            <div class="proposal-hero-inner">
+              <div class="proposal-hero-label">Fresh Brew Coffee Co.</div>
+              <h1>Your Custom Processing Solution</h1>
+              <div class="proposal-hero-sub">Prepared exclusively for you by Pacific Coast Retail &middot; April 2026</div>
+            </div>
+          </div>
+
+          <!-- Section 2: The Problem -->
+          <div class="proposal-section">
+            <h2>You're Overpaying for Processing</h2>
+            <p class="section-sub">Here's what Square is costing your business every month.</p>
+
+            <div class="current-situation">
+              <div class="current-item">
+                <span class="ci-icon">&#128179;</span>
+                <span class="ci-label">Flat rate on every transaction</span>
+                <span class="ci-val" style="color:var(--red);">2.6% + $0.10</span>
+              </div>
+              <div class="current-item">
+                <span class="ci-icon">&#128200;</span>
+                <span class="ci-label">Your monthly processing fees</span>
+                <span class="ci-val" style="color:var(--red);">$812/mo</span>
+              </div>
+              <div class="current-item">
+                <span class="ci-icon">&#128683;</span>
+                <span class="ci-label">Dedicated support &amp; customization</span>
+                <span class="ci-val" style="color:var(--text-muted);">None</span>
+              </div>
+            </div>
+
+            <div class="cost-bar-wrap">
+              <div class="cost-bar-label">Current monthly cost with Square</div>
+              <div class="cost-bar-track">
+                <div class="cost-bar-fill"></div>
+              </div>
+              <div class="cost-bar-amount">$812/mo</div>
+            </div>
+          </div>
+
+          <!-- Section 3: The Solution / Savings -->
+          <div class="proposal-section">
+            <div class="savings-callout">
+              <div class="save-label">Your Estimated Savings</div>
+              <div class="save-big">Save $287/mo</div>
+              <div class="save-yr">($3,444/yr)</div>
+
+              <div class="compare-row">
+                <div class="compare-card old">
+                  <div class="cc-label">Square</div>
+                  <div class="cc-amount">$812/mo</div>
+                </div>
+                <div class="compare-arrow">&#10132;</div>
+                <div class="compare-card new">
+                  <div class="cc-label">First Data</div>
+                  <div class="cc-amount">$525/mo</div>
+                </div>
+              </div>
+
+              <div class="savings-latte">That's like getting 96 free lattes every month &#9749;</div>
+            </div>
+          </div>
+
+          <!-- Section 4: Solution Details -->
+          <div class="proposal-section">
+            <h2>Your Solution Details</h2>
+            <p class="section-sub">Everything included with your custom plan.</p>
+
+            <div class="solution-header">
+              <span style="font-size:18px;">&#127974;</span>
+              <span class="sh-title">First Data Omaha &mdash; Interchange Plus</span>
+              <span class="best-fit-badge">Best Fit</span>
+            </div>
+
+            <div class="benefits-grid">
+              <div class="benefit-card">
+                <div class="bc-icon">&#9889;</div>
+                <div class="bc-title">Next-Day Funding</div>
+                <div class="bc-desc">Deposits in your account by 8am every morning</div>
+              </div>
+              <div class="benefit-card">
+                <div class="bc-icon">&#128203;</div>
+                <div class="bc-title">No Long-Term Contract</div>
+                <div class="bc-desc">Month-to-month. Cancel anytime, no penalties</div>
+              </div>
+              <div class="benefit-card">
+                <div class="bc-icon">&#128737;</div>
+                <div class="bc-title">PCI Compliance Included</div>
+                <div class="bc-desc">We handle security so you don't have to</div>
+              </div>
+              <div class="benefit-card">
+                <div class="bc-icon">&#128100;</div>
+                <div class="bc-title">Dedicated Support</div>
+                <div class="bc-desc">Real humans who know your business, not a call center</div>
+              </div>
+            </div>
+
+            <div class="social-proof">
+              <span class="sp-text">Trusted by 2,400+ food service businesses</span>
+              <div class="sp-logos">
+                <div class="sp-logo"></div>
+                <div class="sp-logo"></div>
+                <div class="sp-logo"></div>
+                <div class="sp-logo"></div>
+                <div class="sp-logo"></div>
+                <div class="sp-logo"></div>
+              </div>
+            </div>
+
+            <button class="rate-toggle" onclick="toggleRates()">
+              <span id="rateToggleText">View Full Rate Details &#9656;</span>
+            </button>
+            <div class="rate-details" id="rateDetails">
+              <div class="rate-details-inner">
+                <div class="rate-row"><span class="rr-label">Pricing Model</span><span class="rr-val">Interchange Plus</span></div>
+                <div class="rate-row"><span class="rr-label">IC+ Markup</span><span class="rr-val">0.15% + $0.07</span></div>
+                <div class="rate-row"><span class="rr-label">Monthly Service Fee</span><span class="rr-val">$9.95</span></div>
+                <div class="rate-row"><span class="rr-label">PCI Compliance Fee</span><span class="rr-val">$0.00 (included)</span></div>
+                <div class="rate-row"><span class="rr-label">Batch Fee</span><span class="rr-val">$0.25</span></div>
+                <div class="rate-row"><span class="rr-label">Statement Fee</span><span class="rr-val">$0.00</span></div>
+                <div class="rate-row"><span class="rr-label">Early Termination</span><span class="rr-val">$0.00 (none)</span></div>
+                <div class="rate-row"><span class="rr-label">Chargeback Fee</span><span class="rr-val">$15.00</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Equipment -->
+          <div class="proposal-section">
+            <h2>Your Equipment Package</h2>
+            <p class="section-sub">Everything you need to start processing &mdash; included with your plan.</p>
+
+            <div class="equipment-grid">
+              <div class="equip-card">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80" alt="PAX A920 Pro" class="equip-img">
+                <div class="equip-body">
+                  <div class="equip-name">PAX A920 Pro</div>
+                  <div class="equip-specs">Smart Terminal &middot; NFC &middot; EMV &middot; Chip &middot; Swipe &middot; Built-in Printer</div>
+                  <div class="equip-price">
+                    <span class="ep-old">$299</span>
+                    <span class="ep-free">FREE &mdash; Included</span>
+                  </div>
+                  <div class="qty-control">
+                    <button class="qty-btn" onclick="adjustQty(-1)">&#8722;</button>
+                    <span class="qty-val" id="terminalQty">1</span>
+                    <button class="qty-btn" onclick="adjustQty(1)">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="equip-card">
+                <div class="equip-img-placeholder">&#127760;</div>
+                <div class="equip-body">
+                  <div class="equip-name">NMI Gateway</div>
+                  <div class="equip-specs">Virtual Gateway &middot; Online + In-Store</div>
+                  <div class="equip-price">
+                    <span class="ep-old">$10/mo</span>
+                    <span class="ep-free">Included</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="equip-extras">
+              Need more? &nbsp;
+              <a href="#">+ Add Terminal</a> &nbsp;&middot;&nbsp;
+              <a href="#">+ PIN Pad</a> &nbsp;&middot;&nbsp;
+              <a href="#">+ Receipt Printer</a>
+            </div>
+
+            <div class="equip-summary">
+              <div class="equip-summary-row">
+                <span>Equipment</span>
+                <span><span class="esr-old">$299</span> <span class="esr-new">$0</span></span>
+              </div>
+              <div class="equip-summary-row">
+                <span>Software</span>
+                <span><span class="esr-old">$10/mo</span> <span class="esr-new">$0/mo</span></span>
+              </div>
+              <div class="equip-summary-note">Your partner is covering all equipment costs.</div>
+            </div>
+          </div>
+
+          <!-- Section 6: Document Check -->
+          <div class="proposal-section">
+            <h3>Almost There &mdash; Quick Document Check</h3>
+
+            <div class="doc-progress">
+              <div class="doc-progress-bar"><div class="doc-progress-fill"></div></div>
+              <span class="doc-progress-text">5 of 7 items complete</span>
+            </div>
+
+            <ul class="doc-list">
+              <li>
+                <span class="dl-icon" style="color:var(--green);">&#10003;</span>
+                <span class="dl-name">Business Info</span>
+                <span class="dl-status-done">Complete</span>
+              </li>
+              <li>
+                <span class="dl-icon" style="color:var(--green);">&#10003;</span>
+                <span class="dl-name">Banking</span>
+                <span class="dl-status-done">Complete</span>
+              </li>
+              <li>
+                <span class="dl-icon" style="color:var(--green);">&#10003;</span>
+                <span class="dl-name">Owners</span>
+                <span class="dl-status-done">Complete</span>
+              </li>
+              <li>
+                <span class="dl-icon" style="color:var(--green);">&#10003;</span>
+                <span class="dl-name">Bank Statements</span>
+                <span class="dl-status-done">Complete</span>
+              </li>
+              <li>
+                <span class="dl-icon" style="color:var(--green);">&#10003;</span>
+                <span class="dl-name">Processing Statements</span>
+                <span class="dl-status-done">Complete</span>
+              </li>
+              <li>
+                <span class="dl-icon" style="color:var(--red);">&#128308;</span>
+                <span class="dl-name">Owner ID (Sarah Chen)</span>
+                <button class="upload-btn-sm">Upload</button>
+              </li>
+              <li>
+                <span class="dl-icon" style="color:var(--text-muted);">&#9675;</span>
+                <span class="dl-name" style="color:var(--text-muted);">Voided Check <span style="font-size:11px;opacity:0.7;">(optional)</span></span>
+              </li>
+            </ul>
+
+            <div class="doc-note">Missing something? No worries &mdash; you can upload after signing.</div>
+          </div>
+
+          <!-- Section 7: CTA -->
+          <div class="cta-section">
+            <h2>Ready to start saving?</h2>
+            <div class="cta-sub">$287/mo back in your pocket starting in as little as 5 days</div>
+            <button class="btn-cta" onclick="goStep(6)">Continue to Sign &rarr;</button>
+            <div class="cta-fine">Takes about 2 minutes</div>
+          </div>
+
+        </div>
+        <!-- end panel5 -->
+
+        <!-- ═══════════════════════════════════════
+             STEP 6 — SIGN & SUBMIT
+        ═══════════════════════════════════════ -->
+        <div class="step-panel" id="panel6">
+          <div class="sign-panel">
+            <span class="step-chip">Step 6</span>
+            <h2>Review &amp; Sign Your Agreement</h2>
+            <p class="sign-sub">Review the document below and sign to complete your application.</p>
+
+            <!-- PDF mock viewer -->
+            <div class="pdf-viewer">
+              <div class="pdf-icon">&#128196;</div>
+              <div class="pdf-title">Merchant Processing Agreement &mdash; First Data Omaha</div>
+              <div class="pdf-page">Page 1 of 4</div>
+              <div class="pdf-scroll-hint">Scroll to review all pages</div>
+            </div>
+
+            <!-- Signature area -->
+            <div class="sign-area">
+              <label>Sign here</label>
+              <div class="sig-box">
+                <span class="sig-box-placeholder">Draw your signature or type your name</span>
+              </div>
+              <label style="margin-bottom:6px;">Type your full legal name</label>
+              <input type="text" class="sign-input" value="Sarah Chen" placeholder="Type your full legal name">
+              <label class="sign-check">
+                <input type="checkbox">
+                I have reviewed and agree to the Merchant Processing Agreement, the terms and conditions, and authorize First Data Omaha to process transactions on behalf of Fresh Brew Coffee Co.
+              </label>
+            </div>
+
+            <!-- Submit -->
+            <div style="text-align:center;">
+              <button class="btn-sign" onclick="signAndSubmit()">&#9997;&#65039; Sign &amp; Submit Application</button>
+            </div>
+
+            <div class="sign-footer">
+              <div class="sign-note">Your application will be submitted for review. Typical approval: 24&ndash;48 hours.</div>
+              <button class="back-link" onclick="goStep(5)">&larr; Back to Proposal</button>
+            </div>
+          </div>
+        </div>
+        <!-- end panel6 -->
+
+      </div>
+      <!-- end form-content -->
+
+      <!-- ═══ CHAT ASIDE ═══ -->
+      <aside class="chat-aside">
+        <div class="ch-hdr">
+          <div class="ch-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            Chat with Twill
+          </div>
+        </div>
+
+        <div class="ch-thread">
+          <div class="act">
+            <div class="ah">
+              <div class="aav" style="background:var(--navy);color:var(--yellow);">T</div>
+              <span class="aname">Twill AI</span>
+              <span class="atime">2:15 PM</span>
+            </div>
+            <div class="abub">Hi Sarah! &#128075; Welcome to your custom proposal. Take a look through everything &mdash; I'm here if you have any questions!</div>
+          </div>
+          <div class="act">
+            <div class="ah">
+              <div class="aav" style="background:var(--navy);color:var(--yellow);">T</div>
+              <span class="aname">Twill AI</span>
+              <span class="atime">2:15 PM</span>
+            </div>
+            <div class="abub">Quick summary: you'll save <strong>$287/mo</strong>, get a <strong>free terminal</strong>, and be processing in about <strong>5 days</strong>. Pretty great deal! &#127881;</div>
+          </div>
+        </div>
+
+        <div class="ch-inp">
+          <div class="ta-wrap">
+            <textarea class="chat-ta" placeholder="Type your message..." rows="3"></textarea>
+            <button class="send-btn">&#9654;</button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+    <!-- end body-row -->
+
+  </div>
+  <!-- end main -->
+
+</div>
+<!-- end shell -->
+
+<script>
+  // ─── Step Navigation ───
+  function goStep(n) {
+    // Update panels
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('panel' + n);
+    if (panel) panel.classList.add('active');
+
+    // Update step nav items
+    document.querySelectorAll('.step-item[id^="stepNav"]').forEach(el => el.classList.remove('active'));
+    const nav = document.getElementById('stepNav' + n);
+    if (nav) nav.classList.add('active');
+
+    // Update step numbers
+    const nav5 = document.querySelector('#stepNav5 .step-num');
+    const nav6 = document.querySelector('#stepNav6 .step-num');
+    if (n === 5) {
+      nav5.className = 'step-num sn-curr';
+      nav5.innerHTML = '5';
+      nav6.className = 'step-num sn-todo';
+      nav6.innerHTML = '6';
+    } else if (n === 6) {
+      nav5.className = 'step-num sn-done';
+      nav5.innerHTML = '&#10003;';
+      nav6.className = 'step-num sn-curr';
+      nav6.innerHTML = '6';
+    }
+
+    // Scroll to top
+    document.getElementById('formContent').scrollTop = 0;
+  }
+
+  // ─── Collapsible Info Gathering ───
+  function toggleInfoGroup() {
+    const body = document.getElementById('igBody');
+    const chevron = document.getElementById('igChevron');
+    body.classList.toggle('collapsed');
+    chevron.style.transform = body.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0)';
+  }
+  // Start collapsed
+  document.getElementById('igChevron').style.transform = 'rotate(-90deg)';
+
+  // ─── Collapsible Rate Details ───
+  function toggleRates() {
+    const rd = document.getElementById('rateDetails');
+    const txt = document.getElementById('rateToggleText');
+    rd.classList.toggle('open');
+    if (rd.classList.contains('open')) {
+      txt.innerHTML = 'Hide Rate Details &#9662;';
+    } else {
+      txt.innerHTML = 'View Full Rate Details &#9656;';
+    }
+  }
+
+  // ─── Equipment Quantity ───
+  let terminalQty = 1;
+  function adjustQty(delta) {
+    terminalQty = Math.max(1, Math.min(10, terminalQty + delta));
+    document.getElementById('terminalQty').textContent = terminalQty;
+  }
+
+
+  // ═══ POST-SIGNATURE FLOW ═══
+  function signAndSubmit() {
+    // Simple validation
+    const checkbox = document.querySelector('.sign-check input[type="checkbox"]');
+    if (!checkbox.checked) {
+      checkbox.parentElement.style.color = 'var(--red)';
+      checkbox.parentElement.style.fontWeight = '600';
+      setTimeout(() => { checkbox.parentElement.style.color = ''; checkbox.parentElement.style.fontWeight = ''; }, 2000);
+      return;
+    }
+
+    // Launch confetti
+    launchConfetti();
+
+    // Expand chat
+    const shell = document.querySelector('.shell');
+    shell.classList.add('chat-expanded');
+
+    // Clear existing chat messages after a beat
+    setTimeout(() => {
+      const thread = document.querySelector('.ch-thread');
+      thread.innerHTML = '';
+
+      // Update header
+      document.querySelector('.ch-title').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Twill AI &middot; Getting You Live';
+
+      // Update sidebar Application status
+      document.querySelector('.nav-status').textContent = 'Signed ✓';
+      document.querySelector('.nav-status').style.color = 'var(--green)';
+
+      // Start the conversation sequence
+      startPostSignConversation();
+    }, 600);
+  }
+
+  function launchConfetti() {
+    const wrap = document.createElement('div');
+    wrap.className = 'confetti-wrap';
+    document.body.appendChild(wrap);
+    const colors = ['#C9A800','#5B7A5E','#6B839B','#A67C5B','#222E48','#D1A400'];
+    for (let i = 0; i < 60; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + '%';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDelay = Math.random() * 0.8 + 's';
+      c.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+      c.style.width = (5 + Math.random() * 6) + 'px';
+      c.style.height = (5 + Math.random() * 6) + 'px';
+      wrap.appendChild(c);
+    }
+    setTimeout(() => wrap.remove(), 4000);
+  }
+
+  function addMessage(sender, html, options = {}) {
+    const thread = document.querySelector('.ch-thread');
+    const act = document.createElement('div');
+    act.className = 'act' + (options.userMsg ? ' user-msg' : '');
+
+    const now = new Date();
+    const time = now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+
+    let avatarStyle, avatarText, name;
+    if (options.userMsg) {
+      avatarStyle = 'background:var(--green);color:#fff;';
+      avatarText = 'SC';
+      name = 'You';
+    } else {
+      avatarStyle = 'background:var(--navy);color:var(--yellow);';
+      avatarText = 'T';
+      name = 'Twill AI';
+    }
+
+    act.innerHTML = '<div class="ah">' +
+      '<div class="aav" style="' + avatarStyle + '">' + avatarText + '</div>' +
+      '<span class="aname">' + name + '</span>' +
+      '<span class="atime">' + time + '</span>' +
+      '</div>' +
+      '<div class="abub">' + html + '</div>';
+
+    thread.appendChild(act);
+    thread.scrollTop = thread.scrollHeight;
+    return act;
+  }
+
+  function addTyping() {
+    const thread = document.querySelector('.ch-thread');
+    const act = document.createElement('div');
+    act.className = 'act typing-act';
+    act.innerHTML = '<div class="ah"><div class="aav" style="background:var(--navy);color:var(--yellow);">T</div><span class="aname">Twill AI</span></div>' +
+      '<div class="abub"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+    thread.appendChild(act);
+    thread.scrollTop = thread.scrollHeight;
+    return act;
+  }
+
+  function removeTyping() {
+    const t = document.querySelector('.typing-act');
+    if (t) t.remove();
+  }
+
+  async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function startPostSignConversation() {
+    const typing = addTyping();
+    await wait(600);
+    removeTyping();
+
+    // Message 1: Celebration
+    addMessage('ai', "🎉 <strong>Congratulations, Sarah!</strong> Your application has been signed and submitted!<br><br>We\'re thrilled to have Fresh Brew Coffee Co. on board. Your processing account is now being reviewed by our underwriting team.");
+
+    await wait(750);
+    const typing2 = addTyping();
+    await wait(500);
+    removeTyping();
+
+    // Message 2: Progress tracker
+    addMessage('ai', "Here\'s where things stand:" +
+      '<div class="chat-progress" style="margin:12px 0 8px;">' +
+        '<div class="cp-step"><div class="cp-dot done">✓</div><span style="font-weight:600;color:var(--green);">Signed</span></div>' +
+        '<div class="cp-line done"></div>' +
+        '<div class="cp-step"><div class="cp-dot active">2</div><span style="font-weight:600;color:var(--amber);">Documents</span></div>' +
+        '<div class="cp-line"></div>' +
+        '<div class="cp-step"><div class="cp-dot todo">3</div><span>Underwriting</span></div>' +
+        '<div class="cp-line"></div>' +
+        '<div class="cp-step"><div class="cp-dot todo">4</div><span>Approved</span></div>' +
+        '<div class="cp-line"></div>' +
+        '<div class="cp-step"><div class="cp-dot todo">5</div><span>Live!</span></div>' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Estimated go-live: <strong style="color:var(--text-primary);">April 19–20</strong> (4-5 business days)</div>'
+    );
+
+    await wait(1000);
+    const typing3 = addTyping();
+    await wait(600);
+    removeTyping();
+
+    // Message 3: Missing document request
+    addMessage('ai', "Before we can move to underwriting, I just need <strong>one thing</strong> from you:<br><br>" +
+      '🪪 <strong>A photo of your government-issued ID</strong> (driver\'s license or passport)<br>' +
+      '<span style="font-size:11px;color:var(--text-muted);">This is required by all payment processors to verify business ownership. It\'s a quick snap — front side is all we need.</span>' +
+      '<div style="margin-top:10px;"><label class="chat-upload-btn"><input type="file" style="display:none;" onchange="handleDocUpload(this)">📎 Upload ID Photo</label></div>'
+    );
+
+    await wait(1500);
+
+    // Simulate user uploading
+    // (In real app this would wait for actual upload, but for demo we auto-continue)
+    addMessage('user', "Here\'s my license 📷", {userMsg: true});
+
+    await wait(400);
+    const typing4 = addTyping();
+    await wait(750);
+    removeTyping();
+
+    // Message 4: Doc received
+    addMessage('ai', "✅ <strong>Got it!</strong> Your ID looks great — verified and matched to your application. That\'s the last document we needed. 👏");
+
+    await wait(750);
+    const typing5 = addTyping();
+    await wait(500);
+    removeTyping();
+
+    // Message 5: Questionnaire intro
+    addMessage('ai', "One more quick thing — since Fresh Brew accepts both <strong>in-store and online orders</strong>, our underwriting team needs a few details about how you operate. It\'ll take about 30 seconds.<br><br>Ready? Here\'s the first one:");
+
+    await wait(750);
+    const typing6 = addTyping();
+    await wait(400);
+    removeTyping();
+
+    // Question 1
+    addMessage('ai', "📋 <strong>How do most of your customers pay?</strong>" +
+      '<div class="chat-q-options">' +
+        '<button class="chat-q-opt" onclick="answerQuestion(this, 1)">🏪 Mostly in-person (counter/register)</button>' +
+        '<button class="chat-q-opt" onclick="answerQuestion(this, 1)">🌐 Mostly online orders</button>' +
+        '<button class="chat-q-opt" onclick="answerQuestion(this, 1)">📱 About 50/50 in-person and online</button>' +
+      '</div>'
+    );
+
+    // The rest continues after user answers...
+  }
+
+  let questionStep = 0;
+
+  async function answerQuestion(btn, q) {
+    // Highlight selected
+    btn.parentElement.querySelectorAll('.chat-q-opt').forEach(b => { b.classList.remove('selected'); b.disabled = true; b.style.pointerEvents = 'none'; });
+    btn.classList.add('selected');
+
+    // User reply
+    await wait(300);
+    addMessage('user', btn.textContent, {userMsg: true});
+
+    await wait(300);
+    const t1 = addTyping();
+    await wait(500);
+    removeTyping();
+
+    if (q === 1) {
+      addMessage('ai', "Got it! ✅");
+      await wait(300);
+      const t2 = addTyping();
+      await wait(400);
+      removeTyping();
+
+      // Question 2
+      addMessage('ai', "📋 <strong>Do you deliver products, or is everything picked up / consumed on-site?</strong>" +
+        '<div class="chat-q-options">' +
+          '<button class="chat-q-opt" onclick="answerQuestion(this, 2)">🚗 We offer delivery (DoorDash, UberEats, etc.)</button>' +
+          '<button class="chat-q-opt" onclick="answerQuestion(this, 2)">🏠 Pickup and dine-in only</button>' +
+          '<button class="chat-q-opt" onclick="answerQuestion(this, 2)">📦 Both delivery and pickup</button>' +
+        '</div>'
+      );
+    } else if (q === 2) {
+      addMessage('ai', "Perfect, that\'s all I needed! ✅<br><br>I\'ve filled out the <strong>First Data Retail Questionnaire</strong> and <strong>E-commerce Addendum</strong> based on your answers. These will be included with your application automatically — no extra forms for you to sign. 🎉");
+
+      await wait(750);
+      const t3 = addTyping();
+      await wait(600);
+      removeTyping();
+
+      // Final wrap-up message
+      addMessage('ai', "🚀 <strong>You\'re all set!</strong> Here\'s what happens next:" +
+        '<div style="margin:10px 0;display:flex;flex-direction:column;gap:8px;">' +
+          '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong>Application submitted</strong> to First Data Omaha</div></div>' +
+          '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong>All documents collected</strong> — nothing else needed from you</div></div>' +
+          '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--amber);flex-shrink:0;">⏳</span><div><strong>Underwriting review</strong> — typically 24-48 hours</div></div>' +
+          '<div style="display:flex;align-items:flex-start;gap:8px;"><span style="color:var(--blue);flex-shrink:0;">📦</span><div><strong>PAX A920 Pro ships</strong> as soon as you\'re approved</div></div>' +
+        '</div>'
+      );
+
+      await wait(1000);
+      const t4 = addTyping();
+      await wait(500);
+      removeTyping();
+
+      addMessage('ai', "Your terminal is a <strong>PAX A920 Pro</strong> — it\'s pretty straightforward to set up. When it arrives, just power it on and connect to WiFi. I\'ll send you a quick setup guide and can walk you through it right here if you need help.<br><br>" +
+        "In the meantime, you can reach <strong>Pacific Coast Retail</strong> (your partner) anytime through this chat, or ask me anything about your account." +
+        '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<button class="chat-schedule-btn" onclick="alert(\'Opening calendar...\')">📅 Schedule Setup Call</button>' +
+          '<button class="chat-upload-btn" onclick="alert(\'Opening help...\')">❓ FAQs & Help</button>' +
+        '</div>'
+      );
+
+      await wait(750);
+      const t5 = addTyping();
+      await wait(400);
+      removeTyping();
+
+      addMessage('ai', "Thanks again for choosing Twill, Sarah. We\'ll keep you updated every step of the way — you\'ll get a notification here as soon as underwriting is complete. Shouldn\'t be long! 😊☕");
+
+      // Update progress tracker in sidebar area if needed
+    }
+  }
+
+  function handleDocUpload(input) {
+    // In real app, this would upload the file
+    // For demo, we just acknowledge
+  }
+
+</script>
+
+</body>
+</html>
