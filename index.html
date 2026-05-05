@@ -7146,7 +7146,7 @@ function cycleReq(el){
             <div class="kpi"><div class="kpi-label">Total Merchants</div><div class="kpi-value" id="merch-kpi-total">1,247</div><div class="kpi-delta" id="merch-kpi-total-sub" style="color:var(--text-secondary);">+18 MTD</div></div>
             <div class="kpi"><div class="kpi-label">Total Volume</div><div class="kpi-value" id="merch-kpi-volume">$83.6M</div><div class="kpi-delta delta-up" id="merch-kpi-volume-sub">↑ 4.1% MoM</div></div>
             <div class="kpi"><div class="kpi-label">Txn Count</div><div class="kpi-value" id="merch-kpi-txn">1.42M</div><div class="kpi-delta delta-up" id="merch-kpi-txn-sub">↑ 3.6% MoM</div></div>
-            <div class="kpi"><div class="kpi-label">Gross Income</div><div class="kpi-value" id="merch-kpi-gross">$847,291</div><div class="kpi-delta delta-up" id="merch-kpi-gross-sub">↑ 4.2% vs Feb</div></div>
+            <div class="kpi"><div class="kpi-label">ISO Income</div><div class="kpi-value" id="merch-kpi-gross">$847,291</div><div class="kpi-delta delta-up" id="merch-kpi-gross-sub">↑ 4.2% vs Feb</div></div>
             <div class="kpi"><div class="kpi-label">Margin %</div><div class="kpi-value" id="merch-kpi-margin">40.0%</div><div class="kpi-delta delta-up" id="merch-kpi-margin-sub">↑ 0.3 pts</div></div>
             <div class="kpi"><div class="kpi-label">⚠️ Fee Audit</div><div class="kpi-value" id="merch-kpi-audit" style="color:var(--red);">7</div><div class="kpi-delta" id="merch-kpi-audit-sub">mismatched fees</div></div>
             <div class="kpi" style="cursor:pointer;border-color:rgba(229,62,62,0.18);" onclick="merchOpenMissingModal()" title="MIDs in Feb residual report not in Mar processor file"><div class="kpi-label" style="color:var(--red);">👻 Missing MIDs</div><div class="kpi-value" id="merch-kpi-missing" style="color:var(--red);">14</div><div class="kpi-delta" id="merch-kpi-missing-sub" style="color:var(--text-secondary);">in Feb · not in Mar</div></div>
@@ -7197,9 +7197,11 @@ function cycleReq(el){
                       <select id="cust-col">
                         <option value="txn">Txn Count</option>
                         <option value="vol">Volume</option>
-                        <option value="gross">Gross Income</option>
+                        <option value="gross">ISO Income</option>
                         <option value="mom">MoM %</option>
+                        <option value="expense">Agent Expense</option>
                         <option value="payout">Payout %</option>
+                        <option value="payouts">Payouts ($)</option>
                         <option value="net">Net Income</option>
                       </select>
                     </div>
@@ -7239,50 +7241,49 @@ function cycleReq(el){
               <table class="res-table" id="res-merchant-table">
                 <thead>
                   <tr>
-                    <th style="text-align:left;width:22px;"></th>
-                    <th style="text-align:left;width:180px;">Merchant</th>
+                    <th style="text-align:left;width:200px;">Merchant</th>
                     <th>Processor</th>
                     <th>Txn Count</th>
                     <th>Volume</th>
-                    <th>Gross Income</th>
+                    <th>ISO Income</th>
                     <th>MoM</th>
-                    <th>Payout %</th>
+                    <th>Agent Expense</th>
+                    <th>Payouts</th>
                     <th>Net Income</th>
                     <th style="text-align:left;">Partner / Rep</th>
-                    <th style="text-align:center;">Detail</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr data-health="risk" data-proc="Fiserv" data-audit="1" data-partner="Coastal Commerce" data-rep="S. Kim" data-txn="1124" data-vol="28100" data-gross="890" data-mom="-67" data-payout="65" data-net="312" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>JoeCo Enterprises</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>Fiserv</td><td>1,124</td><td>$28,100</td><td>$890</td><td style="color:var(--red);">-67%</td><td>65%</td><td>$312</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;">CC</span>Coastal Commerce</span><span class="merch-rep-row">S. Kim</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('JoeCo Enterprises')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="JoeCo Enterprises" data-pool="3589"></div></td></tr>
-                  <tr data-health="risk" data-proc="Paysafe" data-audit="0" data-partner="Apex Elite" data-rep="A. Fry" data-txn="0" data-vol="0" data-gross="0" data-mom="-100" data-payout="60" data-net="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Bright Star Auto</strong></td><td>Paysafe</td><td>0</td><td>$0</td><td>$0</td><td style="color:var(--red);">-100%</td><td>60%</td><td>$0</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#6B839B;">AE</span>Apex Elite</span><span class="merch-rep-row">A. Fry</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Bright Star Auto')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Bright Star Auto" data-pool="3272"></div></td></tr>
-                  <tr data-health="risk" data-proc="Paysafe" data-audit="0" data-partner="Summit Lending" data-rep="M. Wright" data-txn="0" data-vol="0" data-gross="0" data-mom="-100" data-payout="70" data-net="0" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Summit Fitness</strong></td><td>Paysafe</td><td>0</td><td>$0</td><td>$0</td><td style="color:var(--red);">-100%</td><td>70%</td><td>$0</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#8C7A5E;">SL</span>Summit Lending</span><span class="merch-rep-row">M. Wright</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Summit Fitness')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Summit Fitness" data-pool="2638"></div></td></tr>
-                  <tr data-health="risk" data-proc="TSYS" data-audit="1" data-partner="NovaPay" data-rep="J. Patel" data-txn="496" data-vol="12400" data-gross="340" data-mom="-41" data-payout="62" data-net="129" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Oceanview Grill</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>TSYS</td><td>496</td><td>$12,400</td><td>$340</td><td style="color:var(--red);">-41%</td><td>62%</td><td>$129</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#5B7A5E;">N</span>NovaPay</span><span class="merch-rep-row">J. Patel</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Oceanview Grill')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Oceanview Grill" data-pool="2955"></div></td></tr>
-                  <tr data-health="watch" data-proc="Fiserv" data-audit="1" data-partner="Apex Elite" data-rep="A. Fry" data-txn="3368" data-vol="84200" data-gross="2410" data-mom="-34" data-payout="60" data-net="964" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>ABC Corp</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>Fiserv</td><td>3,368</td><td>$84,200</td><td>$2,410</td><td style="color:var(--red);">-34%</td><td>60%</td><td>$964</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#6B839B;">AE</span>Apex Elite</span><span class="merch-rep-row">A. Fry</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('ABC Corp')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="ABC Corp" data-pool="4536"></div></td></tr>
-                  <tr data-health="watch" data-proc="Paysafe" data-audit="0" data-partner="Rivermark" data-rep="S. Reyes" data-txn="756" data-vol="18900" data-gross="610" data-mom="-22" data-payout="68" data-net="195" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Valley Pet Care</strong></td><td>Paysafe</td><td>756</td><td>$18,900</td><td>$610</td><td style="color:var(--red);">-22%</td><td>68%</td><td>$195</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A67C5B;">R</span>Rivermark</span><span class="merch-rep-row">S. Reyes</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Valley Pet Care')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Valley Pet Care" data-pool="2955"></div></td></tr>
-                  <tr data-health="watch" data-proc="TSYS" data-audit="0" data-partner="Internal" data-rep="M. Wright" data-txn="1248" data-vol="31200" data-gross="1120" data-mom="-18" data-payout="25" data-net="840" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Golden Gate Bakery</strong></td><td>TSYS</td><td>1,248</td><td>$31,200</td><td>$1,120</td><td style="color:var(--red);">-18%</td><td>25%</td><td>$840</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Internal</span><span class="merch-rep-row">M. Wright</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Golden Gate Bakery')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Golden Gate Bakery" data-pool="3906"></div></td></tr>
-                  <tr data-health="watch" data-proc="WorldPay" data-audit="1" data-partner="Coastal Commerce" data-rep="S. Kim" data-txn="884" data-vol="22100" data-gross="780" data-mom="-15" data-payout="65" data-net="273" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Downtown Deli</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>WorldPay</td><td>884</td><td>$22,100</td><td>$780</td><td style="color:var(--red);">-15%</td><td>65%</td><td>$273</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;">CC</span>Coastal Commerce</span><span class="merch-rep-row">S. Kim</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Downtown Deli')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Downtown Deli" data-pool="2321"></div></td></tr>
-                  <tr data-health="healthy" data-proc="TSYS" data-audit="0" data-partner="Summit Lending" data-rep="M. Wright" data-txn="49600" data-vol="1240000" data-gross="15330" data-mom="2.1" data-payout="70" data-net="4599" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Hobbies Mini Mart</strong></td><td>TSYS</td><td>49,600</td><td>$1,240,000</td><td style="color:var(--green);">$15,330</td><td style="color:var(--green);">+2.1%</td><td>70%</td><td style="color:var(--green);">$4,599</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#8C7A5E;">SL</span>Summit Lending</span><span class="merch-rep-row">M. Wright</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Hobbies Mini Mart')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Hobbies Mini Mart" data-pool="3589"></div></td></tr>
-                  <tr data-health="healthy" data-proc="Fiserv" data-audit="1" data-partner="Apex Elite" data-rep="A. Fry" data-txn="35680" data-vol="892000" data-gross="4912" data-mom="3.4" data-payout="60" data-net="1965" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Merchant Demo Corp</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>Fiserv</td><td>35,680</td><td>$892,000</td><td style="color:var(--green);">$4,912</td><td style="color:var(--green);">+3.4%</td><td>60%</td><td style="color:var(--green);">$1,965</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#6B839B;">AE</span>Apex Elite</span><span class="merch-rep-row">A. Fry</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Merchant Demo Corp')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Merchant Demo Corp" data-pool="3906"></div></td></tr>
-                  <tr data-health="healthy" data-proc="TSYS" data-audit="1" data-partner="Internal" data-rep="A. Fry" data-txn="16400" data-vol="410000" data-gross="3744" data-mom="1.8" data-payout="25" data-net="2808" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Gorgeous Cosmetics</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>TSYS</td><td>16,400</td><td>$410,000</td><td style="color:var(--green);">$3,744</td><td style="color:var(--green);">+1.8%</td><td>25%</td><td style="color:var(--green);">$2,808</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Internal</span><span class="merch-rep-row">A. Fry</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Gorgeous Cosmetics')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Gorgeous Cosmetics" data-pool="3906"></div></td></tr>
-                  <tr data-health="healthy" data-proc="Paysafe" data-audit="0" data-partner="Rivermark" data-rep="S. Reyes" data-txn="7440" data-vol="186000" data-gross="2418" data-mom="0.9" data-payout="68" data-net="774" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Addicted Convenience</strong></td><td>Paysafe</td><td>7,440</td><td>$186,000</td><td style="color:var(--green);">$2,418</td><td style="color:var(--green);">+0.9%</td><td>68%</td><td style="color:var(--green);">$774</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A67C5B;">R</span>Rivermark</span><span class="merch-rep-row">S. Reyes</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Addicted Convenience')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Addicted Convenience" data-pool="4540"></div></td></tr>
-                  <tr data-health="healthy" data-proc="TSYS" data-audit="0" data-partner="Summit Lending" data-rep="M. Wright" data-txn="8200" data-vol="205000" data-gross="2311" data-mom="4.2" data-payout="70" data-net="693" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Best Travel Agency</strong></td><td>TSYS</td><td>8,200</td><td>$205,000</td><td style="color:var(--green);">$2,311</td><td style="color:var(--green);">+4.2%</td><td>70%</td><td style="color:var(--green);">$693</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#8C7A5E;">SL</span>Summit Lending</span><span class="merch-rep-row">M. Wright</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Best Travel Agency')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Best Travel Agency" data-pool="3906"></div></td></tr>
-                  <tr data-health="healthy" data-proc="WorldPay" data-audit="0" data-partner="NovaPay" data-rep="J. Patel" data-txn="7120" data-vol="178000" data-gross="2189" data-mom="1.2" data-payout="62" data-net="832" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Lakeside Dental</strong></td><td>WorldPay</td><td>7,120</td><td>$178,000</td><td style="color:var(--green);">$2,189</td><td style="color:var(--green);">+1.2%</td><td>62%</td><td style="color:var(--green);">$832</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#5B7A5E;">N</span>NovaPay</span><span class="merch-rep-row">J. Patel</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Lakeside Dental')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Lakeside Dental" data-pool="2955"></div></td></tr>
-                  <tr data-health="healthy" data-proc="Fiserv" data-audit="0" data-partner="Coastal Commerce" data-rep="S. Kim" data-txn="6080" data-vol="152000" data-gross="1870" data-mom="2.8" data-payout="65" data-net="654" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:center;width:22px;padding:8px 6px;"><span class="res-merch-chevron" style="font-size:10px;color:var(--text-muted);display:inline-block;transition:transform .2s;">▶</span></td><td style="text-align:left;"><strong>Metro Auto Parts</strong></td><td>Fiserv</td><td>6,080</td><td>$152,000</td><td style="color:var(--green);">$1,870</td><td style="color:var(--green);">+2.8%</td><td>65%</td><td style="color:var(--green);">$654</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;">CC</span>Coastal Commerce</span><span class="merch-rep-row">S. Kim</span></div></td><td style="text-align:center;"><button class="btn btn-ghost" style="padding:3px 8px;font-size:11px;" onclick="event.stopPropagation();merchOpenDrawer('Metro Auto Parts')">View</button></td></tr>
-                  <tr class="res-merch-accordion" style="display:none;"><td colspan="11" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Metro Auto Parts" data-pool="3272"></div></td></tr>
+                  <tr data-health="risk" data-proc="Fiserv" data-audit="1" data-partner="Coastal Commerce" data-rep="S. Kim" data-txn="1124" data-vol="28100" data-gross="890" data-mom="-67" data-payout="65" data-expense="97" data-payouts="482" data-net="408" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>JoeCo Enterprises</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>Fiserv</td><td>1,124</td><td>$28,100</td><td>$890</td><td style="color:var(--red);">-67%</td><td style="color:var(--red);">−$97</td><td>$482</td><td>$408</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;">CC</span>Coastal Commerce</span><span class="merch-rep-row">S. Kim</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="JoeCo Enterprises" data-pool="3589"></div></td></tr>
+                  <tr data-health="risk" data-proc="Paysafe" data-audit="0" data-partner="Apex Elite" data-rep="A. Fry" data-txn="0" data-vol="0" data-gross="0" data-mom="-100" data-payout="60" data-expense="34" data-payouts="-34" data-net="34" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Bright Star Auto</strong></td><td>Paysafe</td><td>0</td><td>$0</td><td>$0</td><td style="color:var(--red);">-100%</td><td style="color:var(--red);">−$34</td><td style="color:var(--red);">-$34</td><td>$34</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#6B839B;">AE</span>Apex Elite</span><span class="merch-rep-row">A. Fry</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Bright Star Auto" data-pool="3272"></div></td></tr>
+                  <tr data-health="risk" data-proc="Paysafe" data-audit="0" data-partner="Summit Lending" data-rep="M. Wright" data-txn="0" data-vol="0" data-gross="0" data-mom="-100" data-payout="70" data-expense="69" data-payouts="-69" data-net="69" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Summit Fitness</strong></td><td>Paysafe</td><td>0</td><td>$0</td><td>$0</td><td style="color:var(--red);">-100%</td><td style="color:var(--red);">−$69</td><td style="color:var(--red);">-$69</td><td>$69</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#8C7A5E;">SL</span>Summit Lending</span><span class="merch-rep-row">M. Wright</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Summit Fitness" data-pool="2638"></div></td></tr>
+                  <tr data-health="risk" data-proc="TSYS" data-audit="1" data-partner="NovaPay" data-rep="J. Patel" data-txn="496" data-vol="12400" data-gross="340" data-mom="-41" data-payout="62" data-expense="46" data-payouts="165" data-net="175" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Oceanview Grill</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>TSYS</td><td>496</td><td>$12,400</td><td>$340</td><td style="color:var(--red);">-41%</td><td style="color:var(--red);">−$46</td><td>$165</td><td>$175</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#5B7A5E;">N</span>NovaPay</span><span class="merch-rep-row">J. Patel</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Oceanview Grill" data-pool="2955"></div></td></tr>
+                  <tr data-health="watch" data-proc="Fiserv" data-audit="1" data-partner="Apex Elite" data-rep="A. Fry" data-txn="3368" data-vol="84200" data-gross="2410" data-mom="-34" data-payout="60" data-expense="153" data-payouts="1293" data-net="1117" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>ABC Corp</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>Fiserv</td><td>3,368</td><td>$84,200</td><td>$2,410</td><td style="color:var(--red);">-34%</td><td style="color:var(--red);">−$153</td><td>$1,293</td><td>$1,117</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#6B839B;">AE</span>Apex Elite</span><span class="merch-rep-row">A. Fry</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="ABC Corp" data-pool="4536"></div></td></tr>
+                  <tr data-health="watch" data-proc="Paysafe" data-audit="0" data-partner="Rivermark" data-rep="S. Reyes" data-txn="756" data-vol="18900" data-gross="610" data-mom="-22" data-payout="68" data-expense="53" data-payouts="362" data-net="248" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Valley Pet Care</strong></td><td>Paysafe</td><td>756</td><td>$18,900</td><td>$610</td><td style="color:var(--red);">-22%</td><td style="color:var(--red);">−$53</td><td>$362</td><td>$248</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A67C5B;">R</span>Rivermark</span><span class="merch-rep-row">S. Reyes</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Valley Pet Care" data-pool="2955"></div></td></tr>
+                  <tr data-health="watch" data-proc="TSYS" data-audit="0" data-partner="Internal" data-rep="M. Wright" data-txn="1248" data-vol="31200" data-gross="1120" data-mom="-18" data-payout="25" data-expense="100" data-payouts="180" data-net="940" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Golden Gate Bakery</strong></td><td>TSYS</td><td>1,248</td><td>$31,200</td><td>$1,120</td><td style="color:var(--red);">-18%</td><td style="color:var(--red);">−$100</td><td>$180</td><td>$940</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Internal</span><span class="merch-rep-row">M. Wright</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Golden Gate Bakery" data-pool="3906"></div></td></tr>
+                  <tr data-health="watch" data-proc="WorldPay" data-audit="1" data-partner="Coastal Commerce" data-rep="S. Kim" data-txn="884" data-vol="22100" data-gross="780" data-mom="-15" data-payout="65" data-expense="56" data-payouts="451" data-net="329" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Downtown Deli</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>WorldPay</td><td>884</td><td>$22,100</td><td>$780</td><td style="color:var(--red);">-15%</td><td style="color:var(--red);">−$56</td><td>$451</td><td>$329</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;">CC</span>Coastal Commerce</span><span class="merch-rep-row">S. Kim</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Downtown Deli" data-pool="2321"></div></td></tr>
+                  <tr data-health="healthy" data-proc="TSYS" data-audit="0" data-partner="Summit Lending" data-rep="M. Wright" data-txn="49600" data-vol="1240000" data-gross="15330" data-mom="2.1" data-payout="70" data-expense="1309" data-payouts="9422" data-net="5908" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Hobbies Mini Mart</strong></td><td>TSYS</td><td>49,600</td><td>$1,240,000</td><td style="color:var(--green);">$15,330</td><td style="color:var(--green);">+2.1%</td><td style="color:var(--red);">−$1,309</td><td>$9,422</td><td style="color:var(--green);">$5,908</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#8C7A5E;">SL</span>Summit Lending</span><span class="merch-rep-row">M. Wright</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Hobbies Mini Mart" data-pool="3589"></div></td></tr>
+                  <tr data-health="healthy" data-proc="Fiserv" data-audit="1" data-partner="Apex Elite" data-rep="A. Fry" data-txn="35680" data-vol="892000" data-gross="4912" data-mom="3.4" data-payout="60" data-expense="961" data-payouts="1986" data-net="2926" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Merchant Demo Corp</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>Fiserv</td><td>35,680</td><td>$892,000</td><td style="color:var(--green);">$4,912</td><td style="color:var(--green);">+3.4%</td><td style="color:var(--red);">−$961</td><td>$1,986</td><td style="color:var(--green);">$2,926</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#6B839B;">AE</span>Apex Elite</span><span class="merch-rep-row">A. Fry</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Merchant Demo Corp" data-pool="3906"></div></td></tr>
+                  <tr data-health="healthy" data-proc="TSYS" data-audit="1" data-partner="Internal" data-rep="A. Fry" data-txn="16400" data-vol="410000" data-gross="3744" data-mom="1.8" data-payout="25" data-expense="543" data-payouts="393" data-net="3351" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Gorgeous Cosmetics</strong><span class="merch-audit-icon" title="Fee mismatch detected">!</span></td><td>TSYS</td><td>16,400</td><td>$410,000</td><td style="color:var(--green);">$3,744</td><td style="color:var(--green);">+1.8%</td><td style="color:var(--red);">−$543</td><td>$393</td><td style="color:var(--green);">$3,351</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Internal</span><span class="merch-rep-row">A. Fry</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Gorgeous Cosmetics" data-pool="3906"></div></td></tr>
+                  <tr data-health="healthy" data-proc="Paysafe" data-audit="0" data-partner="Rivermark" data-rep="S. Reyes" data-txn="7440" data-vol="186000" data-gross="2418" data-mom="0.9" data-payout="68" data-expense="255" data-payouts="1389" data-net="1029" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Addicted Convenience</strong></td><td>Paysafe</td><td>7,440</td><td>$186,000</td><td style="color:var(--green);">$2,418</td><td style="color:var(--green);">+0.9%</td><td style="color:var(--red);">−$255</td><td>$1,389</td><td style="color:var(--green);">$1,029</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A67C5B;">R</span>Rivermark</span><span class="merch-rep-row">S. Reyes</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Addicted Convenience" data-pool="4540"></div></td></tr>
+                  <tr data-health="healthy" data-proc="TSYS" data-audit="0" data-partner="Summit Lending" data-rep="M. Wright" data-txn="8200" data-vol="205000" data-gross="2311" data-mom="4.2" data-payout="70" data-expense="239" data-payouts="1379" data-net="932" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Best Travel Agency</strong></td><td>TSYS</td><td>8,200</td><td>$205,000</td><td style="color:var(--green);">$2,311</td><td style="color:var(--green);">+4.2%</td><td style="color:var(--red);">−$239</td><td>$1,379</td><td style="color:var(--green);">$932</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#8C7A5E;">SL</span>Summit Lending</span><span class="merch-rep-row">M. Wright</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Best Travel Agency" data-pool="3906"></div></td></tr>
+                  <tr data-health="healthy" data-proc="WorldPay" data-audit="0" data-partner="NovaPay" data-rep="J. Patel" data-txn="7120" data-vol="178000" data-gross="2189" data-mom="1.2" data-payout="62" data-expense="346" data-payouts="1011" data-net="1178" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Lakeside Dental</strong></td><td>WorldPay</td><td>7,120</td><td>$178,000</td><td style="color:var(--green);">$2,189</td><td style="color:var(--green);">+1.2%</td><td style="color:var(--red);">−$346</td><td>$1,011</td><td style="color:var(--green);">$1,178</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#5B7A5E;">N</span>NovaPay</span><span class="merch-rep-row">J. Patel</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Lakeside Dental" data-pool="2955"></div></td></tr>
+                  <tr data-health="healthy" data-proc="Fiserv" data-audit="0" data-partner="Coastal Commerce" data-rep="S. Kim" data-txn="6080" data-vol="152000" data-gross="1870" data-mom="2.8" data-payout="65" data-expense="186" data-payouts="1030" data-net="840" style="cursor:pointer;" onclick="resMerchToggle(this)"><td style="text-align:left;"><strong>Metro Auto Parts</strong></td><td>Fiserv</td><td>6,080</td><td>$152,000</td><td style="color:var(--green);">$1,870</td><td style="color:var(--green);">+2.8%</td><td style="color:var(--red);">−$186</td><td>$1,030</td><td style="color:var(--green);">$840</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;">CC</span>Coastal Commerce</span><span class="merch-rep-row">S. Kim</span></div></td></tr>
+                  <tr class="res-merch-accordion" style="display:none;"><td colspan="10" style="padding:0;border-bottom:2px solid rgba(34,46,72,0.12);"><div class="res-merch-wf-panel" data-merchant="Metro Auto Parts" data-pool="3272"></div></td></tr>
                 </tbody>
               </table>
             </div>
@@ -7365,7 +7366,8 @@ function cycleReq(el){
         </div>
         <div class="po-drawer-tabs">
           <div class="po-drawer-tab active" data-tab="summary" onclick="merchDrawerTab('summary')">Summary</div>
-          <div class="po-drawer-tab" data-tab="waterfall" onclick="merchDrawerTab('waterfall')">Payout Waterfall</div>
+          <div class="po-drawer-tab" data-tab="flags" onclick="merchDrawerTab('flags')">Flags <span id="merch-d-flags-badge" style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">0</span></div>
+          <div class="po-drawer-tab" data-tab="waterfall" onclick="merchDrawerTab('waterfall')">Detail</div>
           <div class="po-drawer-tab" data-tab="activity" onclick="merchDrawerTab('activity')">Activity</div>
         </div>
         <div class="po-drawer-body" id="merch-drawer-body"></div>
@@ -17239,11 +17241,12 @@ function resJumpToMerchants(filter) {
 
 // Custom filter state: each entry { col, op, val }
 var resCustFilters = [];
-var resCustColLabels = { txn: 'Txn Count', vol: 'Volume', gross: 'Gross Income', mom: 'MoM %', payout: 'Payout %', net: 'Net Income' };
+var resCustColLabels = { txn: 'Txn Count', vol: 'Volume', gross: 'ISO Income', mom: 'MoM %', payout: 'Payout %', expense: 'Agent Expense', payouts: 'Payouts ($)', net: 'Net Income' };
 var resCustOpLabels = { gt: '>', gte: '≥', lt: '<', lte: '≤', eq: '=' };
 
 function resApplyCustFilter(row, f) {
-  var v = parseFloat(row.dataset[f.col === 'txn' ? 'txn' : f.col === 'vol' ? 'vol' : f.col === 'gross' ? 'gross' : f.col === 'mom' ? 'mom' : f.col === 'payout' ? 'payout' : 'net']);
+  var key = ({txn:'txn',vol:'vol',gross:'gross',mom:'mom',payout:'payout',expense:'expense',payouts:'payouts',net:'net'})[f.col] || f.col;
+  var v = parseFloat(row.dataset[key]);
   if (isNaN(v)) return false;
   var t = f.val;
   if (f.op === 'gt') return v > t;
@@ -17330,7 +17333,8 @@ function resFilterMerchantTable() {
   const visible = [];
   rows.forEach(r => {
     if (r.classList.contains('res-merch-accordion')) { r.style.display = 'none'; return; }
-    const name = (r.cells[1] ? r.cells[1].textContent : '').toLowerCase();
+    // After chevron + Detail column removal, cells[0] = Merchant
+    const name = (r.cells[0] ? r.cells[0].textContent : '').toLowerCase();
     const rProc = r.dataset.proc || '';
     const rHealth = r.dataset.health || '';
     const rAudit = r.dataset.audit || '0';
@@ -32054,8 +32058,17 @@ function merchRenderDrawer() {
   // Body
   var body = document.getElementById('merch-drawer-body');
   if (merchDrawerState.tab === 'summary') body.innerHTML = merchRenderSummary(name, row);
+  else if (merchDrawerState.tab === 'flags') body.innerHTML = merchRenderFlags(name, row);
   else if (merchDrawerState.tab === 'waterfall') { body.innerHTML = '<div id="merch-d-wf"></div>'; merchRenderWaterfall(name, row); }
   else if (merchDrawerState.tab === 'activity') body.innerHTML = merchRenderActivity(name, row);
+  // Flag count badge
+  var flagBadge = document.getElementById('merch-d-flags-badge');
+  if (flagBadge) {
+    var fc = merchComputeFlags(row).length;
+    flagBadge.textContent = fc;
+    flagBadge.style.color = fc > 0 ? 'var(--amber)' : 'var(--text-muted)';
+    flagBadge.style.fontWeight = fc > 0 ? '700' : '400';
+  }
 }
 
 function merchSummaryDelta(curr, prev, fmt, opts) {
@@ -32076,90 +32089,370 @@ function merchRenderSummary(name, row) {
   var txn = parseFloat(row.dataset.txn) || 0;
   var gross = parseFloat(row.dataset.gross) || 0;
   var mom = parseFloat(row.dataset.mom) || 0;
-  var payoutPct = parseFloat(row.dataset.payout) || 0;
   var net = parseFloat(row.dataset.net) || 0;
-  // Synthetic prev values back-derived from MoM where applicable
+  var expense = merchExpenseTotal(name) || (parseFloat(row.dataset.expense) || 0);
+  // Ensure expense store is populated so Total Agent Expense matches Detail tab
+  if (!MERCH_EXPENSES[name]) merchGetExpenses(name, row);
+  var totalExpense = merchExpenseTotal(name);
+  var payoutPct = parseFloat(row.dataset.payout) || 0;
+  var totalPayouts = Math.round(gross * payoutPct / 100 - totalExpense);
+  var bonusesApplied = merchBonusTotal(name);
+  var bonusList = merchGetBonuses(name);
+  // KPI math — bonuses are an additional outflow on top of payouts
+  var marginBps = vol > 0 ? Math.round(gross / vol * 10000) : 0; // basis points
+  var marginPct = vol > 0 ? (gross / vol * 100) : 0;
+  var netMarginPct = vol > 0 ? ((gross - totalPayouts - bonusesApplied) / vol * 100) : 0;
+  var netMarginBps = vol > 0 ? Math.round((gross - totalPayouts - bonusesApplied) / vol * 10000) : 0;
+  var avgTicket = txn > 0 ? (vol / txn) : 0;
+  var costPerTxn = txn > 0 ? (totalExpense / txn) : 0;
+  // Synthetic prev for MoM annotations
   var hash = 0; for (var i = 0; i < name.length; i++) hash += name.charCodeAt(i);
   var volPrev = mom !== 0 ? Math.round(vol / (1 + mom/100)) : Math.round(vol * (0.95 + (hash%5)/100));
-  var txnPrev = Math.round(txn / (1 + (mom * 0.85)/100));
   var grossPrev = Math.round(gross / (1 + (mom * 1.1)/100));
   var netPrev = Math.round(net / (1 + (mom * 1.1)/100));
-  var fmtMoney = function(n) { return n >= 1e6 ? '$' + (n/1e6).toFixed(2) + 'M' : n >= 1e3 ? '$' + (n/1e3).toFixed(1) + 'K' : '$' + Math.round(n).toLocaleString(); };
+  var fmtMoney = function(n) { var s=n<0?'-':''; n=Math.abs(n); return s + (n >= 1e6 ? '$' + (n/1e6).toFixed(2) + 'M' : n >= 1e3 ? '$' + (n/1e3).toFixed(1) + 'K' : '$' + Math.round(n).toLocaleString()); };
   var fmtCount = function(n) { return n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : Math.round(n).toLocaleString(); };
   var auditFlag = row.dataset.audit === '1';
   var health = row.dataset.health || 'healthy';
   var healthMsg = ({ healthy:'Merchant volume and processing patterns look normal.', watch:'Volume trending down — keep an eye on this account.', risk:'Significant decline detected — recommend partner outreach.' })[health];
+
+  // Mini KPI tile builder
+  var kpi = function(label, value, valColor, sub, subColor) {
+    return '<div class="kpi" style="padding:10px 12px;">'
+      + '<div class="kpi-label">' + label + '</div>'
+      + '<div class="kpi-value" style="font-size:17px;' + (valColor ? 'color:' + valColor + ';' : '') + '">' + value + '</div>'
+      + (sub ? '<div style="font-size:10px;color:' + (subColor || 'var(--text-muted)') + ';margin-top:4px;font-family:var(--font-data);">' + sub + '</div>' : '')
+      + '</div>';
+  };
+  var momColor = mom >= 0 ? 'var(--green)' : 'var(--red)';
+  var momArrow = mom >= 0 ? '↑' : '↓';
+
+  // Lifecycle data — deterministic from name hash
+  var monthsAgo = (hash % 38) + 1; // 1..38 months ago
+  var boardDateObj = new Date(2026, 2 - monthsAgo, 1); // current = Mar 2026 = month index 2
+  var boardDateStr = boardDateObj.toLocaleDateString('en-US', { month:'short', year:'numeric' });
+  var monthsResidual = monthsAgo;
+  // Lifetime residual ≈ months × current ISO Income × growth_factor
+  // (assumes the merchant has roughly grown to current levels, so historical avg is ~80% of current)
+  var lifetimeResidual = Math.round(monthsResidual * gross * 0.82);
+
   return ''
-    + (auditFlag ? '<div style="border:1px solid var(--red-dim);background:rgba(229,62,62,0.05);border-radius:8px;padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;"><span class="merch-audit-icon">!</span><div><div style="font-size:12px;font-weight:600;color:var(--red);">Fee Audit Mismatch Detected</div><div style="font-size:11px;color:var(--text-secondary);margin-top:3px;line-height:1.4;">Statement-fee schedule does not reconcile with the partner agreement. Open Statement Data to compare line-by-line.</div></div></div>' : '')
-    + '<div style="border:1px solid var(--border);background:var(--bg-base);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text-secondary);line-height:1.45;"><strong style="color:var(--text-primary);font-size:12px;">Health: ' + ({healthy:'Healthy',watch:'Watch',risk:'At Risk'}[health]) + '</strong><div style="margin-top:3px;">' + healthMsg + '</div></div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">'
-    + '  <div class="kpi" style="padding:10px 12px;"><div class="kpi-label">Volume</div><div class="kpi-value" style="font-size:18px;">' + fmtMoney(vol) + '</div>' + merchSummaryDelta(vol, volPrev, fmtMoney) + '</div>'
-    + '  <div class="kpi" style="padding:10px 12px;"><div class="kpi-label">Txn Count</div><div class="kpi-value" style="font-size:18px;">' + fmtCount(txn) + '</div>' + merchSummaryDelta(txn, txnPrev, fmtCount) + '</div>'
-    + '  <div class="kpi" style="padding:10px 12px;"><div class="kpi-label">Gross Income</div><div class="kpi-value" style="font-size:18px;">' + fmtMoney(gross) + '</div>' + merchSummaryDelta(gross, grossPrev, fmtMoney) + '</div>'
-    + '  <div class="kpi" style="padding:10px 12px;"><div class="kpi-label">Net Income</div><div class="kpi-value" style="font-size:18px;color:var(--green);">' + fmtMoney(net) + '</div>' + merchSummaryDelta(net, netPrev, fmtMoney) + '</div>'
-    + '  <div class="kpi" style="padding:10px 12px;"><div class="kpi-label">Payout %</div><div class="kpi-value" style="font-size:18px;">' + payoutPct + '%</div></div>'
-    + '  <div class="kpi" style="padding:10px 12px;"><div class="kpi-label">MoM</div><div class="kpi-value" style="font-size:18px;color:' + (mom >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + (mom >= 0 ? '+' : '') + mom.toFixed(1) + '%</div></div>'
+    // Activity FIRST (was last)
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Processing Activity</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">'
+    +   kpi('Volume', fmtMoney(vol), null, momArrow + ' ' + Math.abs(mom).toFixed(0) + '% MoM', momColor)
+    +   kpi('Txn Count', fmtCount(txn), null, txn > 0 ? '' : 'no batches')
+    +   kpi('Avg Ticket', avgTicket > 0 ? '$' + avgTicket.toFixed(2) : '—', null, '')
     + '</div>'
-    + '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Partner Attribution</div>'
+
+    // Revenue row — ISO Income | Margin
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Revenue</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
+    +   kpi('ISO Income', fmtMoney(gross), null, momArrow + ' ' + fmtMoney(Math.abs(gross - grossPrev)) + ' vs Feb', momColor)
+    +   kpi('Margin', marginBps + ' bps', null, marginPct.toFixed(2) + '% of volume')
+    + '</div>'
+
+    // Costs row — Total Payouts | Total Agent Expense
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Costs</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
+    +   kpi('Total Payouts', (totalPayouts < 0 ? '−' : '') + fmtMoney(Math.abs(totalPayouts)), totalPayouts < 0 ? 'var(--red)' : null, payoutPct + '% rate, net of expenses')
+    +   kpi('Total Agent Expense', '−' + fmtMoney(totalExpense), 'var(--red)', '$' + costPerTxn.toFixed(3) + '/txn')
+    + '</div>'
+
+    // Bottom line — Bonuses | Net Margin
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Bottom Line</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
+    +   kpi('Bonuses Applied', fmtMoney(bonusesApplied), bonusesApplied > 0 ? 'var(--green)' : 'var(--text-muted)', bonusesApplied > 0 ? bonusList.length + ' bonus' + (bonusList.length===1?'':'es') + ' · ' + bonusList.map(function(b){return b.type;}).join(', ') : 'no triggers this period')
+    +   kpi('Net Margin', netMarginBps + ' bps', netMarginBps >= 0 ? 'var(--green)' : 'var(--red)', netMarginPct.toFixed(2) + '% of volume')
+    + '</div>'
+
+    // Lifetime row — Board Date | Months Residual | Lifetime Residual
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Lifetime</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">'
+    +   kpi('Board Date', boardDateStr, null, '')
+    +   kpi('Months Residual', monthsResidual.toString(), null, monthsResidual >= 12 ? Math.floor(monthsResidual/12) + 'y ' + (monthsResidual%12) + 'mo' : 'this MID')
+    +   kpi('Lifetime Residual', fmtMoney(lifetimeResidual), 'var(--green)', 'cumulative ISO income')
+    + '</div>'
+
+    // Partner attribution
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Partner Attribution</div>'
     + '<div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">'
     + '  <div><div style="font-size:13px;font-weight:600;">' + (row.dataset.partner || '—') + '</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Internal rep: ' + (row.dataset.rep || '—') + '</div></div>'
-    + '  <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;" onclick="merchOpenStatement()">Statement →</button>'
+    + '  <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;" onclick="merchDrawerTab(\'waterfall\')">Detail →</button>'
     + '</div>';
 }
 
-function merchRenderWaterfall(name, row) {
-  var pool = 2000 + (name.length * 317 % 3800);
-  var entries = (typeof wfDefaultEntries === 'function') ? wfDefaultEntries() : [];
-  var extras = [
-    { id:'ex1', name:'Sara Reyes', sub:'Rep · USR-002', type:'rep', initials:'SR', color:'#5B7A5E', rate:0.40, unit:'pct', locked:false },
-    { id:'ex2', name:'Rivermark',  sub:'Partner · PTR-0027', type:'partner', initials:'RM', color:'#A67C5B', rate:30, unit:'bp', locked:false },
+/* ── Per-merchant Agent Expense store + Detail tab ─── */
+var MERCH_EXPENSES = {}; // keyed by merchant name → array of {id,type,desc,amount,freq,applies}
+
+// Per-merchant bonuses (activation, retention, referral, volume-threshold).
+// Each: { id, type, amount, triggered, paidTo, note }
+var MERCH_BONUSES = {
+  'Hobbies Mini Mart':  [{ id:1, type:'Retention',  amount:500, triggered:'Mar 2026', paidTo:'Summit Lending',  note:'Top-5 portfolio merchant retention bonus' }],
+  'Bright Star Auto':   [{ id:1, type:'Activation', amount:500, triggered:'Feb 2026', paidTo:'Apex Elite',       note:'Paid on activation Feb 2; merchant has not processed since' }],
+  'Best Travel Agency': [{ id:1, type:'Activation', amount:300, triggered:'Mar 2026', paidTo:'Summit Lending',  note:'New boarding bonus on activation' }],
+  'Lakeside Dental':    [{ id:1, type:'Referral',   amount:200, triggered:'Mar 2026', paidTo:'NovaPay',          note:'Healthcare vertical referral incentive' }],
+  'Merchant Demo Corp': [{ id:1, type:'Activation', amount:500, triggered:'Mar 2026', paidTo:'Apex Elite',       note:'New boarding bonus on activation' }],
+  'Addicted Convenience':[{ id:1, type:'Volume Threshold', amount:250, triggered:'Mar 2026', paidTo:'Rivermark', note:'Crossed $150K monthly volume threshold' }],
+};
+function merchGetBonuses(name) { return MERCH_BONUSES[name] || []; }
+function merchBonusTotal(name) { return merchGetBonuses(name).reduce(function(s,b){return s+b.amount;}, 0); }
+
+function merchInitExpenseLines(row) {
+  var txn = parseFloat(row.dataset.txn) || 0;
+  var expense = parseFloat(row.dataset.expense) || 0;
+  var lines = [
+    { id:1, type:'SaaS',      desc:'Twill gateway',    amount:20, freq:'monthly',  applies:'this MID' },
+    { id:2, type:'PCI',       desc:'PCI compliance',   amount:9,  freq:'monthly',  applies:'this MID' },
+    { id:3, type:'Statement', desc:'Statement fee',    amount:5,  freq:'monthly',  applies:'this MID' },
   ];
-  if (name.length % 2 === 0) entries.push(extras[0]); else entries.push(extras[1]);
-  var remaining = pool;
-  var calced = entries.map(function(e) {
-    var rate = e.unit === 'bp' ? e.rate / 10000 : e.rate / 100;
-    var payout = Math.round(remaining * rate * 100) / 100;
-    var inputPool = remaining;
-    remaining = Math.round((remaining - payout) * 100) / 100;
-    return { entry: e, payout: payout, inputPool: inputPool };
-  });
-  var house = Math.max(0, Math.round(remaining * 100) / 100);
-  var rows = '';
-  calced.forEach(function(c, i) {
-    var e = c.entry;
-    var rateDisp = e.unit === 'bp' ? e.rate + ' bp' : e.rate.toFixed(2) + '%';
-    rows += ''
-      + '<div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;background:var(--bg-base);">'
-      + '  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
-      + '    <div style="width:18px;height:18px;border-radius:50%;background:var(--bg-hover);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-secondary);">' + (i+1) + '</div>'
-      + '    <div class="p-avatar" style="background:' + e.color + ';width:24px;height:24px;font-size:9px;">' + e.initials + '</div>'
-      + '    <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">' + e.name + '</div><div style="font-size:10px;color:var(--text-muted);">' + e.sub + '</div></div>'
-      + '    <span style="font-size:10px;color:var(--text-muted);">' + (e.type === 'partner' ? 'Partner' : 'Rep') + '</span>'
-      + '  </div>'
-      + '  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px;">'
-      + '    <div><div style="color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">Rate</div><div style="font-family:var(--font-mono);font-weight:600;">' + rateDisp + '</div></div>'
-      + '    <div><div style="color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">Pool In</div><div style="font-family:var(--font-mono);">$' + c.inputPool.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
-      + '    <div><div style="color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">Payout</div><div style="font-family:var(--font-mono);color:var(--green);font-weight:600;">$' + c.payout.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
-      + '    <div><div style="color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">Remaining</div><div style="font-family:var(--font-mono);">$' + Math.max(0,c.inputPool-c.payout).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div></div>'
+  var nextId = 4;
+  if (txn > 0) {
+    var binAmt = Math.round(txn * 0.025);
+    lines.push({ id:nextId++, type:'BIN Markup', desc:'BIN fee × ' + txn.toLocaleString() + ' txns', amount:binAmt, freq:'monthly', applies:'$0.025/txn' });
+  }
+  // Whatever's not yet accounted for is equipment + setup
+  var accounted = lines.reduce(function(s,l){return s+l.amount;}, 0);
+  var remainder = expense - accounted;
+  if (remainder >= 30) {
+    lines.push({ id:nextId++, type:'Equipment', desc:'PAX A920 lease', amount:35, freq:'monthly', applies:'1 unit' });
+    remainder -= 35;
+  }
+  if (remainder >= 50) {
+    lines.push({ id:nextId++, type:'Setup', desc:'New boarding setup', amount:99, freq:'one-time', applies:'Mar 2026' });
+  }
+  return lines;
+}
+function merchGetExpenses(name, row) {
+  if (!MERCH_EXPENSES[name]) MERCH_EXPENSES[name] = merchInitExpenseLines(row);
+  return MERCH_EXPENSES[name];
+}
+function merchExpenseTotal(name) {
+  return (MERCH_EXPENSES[name] || []).reduce(function(s,l){return s+(parseFloat(l.amount)||0);}, 0);
+}
+function merchEditExpense(name, id, key, val) {
+  var line = (MERCH_EXPENSES[name] || []).find(function(l){return l.id===id;});
+  if (!line) return;
+  if (key === 'amount') val = parseFloat(val) || 0;
+  line[key] = val;
+  // Live-update the aggregate caption
+  var t = document.getElementById('merch-d-exp-total'); if (t) t.textContent = '$' + merchExpenseTotal(name).toLocaleString();
+}
+function merchAddExpense(name) {
+  var arr = MERCH_EXPENSES[name] = MERCH_EXPENSES[name] || [];
+  var nextId = (arr.reduce(function(m,x){return Math.max(m,x.id);}, 0) || 0) + 1;
+  arr.push({ id:nextId, type:'Other', desc:'New expense', amount:0, freq:'monthly', applies:'' });
+  merchRenderDrawer();
+}
+function merchDeleteExpense(name, id) {
+  MERCH_EXPENSES[name] = (MERCH_EXPENSES[name] || []).filter(function(l){return l.id!==id;});
+  merchRenderDrawer();
+}
+
+function merchComputeResidual(row) {
+  var vol = parseFloat(row.dataset.vol) || 0;
+  var txn = parseFloat(row.dataset.txn) || 0;
+  var isoIncome = parseFloat(row.dataset.gross) || 0;
+  // ISO Split is what ISO earns from the processor — typical 70-100%, here defaulting to 80%
+  var isoSplit = 80;
+  var grossResidual = isoSplit > 0 ? Math.round(isoIncome / (isoSplit/100)) : 0;
+  // Total expense (interchange + processor cost) — approx 1.5% of volume
+  var expense = Math.round(vol * 0.015);
+  var income = grossResidual + expense;
+  return { vol:vol, txn:txn, income:income, expense:expense, grossResidual:grossResidual, isoSplit:isoSplit, isoIncome:isoIncome };
+}
+
+function merchRenderWaterfall(name, row) {
+  // Renamed concept: this is now the "Detail" tab content. Function name preserved
+  // to keep the routing in merchRenderDrawer working.
+  var R = merchComputeResidual(row);
+  var partner = row.dataset.partner || '—';
+  var rep = row.dataset.rep || '—';
+  var payoutPct = parseFloat(row.dataset.payout) || 0;
+  var expenses = merchGetExpenses(name, row);
+  var expTotal = merchExpenseTotal(name);
+  var bonusList = merchGetBonuses(name);
+  var bonusTotal = merchBonusTotal(name);
+  var grossPayout = R.isoIncome * payoutPct / 100;
+  var netPayout = grossPayout - expTotal + bonusTotal;
+  var netResidual = R.isoIncome - netPayout;
+  var fmt = function(n) { var s = n < 0 ? '-' : ''; n = Math.abs(n); return s + '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var fmtPct = function(n) { return (n>=0?'+':'') + n.toFixed(1) + '%'; };
+  var pct = function(part, whole) { return whole > 0 ? (part/whole*100) : 0; };
+
+  // ── Section 1: Residual calculation
+  var sec1 = ''
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Residual Calculation · Mar 2026</div>'
+    + '<div style="border:1px solid var(--border);border-radius:8px;background:var(--bg-base);overflow:hidden;margin-bottom:14px;">'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;">'
+    + '    <div><span style="color:var(--text-secondary);">Volume processed</span> <span style="color:var(--text-muted);font-size:11px;">· ' + R.txn.toLocaleString() + ' txns</span></div>'
+    + '    <span style="font-family:var(--font-mono);font-weight:600;">' + fmt(R.vol).replace('.00','') + '</span>'
+    + '  </div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;">'
+    + '    <div><span style="color:var(--text-secondary);">Income</span> <span style="color:var(--text-muted);font-size:10px;">(merchant fees on residual report)</span></div>'
+    + '    <span style="font-family:var(--font-mono);">' + fmt(R.income) + '</span>'
+    + '  </div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--red);">'
+    + '    <div><span>− Expense</span> <span style="color:var(--text-muted);font-size:10px;">(interchange + Schedule A)</span></div>'
+    + '    <span style="font-family:var(--font-mono);">−' + fmt(R.expense) + '</span>'
+    + '  </div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;background:var(--bg-surface);">'
+    + '    <span>Gross Residual</span><span style="font-family:var(--font-mono);">' + fmt(R.grossResidual) + '</span>'
+    + '  </div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-secondary);">'
+    + '    <div><span>× ISO Split</span> <span style="color:var(--text-muted);font-size:10px;">(ISO share of pool from processor)</span></div>'
+    + '    <span style="font-family:var(--font-mono);">' + R.isoSplit + '%</span>'
+    + '  </div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:13px;font-weight:700;background:rgba(34,46,72,0.04);">'
+    + '    <span>ISO Income</span><span style="font-family:var(--font-mono);color:var(--green);">' + fmt(R.isoIncome) + '</span>'
+    + '  </div>'
+    + '</div>';
+
+  // ── Section 2: Agent expenses (editable, per-merchant)
+  var expRows = expenses.map(function(l) {
+    return ''
+      + '<tr class="po-fee-row" data-exp-id="' + l.id + '">'
+      + '<td style="text-align:left;width:28%;"><select onchange="merchEditExpense(\'' + name.replace(/\'/g,'\\\'') + '\',' + l.id + ',\'type\',this.value)" style="padding:3px 6px;font-size:11px;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;font-family:var(--font-data);">'
+      +   ['SaaS','PCI','Statement','BIN Markup','Equipment','Setup','Other'].map(function(t){return '<option ' + (t===l.type?'selected':'') + '>' + t + '</option>';}).join('')
+      + '</select></td>'
+      + '<td style="text-align:left;"><input type="text" value="' + (l.desc||'').replace(/"/g,'&quot;') + '" oninput="merchEditExpense(\'' + name.replace(/\'/g,'\\\'') + '\',' + l.id + ',\'desc\',this.value)"></td>'
+      + '<td style="width:14%;"><input type="number" step="any" value="' + l.amount + '" oninput="merchEditExpense(\'' + name.replace(/\'/g,'\\\'') + '\',' + l.id + ',\'amount\',this.value)" style="text-align:right;"></td>'
+      + '<td style="width:18%;"><select onchange="merchEditExpense(\'' + name.replace(/\'/g,'\\\'') + '\',' + l.id + ',\'freq\',this.value)" style="padding:3px 6px;font-size:11px;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;font-family:var(--font-data);">'
+      +   ['monthly','one-time','annual'].map(function(t){return '<option ' + (t===l.freq?'selected':'') + '>' + t + '</option>';}).join('')
+      + '</select></td>'
+      + '<td style="font-size:10px;color:var(--text-muted);">' + (l.applies||'') + '</td>'
+      + '<td style="text-align:center;width:24px;"><button onclick="merchDeleteExpense(\'' + name.replace(/\'/g,'\\\'') + '\',' + l.id + ')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;">✕</button></td>'
+      + '</tr>';
+  }).join('');
+  var sec2 = ''
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+    + '  <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Agent Expenses (this MID)</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Aggregate: <strong id="merch-d-exp-total" style="color:var(--text-primary);font-family:var(--font-mono);">$' + expTotal.toLocaleString() + '</strong></div></div>'
+    + '  <button class="btn btn-primary" style="font-size:11px;padding:5px 10px;" onclick="merchAddExpense(\'' + name.replace(/\'/g,'\\\'') + '\')">+ Add Expense</button>'
+    + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px;">'
+    + '  <thead><tr style="background:var(--bg-surface);">'
+    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Type</th>'
+    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Description</th>'
+    + '    <th style="text-align:right;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Amount ($)</th>'
+    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Freq</th>'
+    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Applies</th>'
+    + '    <th></th>'
+    + '  </tr></thead>'
+    + '  <tbody>' + (expRows || '<tr><td colspan="6" style="padding:18px;text-align:center;color:var(--text-muted);">No expenses on this merchant.</td></tr>') + '</tbody>'
+    + '</table>';
+
+  // ── Section 3: Payout distribution → Net Residual
+  var partnerLine = partner !== 'Internal'
+    ? '<div style="font-size:12px;font-weight:600;">' + partner + '</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px;">Partner</div>'
+    : '<div style="font-size:12px;font-weight:600;color:var(--yellow);">Internal · ' + rep + '</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px;">Rep commission</div>';
+  // Bonuses inside the payout block (only render if any)
+  var bonusLineSummary = '';
+  if (bonusTotal > 0) {
+    var bonusLabels = bonusList.map(function(b){return b.type;}).join(', ');
+    bonusLineSummary = '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:12px;color:var(--green);"><span>+ Bonuses (' + bonusLabels + ')</span><span style="font-family:var(--font-mono);">+' + fmt(bonusTotal) + ' <span style="color:var(--text-muted);font-size:10px;">' + fmtPct(pct(bonusTotal, R.isoIncome)) + '</span></span></div>';
+  }
+  var sec3 = ''
+    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Payout Distribution</div>'
+    + '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-base);">'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;background:rgba(34,46,72,0.04);">'
+    + '    <span>ISO Income</span><span style="font-family:var(--font-mono);">' + fmt(R.isoIncome) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">100.0%</span></span>'
+    + '  </div>'
+    + '  <div style="padding:10px 14px;border-bottom:1px solid var(--border);">'
+    + '    ' + partnerLine
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:var(--text-secondary);"><span>Gross share (' + payoutPct + '%)</span><span style="font-family:var(--font-mono);">' + fmt(grossPayout) + ' <span style="color:var(--text-muted);font-size:10px;">' + fmtPct(pct(grossPayout, R.isoIncome)) + '</span></span></div>'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:12px;color:var(--red);"><span>− Agent expenses recovered</span><span style="font-family:var(--font-mono);">−' + fmt(expTotal) + ' <span style="color:var(--text-muted);font-size:10px;">' + fmtPct(-pct(expTotal, R.isoIncome)) + '</span></span></div>'
+    +     bonusLineSummary
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);font-size:12px;font-weight:600;"><span>Net payout</span><span style="font-family:var(--font-mono);' + (netPayout < 0 ? 'color:var(--red);' : '') + '">' + fmt(netPayout) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">' + fmtPct(pct(netPayout, R.isoIncome)) + '</span></span></div>'
+    + '  </div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:' + (netResidual >= 0 ? 'rgba(91,122,94,0.08)' : 'rgba(229,62,62,0.06)') + ';font-size:14px;font-weight:700;">'
+    + '    <span>Net Residual to ISO</span><span style="font-family:var(--font-mono);color:' + (netResidual >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + fmt(netResidual) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">' + fmtPct(pct(netResidual, R.isoIncome)) + '</span></span>'
+    + '  </div>'
+    + '</div>';
+
+  // Bonus detail card (only when bonuses exist) — appears below the waterfall
+  var sec4 = '';
+  if (bonusTotal > 0) {
+    var bonusRows = bonusList.map(function(b) {
+      return ''
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 12px;border-top:1px solid var(--border);">'
+        + '  <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">' + b.type + ' Bonus</div>'
+        + '    <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">' + b.note + '</div>'
+        + '    <div style="font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--font-mono);">Triggered ' + b.triggered + ' · paid to ' + b.paidTo + '</div>'
+        + '  </div>'
+        + '  <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--green);margin-left:10px;">+' + fmt(b.amount) + '</span>'
+        + '</div>';
+    }).join('');
+    sec4 = ''
+      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:14px 0 8px;">Bonus Detail</div>'
+      + '<div style="border:1px solid var(--green-dim);background:rgba(34,197,94,0.03);border-radius:8px;overflow:hidden;">'
+      + '  <div style="padding:9px 12px;font-size:11px;color:var(--text-secondary);background:rgba(34,197,94,0.06);">' + bonusList.length + ' bonus' + (bonusList.length === 1 ? '' : 'es') + ' totaling <strong style="color:var(--green);font-family:var(--font-mono);">+' + fmt(bonusTotal) + '</strong></div>'
+      +    bonusRows
+      + '</div>';
+  }
+
+  var container = document.getElementById('merch-d-wf');
+  if (container) container.innerHTML = sec1 + sec2 + sec3 + sec4;
+}
+
+function merchComputeFlags(row) {
+  var flags = [];
+  var health = row.dataset.health || 'healthy';
+  if (row.dataset.audit === '1') {
+    flags.push({ id:'audit', icon:'!', color:'var(--red)', bg:'var(--red-dim)', title:'Fee Audit Mismatch', text:'Statement-fee schedule does not reconcile with the partner agreement. Open Statement Data to compare line-by-line.' });
+  }
+  if (health === 'risk') {
+    flags.push({ id:'health-risk', icon:'⚠', color:'var(--red)', bg:'var(--red-dim)', title:'Health: At Risk', text:'Significant decline detected — recommend partner outreach. Volume and residual trending sharply down.' });
+  } else if (health === 'watch') {
+    flags.push({ id:'health-watch', icon:'⚠', color:'var(--amber)', bg:'var(--amber-dim)', title:'Health: Watch', text:'Volume trending down — keep an eye on this account. May escalate to At Risk if pattern continues.' });
+  }
+  return flags;
+}
+
+function merchRenderFlags(name, row) {
+  var flags = merchComputeFlags(row);
+  var mom = parseFloat(row.dataset.mom) || 0;
+  var vol = parseFloat(row.dataset.vol) || 0;
+  // Build narrative
+  var narrative = '';
+  if (flags.length === 0) {
+    narrative = name + ' is processing normally and reconciles cleanly with the partner agreement. No anomalies surfaced.';
+    return ''
+      + '<div style="border:1px solid var(--green-dim);background:rgba(34,197,94,0.04);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">'
+      + '  <div style="width:28px;height:28px;border-radius:50%;background:var(--green-dim);color:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">✓</div>'
+      + '  <div><div style="font-weight:600;font-size:13px;margin-bottom:4px;">Nothing unusual detected</div>'
+      + '    <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">' + narrative + '</div>'
       + '  </div>'
       + '</div>';
-  });
-  rows += ''
-    + '<div style="border:1px solid var(--green-dim);background:rgba(91,122,94,0.05);border-radius:8px;padding:10px 12px;">'
+  }
+  var ids = flags.map(function(f){return f.id;});
+  var bits = [];
+  if (ids.indexOf('audit') !== -1) {
+    bits.push('Fee schedule on the latest statement does not match the partner agreement on file — recommend pulling Statement Data and comparing the BIN, transaction, and authorization fees line-by-line before approving this period.');
+  }
+  if (ids.indexOf('health-risk') !== -1) {
+    bits.push(name + ' is showing significant decline (' + (mom>=0?'+':'') + mom.toFixed(1) + '% MoM on ' + (vol > 0 ? '$' + (vol/1000).toFixed(1) + 'K volume' : 'no volume') + '). At-Risk status warrants partner outreach this cycle — losing this MID likely means a permanent residual loss.');
+  } else if (ids.indexOf('health-watch') !== -1) {
+    bits.push(name + ' is on Watch — volume trending down ' + Math.abs(mom).toFixed(1) + '% MoM. Not yet a crisis but worth a check-in with the partner before the trend escalates.');
+  }
+  narrative = bits.join(' ');
+  var perFlag = flags.map(function(f) {
+    return ''
+      + '<div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--bg-base);padding:10px 12px;display:flex;gap:10px;">'
+      + '  <span class="po-flag" style="background:' + f.bg + ';color:' + f.color + ';width:18px;height:18px;font-size:11px;flex-shrink:0;margin-top:1px;">' + f.icon + '</span>'
+      + '  <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text-primary);">' + f.title + '</div>'
+      + '    <div style="font-size:11px;color:var(--text-secondary);margin-top:3px;line-height:1.45;">' + f.text + '</div>'
+      + '  </div></div>';
+  }).join('');
+  return ''
+    + '<div style="border:1px solid rgba(255,222,0,0.25);background:rgba(255,222,0,0.05);border-radius:10px;padding:12px 14px;margin-bottom:14px;">'
     + '  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
-    + '    <div style="width:18px;height:18px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">' + (calced.length+1) + '</div>'
-    + '    <div class="p-avatar" style="background:var(--green);width:24px;height:24px;font-size:9px;">TW</div>'
-    + '    <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Twill (House)</div><div style="font-size:10px;color:var(--text-muted);">Remainder after all payouts</div></div>'
+    + '    <span style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;background:var(--yellow);color:var(--navy);padding:2px 7px;border-radius:4px;">AI Review</span>'
+    + '    <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-data);">' + flags.length + ' flag' + (flags.length === 1 ? '' : 's') + ' on this merchant</span>'
     + '  </div>'
-    + '  <div style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--green);">$' + house.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>'
-    + '</div>';
-  var container = document.getElementById('merch-d-wf');
-  if (container) container.innerHTML = ''
-    + '<div style="background:var(--bg-surface);padding:10px 12px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">'
-    + '  <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Net Residual Pool</div><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;">$' + pool.toLocaleString() + '</div></div>'
-    + '  <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;" onclick="merchCloseDrawer(); resGoToWaterfallEdit();">Edit waterfall →</button>'
+    + '  <div style="font-size:13px;line-height:1.55;color:var(--text-primary);">' + narrative + '</div>'
     + '</div>'
-    + rows;
+    + '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Flag detail</div>'
+    + perFlag;
 }
 
 function merchRenderActivity(name, row) {
