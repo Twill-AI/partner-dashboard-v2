@@ -124,6 +124,90 @@
   .res-ph-tile { cursor:pointer; padding:10px 12px; border-radius:8px; transition:background .12s ease, transform .12s ease; }
   .res-ph-tile:hover { background:var(--bg-hover); transform:translateY(-1px); }
   .merch-audit-icon { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; background:var(--red); color:#fff; font-size:9px; font-weight:700; margin-left:6px; cursor:help; vertical-align:middle; }
+  .merch-health-badge { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; font-size:9px; font-weight:700; margin-right:7px; cursor:help; vertical-align:middle; line-height:1; color:#fff; }
+  .merch-health-badge.risk  { background:var(--red);   box-shadow:0 0 0 2px var(--red-dim); }
+  .merch-health-badge.watch { background:var(--amber); box-shadow:0 0 0 2px var(--amber-dim); }
+  .merch-alerts-toggle { display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:5px 10px; border-radius:6px; }
+  .merch-alerts-toggle .dot { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
+  .merch-alerts-toggle .count { font-family:var(--font-mono); color:var(--text-muted); margin-left:2px; }
+  .merch-alerts-toggle.active { background:var(--red-dim); color:var(--red); border-color:rgba(155,107,91,0.35); font-weight:600; }
+  .merch-alerts-toggle.active .count { color:var(--red); }
+  /* ── Drawer Summary redesign (merchant + payout) ──────── */
+  .m-sum-hero { background:linear-gradient(135deg, var(--bg-elevated, #fff) 0%, var(--bg-surface) 100%); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:14px; position:relative; overflow:hidden; }
+  .m-sum-hero::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--green); border-radius:10px 0 0 10px; }
+  .m-sum-hero.is-loss::before { background:var(--red); }
+  .m-sum-hero-label { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-ui); }
+  .m-sum-hero-row { display:flex; align-items:baseline; gap:12px; margin-top:4px; flex-wrap:wrap; }
+  .m-sum-hero-value { font-family:var(--font-mono); font-size:28px; font-weight:700; letter-spacing:-0.02em; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .m-sum-hero-delta { font-size:12px; font-weight:600; font-family:var(--font-data); }
+  .m-sum-hero-meta { font-size:11px; color:var(--text-muted); font-family:var(--font-data); margin-top:6px; }
+  .m-sum-section-label { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; font-family:var(--font-ui); display:flex; justify-content:space-between; align-items:baseline; }
+  .m-sum-section-hint { font-size:10px; color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0; font-family:var(--font-data); }
+  .m-sum-waterfall { border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--bg-base); margin-bottom:14px; }
+  .m-wf-row { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; font-size:12px; border-bottom:1px solid var(--border); gap:8px; }
+  .m-wf-row:last-child { border-bottom:none; }
+  .m-wf-row.m-wf-head { background:rgba(34,46,72,0.04); font-weight:700; font-size:13px; }
+  .m-wf-row.m-wf-foot { background:rgba(91,122,94,0.08); font-weight:700; font-size:13px; border-top:1px solid var(--border); }
+  .m-wf-row.m-wf-foot.is-loss { background:rgba(229,62,62,0.06); }
+  .m-wf-row.m-wf-kept { background:rgba(255,222,0,0.10); font-weight:700; font-size:13px; border-top:1px dashed var(--border); }
+  .m-wf-row.m-wf-emphasis { background:var(--bg-surface); font-weight:600; }
+  .m-wf-row.neg { color:var(--text-secondary); }
+  .m-wf-row.pos { color:var(--green); }
+  .m-wf-row.m-wf-expandable { cursor:pointer; transition:background .12s; }
+  .m-wf-row.m-wf-expandable:hover { background:var(--bg-hover); }
+  .m-wf-row.m-wf-expandable .m-wf-chevron { display:inline-block; transition:transform .15s; color:var(--text-muted); margin-left:6px; }
+  .m-wf-row.m-wf-expandable.expanded .m-wf-chevron { transform:rotate(180deg); }
+  .m-wf-edit-panel { padding:10px 14px; background:var(--bg-surface); border-bottom:1px solid var(--border); }
+  .m-wf-edit-panel[hidden] { display:none !important; }
+  .m-wf-amt { font-family:var(--font-mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .m-wf-pct { font-size:10px; color:var(--text-muted); font-weight:400; margin-left:6px; }
+  .m-wf-count { font-size:10px; color:var(--text-muted); font-weight:400; margin-left:4px; font-family:var(--font-mono); }
+  .m-wf-pct-input { width:46px; padding:2px 6px; border:1px solid rgba(0,0,0,0.18); border-radius:4px; font-family:var(--font-mono); font-size:11px; text-align:right; background:var(--bg-base); color:var(--text-primary); margin:0 3px; }
+  .m-wf-pct-input:focus { outline:none; border-color:var(--yellow); background:#fff; }
+  .m-wf-bar { height:4px; background:var(--bg-surface); position:relative; }
+  .m-wf-bar-fill { height:100%; background:linear-gradient(to right, var(--green), rgba(91,122,94,0.6)); transition:width .3s; }
+  .m-wf-bar-fill.is-loss { background:linear-gradient(to right, var(--red), rgba(155,107,91,0.6)); }
+  .m-sum-meta-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px; }
+  .m-sum-meta-item { background:var(--bg-base); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+  .m-sum-meta-lbl { font-size:9px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-ui); margin-bottom:5px; }
+  .m-sum-meta-val { font-family:var(--font-mono); font-size:15px; font-weight:600; letter-spacing:-0.01em; color:var(--text-primary); font-variant-numeric:tabular-nums; }
+  .m-sum-meta-sub { font-size:10px; color:var(--text-muted); margin-top:3px; font-family:var(--font-data); line-height:1.3; }
+  /* Detail-tab section cards — distinct visual identity per role */
+  .md-section { border-radius:10px; overflow:hidden; margin-bottom:14px; background:var(--bg-elevated); border:1px solid var(--border); }
+  .md-section-hdr { display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--border); background:var(--bg-surface); }
+  .md-section-hdr-icon { width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .md-section-hdr-title { font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-primary); font-family:var(--font-ui); }
+  .md-section-hdr-meta { margin-left:auto; font-size:11px; color:var(--text-secondary); font-family:var(--font-data); }
+  .md-section-body { padding:12px 14px; background:var(--bg-base); }
+  /* Role accents — show what each section IS at a glance */
+  .md-section-residual { border-left:3px solid var(--text-muted); }
+  .md-section-residual .md-section-hdr-icon { background:rgba(0,0,0,0.06); color:var(--text-secondary); }
+  .md-section-payout { border:2px solid var(--yellow); box-shadow:0 1px 6px rgba(201,168,0,0.18); margin-bottom:18px; }
+  .md-section-payout .md-section-hdr { background:rgba(255,222,0,0.10); border-bottom:1px solid rgba(201,168,0,0.30); padding:13px 16px; }
+  .md-section-payout .md-section-hdr-icon { background:var(--yellow); color:#3A2F00; }
+  .md-section-payout .md-section-hdr-title { font-size:13px; }
+  .md-section-payout .md-section-body { padding:14px 16px 16px; }
+  .md-section-expenses { border-left:3px solid #A67C5B; }
+  .md-section-expenses .md-section-hdr-icon { background:rgba(166,124,91,0.15); color:#A67C5B; }
+  .md-section-bottom { border:1.5px solid var(--green); }
+  .md-section-bottom .md-section-hdr { background:rgba(91,122,94,0.10); border-bottom:1px solid rgba(91,122,94,0.25); }
+  .md-section-bottom .md-section-hdr-icon { background:var(--green); color:#fff; }
+  .md-section-bonus { border-left:3px solid var(--green); }
+  .md-section-bonus .md-section-hdr { background:rgba(91,122,94,0.06); }
+  .md-section-bonus .md-section-hdr-icon { background:rgba(91,122,94,0.15); color:var(--green); }
+  /* Multi-party waterfall row grid */
+  .md-wf-grid { display:grid; grid-template-columns:22px 1fr 86px 110px 24px; gap:8px; align-items:center; }
+  .md-wf-head { padding:7px 12px; background:var(--bg-elevated); font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; border-bottom:1px solid var(--border); }
+  .md-wf-row { padding:9px 12px; border-bottom:1px solid var(--border); font-size:12px; }
+  .md-wf-row:last-of-type { border-bottom:0; }
+  .md-wf-row.house { background:rgba(91,122,94,0.06); font-weight:600; }
+  .md-wf-add-cta { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:11px 14px; margin-top:12px; font-size:13px; font-weight:600; background:var(--yellow); color:#3A2F00; border:none; border-radius:8px; cursor:pointer; box-shadow:0 1px 3px rgba(201,168,0,0.30); transition:transform .08s, box-shadow .12s; }
+  .md-wf-add-cta:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(201,168,0,0.32); }
+  .md-wf-add-cta-plus { font-size:18px; line-height:1; font-weight:700; }
+  .md-bottom-row { display:flex; justify-content:space-between; align-items:center; padding:10px 4px; font-size:12px; border-bottom:1px dashed var(--border); }
+  .md-bottom-row:last-of-type { border-bottom:0; }
+  .md-bottom-final { padding:13px 14px; margin:8px -14px -12px; background:rgba(91,122,94,0.10); border-top:1px solid rgba(91,122,94,0.25); display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:700; }
+  .md-bottom-final-loss { background:rgba(229,62,62,0.06); border-top-color:rgba(229,62,62,0.25); }
   .merch-partner-cell { display:flex; flex-direction:column; gap:2px; line-height:1.2; }
   .merch-partner-row { display:inline-flex; align-items:center; gap:5px; font-size:11px; }
   .merch-partner-icon { width:14px; height:14px; border-radius:50%; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; flex-shrink:0; }
@@ -7184,12 +7268,14 @@ function cycleReq(el){
                 <!-- Hidden legacy health filter (used by Portfolio Health tile clicks) -->
                 <select id="res-merch-health" onchange="resFilterMerchantTable()" style="display:none;">
                   <option value="all">All Health</option>
+                  <option value="alerts">Health alerts (risk + watch)</option>
                   <option value="risk">At Risk</option>
                   <option value="watch">Watch</option>
                   <option value="healthy">Healthy</option>
                   <option value="churned">Churned MTD</option>
                   <option value="audit">Fee Audit Flag</option>
                 </select>
+                <button class="btn btn-ghost merch-alerts-toggle" id="res-merch-alerts-toggle" onclick="resToggleAlertsOnly()" title="Show only merchants with health alerts (At Risk + Watch)"><span class="dot"></span>Health alerts<span class="count" id="res-merch-alerts-count"></span></button>
                 <div style="position:relative;">
                   <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px;" onclick="resToggleCustFilter(this)">+ Add Filter</button>
                   <div id="res-cust-popover" class="res-cust-popover" style="display:none;">
@@ -17346,6 +17432,7 @@ function resFilterMerchantTable() {
     if (partner !== 'all' && rPartner !== partner) show = false;
     if (rep !== 'all' && rRep !== rep) show = false;
     if (health === 'audit') { if (rAudit !== '1') show = false; }
+    else if (health === 'alerts') { if (!(rHealth === 'risk' || rHealth === 'watch')) show = false; }
     else if (health !== 'all' && rHealth !== health) show = false;
     // Custom filters (AND)
     if (show && resCustFilters.length > 0) {
@@ -17358,6 +17445,7 @@ function resFilterMerchantTable() {
   if (countEl) countEl.textContent = 'Showing ' + shown + ' of 1,247 merchants';
   resUpdateMerchantKPIs(visible);
   resRenderCustChips();
+  resSyncAlertsToggle();
 }
 
 function resToggleCustFilter(btn) {
@@ -17399,8 +17487,43 @@ function resClearOneFilter(kind) {
   resFilterMerchantTable();
 }
 function resHealthLabel(v) {
-  return ({ risk:'At Risk', watch:'Watch', healthy:'Healthy', churned:'Churned MTD', audit:'Fee Audit Flag' })[v] || v;
+  return ({ alerts:'Health alerts', risk:'At Risk', watch:'Watch', healthy:'Healthy', churned:'Churned MTD', audit:'Fee Audit Flag' })[v] || v;
 }
+function resToggleAlertsOnly() {
+  var sel = document.getElementById('res-merch-health');
+  if (!sel) return;
+  sel.value = (sel.value === 'alerts') ? 'all' : 'alerts';
+  var btn = document.getElementById('res-merch-alerts-toggle');
+  if (btn) btn.classList.toggle('active', sel.value === 'alerts');
+  resFilterMerchantTable();
+}
+function resSyncAlertsToggle() {
+  var sel = document.getElementById('res-merch-health');
+  var btn = document.getElementById('res-merch-alerts-toggle');
+  if (sel && btn) btn.classList.toggle('active', sel.value === 'alerts');
+}
+function resDecorateHealthIcons() {
+  var rows = document.querySelectorAll('#res-merchant-table tbody tr');
+  var counts = { risk:0, watch:0 };
+  rows.forEach(function(tr){
+    if (tr.classList.contains('res-merch-accordion')) return;
+    var h = tr.dataset.health;
+    if (h !== 'risk' && h !== 'watch') return;
+    counts[h]++;
+    var strongEl = tr.querySelector('td:first-child strong');
+    if (!strongEl) return;
+    var td = strongEl.parentElement;
+    if (td.dataset.healthDecorated) return;
+    var label = h === 'risk' ? 'At Risk · volume drop' : 'Watch · volume softening';
+    // Insert as sibling BEFORE the strong so .textContent of strong stays clean
+    strongEl.insertAdjacentHTML('beforebegin', '<span class="merch-health-badge '+h+'" title="'+label+'">!</span>');
+    td.dataset.healthDecorated = '1';
+  });
+  var ct = document.getElementById('res-merch-alerts-count');
+  if (ct) ct.textContent = String(counts.risk + counts.watch);
+}
+document.addEventListener('DOMContentLoaded', function(){ resDecorateHealthIcons(); resSyncAlertsToggle(); });
+if (document.readyState !== 'loading') { resDecorateHealthIcons(); resSyncAlertsToggle(); }
 function resRenderCustChips() {
   const wrap = document.getElementById('res-cust-chips');
   if (!wrap) return;
@@ -32085,101 +32208,80 @@ function merchSummaryDelta(curr, prev, fmt, opts) {
 }
 
 function merchRenderSummary(name, row) {
-  var vol = parseFloat(row.dataset.vol) || 0;
-  var txn = parseFloat(row.dataset.txn) || 0;
-  var gross = parseFloat(row.dataset.gross) || 0;
-  var mom = parseFloat(row.dataset.mom) || 0;
-  var net = parseFloat(row.dataset.net) || 0;
-  var expense = merchExpenseTotal(name) || (parseFloat(row.dataset.expense) || 0);
-  // Ensure expense store is populated so Total Agent Expense matches Detail tab
+  // Ensure expense store is populated for this merchant
   if (!MERCH_EXPENSES[name]) merchGetExpenses(name, row);
-  var totalExpense = merchExpenseTotal(name);
+  var R = merchComputeResidual(row);
+  var vol = R.vol, txn = R.txn;
+  var mom = parseFloat(row.dataset.mom) || 0;
+  var partner = row.dataset.partner || '—';
+  var rep = row.dataset.rep || '—';
   var payoutPct = parseFloat(row.dataset.payout) || 0;
-  var totalPayouts = Math.round(gross * payoutPct / 100 - totalExpense);
-  var bonusesApplied = merchBonusTotal(name);
+  var expenses = merchGetExpenses(name, row);
+  var expTotal = merchExpenseTotal(name);
   var bonusList = merchGetBonuses(name);
-  // KPI math — bonuses are an additional outflow on top of payouts
-  var marginBps = vol > 0 ? Math.round(gross / vol * 10000) : 0; // basis points
-  var marginPct = vol > 0 ? (gross / vol * 100) : 0;
-  var netMarginPct = vol > 0 ? ((gross - totalPayouts - bonusesApplied) / vol * 100) : 0;
-  var netMarginBps = vol > 0 ? Math.round((gross - totalPayouts - bonusesApplied) / vol * 10000) : 0;
-  var avgTicket = txn > 0 ? (vol / txn) : 0;
-  var costPerTxn = txn > 0 ? (totalExpense / txn) : 0;
-  // Synthetic prev for MoM annotations
+  var bonusTotal = merchBonusTotal(name);
+  var grossPayout = R.isoIncome * payoutPct / 100;
+  var netPayout = grossPayout - expTotal + bonusTotal;
+  var netResidual = R.isoIncome - netPayout;
+  var avgTicket = txn > 0 ? vol/txn : 0;
+  var marginBps = vol > 0 ? Math.round(R.isoIncome / vol * 10000) : 0;
+  var netMarginBps = vol > 0 ? Math.round(netResidual / vol * 10000) : 0;
+  var netMarginPct = vol > 0 ? netResidual / vol * 100 : 0;
   var hash = 0; for (var i = 0; i < name.length; i++) hash += name.charCodeAt(i);
-  var volPrev = mom !== 0 ? Math.round(vol / (1 + mom/100)) : Math.round(vol * (0.95 + (hash%5)/100));
-  var grossPrev = Math.round(gross / (1 + (mom * 1.1)/100));
-  var netPrev = Math.round(net / (1 + (mom * 1.1)/100));
+  var monthsAgo = (hash % 38) + 1;
+  var boardDateStr = new Date(2026, 2-monthsAgo, 1).toLocaleDateString('en-US', { month:'short', year:'numeric' });
+  var lifetimeResidual = Math.round(monthsAgo * R.isoIncome * 0.82);
   var fmtMoney = function(n) { var s=n<0?'-':''; n=Math.abs(n); return s + (n >= 1e6 ? '$' + (n/1e6).toFixed(2) + 'M' : n >= 1e3 ? '$' + (n/1e3).toFixed(1) + 'K' : '$' + Math.round(n).toLocaleString()); };
   var fmtCount = function(n) { return n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : Math.round(n).toLocaleString(); };
-  var auditFlag = row.dataset.audit === '1';
-  var health = row.dataset.health || 'healthy';
-  var healthMsg = ({ healthy:'Merchant volume and processing patterns look normal.', watch:'Volume trending down — keep an eye on this account.', risk:'Significant decline detected — recommend partner outreach.' })[health];
-
-  // Mini KPI tile builder
-  var kpi = function(label, value, valColor, sub, subColor) {
-    return '<div class="kpi" style="padding:10px 12px;">'
-      + '<div class="kpi-label">' + label + '</div>'
-      + '<div class="kpi-value" style="font-size:17px;' + (valColor ? 'color:' + valColor + ';' : '') + '">' + value + '</div>'
-      + (sub ? '<div style="font-size:10px;color:' + (subColor || 'var(--text-muted)') + ';margin-top:4px;font-family:var(--font-data);">' + sub + '</div>' : '')
-      + '</div>';
-  };
+  var fmt = function(n) { var s = n < 0 ? '-' : ''; n = Math.abs(n); return s + '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var pct = function(part, whole) { return whole > 0 ? (part/whole*100).toFixed(1) + '%' : '0%'; };
   var momColor = mom >= 0 ? 'var(--green)' : 'var(--red)';
   var momArrow = mom >= 0 ? '↑' : '↓';
+  var isLoss = netResidual < 0;
+  var netColor = isLoss ? 'var(--red)' : 'var(--green)';
+  var fillPct = R.isoIncome > 0 ? Math.max(0, Math.min(100, netResidual/R.isoIncome*100)) : 0;
+  var partnerLabel = partner === 'Internal'
+    ? '<span style="color:var(--yellow);">Internal · ' + rep + '</span>'
+    : partner;
+  var nameJs = name.replace(/'/g, "\\'");
 
-  // Lifecycle data — deterministic from name hash
-  var monthsAgo = (hash % 38) + 1; // 1..38 months ago
-  var boardDateObj = new Date(2026, 2 - monthsAgo, 1); // current = Mar 2026 = month index 2
-  var boardDateStr = boardDateObj.toLocaleDateString('en-US', { month:'short', year:'numeric' });
-  var monthsResidual = monthsAgo;
-  // Lifetime residual ≈ months × current ISO Income × growth_factor
-  // (assumes the merchant has roughly grown to current levels, so historical avg is ~80% of current)
-  var lifetimeResidual = Math.round(monthsResidual * gross * 0.82);
-
-  return ''
-    // Activity FIRST (was last)
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Processing Activity</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">'
-    +   kpi('Volume', fmtMoney(vol), null, momArrow + ' ' + Math.abs(mom).toFixed(0) + '% MoM', momColor)
-    +   kpi('Txn Count', fmtCount(txn), null, txn > 0 ? '' : 'no batches')
-    +   kpi('Avg Ticket', avgTicket > 0 ? '$' + avgTicket.toFixed(2) : '—', null, '')
-    + '</div>'
-
-    // Revenue row — ISO Income | Margin
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Revenue</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
-    +   kpi('ISO Income', fmtMoney(gross), null, momArrow + ' ' + fmtMoney(Math.abs(gross - grossPrev)) + ' vs Feb', momColor)
-    +   kpi('Margin', marginBps + ' bps', null, marginPct.toFixed(2) + '% of volume')
-    + '</div>'
-
-    // Costs row — Total Payouts | Total Agent Expense
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Costs</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
-    +   kpi('Total Payouts', (totalPayouts < 0 ? '−' : '') + fmtMoney(Math.abs(totalPayouts)), totalPayouts < 0 ? 'var(--red)' : null, payoutPct + '% rate, net of expenses')
-    +   kpi('Total Agent Expense', '−' + fmtMoney(totalExpense), 'var(--red)', '$' + costPerTxn.toFixed(3) + '/txn')
-    + '</div>'
-
-    // Bottom line — Bonuses | Net Margin
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Bottom Line</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
-    +   kpi('Bonuses Applied', fmtMoney(bonusesApplied), bonusesApplied > 0 ? 'var(--green)' : 'var(--text-muted)', bonusesApplied > 0 ? bonusList.length + ' bonus' + (bonusList.length===1?'':'es') + ' · ' + bonusList.map(function(b){return b.type;}).join(', ') : 'no triggers this period')
-    +   kpi('Net Margin', netMarginBps + ' bps', netMarginBps >= 0 ? 'var(--green)' : 'var(--red)', netMarginPct.toFixed(2) + '% of volume')
-    + '</div>'
-
-    // Lifetime row — Board Date | Months Residual | Lifetime Residual
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Lifetime</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">'
-    +   kpi('Board Date', boardDateStr, null, '')
-    +   kpi('Months Residual', monthsResidual.toString(), null, monthsResidual >= 12 ? Math.floor(monthsResidual/12) + 'y ' + (monthsResidual%12) + 'mo' : 'this MID')
-    +   kpi('Lifetime Residual', fmtMoney(lifetimeResidual), 'var(--green)', 'cumulative ISO income')
-    + '</div>'
-
-    // Partner attribution
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Partner Attribution</div>'
-    + '<div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">'
-    + '  <div><div style="font-size:13px;font-weight:600;">' + (row.dataset.partner || '—') + '</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Internal rep: ' + (row.dataset.rep || '—') + '</div></div>'
-    + '  <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;" onclick="merchDrawerTab(\'waterfall\')">Detail →</button>'
+  // Hero — Net Residual to ISO is the bottom-line answer
+  var heroHTML = ''
+    + '<div class="m-sum-hero' + (isLoss ? ' is-loss' : '') + '">'
+    + '  <div class="m-sum-hero-label">Net Residual to ISO · Mar 2026</div>'
+    + '  <div class="m-sum-hero-row">'
+    + '    <div class="m-sum-hero-value" style="color:' + netColor + ';">' + fmtMoney(netResidual) + '</div>'
+    + '    <div class="m-sum-hero-delta" style="color:' + momColor + ';">' + momArrow + ' ' + Math.abs(mom).toFixed(1) + '% MoM volume</div>'
+    + '  </div>'
+    + '  <div class="m-sum-hero-meta">' + fmtMoney(vol) + ' volume · ' + fmtCount(txn) + ' txns · $' + avgTicket.toFixed(2) + ' avg ticket</div>'
     + '</div>';
+
+  // Read-only waterfall — Summary is summary-only. All editing lives on the Detail tab.
+  var waterfallHTML = ''
+    + '<div class="m-sum-section-label"><span>Payout Waterfall · Mar 2026</span><span class="m-sum-section-hint">Read-only · edit on Detail tab</span></div>'
+    + '<div class="m-sum-waterfall">'
+    + '  <div class="m-wf-row m-wf-head"><span>Income</span><span class="m-wf-amt">' + fmt(R.income) + '<span class="m-wf-pct">100.0%</span></span></div>'
+    + '  <div class="m-wf-row neg"><span>− Upstream expense (interchange + Schedule A)</span><span class="m-wf-amt">−' + fmt(R.expense) + '<span class="m-wf-pct">−' + pct(R.expense, R.income) + '</span></span></div>'
+    + '  <div class="m-wf-row m-wf-emphasis"><span>Gross Residual</span><span class="m-wf-amt">' + fmt(R.grossResidual) + '<span class="m-wf-pct">' + pct(R.grossResidual, R.income) + '</span></span></div>'
+    + '  <div class="m-wf-row"><span>× ISO Split (' + R.isoSplit + '%) → ISO Income</span><span class="m-wf-amt" style="color:var(--green);">' + fmt(R.isoIncome) + '<span class="m-wf-pct">' + pct(R.isoIncome, R.income) + '</span></span></div>'
+    + '  <div class="m-wf-row neg"><span>− Gross share to ' + partnerLabel + ' (' + payoutPct + '%)</span><span class="m-wf-amt">−' + fmt(grossPayout) + '<span class="m-wf-pct">−' + pct(grossPayout, R.isoIncome) + '</span></span></div>'
+    + '  <div class="m-wf-row pos"><span>+ Agent expenses recovered <span class="m-wf-count">' + expenses.length + ' item' + (expenses.length===1?'':'s') + '</span></span><span class="m-wf-amt" style="color:var(--green);">+' + fmt(expTotal) + '<span class="m-wf-pct">+' + pct(expTotal, R.isoIncome) + '</span></span></div>'
+    + (bonusTotal > 0 ? '  <div class="m-wf-row neg"><span>− Bonuses paid <span class="m-wf-count">' + bonusList.length + '</span></span><span class="m-wf-amt" style="color:var(--red);">−' + fmt(bonusTotal) + '<span class="m-wf-pct">−' + pct(bonusTotal, R.isoIncome) + '</span></span></div>' : '')
+    + '  <div class="m-wf-row m-wf-foot' + (netPayout < 0 ? ' is-loss' : '') + '"><span>Net payout to ' + (partner === 'Internal' ? 'rep' : 'partner') + '</span><span class="m-wf-amt" style="color:' + (netPayout < 0 ? 'var(--red)' : 'var(--text-primary)') + ';">' + fmt(netPayout) + '<span class="m-wf-pct">' + pct(netPayout, R.isoIncome) + '</span></span></div>'
+    + '  <div class="m-wf-row m-wf-kept"><span>Net Residual to ISO</span><span class="m-wf-amt" style="color:' + netColor + ';">' + fmt(netResidual) + '<span class="m-wf-pct">' + pct(netResidual, R.isoIncome) + '</span></span></div>'
+    + '  <div class="m-wf-bar"><div class="m-wf-bar-fill' + (isLoss ? ' is-loss' : '') + '" style="width:' + fillPct + '%;"></div></div>'
+    + '</div>'
+    + '<div style="text-align:right;margin:-8px 0 14px;"><a href="#" onclick="event.preventDefault();merchDrawerTab(\'waterfall\');" style="font-size:11px;color:var(--text-secondary);text-decoration:none;border-bottom:1px dotted var(--text-muted);">Edit on Detail tab →</a></div>';
+
+  // 3-tile footer
+  var footerHTML = ''
+    + '<div class="m-sum-meta-grid">'
+    + '  <div class="m-sum-meta-item"><div class="m-sum-meta-lbl">Net Margin</div><div class="m-sum-meta-val" style="color:' + (netMarginBps >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + netMarginBps + ' bps</div><div class="m-sum-meta-sub">' + netMarginPct.toFixed(2) + '% of volume</div></div>'
+    + '  <div class="m-sum-meta-item"><div class="m-sum-meta-lbl">Lifetime Residual</div><div class="m-sum-meta-val" style="color:var(--green);">' + fmtMoney(lifetimeResidual) + '</div><div class="m-sum-meta-sub">' + monthsAgo + ' mo · boarded ' + boardDateStr + '</div></div>'
+    + '  <div class="m-sum-meta-item"><div class="m-sum-meta-lbl">Attribution</div><div class="m-sum-meta-val" style="font-size:13px;font-weight:600;">' + partnerLabel + '</div><div class="m-sum-meta-sub">Rep: ' + rep + '</div></div>'
+    + '</div>';
+
+  return heroHTML + waterfallHTML + footerHTML;
 }
 
 /* ── Per-merchant Agent Expense store + Detail tab ─── */
@@ -32243,10 +32345,156 @@ function merchAddExpense(name) {
   var nextId = (arr.reduce(function(m,x){return Math.max(m,x.id);}, 0) || 0) + 1;
   arr.push({ id:nextId, type:'Other', desc:'New expense', amount:0, freq:'monthly', applies:'' });
   merchRenderDrawer();
+  // Re-expand the panel that just got a new row (the new render starts collapsed)
+  setTimeout(function(){
+    var p = document.getElementById('m-wf-panel-exp'); if (p) p.removeAttribute('hidden');
+    var head = document.querySelector('[onclick*="m-wf-panel-exp"]'); if (head) head.classList.add('expanded');
+  }, 10);
 }
 function merchDeleteExpense(name, id) {
   MERCH_EXPENSES[name] = (MERCH_EXPENSES[name] || []).filter(function(l){return l.id!==id;});
   merchRenderDrawer();
+  setTimeout(function(){
+    var p = document.getElementById('m-wf-panel-exp'); if (p) p.removeAttribute('hidden');
+    var head = document.querySelector('[onclick*="m-wf-panel-exp"]'); if (head) head.classList.add('expanded');
+  }, 10);
+}
+function merchEditPayoutPct(name, val) {
+  var row = merchFindRow(name);
+  if (!row) return;
+  var num = Math.max(0, Math.min(100, parseFloat(val) || 0));
+  row.dataset.payout = num;
+  // Keep the waterfall partner entry rate in sync with the row data
+  if (MERCH_WF[name] && MERCH_WF[name].entries) {
+    var p = MERCH_WF[name].entries.find(function(e){return e.locked && e.type==='partner';});
+    if (p) p.rate = num;
+  }
+  merchRenderDrawer();
+}
+
+/* ── Per-merchant Payout Waterfall (Detail tab) ─── */
+var MERCH_WF = {}; // keyed by merchant name → { entries: [...] }
+var _merchWfNextId = 100;
+function _merchInitials(s) {
+  return (s || '').split(/[\s.]+/).filter(function(w){return w;}).slice(0,2).map(function(w){return (w[0]||'').toUpperCase();}).join('') || '?';
+}
+function _merchColor(s) {
+  var palette = ['#6B839B','#5B7A5E','#8C7A5E','#A67C5B','#9B6B5B','#6366F1'];
+  var h = 0; for (var i=0;i<(s||'').length;i++) h += s.charCodeAt(i);
+  return palette[Math.abs(h) % palette.length];
+}
+function merchInitWfEntries(name, row) {
+  var partner = row.dataset.partner || '';
+  var rep = row.dataset.rep || '';
+  var payoutPct = parseFloat(row.dataset.payout) || 0;
+  var entries = [];
+  if (partner && partner !== '—' && partner !== 'Internal') {
+    entries.push({ id:'p1', name:partner, sub:'Submitting Partner', type:'partner', initials:_merchInitials(partner), color:_merchColor(partner), rate:payoutPct, locked:true });
+  }
+  if (rep && rep !== '—') {
+    entries.push({ id:'r1', name:rep, sub:'Assigned Rep', type:'rep', initials:_merchInitials(rep), color:'#6366F1', rate:0, locked:true });
+  }
+  return entries;
+}
+function merchGetWfEntries(name, row) {
+  if (!MERCH_WF[name]) MERCH_WF[name] = { entries: merchInitWfEntries(name, row) };
+  return MERCH_WF[name].entries;
+}
+function merchWfCalc(entries, pool) {
+  var remaining = pool;
+  var calced = entries.map(function(e) {
+    var rate = (parseFloat(e.rate) || 0) / 100;
+    var payout = Math.round(remaining * rate * 100) / 100;
+    var inputPool = remaining;
+    remaining = Math.round((remaining - payout) * 100) / 100;
+    return { entry:e, payout:payout, inputPool:inputPool };
+  });
+  return { calced:calced, house:Math.max(0, Math.round(remaining * 100) / 100) };
+}
+function merchWfDelete(name, id) {
+  if (!MERCH_WF[name]) return;
+  MERCH_WF[name].entries = MERCH_WF[name].entries.filter(function(e){return e.id!==id || e.locked;});
+  merchRenderDrawer();
+}
+function merchWfEditRate(name, id, val) {
+  if (!MERCH_WF[name]) return;
+  var e = MERCH_WF[name].entries.find(function(e){return e.id===id;});
+  if (!e) return;
+  var num = Math.max(0, Math.min(100, parseFloat(val) || 0));
+  e.rate = num;
+  // If editing the locked submitting partner, mirror to row.dataset.payout
+  if (e.locked && e.type === 'partner') {
+    var row = merchFindRow(name);
+    if (row) row.dataset.payout = num;
+  }
+  merchRenderDrawer();
+  // Re-focus the rate input that was just edited
+  setTimeout(function(){
+    var input = document.querySelector('[data-merch-wf-rate="' + id + '"]');
+    if (input) { input.focus(); var v = input.value; input.value = ''; input.value = v; }
+  }, 0);
+}
+function merchWfAdd(name) {
+  // Toggle picker
+  var existing = document.querySelector('.merch-wf-picker');
+  if (existing) { existing.remove(); return; }
+  var anchor = document.getElementById('merch-wf-add-btn');
+  if (!anchor) return;
+  var entries = (MERCH_WF[name] || {}).entries || [];
+  var opts = [
+    { name:'Apex Elite',       initials:'AE', color:'#6B839B', type:'partner', sub:'Partner · PTR-0042' },
+    { name:'NovaPay',          initials:'NV', color:'#5B7A5E', type:'partner', sub:'Partner · PTR-0038' },
+    { name:'Summit Lending',   initials:'SL', color:'#8C7A5E', type:'partner', sub:'Partner · PTR-0031' },
+    { name:'Rivermark',        initials:'RM', color:'#A67C5B', type:'partner', sub:'Partner · PTR-0027' },
+    { name:'Coastal Commerce', initials:'CC', color:'#9B6B5B', type:'partner', sub:'Partner · PTR-0019' },
+    { name:'James Carter',     initials:'JC', color:'#6366F1', type:'rep',     sub:'Rep · USR-001' },
+    { name:'Sara Reyes',       initials:'SR', color:'#5B7A5E', type:'rep',     sub:'Rep · USR-002' },
+    { name:'Dan Mitchell',     initials:'DM', color:'#6B839B', type:'rep',     sub:'Rep · USR-003' },
+    { name:'Tara Patel',       initials:'TP', color:'#A67C5B', type:'rep',     sub:'Rep · USR-006' },
+    { name:'Blake Chen',       initials:'BC', color:'#9B6B5B', type:'rep',     sub:'Rep · USR-007' },
+  ];
+  var picker = document.createElement('div');
+  picker.className = 'merch-wf-picker';
+  picker.style.cssText = 'background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:8px;display:flex;flex-direction:column;gap:2px;margin-top:6px;max-height:280px;overflow-y:auto;';
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:4px 8px 8px;border-bottom:1px solid var(--border);margin-bottom:4px;';
+  hdr.textContent = 'Add partner or rep who worked on this deal';
+  picker.appendChild(hdr);
+  opts.forEach(function(o) {
+    var already = entries.find(function(e){return e.name===o.name;});
+    var rowEl = document.createElement('div');
+    rowEl.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;' + (already?'opacity:0.4;pointer-events:none;':'');
+    rowEl.onmouseover = function(){ this.style.background = 'var(--bg-hover, rgba(0,0,0,0.03))'; };
+    rowEl.onmouseout  = function(){ this.style.background = ''; };
+    rowEl.innerHTML = ''
+      + '<div style="background:'+o.color+';width:22px;height:22px;font-size:9px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;border-radius:50%;flex-shrink:0;">'+o.initials+'</div>'
+      + '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:500;">'+o.name+'</div><div style="font-size:10px;color:var(--text-muted);">'+o.sub+'</div></div>'
+      + (already ? '<span style="font-size:10px;color:var(--text-muted);">Added</span>' : '');
+    if (!already) {
+      rowEl.onclick = function() {
+        entries.push({ id:'wf'+(++_merchWfNextId), name:o.name, sub:o.sub, type:o.type, initials:o.initials, color:o.color, rate:0, locked:false });
+        MERCH_WF[name] = { entries: entries };
+        picker.remove();
+        merchRenderDrawer();
+      };
+    }
+    picker.appendChild(rowEl);
+  });
+  anchor.parentNode.insertBefore(picker, anchor.nextSibling);
+  setTimeout(function(){
+    document.addEventListener('click', function close(ev){
+      if (!picker.contains(ev.target) && ev.target !== anchor && !anchor.contains(ev.target)) {
+        picker.remove(); document.removeEventListener('click', close);
+      }
+    });
+  }, 100);
+}
+
+function merchToggleWfPanel(panelId, headerEl) {
+  var p = document.getElementById(panelId); if (!p) return;
+  var isHidden = p.hasAttribute('hidden');
+  if (isHidden) { p.removeAttribute('hidden'); headerEl && headerEl.classList.add('expanded'); }
+  else { p.setAttribute('hidden', ''); headerEl && headerEl.classList.remove('expanded'); }
 }
 
 function merchComputeResidual(row) {
@@ -32280,35 +32528,98 @@ function merchRenderWaterfall(name, row) {
   var fmtPct = function(n) { return (n>=0?'+':'') + n.toFixed(1) + '%'; };
   var pct = function(part, whole) { return whole > 0 ? (part/whole*100) : 0; };
 
-  // ── Section 1: Residual calculation
+  // ── Section 1: Residual calculation (neutral — context for the pool)
   var sec1 = ''
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Residual Calculation · Mar 2026</div>'
-    + '<div style="border:1px solid var(--border);border-radius:8px;background:var(--bg-base);overflow:hidden;margin-bottom:14px;">'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;">'
-    + '    <div><span style="color:var(--text-secondary);">Volume processed</span> <span style="color:var(--text-muted);font-size:11px;">· ' + R.txn.toLocaleString() + ' txns</span></div>'
-    + '    <span style="font-family:var(--font-mono);font-weight:600;">' + fmt(R.vol).replace('.00','') + '</span>'
+    + '<div class="md-section md-section-residual">'
+    + '  <div class="md-section-hdr">'
+    + '    <span class="md-section-hdr-icon">📊</span>'
+    + '    <span class="md-section-hdr-title">Residual Calculation</span>'
+    + '    <span class="md-section-hdr-meta">Mar 2026 · how the pool is computed</span>'
     + '  </div>'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;">'
-    + '    <div><span style="color:var(--text-secondary);">Income</span> <span style="color:var(--text-muted);font-size:10px;">(merchant fees on residual report)</span></div>'
-    + '    <span style="font-family:var(--font-mono);">' + fmt(R.income) + '</span>'
-    + '  </div>'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--red);">'
-    + '    <div><span>− Expense</span> <span style="color:var(--text-muted);font-size:10px;">(interchange + Schedule A)</span></div>'
-    + '    <span style="font-family:var(--font-mono);">−' + fmt(R.expense) + '</span>'
-    + '  </div>'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;background:var(--bg-surface);">'
-    + '    <span>Gross Residual</span><span style="font-family:var(--font-mono);">' + fmt(R.grossResidual) + '</span>'
-    + '  </div>'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-secondary);">'
-    + '    <div><span>× ISO Split</span> <span style="color:var(--text-muted);font-size:10px;">(ISO share of pool from processor)</span></div>'
-    + '    <span style="font-family:var(--font-mono);">' + R.isoSplit + '%</span>'
-    + '  </div>'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:13px;font-weight:700;background:rgba(34,46,72,0.04);">'
-    + '    <span>ISO Income</span><span style="font-family:var(--font-mono);color:var(--green);">' + fmt(R.isoIncome) + '</span>'
+    + '  <div class="md-section-body" style="padding:0;">'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;">'
+    + '      <div><span style="color:var(--text-secondary);">Volume processed</span> <span style="color:var(--text-muted);font-size:11px;">· ' + R.txn.toLocaleString() + ' txns</span></div>'
+    + '      <span style="font-family:var(--font-mono);font-weight:600;">' + fmt(R.vol).replace('.00','') + '</span>'
+    + '    </div>'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;">'
+    + '      <div><span style="color:var(--text-secondary);">Income</span> <span style="color:var(--text-muted);font-size:10px;">(merchant fees on residual report)</span></div>'
+    + '      <span style="font-family:var(--font-mono);">' + fmt(R.income) + '</span>'
+    + '    </div>'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--red);">'
+    + '      <div><span>− Expense</span> <span style="color:var(--text-muted);font-size:10px;">(interchange + Schedule A)</span></div>'
+    + '      <span style="font-family:var(--font-mono);">−' + fmt(R.expense) + '</span>'
+    + '    </div>'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;background:var(--bg-surface);">'
+    + '      <span>Gross Residual</span><span style="font-family:var(--font-mono);">' + fmt(R.grossResidual) + '</span>'
+    + '    </div>'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-secondary);">'
+    + '      <div><span>× ISO Split</span> <span style="color:var(--text-muted);font-size:10px;">(ISO share of pool from processor)</span></div>'
+    + '      <span style="font-family:var(--font-mono);">' + R.isoSplit + '%</span>'
+    + '    </div>'
+    + '    <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:13px;font-weight:700;background:rgba(91,122,94,0.06);">'
+    + '      <span>ISO Income → Pool</span><span style="font-family:var(--font-mono);color:var(--green);">' + fmt(R.isoIncome) + '</span>'
+    + '    </div>'
     + '  </div>'
     + '</div>';
 
-  // ── Section 2: Agent expenses (editable, per-merchant)
+  // ── Section 2: Payout Waterfall — primary edit surface (yellow accent, dominant)
+  // User edits by adding a partner or rep who worked on the deal. Splits are a
+  // consequence of who's on the waterfall, not the primary lever.
+  var wfEntries = merchGetWfEntries(name, row);
+  var wfPool = R.isoIncome;
+  var wfRes = merchWfCalc(wfEntries, wfPool);
+  var wfTotalPaid = wfRes.calced.reduce(function(s,c){return s+c.payout;}, 0);
+  var nameJsW = name.replace(/'/g,"\\'");
+  var wfRowsHtml = wfRes.calced.map(function(c, i) {
+    var e = c.entry;
+    var lockBadge = e.locked
+      ? '<span title="Submitting partner / assigned rep — locked" style="font-size:9px;color:var(--text-muted);background:rgba(0,0,0,0.05);padding:1px 5px;border-radius:3px;font-weight:600;letter-spacing:.04em;">🔒</span>'
+      : '<button onclick="merchWfDelete(\'' + nameJsW + '\',\'' + e.id + '\')" title="Remove from waterfall" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;">✕</button>';
+    var roleTag = e.type === 'partner'
+      ? '<span style="font-size:8px;font-weight:700;letter-spacing:.06em;color:#A67C5B;background:rgba(166,124,91,0.14);padding:1px 4px;border-radius:3px;text-transform:uppercase;">Partner</span>'
+      : '<span style="font-size:8px;font-weight:700;letter-spacing:.06em;color:#6366F1;background:rgba(99,102,241,0.14);padding:1px 4px;border-radius:3px;text-transform:uppercase;">Rep</span>';
+    return ''
+      + '<div class="md-wf-grid md-wf-row">'
+      + '  <div style="font-family:var(--font-mono);color:var(--text-muted);font-size:10px;text-align:center;">' + (i+1) + '</div>'
+      + '  <div style="display:flex;align-items:center;gap:8px;min-width:0;">'
+      +     '<div style="background:' + e.color + ';width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;">' + e.initials + '</div>'
+      +     '<div style="min-width:0;flex:1;"><div style="font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + e.name + '</div><div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;">' + roleTag + '<span style="overflow:hidden;text-overflow:ellipsis;">' + e.sub + '</span></div></div>'
+      + '  </div>'
+      + '  <div style="display:flex;align-items:center;justify-content:flex-end;gap:3px;"><input type="number" data-merch-wf-rate="' + e.id + '" value="' + e.rate + '" min="0" max="100" step="0.5" onchange="merchWfEditRate(\'' + nameJsW + '\',\'' + e.id + '\',this.value)" onclick="event.stopPropagation();" style="width:50px;padding:4px 6px;text-align:right;font-family:var(--font-mono);font-size:12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;"><span style="font-size:11px;color:var(--text-muted);">%</span></div>'
+      + '  <div style="text-align:right;"><div style="font-family:var(--font-mono);font-size:13px;color:var(--green);font-weight:700;">' + fmt(c.payout) + '</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">of ' + fmt(c.inputPool).replace('.00','') + '</div></div>'
+      + '  <div style="text-align:center;">' + lockBadge + '</div>'
+      + '</div>';
+  }).join('');
+  var sec2 = ''
+    + '<div class="md-section md-section-payout">'
+    + '  <div class="md-section-hdr">'
+    + '    <span class="md-section-hdr-icon">💧</span>'
+    + '    <span class="md-section-hdr-title">Payout Waterfall</span>'
+    + '    <span class="md-section-hdr-meta">Mar 2026 · Pool: <strong style="color:var(--text-primary);font-family:var(--font-mono);">' + fmt(wfPool) + '</strong></span>'
+    + '  </div>'
+    + '  <div class="md-section-body">'
+    + '    <div style="border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--bg-elevated);">'
+    + '      <div class="md-wf-grid md-wf-head">'
+    + '        <div></div><div>Recipient</div><div style="text-align:right;">Rate</div><div style="text-align:right;">Payout</div><div></div>'
+    + '      </div>'
+    +        (wfRowsHtml || '<div style="padding:22px;text-align:center;color:var(--text-muted);font-size:12px;">No partners or reps on this deal yet — add the first one below.</div>')
+    + '      <div class="md-wf-grid md-wf-row house">'
+    + '        <div style="font-family:var(--font-mono);color:var(--green);font-size:11px;text-align:center;">🏠</div>'
+    + '        <div><div style="font-size:12px;font-weight:600;">Twill (House)</div><div style="font-size:10px;color:var(--text-muted);">Remainder after all payouts</div></div>'
+    + '        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-align:right;">remainder</div>'
+    + '        <div style="text-align:right;"><div style="font-family:var(--font-mono);font-size:13px;color:var(--green);font-weight:700;">' + fmt(wfRes.house) + '</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">' + fmtPct(pct(wfRes.house, wfPool)) + '</div></div>'
+    + '        <div></div>'
+    + '      </div>'
+    + '    </div>'
+    // Primary CTA — adding partners/reps is the primary edit action
+    + '    <button id="merch-wf-add-btn" class="md-wf-add-cta" onclick="merchWfAdd(\'' + nameJsW + '\')">'
+    + '      <span class="md-wf-add-cta-plus">+</span>Add partner or rep to waterfall'
+    + '    </button>'
+    + '    <div style="font-size:10px;color:var(--text-muted);margin-top:8px;text-align:center;line-height:1.5;">Each entry takes their % of the remaining pool, in order. Locked entries are the submitting partner and assigned rep.</div>'
+    + '  </div>'
+    + '</div>';
+
+  // ── Section 3: Agent expenses (editable, per-merchant)
   var expRows = expenses.map(function(l) {
     return ''
       + '<tr class="po-fee-row" data-exp-id="' + l.id + '">'
@@ -32324,53 +32635,60 @@ function merchRenderWaterfall(name, row) {
       + '<td style="text-align:center;width:24px;"><button onclick="merchDeleteExpense(\'' + name.replace(/\'/g,'\\\'') + '\',' + l.id + ')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;">✕</button></td>'
       + '</tr>';
   }).join('');
-  var sec2 = ''
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-    + '  <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Agent Expenses (this MID)</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Aggregate: <strong id="merch-d-exp-total" style="color:var(--text-primary);font-family:var(--font-mono);">$' + expTotal.toLocaleString() + '</strong></div></div>'
-    + '  <button class="btn btn-primary" style="font-size:11px;padding:5px 10px;" onclick="merchAddExpense(\'' + name.replace(/\'/g,'\\\'') + '\')">+ Add Expense</button>'
-    + '</div>'
-    + '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px;">'
-    + '  <thead><tr style="background:var(--bg-surface);">'
-    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Type</th>'
-    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Description</th>'
-    + '    <th style="text-align:right;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Amount ($)</th>'
-    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Freq</th>'
-    + '    <th style="text-align:left;padding:6px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Applies</th>'
-    + '    <th></th>'
-    + '  </tr></thead>'
-    + '  <tbody>' + (expRows || '<tr><td colspan="6" style="padding:18px;text-align:center;color:var(--text-muted);">No expenses on this merchant.</td></tr>') + '</tbody>'
-    + '</table>';
-
-  // ── Section 3: Payout distribution → Net Residual
-  var partnerLine = partner !== 'Internal'
-    ? '<div style="font-size:12px;font-weight:600;">' + partner + '</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px;">Partner</div>'
-    : '<div style="font-size:12px;font-weight:600;color:var(--yellow);">Internal · ' + rep + '</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px;">Rep commission</div>';
-  // Bonuses inside the payout block (only render if any)
-  var bonusLineSummary = '';
-  if (bonusTotal > 0) {
-    var bonusLabels = bonusList.map(function(b){return b.type;}).join(', ');
-    bonusLineSummary = '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:12px;color:var(--green);"><span>+ Bonuses (' + bonusLabels + ')</span><span style="font-family:var(--font-mono);">+' + fmt(bonusTotal) + ' <span style="color:var(--text-muted);font-size:10px;">' + fmtPct(pct(bonusTotal, R.isoIncome)) + '</span></span></div>';
-  }
   var sec3 = ''
-    + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Payout Distribution</div>'
-    + '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-base);">'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;background:rgba(34,46,72,0.04);">'
-    + '    <span>ISO Income</span><span style="font-family:var(--font-mono);">' + fmt(R.isoIncome) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">100.0%</span></span>'
+    + '<div class="md-section md-section-expenses">'
+    + '  <div class="md-section-hdr">'
+    + '    <span class="md-section-hdr-icon">💳</span>'
+    + '    <span class="md-section-hdr-title">Agent Expenses (this MID)</span>'
+    + '    <span class="md-section-hdr-meta">Aggregate: <strong id="merch-d-exp-total" style="color:var(--text-primary);font-family:var(--font-mono);">$' + expTotal.toLocaleString() + '</strong></span>'
     + '  </div>'
-    + '  <div style="padding:10px 14px;border-bottom:1px solid var(--border);">'
-    + '    ' + partnerLine
-    + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:var(--text-secondary);"><span>Gross share (' + payoutPct + '%)</span><span style="font-family:var(--font-mono);">' + fmt(grossPayout) + ' <span style="color:var(--text-muted);font-size:10px;">' + fmtPct(pct(grossPayout, R.isoIncome)) + '</span></span></div>'
-    + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:12px;color:var(--red);"><span>− Agent expenses recovered</span><span style="font-family:var(--font-mono);">−' + fmt(expTotal) + ' <span style="color:var(--text-muted);font-size:10px;">' + fmtPct(-pct(expTotal, R.isoIncome)) + '</span></span></div>'
-    +     bonusLineSummary
-    + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);font-size:12px;font-weight:600;"><span>Net payout</span><span style="font-family:var(--font-mono);' + (netPayout < 0 ? 'color:var(--red);' : '') + '">' + fmt(netPayout) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">' + fmtPct(pct(netPayout, R.isoIncome)) + '</span></span></div>'
+    + '  <div class="md-section-body">'
+    + '    <table style="width:100%;border-collapse:collapse;font-size:11px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:7px;overflow:hidden;">'
+    + '      <thead><tr style="background:var(--bg-surface);">'
+    + '        <th style="text-align:left;padding:7px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Type</th>'
+    + '        <th style="text-align:left;padding:7px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Description</th>'
+    + '        <th style="text-align:right;padding:7px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Amount ($)</th>'
+    + '        <th style="text-align:left;padding:7px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Freq</th>'
+    + '        <th style="text-align:left;padding:7px 8px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;">Applies</th>'
+    + '        <th></th>'
+    + '      </tr></thead>'
+    + '      <tbody>' + (expRows || '<tr><td colspan="6" style="padding:18px;text-align:center;color:var(--text-muted);">No expenses on this merchant.</td></tr>') + '</tbody>'
+    + '    </table>'
+    + '    <button class="btn btn-ghost" style="margin-top:10px;font-size:11px;padding:6px 12px;" onclick="merchAddExpense(\'' + name.replace(/\'/g,'\\\'') + '\')">+ Add Expense</button>'
     + '  </div>'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:' + (netResidual >= 0 ? 'rgba(91,122,94,0.08)' : 'rgba(229,62,62,0.06)') + ';font-size:14px;font-weight:700;">'
-    + '    <span>Net Residual to ISO</span><span style="font-family:var(--font-mono);color:' + (netResidual >= 0 ? 'var(--green)' : 'var(--red)') + ';">' + fmt(netResidual) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">' + fmtPct(pct(netResidual, R.isoIncome)) + '</span></span>'
+    + '</div>';
+
+  // ── Bottom line: rolls up the multi-party waterfall + agent expenses + bonuses
+  var adjustedNetToIso = wfRes.house + expTotal - bonusTotal;
+  var bottomLossClass = adjustedNetToIso < 0 ? ' md-bottom-final-loss' : '';
+  var sec4 = ''
+    + '<div class="md-section md-section-bottom">'
+    + '  <div class="md-section-hdr">'
+    + '    <span class="md-section-hdr-icon">✓</span>'
+    + '    <span class="md-section-hdr-title">Bottom Line</span>'
+    + '    <span class="md-section-hdr-meta">Mar 2026 · what ISO actually keeps</span>'
+    + '  </div>'
+    + '  <div class="md-section-body">'
+    + '    <div class="md-bottom-row" style="color:var(--text-secondary);">'
+    + '      <span>Total paid to ' + wfRes.calced.length + ' part' + (wfRes.calced.length===1?'y':'ies') + ' (waterfall)</span>'
+    + '      <span style="font-family:var(--font-mono);">' + fmt(wfTotalPaid) + '</span>'
+    + '    </div>'
+    + '    <div class="md-bottom-row" style="color:var(--green);">'
+    + '      <span>+ Agent expenses recovered (' + expenses.length + ' item' + (expenses.length===1?'':'s') + ')</span>'
+    + '      <span style="font-family:var(--font-mono);">+' + fmt(expTotal) + '</span>'
+    + '    </div>'
+    + (bonusTotal > 0
+       ? '    <div class="md-bottom-row" style="color:var(--red);"><span>− Bonuses paid (' + bonusList.length + ')</span><span style="font-family:var(--font-mono);">−' + fmt(bonusTotal) + '</span></div>'
+       : '')
+    + '    <div class="md-bottom-final' + bottomLossClass + '">'
+    + '      <span>Net Residual to ISO</span>'
+    + '      <span style="font-family:var(--font-mono);color:' + (adjustedNetToIso >= 0 ? 'var(--green)' : 'var(--red)') + ';font-size:18px;">' + fmt(adjustedNetToIso) + ' <span style="color:var(--text-muted);font-weight:400;font-size:11px;">' + fmtPct(pct(adjustedNetToIso, R.isoIncome)) + '</span></span>'
+    + '    </div>'
     + '  </div>'
     + '</div>';
 
   // Bonus detail card (only when bonuses exist) — appears below the waterfall
-  var sec4 = '';
+  var sec5 = '';
   if (bonusTotal > 0) {
     var bonusRows = bonusList.map(function(b) {
       return ''
@@ -32382,16 +32700,21 @@ function merchRenderWaterfall(name, row) {
         + '  <span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--green);margin-left:10px;">+' + fmt(b.amount) + '</span>'
         + '</div>';
     }).join('');
-    sec4 = ''
-      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:14px 0 8px;">Bonus Detail</div>'
-      + '<div style="border:1px solid var(--green-dim);background:rgba(34,197,94,0.03);border-radius:8px;overflow:hidden;">'
-      + '  <div style="padding:9px 12px;font-size:11px;color:var(--text-secondary);background:rgba(34,197,94,0.06);">' + bonusList.length + ' bonus' + (bonusList.length === 1 ? '' : 'es') + ' totaling <strong style="color:var(--green);font-family:var(--font-mono);">+' + fmt(bonusTotal) + '</strong></div>'
+    sec5 = ''
+      + '<div class="md-section md-section-bonus">'
+      + '  <div class="md-section-hdr">'
+      + '    <span class="md-section-hdr-icon">★</span>'
+      + '    <span class="md-section-hdr-title">Bonus Detail</span>'
+      + '    <span class="md-section-hdr-meta">' + bonusList.length + ' bonus' + (bonusList.length === 1 ? '' : 'es') + ' totaling <strong style="color:var(--green);font-family:var(--font-mono);">+' + fmt(bonusTotal) + '</strong></span>'
+      + '  </div>'
+      + '  <div class="md-section-body" style="padding:0;background:var(--bg-elevated);">'
       +    bonusRows
+      + '  </div>'
       + '</div>';
   }
 
   var container = document.getElementById('merch-d-wf');
-  if (container) container.innerHTML = sec1 + sec2 + sec3 + sec4;
+  if (container) container.innerHTML = sec1 + sec2 + sec3 + sec4 + sec5;
 }
 
 function merchComputeFlags(row) {
