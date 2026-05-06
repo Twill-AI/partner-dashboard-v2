@@ -3456,7 +3456,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="alert-trow-icon sev-high">⚠️</div>
               <div class="alert-trow-meta">
                 <div class="alert-trow-title">Chargeback spike — Harbor Bistro exceeding 1.5% threshold</div>
-                <div class="alert-trow-sub">Harbor Bistro · Coastal Commerce · <span class="p-badge badge-warn" style="font-size:9px;padding:1px 5px;">Open</span></div>
+                <div class="alert-trow-sub">Harbor Bistro · Coastal Commerce</div>
               </div>
               <div class="alert-trow-time">4m ago</div>
             </div>
@@ -3465,7 +3465,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="alert-trow-icon sev-high">🕐</div>
               <div class="alert-trow-meta">
                 <div class="alert-trow-title">No batch submitted — Pines Auto Group (3 days)</div>
-                <div class="alert-trow-sub">Pines Auto Group · Apex Elite · <span class="p-badge badge-warn" style="font-size:9px;padding:1px 5px;">Open</span></div>
+                <div class="alert-trow-sub">Pines Auto Group · Apex Elite</div>
               </div>
               <div class="alert-trow-time">18m ago</div>
             </div>
@@ -3474,7 +3474,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="alert-trow-icon sev-high">📉</div>
               <div class="alert-trow-meta">
                 <div class="alert-trow-title">Volume drop 42% WoW — Green Valley Market</div>
-                <div class="alert-trow-sub">Green Valley Market · NovaPay · <span class="p-badge badge-warn" style="font-size:9px;padding:1px 5px;">Open</span></div>
+                <div class="alert-trow-sub">Green Valley Market · NovaPay</div>
               </div>
               <div class="alert-trow-time">1h ago</div>
             </div>
@@ -3483,7 +3483,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="alert-trow-icon sev-medium">🔵</div>
               <div class="alert-trow-meta">
                 <div class="alert-trow-title">Auth rate dropped to 88% — Lakeview Dental</div>
-                <div class="alert-trow-sub">Lakeview Dental · Summit Lending · <span class="p-badge badge-warn" style="font-size:9px;padding:1px 5px;">Open</span></div>
+                <div class="alert-trow-sub">Lakeview Dental · Summit Lending</div>
               </div>
               <div class="alert-trow-time">2h ago</div>
             </div>
@@ -3492,7 +3492,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="alert-trow-icon sev-medium">⚠️</div>
               <div class="alert-trow-meta">
                 <div class="alert-trow-title">2 new chargebacks — Metro Print Shop</div>
-                <div class="alert-trow-sub">Metro Print Shop · Rivermark · <span class="p-badge badge-warn" style="font-size:9px;padding:1px 5px;">Open</span></div>
+                <div class="alert-trow-sub">Metro Print Shop · Rivermark</div>
               </div>
               <div class="alert-trow-time">3h ago</div>
             </div>
@@ -3501,7 +3501,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="alert-trow-icon sev-medium">🕐</div>
               <div class="alert-trow-meta">
                 <div class="alert-trow-title">No batch submitted — Sunrise Cafe (5 days)</div>
-                <div class="alert-trow-sub">Sunrise Cafe · Apex Elite · <span class="p-badge badge-warn" style="font-size:9px;padding:1px 5px;">Open</span></div>
+                <div class="alert-trow-sub">Sunrise Cafe · Apex Elite</div>
               </div>
               <div class="alert-trow-time">4h ago</div>
             </div>
@@ -3549,6 +3549,9 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
           </div>
         </div><!-- /tdetail-panel -->
+
+        <!-- MERCHANT RAIL — full-height sibling column, populated by renderAlertDetail -->
+        <div class="tsidebar tsidebar-alerts" id="alert-sidebar"></div>
 
       </div><!-- /alerts-split -->
 
@@ -29961,7 +29964,7 @@ function renderAlertList(filter) {
         <div class="alert-trow-icon ${a.sevClass}">${a.icon}</div>
         <div class="alert-trow-meta">
           <div class="alert-trow-title">${a.title}</div>
-          <div class="alert-trow-sub">${a.merchant} · ${a.partner} · <span class="p-badge ${a.statusClass}" style="font-size:9px;padding:1px 5px;">${a.status}</span></div>
+          <div class="alert-trow-sub">${a.merchant} · ${a.partner}${a.status && a.status !== 'Open' ? ` · <span class="p-badge ${a.statusClass}" style="font-size:9px;padding:1px 5px;">${a.status}</span>` : ''}</div>
         </div>
         <div class="alert-trow-time">${a.age}</div>
       </div>`;
@@ -30028,19 +30031,17 @@ function renderAlertDetail(idx) {
       <div class="tdetail-id" style="color:#D97706;">${a.id} · ${a.type} · Triggered ${a.age}</div>
       <div class="tdetail-title-row">
         <div class="tdetail-title">${a.title}</div>
-        <div class="tdetail-actions">
-          <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Reassign</button>
-          <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:#D97706;border-color:rgba(245,158,11,0.3);" onclick="askAIAnalyst(this)">⚡ Ask AI</button>
-          <button class="btn btn-success" style="font-size:11px;padding:5px 10px;" onclick="tktResolve(this)">✓ Resolve</button>
-        </div>
       </div>
-      <div class="tdetail-meta-row">
+      <div class="tdetail-actions" style="display:flex;gap:6px;margin-top:8px;">
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Reassign</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:#D97706;border-color:rgba(245,158,11,0.3);" onclick="askAIAnalyst(this)">⚡ Ask AI</button>
+        <button class="btn btn-success" style="font-size:11px;padding:5px 10px;" onclick="tktResolve(this)">✓ Resolve</button>
+      </div>
+      <div class="tdetail-meta-row" style="margin-top:10px;">
         <div class="meta-pill" onclick="tktMetaClick(this,'status')"><span class="meta-label">Status</span><span class="meta-sep">·</span><span class="meta-pill-val"><span class="p-badge ${a.statusClass}">${a.status}</span></span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'priority')"><span class="meta-label">Priority</span><span class="meta-sep">·</span><span data-meta-val="1" style="color:${a.priColor};font-size:11px;font-weight:600;">● ${a.priority}</span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'type')"><span class="meta-label">Type</span><span class="meta-sep">·</span><span class="meta-type-val">${a.type}</span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'assigned')"><span class="meta-label">Assigned</span><span class="meta-sep">·</span><span class="meta-assigned-val"><div class="assign-av" style="background:var(--yellow);color:var(--text-inverse);width:16px;height:16px;font-size:8px;">MA</div> <strong style="color:var(--yellow);">You</strong></span></div>
-        <div class="meta-pill"><span class="meta-label">Merchant</span><span class="meta-sep">·</span>${a.merchant}</div>
-        <div class="meta-pill"><span class="meta-label">Partner</span><span class="meta-sep">·</span>${a.partner}</div>
       </div>
     </div>
 
@@ -30074,47 +30075,33 @@ function renderAlertDetail(idx) {
         </div>
       </div>
 
-      <!-- SIDEBAR -->
-      <div class="tsidebar">
-        <div class="tsb-section">
-          <div class="tsb-title">Merchant</div>
-          <div class="tsb-merchant-card">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-              <div class="p-avatar" style="background:${m.color};width:30px;height:30px;font-size:11px;">${m.initials}</div>
-              <div><div class="tsb-merchant-name">${a.merchant}</div><div class="tsb-merchant-sub">${a.partner} · ${a.merchantId}</div></div>
-            </div>
-          </div>
-          <div class="tsb-stat-grid">
-            <div class="tsb-stat"><div class="tsb-stat-label">MTD Vol</div><div class="tsb-stat-val">${m.vol}</div></div>
-            <div class="tsb-stat"><div class="tsb-stat-label">Auth Rate</div><div class="tsb-stat-val" style="color:${m.authColor};">${m.auth}</div></div>
-            <div class="tsb-stat"><div class="tsb-stat-label">Last Batch</div><div class="tsb-stat-val" style="font-size:11px;">${m.lastBatch}</div></div>
-            <div class="tsb-stat"><div class="tsb-stat-label">CB Ratio</div><div class="tsb-stat-val" style="color:${m.cbColor};">${m.cb}</div></div>
-          </div>
+    </div>`;
+
+  // Sidebar lives in its own full-height column (sibling of the detail panel)
+  var sb = document.getElementById('alert-sidebar');
+  if (sb) sb.innerHTML = `
+    <div class="tsb-section">
+      <div class="tsb-title">Merchant</div>
+      <div class="tsb-merchant-card">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="p-avatar" style="background:${m.color};width:30px;height:30px;font-size:11px;">${m.initials}</div>
+          <div><div class="tsb-merchant-name">${a.merchant}</div><div class="tsb-merchant-sub">${a.partner} · ${a.merchantId}</div></div>
         </div>
-        <div class="tsb-section">
-          <div class="tsb-title">Alert Details</div>
-          <div class="tsb-row"><span class="tsb-key">Alert ID</span><span class="tsb-val mono">${a.id}</span></div>
-          <div class="tsb-row"><span class="tsb-key">Type</span><span class="tsb-val">${a.type}</span></div>
-          <div class="tsb-row"><span class="tsb-key">Severity</span><span class="tsb-val" style="text-transform:capitalize;">${a.sev}</span></div>
-          <div class="tsb-row"><span class="tsb-key">Triggered</span><span class="tsb-val">${a.age}</span></div>
-          <div class="tsb-row"><span class="tsb-key">Partner</span><span class="tsb-val">${a.partner}</span></div>
-        </div>
-        <div class="tsb-section">
-          <div class="tsb-title">AI Analyst</div>
-          <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--text-secondary);line-height:1.5;">
-            Analysis complete. ${a.aiOpening.length} insights ready. Ask any follow-up question using the AI Analyst tab below.
-          </div>
-          <button class="btn btn-ghost" style="font-size:11px;margin-top:8px;width:100%;justify-content:center;border-color:rgba(245,158,11,0.3);color:#D97706;" onclick="askAIAnalyst(this)">⚡ Ask a question</button>
-        </div>
-        <div class="tsb-section">
-          <div class="tsb-title">Quick Actions</div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📋 View merchant profile</button>
-            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📊 Pull transaction log</button>
-            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📤 Escalate to partner</button>
-            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">🎫 Convert to ticket</button>
-          </div>
-        </div>
+      </div>
+      <div class="tsb-stat-grid">
+        <div class="tsb-stat"><div class="tsb-stat-label">MTD Vol</div><div class="tsb-stat-val">${m.vol}</div></div>
+        <div class="tsb-stat"><div class="tsb-stat-label">Auth Rate</div><div class="tsb-stat-val" style="color:${m.authColor};">${m.auth}</div></div>
+        <div class="tsb-stat"><div class="tsb-stat-label">Last Batch</div><div class="tsb-stat-val" style="font-size:11px;">${m.lastBatch}</div></div>
+        <div class="tsb-stat"><div class="tsb-stat-label">CB Ratio</div><div class="tsb-stat-val" style="color:${m.cbColor};">${m.cb}</div></div>
+      </div>
+    </div>
+    <div class="tsb-section">
+      <div class="tsb-title">Quick Actions</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📋 View merchant profile</button>
+        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📊 Pull transaction log</button>
+        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📤 Escalate to partner</button>
+        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">🎫 Convert to ticket</button>
       </div>
     </div>`;
 
@@ -33090,6 +33077,35 @@ function assignToast(msg) {
 .alert-trow-title { font-size: 12px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .alert-trow-sub   { font-size: 11px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .alert-trow-time  { font-size: 11px; color: var(--text-muted); flex-shrink: 0; font-family: var(--font-data); padding-top: 2px; }
+/* Alerts merchant rail — full-height sibling column (not nested in detail body) */
+.tsidebar-alerts { width:340px; border-left:1px solid rgba(245,158,11,0.15); background:var(--bg-surface); }
+
+/* ── Alerts detail panel — readability pass (scoped to #view-alerts only) ── */
+#view-alerts .tdetail-header { padding:20px 24px 16px; }
+#view-alerts .tdetail-id { font-size:12px; letter-spacing:0.04em; margin-bottom:8px; }
+#view-alerts .tdetail-title { font-size:18px; line-height:1.35; letter-spacing:-0.005em; font-weight:600; }
+#view-alerts .tdetail-title-row { margin-bottom:0; }
+#view-alerts .tdetail-actions { gap:8px; margin-top:14px !important; }
+#view-alerts .tdetail-actions .btn { font-size:12.5px !important; padding:7px 14px !important; }
+#view-alerts .tdetail-meta-row { margin-top:14px !important; gap:10px; }
+#view-alerts .meta-pill { font-size:12px; padding:5px 10px; border-radius:7px; }
+#view-alerts .meta-label { font-size:11px; }
+/* Message thread — more breathing room, larger AI body type */
+#view-alerts .tthread-msgs { padding:20px 24px; gap:18px; }
+#view-alerts .tmsg { gap:6px; }
+#view-alerts .tmsg-header { margin-bottom:4px; gap:8px; }
+#view-alerts .tmsg-sender { font-size:12px; font-weight:600; }
+#view-alerts .tmsg-time   { font-size:11px; }
+#view-alerts .tmsg-badge  { font-size:10px; padding:2px 6px; }
+#view-alerts .tmsg-ai .tmsg-bubble { font-size:14px; line-height:1.6; padding:14px 16px; border-radius:10px; max-width:none; }
+#view-alerts .tmsg-event .tmsg-bubble { font-size:12px; padding:6px 0; }
+/* Reply box — slightly roomier */
+#view-alerts .treply-box { padding:14px 20px; }
+#view-alerts .treply-tabs { margin-bottom:10px; }
+#view-alerts .rtab { font-size:12px; padding:7px 12px; }
+#view-alerts .treply-textarea { font-size:13px; padding:12px 14px; min-height:80px; line-height:1.55; }
+#view-alerts .treply-actions { padding-top:10px; }
+#view-alerts .treply-actions .btn { font-size:12px !important; padding:6px 12px !important; }
 </style>
 
 <style id="tkt-scroll-fix">
