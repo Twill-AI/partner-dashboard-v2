@@ -6527,7 +6527,7 @@ function cycleReq(el){
           <div id="ma-panel-overview" class="ma-panel">
 
           <!-- Section 1: AI Alerts strip -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div id="tour-merchant-ai" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
             <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.25);border-radius:8px;">
               <span style="font-size:16px;flex-shrink:0;">⚠</span>
               <div>
@@ -33457,6 +33457,10 @@ function partnerResetDemo() {
     { title:'Merchant Portfolio: AI-Suggested Actions',
       desc:'Every merchant gets an AI-suggested next action. Escalate a chargeback, retain an at-risk account, follow up on stalled equipment — Twill tells your team exactly what to do.',
       view:'merchants', nav:'nav-merchants', target:'tour-merchants-summary', pos:'bottom' },
+    { title:'Merchant Intelligence: AI on Every Account',
+      desc:'Click any merchant and Twill surfaces everything instantly — auth rate anomalies, chargeback flags, renewal windows, and AI-suggested next actions. No digging, no spreadsheets.',
+      view:'merchant-active', nav:'nav-merchants', target:'tour-merchant-ai', pos:'bottom',
+      action:function(){ if(typeof navigateToMerchant==='function') navigateToMerchant('Harbor View Hotels','active'); } },
     { title:'Ticketing: Full Context on Every Issue',
       desc:'When a merchant has a problem, the full picture is here — transaction history, prior notes, processor data, and AI-generated resolution steps all in one thread.',
       view:'tickets', nav:'nav-tickets', target:'tour-ticket-strip', pos:'bottom' },
