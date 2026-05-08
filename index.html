@@ -33481,14 +33481,11 @@ function partnerResetDemo() {
       b.onclick = function(){ document.getElementById('tour-welcome').classList.add('show'); };
       tb.insertBefore(b, tb.firstChild);
     });
-    if(!sessionStorage.getItem('twill_tour_v1')){
-      setTimeout(function(){ document.getElementById('tour-welcome').classList.add('show'); }, 900);
-    }
+    setTimeout(function(){ document.getElementById('tour-welcome').classList.add('show'); }, 900);
   });
 
   window.tourDismiss = function(){
     document.getElementById('tour-welcome').classList.remove('show');
-    sessionStorage.setItem('twill_tour_v1','1');
   };
 
   window.tourStart = function(){
