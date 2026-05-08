@@ -2013,7 +2013,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             </div>
           </div>
 
-          <div class="card">
+          <div class="card" id="tour-portfolio-alerts">
             <div class="card-header"><div><div class="card-title">Portfolio Alerts</div><div class="card-sub">9 merchants with active alerts</div></div><button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="showView('alerts', document.getElementById('nav-alerts'))">View All</button></div>
             <div class="card-body scroll" style="max-height:320px;">
               <div class="alert-item" onclick="openAlertByMerchant('Harbor Bistro')"><div class="alert-icon chargeback">⚠️</div><div class="alert-meta"><div class="alert-merchant">Harbor Bistro <span class="p-badge badge-warn">Chargeback</span></div><div class="alert-desc">CB ratio 1.8% · Coastal</div></div><div class="alert-time">4m ago</div></div>
@@ -2936,7 +2936,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       </div>
 
       <!-- KPI STRIP -->
-      <div class="tkpi-strip">
+      <div class="tkpi-strip" id="tour-ticket-strip">
         <div class="tkpi"><div class="tkpi-label">Open</div><div class="tkpi-value">12</div><div class="tkpi-sub">↑ 3 since yesterday</div></div>
         <div class="tkpi"><div class="tkpi-label">Assigned to Me</div><div class="tkpi-value" style="color:var(--yellow);">3</div><div class="tkpi-sub">Needs attention</div></div>
         <div class="tkpi"><div class="tkpi-label">Urgent</div><div class="tkpi-value" style="color:var(--red);">2</div><div class="tkpi-sub">Escalated this week</div></div>
@@ -4051,7 +4051,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       </div>
 
       <!-- portfolio summary strip -->
-      <div class="m-portfolio-summary">
+      <div class="m-portfolio-summary" id="tour-merchants-summary">
         <div class="m-summary-stat">
           <div class="m-stat-label">Total MTD Volume</div>
           <div class="m-stat-value">$1,247,832</div>
@@ -7001,7 +7001,7 @@ function cycleReq(el){
       <div class="res-panel active" id="res-overview">
         <div class="content">
           <!-- KPI Strip -->
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px;">
+          <div id="tour-res-overview-kpi" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px;">
             <div class="kpi">
               <div class="kpi-label">Gross Income</div>
               <div class="kpi-value">$847,291</div>
@@ -33329,5 +33329,282 @@ function partnerResetDemo() {
 }
 </script>
 <!-- cache-bust:1773827400 -->
+
+<!-- ── DEMO GUIDED TOUR ──────────────────────────────────────────── -->
+<style>
+  #tour-spotlight {
+    display:none; position:fixed; border-radius:10px;
+    box-shadow: 0 0 0 9999px rgba(17,17,17,0.62);
+    z-index:9998; pointer-events:none;
+    outline:2px solid rgba(201,168,0,0.85); outline-offset:3px;
+    transition: top .32s cubic-bezier(.4,0,.2,1), left .32s cubic-bezier(.4,0,.2,1),
+                width .32s cubic-bezier(.4,0,.2,1), height .32s cubic-bezier(.4,0,.2,1);
+  }
+  #tour-tooltip {
+    display:none; position:fixed; z-index:9999; width:320px;
+    background:#fff; border-radius:13px; padding:20px 22px 16px;
+    box-shadow:0 16px 56px rgba(0,0,0,0.22),0 2px 8px rgba(0,0,0,0.07);
+    pointer-events:all; font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    transition: top .32s cubic-bezier(.4,0,.2,1), left .32s cubic-bezier(.4,0,.2,1);
+  }
+  .tt-step  { font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#C9A800;margin-bottom:5px; }
+  .tt-title { font-size:15px;font-weight:700;color:#111;margin-bottom:7px;letter-spacing:-.02em;line-height:1.3; }
+  .tt-desc  { font-size:13px;color:#4B4B4B;line-height:1.55;margin-bottom:16px; }
+  .tt-foot  { display:flex;align-items:center;justify-content:space-between; }
+  .tt-dots  { display:flex;gap:4px;align-items:center; }
+  .tt-dot   { width:5px;height:5px;border-radius:50%;background:#E0DDD7;transition:all .2s; }
+  .tt-dot.on{ background:#C9A800;width:14px;border-radius:3px; }
+  .tt-btns  { display:flex;gap:7px;align-items:center; }
+  .tt-btn   { font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+              padding:7px 13px;border-radius:7px;border:none;cursor:pointer;transition:all .15s; }
+  .tt-primary{ background:#222E48;color:#fff; }
+  .tt-primary:hover{ background:#161E2D; }
+  .tt-ghost { background:transparent;color:#737373;border:1px solid rgba(0,0,0,0.13); }
+  .tt-ghost:hover{ color:#111;background:rgba(0,0,0,0.04); }
+  .tt-end   { background:transparent;color:#9B6B5B;border:none;font-size:12px;font-weight:500;cursor:pointer;padding:7px 4px; }
+
+  #tour-welcome {
+    display:none; position:fixed; inset:0; z-index:10000;
+    background:rgba(17,17,17,0.65); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center; pointer-events:all;
+  }
+  #tour-welcome.show{ display:flex; }
+  .tw-card {
+    background:#fff; border-radius:16px; padding:36px 40px 30px;
+    width:440px; max-width:calc(100vw - 48px);
+    box-shadow:0 24px 80px rgba(0,0,0,0.22);
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif; text-align:center;
+  }
+  .tw-logo {
+    width:48px;height:48px;background:#222E48;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  }
+  .tw-h1  { font-size:22px;font-weight:700;color:#111;letter-spacing:-.03em;margin-bottom:9px;line-height:1.2; }
+  .tw-sub { font-size:14px;color:#737373;line-height:1.55;margin-bottom:22px; }
+  .tw-bullets { text-align:left;background:#F7F5F0;border-radius:10px;padding:13px 17px;margin-bottom:26px; }
+  .tw-bullet { display:flex;align-items:flex-start;gap:9px;font-size:13px;color:#4B4B4B;padding:4px 0;line-height:1.45; }
+  .tw-start {
+    width:100%;padding:13px;font-size:15px;font-weight:700;
+    background:#222E48;color:#fff;border:none;border-radius:10px;
+    cursor:pointer;font-family:'Plus Jakarta Sans',-apple-system,sans-serif;
+    letter-spacing:-.01em;transition:background .15s;display:block;margin-bottom:10px;
+  }
+  .tw-start:hover{ background:#161E2D; }
+  .tw-skip { background:transparent;border:none;color:#A0A0A0;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',-apple-system,sans-serif; }
+  .tw-skip:hover{ color:#111; }
+
+  .tour-badge {
+    display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;
+    background:rgba(201,168,0,0.12);border:1px solid rgba(201,168,0,0.3);
+    color:#8A6F00;font-size:12px;font-weight:600;cursor:pointer;
+    font-family:'Plus Jakarta Sans',-apple-system,sans-serif;transition:all .15s;
+  }
+  .tour-badge:hover{ background:rgba(201,168,0,0.22); }
+</style>
+
+<!-- Welcome modal -->
+<div id="tour-welcome">
+  <div class="tw-card">
+    <div class="tw-logo">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none">
+        <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#C9A800"/>
+        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#C9A800" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="tw-h1">See Twill in 5 minutes</div>
+    <div class="tw-sub">A guided walk through the features that matter most — AI monitoring, residuals, and merchant management.</div>
+    <div class="tw-bullets">
+      <div class="tw-bullet"><span>🤖</span><span>AI portfolio alerts that catch problems before your partners call you</span></div>
+      <div class="tw-bullet"><span>💰</span><span>Residual engine that catches processor billing errors worth thousands per month</span></div>
+      <div class="tw-bullet"><span>📋</span><span>Merchant portfolio with AI-suggested next actions for every account</span></div>
+      <div class="tw-bullet"><span>🎁</span><span>Branded merchant proposals your partners can send in one click</span></div>
+    </div>
+    <button class="tw-start" onclick="tourStart()">Start Tour →</button>
+    <button class="tw-skip" onclick="tourDismiss()">Skip for now</button>
+  </div>
+</div>
+
+<!-- Spotlight + Tooltip -->
+<div id="tour-spotlight"></div>
+<div id="tour-tooltip">
+  <div class="tt-step" id="tt-step"></div>
+  <div class="tt-title" id="tt-title"></div>
+  <div class="tt-desc" id="tt-desc"></div>
+  <div class="tt-foot">
+    <div class="tt-dots" id="tt-dots"></div>
+    <div class="tt-btns">
+      <button class="tt-btn tt-ghost"  id="tt-back" onclick="tourBack()">← Back</button>
+      <button class="tt-btn tt-primary" id="tt-next" onclick="tourNext()">Next →</button>
+      <button class="tt-end" id="tt-end" onclick="tourEnd()">End Tour</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var STEPS = [
+    { title:'AI Portfolio Alerts',
+      desc:'Twill monitors every merchant 24/7. These live alerts surface chargeback spikes, missing batches, and volume drops automatically — before your partners call you.',
+      view:'dashboard', nav:null, target:'tour-portfolio-alerts', pos:'left' },
+    { title:'Residuals: Automated Income Tracking',
+      desc:'Every processor statement normalized automatically. $847K gross income tracked to the penny across TSYS, Fiserv, Paysafe, and WorldPay — no spreadsheets, no manual reconciliation.',
+      view:'residuals', nav:'nav-residuals', target:'tour-res-overview-kpi', pos:'bottom',
+      action:function(){ var t=document.querySelector('.res-tab[onclick*="res-overview"]'); if(t) t.click(); } },
+    { title:'Fee Audit: Catch Processor Billing Errors',
+      desc:'Twill caught $3,142/month in processor overcharges — $37,704 annualized. WorldPay alone has been overbilling by 4 bps since November. One click to open a dispute.',
+      view:'residuals', nav:null, target:'res-feeaudit', pos:'bottom',
+      action:function(){ var t=document.querySelector('.res-tab[onclick*="res-feeaudit"]'); if(t) t.click(); } },
+    { title:'Merchant Portfolio: AI-Suggested Actions',
+      desc:'Every merchant gets an AI-suggested next action. Escalate a chargeback, retain an at-risk account, follow up on stalled equipment — Twill tells your team exactly what to do.',
+      view:'merchants', nav:'nav-merchants', target:'tour-merchants-summary', pos:'bottom' },
+    { title:'Ticketing: Full Context on Every Issue',
+      desc:'When a merchant has a problem, the full picture is here — transaction history, prior notes, processor data, and AI-generated resolution steps all in one thread.',
+      view:'tickets', nav:'nav-tickets', target:'tour-ticket-strip', pos:'bottom' },
+    { title:'The Merchant Experience',
+      desc:'Your partners send merchants a branded proposal showing exactly how much they\'ll save vs their current processor. Built for demos, built for closing.',
+      view:null, nav:null, target:null, pos:'center', isFinal:true }
+  ];
+
+  var cur = -1;
+
+  window.addEventListener('DOMContentLoaded', function(){
+    // Inject tour badge into every topbar-right
+    document.querySelectorAll('.topbar-right').forEach(function(tb){
+      if(tb.querySelector('.tour-badge')) return;
+      var b = document.createElement('button');
+      b.className = 'tour-badge';
+      b.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="7"/><path d="M8 11v-4M8 5v-.5"/></svg> Take a Tour';
+      b.onclick = function(){ document.getElementById('tour-welcome').classList.add('show'); };
+      tb.insertBefore(b, tb.firstChild);
+    });
+    if(!sessionStorage.getItem('twill_tour_v1')){
+      setTimeout(function(){ document.getElementById('tour-welcome').classList.add('show'); }, 900);
+    }
+  });
+
+  window.tourDismiss = function(){
+    document.getElementById('tour-welcome').classList.remove('show');
+    sessionStorage.setItem('twill_tour_v1','1');
+  };
+
+  window.tourStart = function(){
+    tourDismiss();
+    cur = 0; runStep(0);
+  };
+
+  window.tourNext = function(){
+    if(cur < STEPS.length-1){ cur++; runStep(cur); }
+  };
+
+  window.tourBack = function(){
+    if(cur > 0){ cur--; runStep(cur); }
+  };
+
+  window.tourEnd = function(){
+    cur = -1;
+    document.getElementById('tour-spotlight').style.display = 'none';
+    document.getElementById('tour-tooltip').style.display = 'none';
+  };
+
+  function runStep(idx){
+    var s = STEPS[idx];
+    // Navigate
+    if(s.view && typeof showView==='function'){
+      showView(s.view, s.nav ? document.getElementById(s.nav) : null);
+    }
+    if(s.action){ setTimeout(s.action, 120); }
+
+    if(s.isFinal){ setTimeout(showFinal, 200); return; }
+
+    setTimeout(function(){
+      var el = document.getElementById(s.target);
+      if(el){ el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+      setTimeout(function(){ spotlight(el, s, idx); }, el ? 220 : 80);
+    }, s.action ? 380 : 160);
+  }
+
+  function spotlight(el, s, idx){
+    var sp  = document.getElementById('tour-spotlight');
+    var tip = document.getElementById('tour-tooltip');
+    var PAD = 8;
+    if(el){
+      var r = el.getBoundingClientRect();
+      sp.style.cssText = 'display:block;top:'+(r.top-PAD)+'px;left:'+(r.left-PAD)+'px;width:'+(r.width+PAD*2)+'px;height:'+(r.height+PAD*2)+'px;';
+      tip.style.display = 'block';
+      tip.style.transform = '';
+      posTooltip(tip, r, s.pos);
+    } else {
+      sp.style.display = 'none';
+      tip.style.display = 'block';
+      tip.style.top='50%'; tip.style.left='50%'; tip.style.transform='translate(-50%,-50%)';
+    }
+    fillTooltip(s, idx, false);
+  }
+
+  function showFinal(){
+    var sp  = document.getElementById('tour-spotlight');
+    var tip = document.getElementById('tour-tooltip');
+    sp.style.display = 'none';
+    tip.style.cssText = 'display:block;top:50%;left:50%;transform:translate(-50%,-50%);';
+    fillTooltip(STEPS[5], 5, true);
+  }
+
+  function fillTooltip(s, idx, isFinal){
+    document.getElementById('tt-step').textContent = 'Step '+(idx+1)+' of '+STEPS.length;
+    document.getElementById('tt-title').textContent = s.title;
+    document.getElementById('tt-desc').textContent  = s.desc;
+
+    var dots = document.getElementById('tt-dots');
+    dots.innerHTML = '';
+    STEPS.forEach(function(_,i){
+      var d = document.createElement('div');
+      d.className = 'tt-dot'+(i===idx?' on':'');
+      dots.appendChild(d);
+    });
+
+    var back = document.getElementById('tt-back');
+    var next = document.getElementById('tt-next');
+    back.style.display = idx===0 ? 'none' : '';
+    back.onclick = tourBack;
+
+    if(isFinal){
+      next.textContent = 'Open Merchant View →';
+      next.onclick = function(){ window.open('merchant.html','_blank'); tourEnd(); };
+    } else if(idx===STEPS.length-2){
+      next.textContent = 'See Merchant View →';
+      next.onclick = tourNext;
+    } else {
+      next.textContent = 'Next →';
+      next.onclick = tourNext;
+    }
+  }
+
+  function posTooltip(tip, r, pos){
+    var TW=320, TH=230, GAP=16, vw=window.innerWidth, vh=window.innerHeight;
+    var top, left;
+    tip.style.transform='';
+    if(pos==='left'){
+      top  = Math.max(16, Math.min(r.top, vh-TH-16));
+      left = r.left-TW-GAP;
+      if(left<16) left = Math.min(r.right+GAP, vw-TW-16);
+    } else if(pos==='right'){
+      top  = Math.max(16, Math.min(r.top, vh-TH-16));
+      left = Math.min(r.right+GAP, vw-TW-16);
+    } else if(pos==='bottom'){
+      top  = Math.min(r.bottom+GAP, vh-TH-16);
+      left = Math.max(16, Math.min(r.left, vw-TW-16));
+    } else {
+      top  = Math.max(16, r.top-TH-GAP);
+      left = Math.max(16, Math.min(r.left, vw-TW-16));
+    }
+    tip.style.top  = top+'px';
+    tip.style.left = left+'px';
+  }
+
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') tourEnd(); });
+})();
+</script>
+<!-- /DEMO GUIDED TOUR -->
+
 </body>
 </html>
