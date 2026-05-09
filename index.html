@@ -33569,11 +33569,12 @@ function partnerResetDemo() {
     back.onclick = tourBack;
 
     if(isFinal){
-      next.textContent = 'Open Merchant View →';
-      next.onclick = function(){ window.open('merchant.html','_blank'); tourEnd(); };
-    } else if(idx===STEPS.length-2){
-      next.textContent = 'See Merchant View →';
-      next.onclick = tourNext;
+      next.textContent = 'Explore a Merchant →';
+      next.onclick = function(){
+        tourEnd();
+        if(typeof showView==='function') showView('merchant-active', document.getElementById('nav-merchants'));
+        if(typeof navigateToMerchant==='function') setTimeout(function(){ navigateToMerchant('Harbor View Hotels','active'); }, 120);
+      };
     } else {
       next.textContent = 'Next →';
       next.onclick = tourNext;
