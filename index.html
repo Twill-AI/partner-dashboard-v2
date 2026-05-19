@@ -4211,6 +4211,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <span style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;" id="md-assign-bar"><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'partner','md')"><span style="width:18px;height:18px;border-radius:50%;background:#8C7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SL</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Partner</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Summit Lending</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><span style="display:inline-block;width:1px;height:16px;background:var(--border-strong);margin:0 4px;vertical-align:middle;"></span><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'rep','md')"><span style="width:18px;height:18px;border-radius:50%;background:#5B7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SR</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Rep</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Sara Reyes</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><button style="display:inline-flex;align-items:center;gap:4px;background:none;border:1px dashed var(--border-strong);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;" onclick="assignAddRep(this,'md')">+ Rep</button></span>
         </div>
         <div class="topbar-right">
+          <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
+            <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
+            📎 Send form
+          </label>
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
           <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;">✕ Decline</button>
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
@@ -8641,6 +8645,10 @@ function cycleReq(el){
           <span class="p-badge bp">Awaiting Docs</span>
         </div>
         <div class="topbar-right">
+          <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
+            <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
+            📎 Send form
+          </label>
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
           <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;">✕ Decline</button>
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
@@ -18466,6 +18474,10 @@ function initResCharts() {
           <span class="p-badge bp">Awaiting Docs</span>
         </div>
         <div class="topbar-right">
+          <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
+            <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
+            📎 Send form
+          </label>
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
           <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;">✕ Decline</button>
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
@@ -21322,6 +21334,10 @@ function initResCharts() {
           <span class="p-badge bp">Awaiting Docs</span>
         </div>
         <div class="topbar-right">
+          <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
+            <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
+            📎 Send form
+          </label>
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
           <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;">✕ Decline</button>
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
@@ -24179,6 +24195,10 @@ function initResCharts() {
           <span class="p-badge bp">Awaiting Docs</span>
         </div>
         <div class="topbar-right">
+          <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
+            <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
+            📎 Send form
+          </label>
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
           <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;">✕ Decline</button>
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
@@ -27035,6 +27055,10 @@ function initResCharts() {
           <span class="p-badge bp">Awaiting Docs</span>
         </div>
         <div class="topbar-right">
+          <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
+            <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
+            📎 Send form
+          </label>
           <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">↗ Share</button>
           <button class="btn btn-danger" style="font-size:11px;padding:5px 10px;">✕ Decline</button>
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
@@ -33221,6 +33245,10 @@ window.twillBC.onmessage = function(e) {
   if (type === 'reset') {
     location.reload();
   }
+
+  if (type === 'form_fill_complete') {
+    handleFormFillComplete(data);
+  }
 };
 
 async function handleMerchantSigned() {
@@ -33327,6 +33355,91 @@ function partnerResetDemo() {
   }
   location.reload();
 }
+
+// ═══ PDF FORM-FILL — PARTNER SIDE ═══
+// The partner picks a fillable PDF; we upload it to /api/forms/upload to create
+// a session, then broadcast `form_fill_request` so the merchant tab can start
+// the chat-driven Q&A. When the merchant finishes, they broadcast back
+// `form_fill_complete` and we surface a notification.
+async function partnerSendFormToMerchant(input) {
+  const file = input.files && input.files[0];
+  input.value = ''; // allow re-selecting the same file
+  if (!file) return;
+  if (file.type && file.type !== 'application/pdf') {
+    if (typeof partnerAddNotification === 'function') {
+      partnerAddNotification('<span class="pn-icon">⚠️</span> <strong>Form upload failed:</strong> please pick a PDF.');
+    } else {
+      alert('Please choose a PDF.');
+    }
+    return;
+  }
+
+  const merchantEl = document.getElementById('md-merchant-name');
+  const merchantName = merchantEl ? merchantEl.textContent.trim() : 'the merchant';
+
+  // Visual feedback on the partner side.
+  if (typeof partnerAddNotification === 'function') {
+    partnerAddNotification('<span class="pn-icon">📤</span> Uploading <strong>' + escapeHtmlPartner(file.name) + '</strong>…');
+  }
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/forms/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = '<span class="pn-icon">⚠️</span> <strong>Form upload failed:</strong> ' + escapeHtmlPartner(data.error || 'unknown error');
+      if (typeof partnerAddNotification === 'function') partnerAddNotification(msg);
+      else alert(data.error || 'Upload failed');
+      return;
+    }
+
+    // Broadcast to the merchant tab so it can start the chat.
+    if (window.twillBC) {
+      window.twillBC.postMessage({
+        type: 'form_fill_request',
+        data: {
+          session_id: data.session_id,
+          filename: data.filename,
+          field_count: data.field_count,
+          sender: 'Twill Partner',
+          merchant_name: merchantName,
+          timestamp: Date.now(),
+        },
+      });
+    }
+
+    if (typeof partnerAddNotification === 'function') {
+      partnerAddNotification(
+        '<span class="pn-icon">📨</span> Sent <strong>' + escapeHtmlPartner(data.filename) + '</strong> to ' +
+        escapeHtmlPartner(merchantName) + ' (' + data.field_count + ' fields). They\'re filling it now in their chat.'
+      );
+    }
+  } catch (err) {
+    if (typeof partnerAddNotification === 'function') {
+      partnerAddNotification('<span class="pn-icon">⚠️</span> <strong>Form upload error:</strong> ' + escapeHtmlPartner(err.message));
+    } else {
+      alert('Upload error: ' + err.message);
+    }
+  }
+}
+
+function handleFormFillComplete(data) {
+  if (typeof partnerAddNotification === 'function') {
+    partnerAddNotification(
+      '<span class="pn-icon">✅</span> <strong>Merchant completed the form!</strong> ' +
+      escapeHtmlPartner(data.filename || 'form.pdf') + ' — ' +
+      (data.answered_count || 0) + '/' + (data.field_count || 0) + ' fields filled.'
+    );
+  }
+}
+
+function escapeHtmlPartner(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 </script>
 <!-- cache-bust:1773827400 -->
 </body>

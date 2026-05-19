@@ -1,0 +1,12 @@
+name = "partner-dashboard-v2"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."
+
+# KV namespace for form-fill session state.
+# For local dev (wrangler pages dev) the id below is a placeholder — wrangler
+# uses an in-memory simulator. Replace the production id with one created via:
+#   npx wrangler kv namespace create FORM_SESSIONS
+[[kv_namespaces]]
+binding = "FORM_SESSIONS"
+id = "local-dev-placeholder"

@@ -1,0 +1,16 @@
+{
+  "name": "partner-dashboard-v2",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev . --port 8080",
+    "deploy": "wrangler pages deploy ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.93.0"
+  }
+}

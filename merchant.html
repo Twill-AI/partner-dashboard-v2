@@ -1431,8 +1431,8 @@
 
         <div class="ch-inp">
           <div class="ta-wrap">
-            <textarea class="chat-ta" placeholder="Type your message..." rows="3"></textarea>
-            <button class="send-btn">&#9654;</button>
+            <textarea class="chat-ta" placeholder="Type your message..." rows="3" onkeydown="handleFormFillKeydown(event)"></textarea>
+            <button class="send-btn" onclick="handleFormFillSend()">&#9654;</button>
           </div>
         </div>
       </aside>
@@ -1471,6 +1471,11 @@ bc.onmessage = function(e) {
   if (type === 'reset') {
     // Partner triggered reset
     location.reload();
+  }
+
+  if (type === 'form_fill_request') {
+    // Partner uploaded a PDF and wants the merchant to fill it via chat
+    startFormFillFromBroadcast(data);
   }
 };
 
@@ -1911,6 +1916,157 @@ async function handleApproval() {
 function resetDemo() {
   bc.postMessage({type: 'reset', data: {}});
   location.reload();
+}
+
+// ═══ PDF FORM-FILL CHAT TOOL ═══
+// The partner (or sub-partner) uploads a PDF on their side; that side posts a
+// BroadcastChannel message {type:'form_fill_request', data:{session_id, filename, field_count}}.
+// The merchant tab listens for it and starts the Q&A here.
+window.formFill = { sessionId: null, filename: null, fieldCount: 0, busy: false };
+
+async function startFormFillFromBroadcast(data) {
+  if (window.formFill.busy || window.formFill.sessionId) {
+    addMessage('ai', "Your partner just sent a new form, but I'm still working on the last one. Finish that one first.");
+    return;
+  }
+  if (!data || !data.session_id) return;
+
+  // Expand chat to full width so the Q&A is easy to read.
+  const shell = document.querySelector('.shell');
+  if (shell && !shell.classList.contains('chat-expanded')) shell.classList.add('chat-expanded');
+
+  window.formFill.sessionId = data.session_id;
+  window.formFill.filename = data.filename || 'form.pdf';
+  window.formFill.fieldCount = data.field_count || 0;
+
+  const senderLabel = data.sender ? `Your partner (${escapeHtml(data.sender)})` : 'Your partner';
+  addMessage('ai',
+    `&#128206; ${senderLabel} sent over <strong>${escapeHtml(window.formFill.filename)}</strong> for you to fill out` +
+    (window.formFill.fieldCount ? ` &mdash; ${window.formFill.fieldCount} fields total.` : '.') +
+    ` I'll walk you through it one question at a time.`
+  );
+  await formFillTurn(''); // first turn — Claude opens with the first question
+}
+
+function handleFormFillKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleFormFillSend();
+  }
+}
+
+async function handleFormFillSend() {
+  const ta = document.querySelector('.chat-ta');
+  const msg = ta && ta.value.trim();
+  if (!msg) return;
+  if (!window.formFill.sessionId) {
+    addMessage('user', escapeHtml(msg), {userMsg: true});
+    ta.value = '';
+    addMessage('ai', "Upload a PDF first with the 📎 button and I'll walk you through it.");
+    return;
+  }
+  ta.value = '';
+  addMessage('user', escapeHtml(msg), {userMsg: true});
+  await formFillTurn(msg);
+}
+
+async function formFillTurn(message) {
+  const id = window.formFill.sessionId;
+  if (!id) return;
+  window.formFill.busy = true;
+  const typing = addTyping();
+  try {
+    const res = await fetch(`/api/forms/${encodeURIComponent(id)}/turn`, {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({ message: message || '' }),
+    });
+    const data = await res.json();
+    removeTyping();
+    if (!res.ok) {
+      addMessage('ai', `Hit an error: ${escapeHtml(data.error || 'unknown')}`);
+      window.formFill.busy = false;
+      return;
+    }
+
+    // Progress bar — answered / total.
+    const text = (data.assistant_text || '').trim();
+    const progress = `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${data.answered_count}/${data.field_count} fields filled</div>`;
+    if (text) {
+      addMessage('ai', `${escapeHtml(text).replace(/\n/g,'<br>')}${progress}`);
+    }
+
+    if (data.finalize) {
+      await formFillFinalize();
+    } else {
+      window.formFill.busy = false;
+    }
+  } catch (err) {
+    removeTyping();
+    addMessage('ai', `Turn failed: ${escapeHtml(err.message)}`);
+    window.formFill.busy = false;
+  }
+}
+
+async function formFillFinalize() {
+  const id = window.formFill.sessionId;
+  if (!id) return;
+  const typing = addTyping();
+  try {
+    const res = await fetch(`/api/forms/${encodeURIComponent(id)}/finalize`, { method: 'POST' });
+    const data = await res.json();
+    removeTyping();
+    if (!res.ok) {
+      addMessage('ai', `Finalize failed: ${escapeHtml(data.error || 'unknown')}`);
+      window.formFill.busy = false;
+      return;
+    }
+
+    // Build a download link from the base64 blob.
+    const byteChars = atob(data.pdf_base64);
+    const bytes = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+
+    const skippedNote = (data.skipped && data.skipped.length)
+      ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${data.skipped.length} field(s) couldn't be written — see console.</div>` : '';
+    if (data.skipped && data.skipped.length) console.warn('Form-fill skipped fields:', data.skipped);
+
+    addMessage('ai',
+      `&#9989; All done! Your filled form is ready.<br><br>` +
+      `<a href="${url}" download="${escapeHtml(data.filename)}" class="chat-upload-btn" style="text-decoration:none;">&#128229; Download ${escapeHtml(data.filename)}</a>` +
+      skippedNote
+    );
+
+    // Let the partner side know the merchant finished — they get a notification.
+    bc.postMessage({
+      type: 'form_fill_complete',
+      data: {
+        session_id: id,
+        filename: data.filename,
+        answered_count: data.answered_count,
+        field_count: data.field_count,
+        timestamp: Date.now(),
+      },
+    });
+
+    // Reset session so another form can be sent.
+    window.formFill.sessionId = null;
+    window.formFill.filename = null;
+    window.formFill.fieldCount = 0;
+    window.formFill.busy = false;
+  } catch (err) {
+    removeTyping();
+    addMessage('ai', `Finalize failed: ${escapeHtml(err.message)}`);
+    window.formFill.busy = false;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 </script>
