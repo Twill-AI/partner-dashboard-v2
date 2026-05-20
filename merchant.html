@@ -969,9 +969,95 @@
   }
   .back-link:hover { color:var(--text-primary); text-decoration:underline; }
 
+  /* ═══ FORM-FILL REVIEW DRAWER (right side, slides in) ═══ */
+  .ff-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:9000; }
+  .ff-backdrop.open { opacity:1; pointer-events:auto; }
+  .ff-drawer {
+    position:fixed; top:0; right:0; bottom:0;
+    width:min(640px, 90vw);
+    background:var(--bg-surface, #14141A);
+    border-left:1px solid var(--border-strong, #2a2a35);
+    display:flex; flex-direction:column;
+    transform:translateX(100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    z-index:9001;
+    box-shadow:-12px 0 32px rgba(0,0,0,.5);
+  }
+  .ff-drawer.open { transform:translateX(0); }
+  .ff-hdr {
+    padding:14px 18px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px; flex-shrink:0;
+    background:var(--bg-elevated, #1a1a22);
+  }
+  .ff-hdr-title { flex:1; min-width:0; }
+  .ff-hdr-title h3 { margin:0; font-size:14px; font-weight:600; color:var(--text-primary); font-family:var(--font-ui); }
+  .ff-hdr-title .ff-sub { font-size:11px; color:var(--text-muted); margin-top:2px; font-family:var(--font-data); }
+  .ff-close { background:none; border:1px solid var(--border-strong); color:var(--text-secondary); width:28px; height:28px; border-radius:6px; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; justify-content:center; }
+  .ff-close:hover { background:var(--bg-hover); color:var(--text-primary); }
+  .ff-body { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+  .ff-pdf-wrap { flex:1; min-height:300px; background:#22222A; border-bottom:1px solid var(--border); position:relative; }
+  .ff-pdf-wrap iframe { width:100%; height:100%; border:none; background:#fff; }
+  .ff-sig-section { padding:16px 18px; background:var(--bg-elevated, #1a1a22); border-top:1px solid var(--border); }
+  .ff-sig-section h4 { margin:0 0 4px; font-size:12px; font-weight:600; color:var(--text-primary); font-family:var(--font-ui); }
+  .ff-sig-section .ff-sig-hint { font-size:11px; color:var(--text-muted); margin-bottom:10px; }
+  .ff-sig-pad-wrap { position:relative; background:#fff; border:1px solid var(--border-strong); border-radius:6px; overflow:hidden; }
+  .ff-sig-pad { display:block; width:100%; height:120px; cursor:crosshair; touch-action:none; }
+  .ff-sig-placeholder { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#999; font-size:12px; font-family:var(--font-ui); pointer-events:none; user-select:none; }
+  .ff-sig-placeholder.hidden { display:none; }
+  .ff-sig-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
+  .ff-sig-row input { flex:1; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:6px; padding:7px 10px; font-size:12px; color:var(--text-primary); font-family:var(--font-ui); outline:none; }
+  .ff-sig-row input:focus { border-color:var(--yellow); }
+  .ff-sig-clear { background:none; border:1px solid var(--border-strong); color:var(--text-secondary); padding:7px 12px; border-radius:6px; font-size:11px; cursor:pointer; font-family:var(--font-ui); }
+  .ff-sig-clear:hover { color:var(--text-primary); background:var(--bg-hover); }
+  .ff-footer { padding:12px 18px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; background:var(--bg-elevated, #1a1a22); }
+  .ff-btn { padding:8px 16px; border-radius:6px; font-size:12px; font-weight:600; font-family:var(--font-ui); cursor:pointer; border:1px solid var(--border-strong); }
+  .ff-btn-ghost { background:var(--bg-surface); color:var(--text-secondary); }
+  .ff-btn-ghost:hover { background:var(--bg-hover); color:var(--text-primary); }
+  .ff-btn-primary { background:var(--yellow); color:#09091A; border-color:var(--yellow); }
+  .ff-btn-primary:hover { filter:brightness(1.05); }
+  .ff-btn-primary:disabled { opacity:.45; cursor:not-allowed; filter:none; }
+  .ff-meta { padding:10px 18px; background:var(--bg-surface); border-bottom:1px solid var(--border); display:flex; gap:14px; font-size:11px; color:var(--text-muted); font-family:var(--font-ui); flex-wrap:wrap; }
+  .ff-meta strong { color:var(--text-primary); font-weight:600; }
+
 </style>
 </head>
 <body>
+
+<!-- ═══ FORM-FILL REVIEW DRAWER (PDF preview + signature) ═══ -->
+<div class="ff-backdrop" id="ff-backdrop" onclick="ffCloseDrawer()"></div>
+<aside class="ff-drawer" id="ff-drawer" role="dialog" aria-label="Review filled form">
+  <div class="ff-hdr">
+    <div class="ff-hdr-title">
+      <h3 id="ff-filename">form.pdf</h3>
+      <div class="ff-sub" id="ff-sub">Review and sign to submit</div>
+    </div>
+    <button class="ff-close" onclick="ffCloseDrawer()" aria-label="Close">&#10005;</button>
+  </div>
+  <div class="ff-meta" id="ff-meta"></div>
+  <div class="ff-body">
+    <div class="ff-pdf-wrap">
+      <iframe id="ff-pdf-frame" title="Filled form preview"></iframe>
+    </div>
+    <div class="ff-sig-section" id="ff-sig-section">
+      <h4>Signature</h4>
+      <div class="ff-sig-hint">Draw your signature below, then type your name and submit.</div>
+      <div class="ff-sig-pad-wrap">
+        <canvas class="ff-sig-pad" id="ff-sig-pad"></canvas>
+        <div class="ff-sig-placeholder" id="ff-sig-placeholder">Sign here</div>
+      </div>
+      <div class="ff-sig-row">
+        <input type="text" id="ff-sig-name" placeholder="Type your full name" oninput="ffUpdateSubmitState()">
+        <input type="text" id="ff-sig-date" readonly style="max-width:120px;">
+        <button class="ff-sig-clear" onclick="ffResetSignaturePad()">Clear</button>
+      </div>
+    </div>
+  </div>
+  <div class="ff-footer">
+    <button class="ff-btn ff-btn-ghost" onclick="ffCloseDrawer()">Cancel</button>
+    <button class="ff-btn ff-btn-primary" id="ff-submit" onclick="ffSubmit()" disabled>Sign &amp; submit</button>
+  </div>
+</aside>
+
 <div class="shell">
 
   <!-- ═══ SIDEBAR ═══ -->
@@ -2022,24 +2108,46 @@ async function formFillFinalize() {
       return;
     }
 
-    // Build a download link from the base64 blob.
+    // Build a Blob from the base64 PDF for the drawer's iframe + download link.
     const byteChars = atob(data.pdf_base64);
     const bytes = new Uint8Array(byteChars.length);
     for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
     const blob = new Blob([bytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
 
-    const skippedNote = (data.skipped && data.skipped.length)
-      ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${data.skipped.length} field(s) couldn't be written — see console.</div>` : '';
-    if (data.skipped && data.skipped.length) console.warn('Form-fill skipped fields:', data.skipped);
+    if (data.skipped && data.skipped.length) console.warn('Form-fill write errors:', data.skipped);
 
+    const skipCount = (data.intentionally_skipped || []).length;
     addMessage('ai',
-      `&#9989; All done! Your filled form is ready.<br><br>` +
-      `<a href="${url}" download="${escapeHtml(data.filename)}" class="chat-upload-btn" style="text-decoration:none;">&#128229; Download ${escapeHtml(data.filename)}</a>` +
-      skippedNote
+      `&#9989; Filled! <strong>${data.written_count || 0}</strong> field${data.written_count === 1 ? '' : 's'} written` +
+      (skipCount ? `, <strong>${skipCount}</strong> intentionally left blank.` : '.') +
+      `<br><br><button class="chat-upload-btn" onclick="ffReopenLastForm()">📄 Review${data.signature_required ? ' &amp; sign' : ''} the filled form &rarr;</button>`
     );
 
-    // Let the partner side know the merchant finished — they get a notification.
+    // Open the review drawer with PDF preview + (optional) signature pad.
+    ffInitSignaturePad();
+    showFilledFormDrawer({
+      filename: data.filename,
+      pdfBlob: blob,
+      signatureRequired: !!data.signature_required,
+      writtenCount: data.written_count || 0,
+      fieldCount: data.field_count || 0,
+      intentionallySkipped: data.intentionally_skipped || [],
+      sessionId: id,
+    });
+
+    // Stash so the chat button can re-open the same drawer state.
+    window.formFill.lastDrawerArgs = {
+      filename: data.filename,
+      pdfBlob: blob,
+      signatureRequired: !!data.signature_required,
+      writtenCount: data.written_count || 0,
+      fieldCount: data.field_count || 0,
+      intentionallySkipped: data.intentionally_skipped || [],
+      sessionId: id,
+    };
+
+    // Let the partner side know the merchant finished filling — separate from
+    // "signed and submitted" which fires later from the drawer's Submit button.
     bc.postMessage({
       type: 'form_fill_complete',
       data: {
@@ -2047,11 +2155,12 @@ async function formFillFinalize() {
         filename: data.filename,
         answered_count: data.answered_count,
         field_count: data.field_count,
+        written_count: data.written_count || 0,
         timestamp: Date.now(),
       },
     });
 
-    // Reset session so another form can be sent.
+    // Reset session so another form can be sent (the drawer keeps its own blob).
     window.formFill.sessionId = null;
     window.formFill.filename = null;
     window.formFill.fieldCount = 0;
@@ -2067,6 +2176,184 @@ function escapeHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ═══ FORM-FILL REVIEW DRAWER (PDF preview + signature pad) ═══
+window.ffDrawer = { blobUrl: null, sessionData: null, signed: false };
+
+function showFilledFormDrawer({ filename, pdfBlob, signatureRequired, writtenCount, fieldCount, intentionallySkipped, sessionId }) {
+  // Revoke previous blob URL if any.
+  if (window.ffDrawer.blobUrl) URL.revokeObjectURL(window.ffDrawer.blobUrl);
+
+  const blobUrl = URL.createObjectURL(pdfBlob);
+  window.ffDrawer.blobUrl = blobUrl;
+  window.ffDrawer.sessionData = { filename, signatureRequired, writtenCount, fieldCount, intentionallySkipped, sessionId };
+  window.ffDrawer.signed = false;
+
+  const backdrop = document.getElementById('ff-backdrop');
+  const drawer = document.getElementById('ff-drawer');
+  drawer.querySelector('#ff-filename').textContent = filename || 'form.pdf';
+  drawer.querySelector('#ff-sub').textContent = signatureRequired ? 'Review and sign to submit' : 'Review and submit';
+
+  // Stats row
+  const skippedCount = (intentionallySkipped || []).length;
+  drawer.querySelector('#ff-meta').innerHTML =
+    `<span><strong>${writtenCount || 0}</strong> field${writtenCount === 1 ? '' : 's'} written</span>` +
+    `<span>·</span>` +
+    `<span><strong>${skippedCount}</strong> intentionally blank</span>` +
+    `<span>·</span>` +
+    `<a href="${blobUrl}" download="${escapeHtml(filename)}" style="color:var(--text-muted);text-decoration:underline;">download raw PDF</a>`;
+
+  // Embed PDF
+  drawer.querySelector('#ff-pdf-frame').src = blobUrl + '#toolbar=0&navpanes=0';
+
+  // Show / hide signature section
+  const sigSection = drawer.querySelector('#ff-sig-section');
+  sigSection.style.display = signatureRequired ? 'block' : 'none';
+
+  // Reset signature pad + inputs
+  if (signatureRequired) {
+    ffResetSignaturePad();
+    drawer.querySelector('#ff-sig-name').value = '';
+    drawer.querySelector('#ff-sig-date').value = new Date().toLocaleDateString('en-US');
+  }
+
+  ffUpdateSubmitState();
+
+  backdrop.classList.add('open');
+  drawer.classList.add('open');
+}
+
+function ffCloseDrawer() {
+  document.getElementById('ff-backdrop').classList.remove('open');
+  document.getElementById('ff-drawer').classList.remove('open');
+  // Stop loading PDF & free memory after the slide-out animation completes.
+  setTimeout(() => {
+    const iframe = document.getElementById('ff-pdf-frame');
+    if (iframe) iframe.src = 'about:blank';
+    if (window.ffDrawer.blobUrl) {
+      URL.revokeObjectURL(window.ffDrawer.blobUrl);
+      window.ffDrawer.blobUrl = null;
+    }
+  }, 300);
+}
+
+// ─── Signature pad ───────────────────────────────────────────────
+function ffInitSignaturePad() {
+  const canvas = document.getElementById('ff-sig-pad');
+  if (!canvas || canvas.dataset.inited === '1') return;
+  canvas.dataset.inited = '1';
+
+  // Resize canvas for crisp drawing on retina.
+  const resize = () => {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(ratio, ratio);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#1a1a22';
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  let drawing = false, last = null;
+  const ctx = canvas.getContext('2d');
+  const getPoint = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+  };
+  const start = (e) => { e.preventDefault(); drawing = true; last = getPoint(e); markSigned(); };
+  const move = (e) => {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPoint(e);
+    ctx.beginPath();
+    ctx.moveTo(last.x, last.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    last = p;
+  };
+  const end = () => { drawing = false; last = null; };
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+}
+
+function markSigned() {
+  const placeholder = document.getElementById('ff-sig-placeholder');
+  if (placeholder) placeholder.classList.add('hidden');
+  ffUpdateSubmitState();
+}
+
+function ffResetSignaturePad() {
+  const canvas = document.getElementById('ff-sig-pad');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform before clearing
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+  const placeholder = document.getElementById('ff-sig-placeholder');
+  if (placeholder) placeholder.classList.remove('hidden');
+  window.ffDrawer.signed = false;
+  ffUpdateSubmitState();
+}
+
+function ffUpdateSubmitState() {
+  const btn = document.getElementById('ff-submit');
+  if (!btn) return;
+  const sd = window.ffDrawer.sessionData || {};
+  if (!sd.signatureRequired) {
+    btn.disabled = false;
+    btn.textContent = 'Submit to Twill';
+    return;
+  }
+  const placeholder = document.getElementById('ff-sig-placeholder');
+  const hasDrawn = placeholder && placeholder.classList.contains('hidden');
+  const name = (document.getElementById('ff-sig-name') || {}).value || '';
+  btn.disabled = !(hasDrawn && name.trim().length > 0);
+  btn.textContent = hasDrawn && name.trim() ? 'Sign & submit to Twill' : 'Sign & submit';
+}
+
+function ffReopenLastForm() {
+  const args = window.formFill && window.formFill.lastDrawerArgs;
+  if (!args) {
+    addMessage('ai', "I don't have a recent form to re-open. Ask your partner to send it again if you need to.");
+    return;
+  }
+  ffInitSignaturePad();
+  showFilledFormDrawer(args);
+}
+
+function ffSubmit() {
+  const sd = window.ffDrawer.sessionData || {};
+  // Mock: pretend we just shipped to Twill.
+  const name = (document.getElementById('ff-sig-name') || {}).value || '(unsigned)';
+  bc.postMessage({
+    type: 'form_fill_signed',
+    data: {
+      session_id: sd.sessionId,
+      filename: sd.filename,
+      signed_by: name,
+      signed_at: Date.now(),
+    },
+  });
+  addMessage('ai',
+    `&#9989; <strong>${escapeHtml(sd.filename || 'Form')}</strong> submitted to Twill` +
+    (sd.signatureRequired ? ` &mdash; signed as <strong>${escapeHtml(name)}</strong>.` : '.') +
+    `<br><br>You\'ll hear back from your underwriter within 1–2 business days.`
+  );
+  ffCloseDrawer();
 }
 
 </script>

@@ -33249,6 +33249,10 @@ window.twillBC.onmessage = function(e) {
   if (type === 'form_fill_complete') {
     handleFormFillComplete(data);
   }
+
+  if (type === 'form_fill_signed') {
+    handleFormFillSigned(data);
+  }
 };
 
 async function handleMerchantSigned() {
@@ -33427,9 +33431,19 @@ async function partnerSendFormToMerchant(input) {
 function handleFormFillComplete(data) {
   if (typeof partnerAddNotification === 'function') {
     partnerAddNotification(
-      '<span class="pn-icon">✅</span> <strong>Merchant completed the form!</strong> ' +
-      escapeHtmlPartner(data.filename || 'form.pdf') + ' — ' +
-      (data.answered_count || 0) + '/' + (data.field_count || 0) + ' fields filled.'
+      '<span class="pn-icon">👀</span> <strong>Merchant is reviewing the filled form</strong> ' +
+      '(' + escapeHtmlPartner(data.filename || 'form.pdf') + ') &mdash; ' +
+      (data.written_count || data.answered_count || 0) + '/' + (data.field_count || 0) + ' fields written.'
+    );
+  }
+}
+
+function handleFormFillSigned(data) {
+  if (typeof partnerAddNotification === 'function') {
+    partnerAddNotification(
+      '<span class="pn-icon">✍️</span> <strong>Merchant signed and submitted</strong> ' +
+      escapeHtmlPartner(data.filename || 'form.pdf') +
+      ' &mdash; signed as <strong>' + escapeHtmlPartner(data.signed_by || 'merchant') + '</strong>.'
     );
   }
 }

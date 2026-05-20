@@ -2987,8 +2987,14 @@ window.spBC.addEventListener('message', function(e) {
   const {type, data} = e.data || {};
   if (type === 'form_fill_complete') {
     spFormFillToast(
-      '✅ Merchant completed <strong>' + spEscape(data.filename || 'form.pdf') + '</strong> — ' +
-      (data.answered_count || 0) + '/' + (data.field_count || 0) + ' fields filled.'
+      '👀 Merchant is reviewing <strong>' + spEscape(data.filename || 'form.pdf') + '</strong> — ' +
+      (data.written_count || data.answered_count || 0) + '/' + (data.field_count || 0) + ' fields written.'
+    );
+  }
+  if (type === 'form_fill_signed') {
+    spFormFillToast(
+      '✍️ Merchant signed and submitted <strong>' + spEscape(data.filename || 'form.pdf') + '</strong> ' +
+      '— signed as <strong>' + spEscape(data.signed_by || 'merchant') + '</strong>.'
     );
   }
 });

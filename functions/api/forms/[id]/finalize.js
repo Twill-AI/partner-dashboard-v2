@@ -91,6 +91,10 @@ export async function onRequestPost({ env, params }) {
   await saveSession(env, session.id, session);
 
   const baseName = (session.filename || "form.pdf").replace(/\.pdf$/i, "");
+  // Heuristic: most onboarding/IRS/ACH forms need a signature. We default to
+  // true for the demo so the drawer always shows the signature step. Future:
+  // detect a Sig field in AcroForm, or have the agent set this in the session.
+  const signatureRequired = true;
   return jsonResponse({
     filename: `${baseName}-filled.pdf`,
     pdf_base64: b64,
@@ -100,6 +104,7 @@ export async function onRequestPost({ env, params }) {
       Object.keys(session.answers).length - intentionallySkipped.length,
     intentionally_skipped: intentionallySkipped,
     skipped,
+    signature_required: signatureRequired,
   });
 }
 
