@@ -51,6 +51,12 @@ export async function onRequestPost({ request, env, params }) {
     userContent.push({ type: "text", text: userMessage });
   }
 
+  // Defensive: if a prior turn ended with orphan tool_use blocks (e.g. the
+  // assistant message hit max_tokens mid-generation and we didn't push
+  // tool_results), Anthropic will reject the next request. Repair before
+  // sending the new user turn.
+  repairOrphanToolUse(session);
+
   session.conversation.push({ role: "user", content: userContent });
 
   // Run the tool-use loop until Claude either:
@@ -73,7 +79,11 @@ export async function onRequestPost({ request, env, params }) {
       },
       body: JSON.stringify({
         model: ANTHROPIC_MODEL,
-        max_tokens: 1024,
+        // 4096 is plenty for chat turns; a single message of 10+ record_answer
+        // tool_use blocks against IRS-style long field names can blow past
+        // 1024 and truncate mid-block, which leaves orphan tool_use ids and
+        // corrupts the conversation.
+        max_tokens: 4096,
         system: systemPrompt(session),
         tools: TOOLS,
         messages: session.conversation,
@@ -99,14 +109,42 @@ export async function onRequestPost({ request, env, params }) {
       assistantText = textBlocks.map((b) => b.text).join("\n").trim();
     }
 
-    if (reply.stop_reason !== "tool_use") {
-      // Plain text turn — hand back to the user.
+    // Process tool_use blocks WHENEVER they appear, regardless of stop_reason.
+    // If stop_reason is 'max_tokens' (truncation) but Claude still emitted some
+    // tool_use blocks, we need to either honor them with tool_results or strip
+    // them — otherwise Anthropic rejects the next turn with "tool_use ids were
+    // found without tool_result blocks immediately after".
+    const toolUses = (reply.content || []).filter((b) => b.type === "tool_use");
+
+    if (toolUses.length === 0) {
+      // No tools — plain text turn, hand back to the user.
       break;
+    }
+
+    if (reply.stop_reason === "max_tokens") {
+      // Truncation: the LAST tool_use may be malformed. Be conservative — strip
+      // all tool_use blocks from the assistant message so we don't have to
+      // guess which ones are complete, then tell the user to retry.
+      const cleaned = (reply.content || []).filter((b) => b.type !== "tool_use");
+      session.conversation[session.conversation.length - 1] = {
+        role: "assistant",
+        content: cleaned.length ? cleaned : [{ type: "text", text: "(response truncated)" }],
+      };
+      await saveSession(env, session.id, session);
+      return jsonResponse({
+        assistant_text:
+          (assistantText ? assistantText + "\n\n" : "") +
+          "(I generated too many tool calls in one shot and hit a length limit. Please rephrase your last answer or try again.)",
+        finalize: false,
+        answers: session.answers,
+        field_count: session.fields.length,
+        answered_count: Object.keys(session.answers).length,
+        truncated: true,
+      });
     }
 
     // Execute every tool_use block, append a single user message of tool_results,
     // then loop so Claude can continue.
-    const toolUses = (reply.content || []).filter((b) => b.type === "tool_use");
     const toolResults = [];
     for (const tu of toolUses) {
       if (tu.name === "record_answer") {
@@ -201,5 +239,53 @@ async function safeJson(request) {
     return await request.json();
   } catch {
     return null;
+  }
+}
+
+// Scan the conversation for any assistant message with tool_use blocks that
+// AREN'T immediately followed by a user message containing matching tool_result
+// blocks for every tool_use_id. This corruption can happen when a prior turn
+// was truncated (max_tokens), errored mid-loop, or saved a new user message
+// after an orphan was already in place.
+//
+// Strategy when corruption is found: strip the orphan tool_use blocks from
+// that assistant message AND truncate everything after it (those later
+// messages were built on a state Anthropic now rejects). If the cleaned
+// assistant message would be empty, drop it entirely. The next live turn will
+// re-prompt from a clean point.
+function repairOrphanToolUse(session) {
+  const convo = session.conversation;
+  if (!convo || convo.length === 0) return;
+
+  for (let i = 0; i < convo.length; i++) {
+    const msg = convo[i];
+    if (!msg || msg.role !== "assistant") continue;
+
+    const toolUseIds = (msg.content || [])
+      .filter((b) => b.type === "tool_use")
+      .map((b) => b.id);
+    if (toolUseIds.length === 0) continue;
+
+    const next = convo[i + 1];
+    const nextResultIds = new Set(
+      next && next.role === "user"
+        ? (next.content || [])
+            .filter((b) => b.type === "tool_result")
+            .map((b) => b.tool_use_id)
+        : [],
+    );
+    const orphaned = toolUseIds.filter((id) => !nextResultIds.has(id));
+    if (orphaned.length === 0) continue;
+
+    // Corruption found at message i. Strip the tool_use blocks from this
+    // message and truncate everything that came after.
+    const kept = (msg.content || []).filter((b) => b.type !== "tool_use");
+    if (kept.length === 0) {
+      convo.splice(i); // drop this and everything after
+    } else {
+      msg.content = kept;
+      convo.splice(i + 1); // keep the cleaned message; drop everything after
+    }
+    return; // one repair per pass — earliest orphan is the real cause
   }
 }
