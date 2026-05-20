@@ -1,7 +1,7 @@
 import {
   ANTHROPIC_BETA,
   ANTHROPIC_VERSION,
-  ANTHROPIC_MODEL,
+  ANTHROPIC_MODEL_DEFAULT,
   TOOLS,
   errorResponse,
   jsonResponse,
@@ -78,7 +78,7 @@ export async function onRequestPost({ request, env, params }) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: ANTHROPIC_MODEL,
+        model: env.ANTHROPIC_MODEL || ANTHROPIC_MODEL_DEFAULT,
         // 4096 is plenty for chat turns; a single message of 10+ record_answer
         // tool_use blocks against IRS-style long field names can blow past
         // 1024 and truncate mid-block, which leaves orphan tool_use ids and
@@ -184,6 +184,28 @@ export async function onRequestPost({ request, env, params }) {
           type: "tool_result",
           tool_use_id: tu.id,
           content: `Recorded. ${Object.keys(session.answers).length}/${session.fields.length} fields filled.`,
+        });
+      } else if (tu.name === "skip_field") {
+        const { field, reason } = tu.input || {};
+        if (!field) {
+          toolResults.push(toolErr(tu.id, "Missing 'field'."));
+          continue;
+        }
+        const schema = session.fields.find((f) => f.name === field);
+        if (!schema) {
+          toolResults.push(
+            toolErr(tu.id, `Unknown field '${field}'. Use a name from the schema.`),
+          );
+          continue;
+        }
+        // Mark as intentionally skipped. We store a sentinel so the field is
+        // considered "answered" for the finalize gate, but finalize.js will
+        // see __skip__ and write nothing to the PDF.
+        session.answers[field] = { __skip__: true, reason: reason || "" };
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: tu.id,
+          content: `Skipped (${reason || "no reason given"}). ${Object.keys(session.answers).length}/${session.fields.length} resolved.`,
         });
       } else if (tu.name === "finalize_form") {
         const missing = session.fields

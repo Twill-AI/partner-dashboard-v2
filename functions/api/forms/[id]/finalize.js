@@ -29,9 +29,16 @@ export async function onRequestPost({ env, params }) {
   }
 
   const skipped = [];
+  const intentionallySkipped = [];
   for (const fieldSpec of session.fields) {
     const value = session.answers[fieldSpec.name];
     if (value === undefined) continue; // unanswered — leave blank
+
+    // Skip sentinel from skip_field tool: don't touch the PDF, but track it.
+    if (value && typeof value === "object" && value.__skip__) {
+      intentionallySkipped.push({ name: fieldSpec.name, reason: value.reason });
+      continue;
+    }
 
     const field = form.getFieldMaybe
       ? form.getFieldMaybe(fieldSpec.name)
@@ -89,6 +96,9 @@ export async function onRequestPost({ env, params }) {
     pdf_base64: b64,
     answered_count: Object.keys(session.answers).length,
     field_count: session.fields.length,
+    written_count:
+      Object.keys(session.answers).length - intentionallySkipped.length,
+    intentionally_skipped: intentionallySkipped,
     skipped,
   });
 }
