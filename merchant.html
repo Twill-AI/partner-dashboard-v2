@@ -1016,8 +1016,25 @@
   .ff-btn-primary { background:var(--yellow); color:#09091A; border-color:var(--yellow); }
   .ff-btn-primary:hover { filter:brightness(1.05); }
   .ff-btn-primary:disabled { opacity:.45; cursor:not-allowed; filter:none; }
-  .ff-meta { padding:10px 18px; background:var(--bg-surface); border-bottom:1px solid var(--border); display:flex; gap:14px; font-size:11px; color:var(--text-muted); font-family:var(--font-ui); flex-wrap:wrap; }
+  .ff-meta { padding:10px 18px; background:var(--bg-surface); border-bottom:1px solid var(--border); display:flex; gap:14px; font-size:11px; color:var(--text-muted); font-family:var(--font-ui); flex-wrap:wrap; align-items:center; }
   .ff-meta strong { color:var(--text-primary); font-weight:600; }
+  .ff-meta-spacer { flex:1; }
+  .ff-edit-toggle { background:var(--bg-elevated); border:1px solid var(--border-strong); color:var(--text-secondary); padding:5px 12px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font-ui); }
+  .ff-edit-toggle:hover { background:var(--bg-hover); color:var(--text-primary); border-color:var(--yellow); }
+  .ff-edit-toggle.active { background:var(--yellow); color:#09091A; border-color:var(--yellow); }
+
+  /* Edit-mode panel — slides up over the PDF preview */
+  .ff-edit-panel { background:var(--bg-elevated); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:14px 18px; display:none; max-height:340px; overflow-y:auto; }
+  .ff-edit-panel.open { display:block; }
+  .ff-edit-panel h4 { margin:0 0 10px; font-size:12px; font-weight:600; color:var(--text-primary); font-family:var(--font-ui); }
+  .ff-edit-panel .ff-edit-hint { font-size:11px; color:var(--text-muted); margin-bottom:14px; }
+  .ff-edit-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+  .ff-edit-row label { flex:0 0 160px; font-size:11px; color:var(--text-secondary); font-family:var(--font-ui); font-weight:500; }
+  .ff-edit-row input[type=text], .ff-edit-row select { flex:1; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:5px; padding:6px 9px; font-size:12px; color:var(--text-primary); font-family:var(--font-ui); outline:none; min-width:0; }
+  .ff-edit-row input[type=text]:focus, .ff-edit-row select:focus { border-color:var(--yellow); }
+  .ff-edit-row input[type=checkbox] { width:16px; height:16px; cursor:pointer; }
+  .ff-edit-row .ff-edit-meta { font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
+  .ff-edit-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
 
 </style>
 </head>
@@ -1035,6 +1052,15 @@
   </div>
   <div class="ff-meta" id="ff-meta"></div>
   <div class="ff-body">
+    <div class="ff-edit-panel" id="ff-edit-panel">
+      <h4>Edit values</h4>
+      <div class="ff-edit-hint">Change anything that's wrong, then click Apply changes. The PDF preview above will refresh.</div>
+      <div id="ff-edit-rows"></div>
+      <div class="ff-edit-footer">
+        <button class="ff-btn ff-btn-ghost" onclick="ffCancelEdit()">Cancel</button>
+        <button class="ff-btn ff-btn-primary" id="ff-apply-edits" onclick="ffApplyEdits()">Apply changes</button>
+      </div>
+    </div>
     <div class="ff-pdf-wrap">
       <iframe id="ff-pdf-frame" title="Filled form preview"></iframe>
     </div>
@@ -2125,7 +2151,7 @@ async function formFillFinalize() {
 
     // Open the review drawer with PDF preview + (optional) signature pad.
     ffInitSignaturePad();
-    showFilledFormDrawer({
+    const drawerArgs = {
       filename: data.filename,
       pdfBlob: blob,
       signatureRequired: !!data.signature_required,
@@ -2133,18 +2159,11 @@ async function formFillFinalize() {
       fieldCount: data.field_count || 0,
       intentionallySkipped: data.intentionally_skipped || [],
       sessionId: id,
-    });
-
-    // Stash so the chat button can re-open the same drawer state.
-    window.formFill.lastDrawerArgs = {
-      filename: data.filename,
-      pdfBlob: blob,
-      signatureRequired: !!data.signature_required,
-      writtenCount: data.written_count || 0,
-      fieldCount: data.field_count || 0,
-      intentionallySkipped: data.intentionally_skipped || [],
-      sessionId: id,
+      editableFields: data.editable_fields || [],
     };
+    showFilledFormDrawer(drawerArgs);
+    // Stash so the chat button can re-open the same drawer state.
+    window.formFill.lastDrawerArgs = drawerArgs;
 
     // Let the partner side know the merchant finished filling — separate from
     // "signed and submitted" which fires later from the drawer's Submit button.
@@ -2181,28 +2200,37 @@ function escapeHtml(s) {
 // ═══ FORM-FILL REVIEW DRAWER (PDF preview + signature pad) ═══
 window.ffDrawer = { blobUrl: null, sessionData: null, signed: false };
 
-function showFilledFormDrawer({ filename, pdfBlob, signatureRequired, writtenCount, fieldCount, intentionallySkipped, sessionId }) {
+function showFilledFormDrawer({ filename, pdfBlob, signatureRequired, writtenCount, fieldCount, intentionallySkipped, sessionId, editableFields }) {
   // Revoke previous blob URL if any.
   if (window.ffDrawer.blobUrl) URL.revokeObjectURL(window.ffDrawer.blobUrl);
 
   const blobUrl = URL.createObjectURL(pdfBlob);
   window.ffDrawer.blobUrl = blobUrl;
-  window.ffDrawer.sessionData = { filename, signatureRequired, writtenCount, fieldCount, intentionallySkipped, sessionId };
+  window.ffDrawer.sessionData = { filename, signatureRequired, writtenCount, fieldCount, intentionallySkipped, sessionId, editableFields: editableFields || [] };
   window.ffDrawer.signed = false;
+  window.ffDrawer.editing = false;
 
   const backdrop = document.getElementById('ff-backdrop');
   const drawer = document.getElementById('ff-drawer');
   drawer.querySelector('#ff-filename').textContent = filename || 'form.pdf';
   drawer.querySelector('#ff-sub').textContent = signatureRequired ? 'Review and sign to submit' : 'Review and submit';
 
-  // Stats row
+  // Stats row (with the Edit toggle on the right)
   const skippedCount = (intentionallySkipped || []).length;
   drawer.querySelector('#ff-meta').innerHTML =
     `<span><strong>${writtenCount || 0}</strong> field${writtenCount === 1 ? '' : 's'} written</span>` +
     `<span>·</span>` +
     `<span><strong>${skippedCount}</strong> intentionally blank</span>` +
     `<span>·</span>` +
-    `<a href="${blobUrl}" download="${escapeHtml(filename)}" style="color:var(--text-muted);text-decoration:underline;">download raw PDF</a>`;
+    `<a href="${blobUrl}" download="${escapeHtml(filename)}" style="color:var(--text-muted);text-decoration:underline;">download raw PDF</a>` +
+    `<span class="ff-meta-spacer"></span>` +
+    `<button class="ff-edit-toggle" id="ff-edit-toggle" onclick="ffToggleEdit()">✎ Edit values</button>`;
+
+  // Build the Edit panel rows from editable_fields
+  ffRenderEditRows();
+  // Edit panel starts collapsed every time the drawer opens fresh.
+  document.getElementById('ff-edit-panel').classList.remove('open');
+  document.getElementById('ff-edit-toggle').classList.remove('active');
 
   // Embed PDF
   drawer.querySelector('#ff-pdf-frame').src = blobUrl + '#toolbar=0&navpanes=0';
@@ -2325,6 +2353,121 @@ function ffUpdateSubmitState() {
   btn.textContent = hasDrawn && name.trim() ? 'Sign & submit to Twill' : 'Sign & submit';
 }
 
+// ─── Edit mode ───────────────────────────────────────────────────
+function ffRenderEditRows() {
+  const host = document.getElementById('ff-edit-rows');
+  if (!host) return;
+  const fields = (window.ffDrawer.sessionData && window.ffDrawer.sessionData.editableFields) || [];
+  if (fields.length === 0) {
+    host.innerHTML = '<div style="font-size:11px;color:var(--text-muted);">Nothing to edit — no values were written.</div>';
+    return;
+  }
+  host.innerHTML = fields.map((f, i) => {
+    const id = `ff-edit-input-${i}`;
+    let inputHtml;
+    if (f.type === 'PDFCheckBox') {
+      const checked = /^(true|yes|y|1|checked)$/i.test(String(f.value)) ? 'checked' : '';
+      inputHtml = `<input type="checkbox" id="${id}" data-field="${escapeHtml(f.field)}" data-type="checkbox" ${checked}>`;
+    } else if ((f.type === 'PDFDropdown' || f.type === 'PDFOptionList' || f.type === 'PDFRadioGroup') && Array.isArray(f.options) && f.options.length) {
+      inputHtml = '<select id="' + id + '" data-field="' + escapeHtml(f.field) + '" data-type="select">' +
+        f.options.map(o => `<option value="${escapeHtml(o)}"${o === f.value ? ' selected' : ''}>${escapeHtml(o)}</option>`).join('') +
+        '</select>';
+    } else {
+      const ml = f.max_length ? ` maxlength="${f.max_length}"` : '';
+      inputHtml = `<input type="text" id="${id}" data-field="${escapeHtml(f.field)}" data-type="text" value="${escapeHtml(f.value)}"${ml}>`;
+    }
+    const meta = f.max_length ? `<span class="ff-edit-meta">max ${f.max_length}</span>` : '';
+    return '<div class="ff-edit-row">' +
+      `<label for="${id}">${escapeHtml(f.label || f.field)}</label>` +
+      inputHtml + meta +
+    '</div>';
+  }).join('');
+}
+
+function ffToggleEdit() {
+  const panel = document.getElementById('ff-edit-panel');
+  const toggle = document.getElementById('ff-edit-toggle');
+  const open = !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  toggle.classList.toggle('active', open);
+  toggle.textContent = open ? '✕ Close editor' : '✎ Edit values';
+  window.ffDrawer.editing = open;
+}
+
+function ffCancelEdit() {
+  // Re-render rows from the last known state to discard in-flight edits.
+  ffRenderEditRows();
+  document.getElementById('ff-edit-panel').classList.remove('open');
+  const t = document.getElementById('ff-edit-toggle');
+  if (t) { t.classList.remove('active'); t.textContent = '✎ Edit values'; }
+  window.ffDrawer.editing = false;
+}
+
+async function ffApplyEdits() {
+  const sd = window.ffDrawer.sessionData;
+  if (!sd || !sd.sessionId) return;
+  const inputs = document.querySelectorAll('#ff-edit-rows [data-field]');
+  const changes = {};
+  inputs.forEach(el => {
+    const field = el.dataset.field;
+    if (el.dataset.type === 'checkbox') changes[field] = el.checked ? 'true' : 'false';
+    else changes[field] = el.value;
+  });
+
+  const btn = document.getElementById('ff-apply-edits');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    const res = await fetch(`/api/forms/${encodeURIComponent(sd.sessionId)}/update`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ changes }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert('Edits not applied: ' + (data.error || 'unknown error'));
+      return;
+    }
+    // Swap iframe with the updated PDF.
+    const bytes = atobToBytes(data.pdf_base64);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    if (window.ffDrawer.blobUrl) URL.revokeObjectURL(window.ffDrawer.blobUrl);
+    const url = URL.createObjectURL(blob);
+    window.ffDrawer.blobUrl = url;
+    sd.editableFields = data.editable_fields || sd.editableFields;
+    sd.writtenCount = data.written_count;
+    sd.intentionallySkipped = data.intentionally_skipped || sd.intentionallySkipped;
+    if (window.formFill && window.formFill.lastDrawerArgs) {
+      window.formFill.lastDrawerArgs.pdfBlob = blob;
+      window.formFill.lastDrawerArgs.editableFields = sd.editableFields;
+      window.formFill.lastDrawerArgs.writtenCount = sd.writtenCount;
+      window.formFill.lastDrawerArgs.intentionallySkipped = sd.intentionallySkipped;
+    }
+    document.getElementById('ff-pdf-frame').src = url + '#toolbar=0&navpanes=0';
+    // Refresh stats row
+    const skippedCount = (sd.intentionallySkipped || []).length;
+    document.getElementById('ff-meta').innerHTML =
+      `<span><strong>${sd.writtenCount || 0}</strong> field${sd.writtenCount === 1 ? '' : 's'} written</span>` +
+      `<span>·</span>` +
+      `<span><strong>${skippedCount}</strong> intentionally blank</span>` +
+      `<span>·</span>` +
+      `<a href="${url}" download="${escapeHtml(sd.filename)}" style="color:var(--text-muted);text-decoration:underline;">download raw PDF</a>` +
+      `<span class="ff-meta-spacer"></span>` +
+      `<button class="ff-edit-toggle active" id="ff-edit-toggle" onclick="ffToggleEdit()">✕ Close editor</button>`;
+    ffRenderEditRows();
+  } catch (err) {
+    alert('Edits failed: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Apply changes'; }
+  }
+}
+
+function atobToBytes(b64) {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+
 function ffReopenLastForm() {
   const args = window.formFill && window.formFill.lastDrawerArgs;
   if (!args) {
@@ -2335,24 +2478,77 @@ function ffReopenLastForm() {
   showFilledFormDrawer(args);
 }
 
-function ffSubmit() {
+async function ffSubmit() {
   const sd = window.ffDrawer.sessionData || {};
-  // Mock: pretend we just shipped to Twill.
-  const name = (document.getElementById('ff-sig-name') || {}).value || '(unsigned)';
+  if (!sd.sessionId) return;
+  const submitBtn = document.getElementById('ff-submit');
+  const nameInput = document.getElementById('ff-sig-name');
+  const dateInput = document.getElementById('ff-sig-date');
+  const name = (nameInput && nameInput.value.trim()) || '(unsigned)';
+  const date = (dateInput && dateInput.value.trim()) || new Date().toLocaleDateString('en-US');
+
+  // If a signature is required, ship the signature image to /sign and get
+  // back the stamped + flattened PDF. Otherwise just use the current blob.
+  let signedBlob;
+  let signedFilename = sd.filename || 'form.pdf';
+  if (sd.signatureRequired) {
+    const canvas = document.getElementById('ff-sig-pad');
+    if (!canvas) { alert('Signature pad missing'); return; }
+    const sigPng = canvas.toDataURL('image/png');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Stamping signature…'; }
+    try {
+      const res = await fetch(`/api/forms/${encodeURIComponent(sd.sessionId)}/sign`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          signature_png_base64: sigPng,
+          signer_name: name,
+          signed_date: date,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert('Signing failed: ' + (data.error || 'unknown'));
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Sign & submit'; }
+        return;
+      }
+      signedFilename = data.filename || signedFilename;
+      const bytes = atobToBytes(data.pdf_base64);
+      signedBlob = new Blob([bytes], { type: 'application/pdf' });
+    } catch (err) {
+      alert('Signing failed: ' + err.message);
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Sign & submit'; }
+      return;
+    }
+  } else {
+    // Re-use the currently-shown filled PDF for the download link.
+    const args = (window.formFill && window.formFill.lastDrawerArgs) || {};
+    signedBlob = args.pdfBlob;
+  }
+
+  // Tell the partner side immediately.
   bc.postMessage({
     type: 'form_fill_signed',
     data: {
       session_id: sd.sessionId,
-      filename: sd.filename,
+      filename: signedFilename,
       signed_by: name,
       signed_at: Date.now(),
     },
   });
+
+  // Drop a downloadable signed copy into the chat thread.
+  const signedUrl = signedBlob ? URL.createObjectURL(signedBlob) : null;
+  const downloadHtml = signedUrl
+    ? `<br><br><a href="${signedUrl}" download="${escapeHtml(signedFilename)}" class="chat-upload-btn" style="text-decoration:none;">&#128229; Download ${escapeHtml(signedFilename)}</a>`
+    : '';
   addMessage('ai',
-    `&#9989; <strong>${escapeHtml(sd.filename || 'Form')}</strong> submitted to Twill` +
+    `&#9989; <strong>${escapeHtml(signedFilename)}</strong> submitted to Twill` +
     (sd.signatureRequired ? ` &mdash; signed as <strong>${escapeHtml(name)}</strong>.` : '.') +
-    `<br><br>You\'ll hear back from your underwriter within 1–2 business days.`
+    `<br>You\'ll hear back from your underwriter within 1–2 business days.` +
+    downloadHtml
   );
+
   ffCloseDrawer();
 }
 

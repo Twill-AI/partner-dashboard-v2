@@ -148,10 +148,14 @@ export async function onRequestPost({ request, env, params }) {
     const toolResults = [];
     for (const tu of toolUses) {
       if (tu.name === "record_answer") {
-        const { field, value } = tu.input || {};
+        const { field, value, label } = tu.input || {};
         if (!field) {
           toolResults.push(toolErr(tu.id, "Missing 'field'."));
           continue;
+        }
+        if (label) {
+          session.answer_labels = session.answer_labels || {};
+          session.answer_labels[field] = label;
         }
         // Validate against schema — keeps Claude honest if it invents a field
         // or overflows a max_length constraint.

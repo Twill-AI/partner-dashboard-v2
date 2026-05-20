@@ -10,7 +10,7 @@ export const TOOLS = [
   {
     name: "record_answer",
     description:
-      "Record the user's answer to one or more form fields. CALL THIS IN PARALLEL with multiple invocations in a single assistant turn whenever a single user answer covers multiple fields. Examples: an address answer fills street, city, state, ZIP — emit 4 record_answer calls in one turn. An EIN like '12-3456789' fills two adjacent max_length=2 and max_length=7 sub-fields — emit 2 record_answer calls. A tax-classification answer like 'LLC, partnership' may fill a checkbox AND a letter-code field — emit both. Never serialize calls across multiple turns when one turn would do. The `field` argument MUST be the exact technical field name from the field schema (e.g. 'topmostSubform[0].Page1[0].f1_01[0]') — not a human-readable label.",
+      "Record the user's answer to one or more form fields. CALL THIS IN PARALLEL with multiple invocations in a single assistant turn whenever a single user answer covers multiple fields. Examples: an address answer fills street, city, state, ZIP — emit 4 record_answer calls in one turn. An EIN like '12-3456789' fills two adjacent max_length=2 and max_length=7 sub-fields — emit 2 record_answer calls. A tax-classification answer like 'LLC, partnership' may fill a checkbox AND a letter-code field — emit both. Never serialize calls across multiple turns when one turn would do. The `field` argument MUST be the exact technical field name from the schema (e.g. 'topmostSubform[0].Page1[0].f1_01[0]') — not a human-readable label. ALWAYS include a `label` — a short human-readable name for what this field represents (e.g. 'Business name', 'EIN prefix', 'Street address', 'LLC checkbox'). The label is shown to the merchant in the review drawer's Edit mode, so they can correct the value without seeing the opaque technical name.",
     input_schema: {
       type: "object",
       properties: {
@@ -23,8 +23,13 @@ export const TOOLS = [
           description:
             "The user's answer for this field. For checkboxes use 'true' or 'false'. For text fields use the literal string. For sub-divided values (EIN, SSN, phone), use the right slice for THIS field's max_length.",
         },
+        label: {
+          type: "string",
+          description:
+            "Short human-readable name for this field (e.g. 'Business name', 'EIN', 'Street'). Shown in the review drawer's Edit mode. For sub-divided values, label them descriptively like 'EIN prefix (2 digits)' and 'EIN suffix (7 digits)' so the merchant can edit each piece.",
+        },
       },
-      required: ["field", "value"],
+      required: ["field", "value", "label"],
     },
   },
   {
@@ -46,7 +51,7 @@ export const TOOLS = [
   {
     name: "finalize_form",
     description:
-      "Call this once every field in the schema has either been answered via record_answer or skipped via skip_field. Before calling, show the user a short summary of what will be written (and what's being left blank) so they can correct anything wrong. The system fills the PDF and hands back a download link.",
+      "Call this IMMEDIATELY once every field in the schema has been answered via record_answer or skipped via skip_field. Call it in the SAME assistant turn as the last record_answer/skip_field calls — do not show a summary, do not ask the merchant to confirm, do not say 'say ship it'. The merchant reviews the filled PDF in a review drawer that opens automatically, with built-in Edit and Sign controls. Your job is to finish the data collection and trigger finalize; the drawer takes it from there.",
     input_schema: { type: "object", properties: {} },
   },
 ];
@@ -66,6 +71,119 @@ export async function loadSession(env, sessionId) {
   if (!sessionId) return null;
   const raw = await env.FORM_SESSIONS.get(sessionId);
   return raw ? JSON.parse(raw) : null;
+}
+
+// Build an `editable_fields` array for the review drawer: one entry per
+// field that was actually answered (not skipped), with a friendly label.
+export function buildEditableFields(session) {
+  const labels = session.answer_labels || {};
+  return session.fields
+    .filter((f) => {
+      const v = session.answers[f.name];
+      if (v === undefined) return false;
+      if (v && typeof v === "object" && v.__skip__) return false;
+      return true;
+    })
+    .map((f) => ({
+      field: f.name,
+      label: labels[f.name] || prettyFallbackLabel(f.name),
+      value: String(session.answers[f.name]),
+      type: f.type,
+      max_length: f.max_length || null,
+      options: f.options || null,
+    }));
+}
+
+// If Claude forgot to provide a label (or this came in via /update before
+// any agent label existed), make something less ugly than the raw IRS-style
+// technical name.
+function prettyFallbackLabel(name) {
+  const tail = name.split(".").pop() || name;
+  return tail.replace(/[\[\]]/g, " ").trim();
+}
+
+// Encode bytes as base64 in a way that works inside Cloudflare Workers
+// without exhausting the call stack on larger PDFs.
+export function uint8ToBase64(bytes) {
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+export function base64ToUint8(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function isTruthyValue(v) {
+  if (typeof v === "boolean") return v;
+  const s = String(v).trim().toLowerCase();
+  return s === "true" || s === "yes" || s === "y" || s === "1" || s === "checked";
+}
+
+// Fill an AcroForm PDF with the session's collected answers. Returns
+// { bytes, writeErrors, intentionallySkipped }. PDFDocument is passed in
+// from the caller so this module doesn't need a top-level pdf-lib import.
+export async function fillPdfFromSession({ PDFDocument, pdfBytes, session, flatten = true }) {
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const form = pdfDoc.getForm();
+  const writeErrors = [];
+  const intentionallySkipped = [];
+
+  for (const fieldSpec of session.fields) {
+    const value = session.answers[fieldSpec.name];
+    if (value === undefined) continue;
+    if (value && typeof value === "object" && value.__skip__) {
+      intentionallySkipped.push({ name: fieldSpec.name, reason: value.reason });
+      continue;
+    }
+
+    let field = null;
+    try {
+      field = form.getField(fieldSpec.name);
+    } catch {
+      writeErrors.push({ name: fieldSpec.name, value, reason: "field not found" });
+      continue;
+    }
+
+    try {
+      switch (fieldSpec.type) {
+        case "PDFTextField":
+          field.setText(String(value));
+          break;
+        case "PDFCheckBox":
+          if (isTruthyValue(value)) field.check();
+          else field.uncheck();
+          break;
+        case "PDFDropdown":
+        case "PDFOptionList":
+        case "PDFRadioGroup":
+          field.select(String(value));
+          break;
+        default:
+          if (typeof field.setText === "function") field.setText(String(value));
+          else writeErrors.push({ name: fieldSpec.name, value, reason: `unsupported type ${fieldSpec.type}` });
+      }
+    } catch (err) {
+      writeErrors.push({ name: fieldSpec.name, value, reason: err.message });
+    }
+  }
+
+  if (flatten) {
+    try {
+      form.flatten();
+    } catch (err) {
+      writeErrors.push({ name: "(flatten)", value: "", reason: err.message });
+    }
+  }
+
+  const bytes = await pdfDoc.save();
+  return { bytes, writeErrors, intentionallySkipped };
 }
 
 export async function saveSession(env, sessionId, session) {
@@ -115,7 +233,7 @@ Combine multiple fields into ONE question whenever it makes natural sense. Group
 - **Contact:** street + city + state + ZIP in one ask.
 - **Tax ID:** EIN (or SSN) in one ask.
 - **Yes/no defaults:** stack the rare-yes questions ("Quick check: no foreign partners, no FATCA exemptions, no DBA, right?") and assume "no" if the merchant agrees.
-The IDEAL flow for a typical W-9-style form is THREE user messages: (1) batched identity+tax+address+EIN, (2) batched confirmation of rare-yes defaults if needed, (3) "ship it" after the summary. Don't make merchants click 15 times when 3 will do.
+The IDEAL flow for a typical W-9-style form is ONE OR TWO user messages: one batched answer covering identity+tax+address+EIN, then (only if any rare-yes fields remain unresolved) one yes/no confirmation. Then the agent auto-finalizes and the drawer pops up for review. Don't make merchants click 15 times when 1–2 will do.
 When the user answers a batched question, call \`record_answer\` IN PARALLEL — multiple tool_use blocks in the same assistant turn, one per field you can fill from that answer. Never serialize across turns when one turn would do.
 
 ## 2. Skip fields that don't apply. Use \`skip_field\` aggressively.
@@ -137,17 +255,9 @@ Government forms split values across multiple text fields. Examples:
 - A single character classification code (C/S/P) goes in a max_length=1 field.
 When you see adjacent text fields with small max_length values, split the user's value correctly by looking at the visual layout AND the order in the schema. Never overflow — you'll get a tool_result error.
 
-## 5. Before calling \`finalize_form\`, ALWAYS show a one-screen summary.
-Format:
-> Here's what I'll write on the form:
-> - **Name:** Acme Coffee LLC
-> - **Tax class:** LLC taxed as partnership
-> - **Address:** 123 Main St, San Francisco, CA 94105
-> - **EIN:** 12-3456789
-> - **Leaving blank:** DBA (none), exemption codes (none), SSN (using EIN), account numbers (none)
->
-> Look right? Say "ship it" to finalize or tell me what to change.
-Only call \`finalize_form\` after the user confirms.
+## 5. Auto-finalize the instant every field is resolved. NO ship-it ceremony.
+The moment the field schema is fully covered (every field has been recorded or skipped), call \`finalize_form\` in the SAME assistant turn as your last \`record_answer\`/\`skip_field\` calls. Do not show a summary. Do not say "look right?" or "say ship it". Do not pause for confirmation. The merchant will see the filled PDF in a slide-in review drawer that has its own Edit button (to change values) and signature pad — your confirmation step is unnecessary and just slows them down.
+The ONE exception: if the user clearly indicated uncertainty mid-conversation ("I'm not sure about the EIN, let me check"), end that turn with a short single-line reassurance before finalizing on the next turn. Otherwise: collect → finalize, same turn.
 
 ## 6. Tone.
 Short. Direct. Friendly. Use **bold** for the field they're answering. One question per turn unless you're batching. Never paste the technical field names.
