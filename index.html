@@ -4807,10 +4807,10 @@ function cycleReq(el){
 }
 function cRB(el) {
   var s = [
-    {t:'Required',    bg:'rgba(239,68,68,.08)',  bc:'rgba(239,68,68,.25)',  c:'var(--red)'},
-    {t:'Recommended', bg:'rgba(245,158,11,.08)', bc:'rgba(245,158,11,.3)', c:'var(--amber)'},
-    {t:'Optional',    bg:'rgba(0,0,0,.04)',       bc:'var(--border-strong)', c:'var(--text-muted)'},
-    {t:'Not Required',bg:'transparent',           bc:'var(--border)',        c:'var(--text-muted)'}
+    {t:'Required',     bg:'rgba(239,68,68,.06)',  bc:'rgba(239,68,68,.28)',  c:'var(--red)'},
+    {t:'Recommended',  bg:'rgba(245,158,11,.06)', bc:'rgba(245,158,11,.28)', c:'var(--amber)'},
+    {t:'Optional',     bg:'transparent',           bc:'var(--border-strong)', c:'var(--text-muted)'},
+    {t:'Not Required', bg:'transparent',           bc:'var(--border)',        c:'var(--text-muted)'}
   ];
   var n = (+el.dataset.req + 1) % s.length;
   el.dataset.req = n;
@@ -4819,7 +4819,13 @@ function cRB(el) {
   el.style.borderColor = s[n].bc;
   el.style.color = s[n].c;
   var row = el.closest('[data-doc-row]');
-  if (row) row.style.opacity = (n === 3) ? '.4' : '';
+  if (row) row.style.opacity = (n === 3) ? '.35' : '';
+}
+function nudgeWithDocs() {
+  var msg = 'Hi Fresh Brew Coffee team! 👋\n\nGreat news — we\'re almost done with your payment processing application. Here\'s where things stand:\n\n✅ Received & verified:\n   • Bank statements (Jan–Mar 2026)\n   • Square processing statements (3 months)\n   • Voided check\n   • Articles of Incorporation\n\n📋 One last thing needed:\n   • Government-issued photo ID for Sarah Chen\n     (driver\'s license or passport works great)\n\nYou can upload it directly in this chat — just tap the attachment icon below and send it over. That\'s the last piece we need to get your application submitted!\n\nLet me know if you have any questions.\n\nThanks,\nMike Wright · Twill Payments';
+  if (confirm('Send this message to Fresh Brew Coffee Co.?\n─────────────────────────────\n' + msg + '\n─────────────────────────────')) {
+    alert('✓ Message sent!\nFresh Brew Coffee will be notified to upload Sarah\'s ID in the merchant chat.');
+  }
 }
 </script>
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
@@ -4829,8 +4835,8 @@ function cRB(el) {
             <span class="step-hdr-title">Requirements &amp; Documents</span>
           </div>
 
-          <!-- ══ STATUS TILES — click to expand AI summary ══ -->
-          <div onclick="(function(el){var p=document.getElementById('doc-ai-summary');var open=p.style.display!=='none';p.style.display=open?'none':'block';el.querySelector('.sum-chev').style.transform=open?'':'rotate(180deg)'})(this)" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:0;cursor:pointer;user-select:none;">
+          <!-- ══ STATUS TILES — info only ══ -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px 10px 0 0;overflow:hidden;margin-bottom:0;">
             <div style="padding:13px 16px;border-right:1px solid var(--border);">
               <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
@@ -4860,23 +4866,32 @@ function cRB(el) {
               <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
                 <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Pending</span>
-                <span class="sum-chev" style="font-size:9px;color:var(--text-muted);margin-left:auto;transition:transform .2s;">▾</span>
               </div>
               <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:5px;">
                 <span style="font-size:24px;font-weight:800;font-family:var(--font-mono);color:var(--amber);">2</span>
                 <span style="font-size:11px;color:var(--text-muted);">addendums</span>
               </div>
-              <div style="font-size:10px;color:var(--text-muted);margin-top:9px;">Auto-generated on submit</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:9px;">Processor addendums · not yet sent</div>
             </div>
           </div>
 
-          <!-- AI Doc Package Summary (collapsed by default) -->
-          <div id="doc-ai-summary" style="display:none;border:1px solid rgba(99,102,241,.18);border-top:none;border-radius:0 0 10px 10px;background:linear-gradient(135deg,rgba(99,102,241,.03),rgba(255,222,0,.015));padding:14px 16px;margin-bottom:10px;">
+          <!-- AI Doc Package Summary — always-visible trigger (same style as AI Bank Analysis) -->
+          <div onclick="(function(h){var a=document.getElementById('doc-ai-summary');var o=a.style.display!=='none';a.style.display=o?'none':'block';h.querySelector('.ai-chev').textContent=o?'▸':'▾'})(this)" style="padding:7px 12px 7px 17px;cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;margin-bottom:10px;" onmouseenter="this.style.background='rgba(255,222,0,.03)'" onmouseleave="this.style.background='var(--bg-surface)'">
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(255,222,0,.09);border:1px solid rgba(255,222,0,.22);border-radius:5px;">
+              <span style="font-size:11px;color:var(--yellow);">✦</span>
+              <span style="font-size:10px;font-weight:600;color:var(--text-secondary);">AI Doc Package Summary</span>
+              <span class="ai-chev" style="font-size:9px;color:var(--text-muted);margin-left:1px;">▸</span>
+            </span>
+            <span style="font-size:10px;color:var(--text-secondary);">Strong package · <span style="color:var(--red);font-weight:600;">1 doc still needed</span> · ready to submit once collected</span>
+          </div>
+
+          <!-- AI Doc Summary expandable panel -->
+          <div id="doc-ai-summary" style="display:none;border:1px solid rgba(255,222,0,.15);border-radius:10px;background:rgba(255,222,0,.015);padding:14px 16px;margin-bottom:10px;margin-top:-4px;">
             <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
               <span style="font-size:11px;color:var(--yellow);">✦</span>
               <span style="font-size:11px;font-weight:700;color:var(--text-primary);">AI Doc Package Summary</span>
               <span style="font-size:10px;padding:2px 7px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:4px;color:var(--green);font-weight:600;">Strong</span>
-              <span style="margin-left:auto;font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:4px;color:var(--amber);font-weight:500;">1 action needed</span>
+              <span style="margin-left:auto;font-size:10px;padding:2px 8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:4px;color:var(--red);font-weight:500;">1 action needed</span>
             </div>
             <div style="font-size:11px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px;">This package is <strong style="color:var(--text-primary);">nearly complete</strong>. Bank statements show clean cash flow, Square processing history confirms volume, and formation docs are in order. The only blocker is <strong style="color:var(--red);">Sarah Chen's owner ID</strong> — required by all matched processors for 60%+ ownership. Once collected, this application is ready to submit.</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
@@ -4886,9 +4901,9 @@ function cRB(el) {
               <span style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:4px;color:var(--red);">✗ Owner ID missing</span>
               <span style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:4px;color:var(--amber);">⏳ 2 addendums pending</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid rgba(99,102,241,.1);">
-              <span style="font-size:11px;color:var(--text-muted);">Owner ID still needed — send a reminder?</span>
-              <button onclick="nudgeMerchant()" style="padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">📣 Message Fresh Brew Coffee</button>
+            <div style="display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid rgba(255,222,0,.12);">
+              <span style="font-size:11px;color:var(--text-muted);">Owner ID still needed — send Sarah a reminder?</span>
+              <button onclick="nudgeWithDocs()" style="padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">📣 Message Fresh Brew Coffee</button>
             </div>
           </div>
 
@@ -4903,32 +4918,28 @@ function cRB(el) {
               <span class="s-caret" style="font-size:10px;color:var(--text-muted);">▾</span>
             </div>
             <div>
-              <!-- Doc: Bank Statement 3mo -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid var(--border);border-left:3px solid var(--green);">
-                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+              <!-- Doc: Bank Statement -->
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:6px;color:var(--green);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✓ Uploaded</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Bank Statement</div>
-                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Chase ••7291 · Jan–Mar 2026</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Chase ••7291 · Jan–Mar 2026 · M. Wright · Apr 3</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">bank_statements.pdf</span>
-                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 3</span>
-                <button onclick="alert('Downloading bank_statements.pdf')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
-                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <span onclick="cRB(this)" data-req="0" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.28);border-radius:4px;color:var(--red);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Required</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Downloading bank_statements.pdf')" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;">↓ bank_statements.pdf</button>
                 <button onclick="alert('Options:\n• Mark as Recommended\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;" title="More options">⋯</button>
               </div>
               <!-- Doc: Voided Check -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--green);">
-                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:6px;color:var(--green);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✓ Uploaded</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Voided Check</div>
-                  <div style="font-size:10px;color:var(--text-muted);">Confirms bank account</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Confirms bank account · M. Wright · Apr 3</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">voided_check.jpg</span>
-                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 3</span>
-                <button onclick="alert('Downloading voided_check.jpg')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
-                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <span onclick="cRB(this)" data-req="0" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.28);border-radius:4px;color:var(--red);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Required</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Downloading voided_check.jpg')" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;">↓ voided_check.jpg</button>
                 <button onclick="alert('Options:\n• Mark as Recommended\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;" title="More options">⋯</button>
               </div>
               <!-- AI Bank Analysis -->
@@ -4963,45 +4974,39 @@ function cRB(el) {
             </div>
             <div>
               <!-- Square Jan -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid var(--border);border-left:3px solid var(--amber);">
-                <span onclick="cRB(this)" data-req="1" style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Recommended</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:6px;color:var(--green);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✓ Uploaded</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Square — Jan 2026</div>
-                  <div style="font-size:10px;color:var(--text-muted);">$28,910 · 2,614 txns</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">$28,910 · 2,614 txns · M. Wright · Apr 5</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">sq_payout_jan.csv</span>
-                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 5</span>
-                <button onclick="alert('Downloading sq_payout_jan.csv')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
-                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <span onclick="cRB(this)" data-req="1" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.28);border-radius:4px;color:var(--amber);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Recommended</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Downloading sq_payout_jan.csv')" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;">↓ sq_payout_jan.csv</button>
                 <button onclick="alert('Options:\n• Mark as Required\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
               <!-- Square Feb -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--amber);">
-                <span onclick="cRB(this)" data-req="1" style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Recommended</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:6px;color:var(--green);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✓ Uploaded</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Square — Feb 2026</div>
-                  <div style="font-size:10px;color:var(--text-muted);">$31,420 · 2,891 txns</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">$31,420 · 2,891 txns · M. Wright · Apr 5</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">sq_payout_feb.csv</span>
-                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 5</span>
-                <button onclick="alert('Downloading sq_payout_feb.csv')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
-                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <span onclick="cRB(this)" data-req="1" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.28);border-radius:4px;color:var(--amber);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Recommended</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Downloading sq_payout_feb.csv')" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;">↓ sq_payout_feb.csv</button>
                 <button onclick="alert('Options:\n• Mark as Required\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
               <!-- Square Mar -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--amber);">
-                <span onclick="cRB(this)" data-req="1" style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Recommended</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:6px;color:var(--green);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✓ Uploaded</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Square — Mar 2026</div>
-                  <div style="font-size:10px;color:var(--text-muted);">$33,411 · 3,036 txns</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">$33,411 · 3,036 txns · M. Wright · Apr 5</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">sq_payout_mar.csv</span>
-                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 5</span>
-                <button onclick="alert('Downloading sq_payout_mar.csv')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
-                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <span onclick="cRB(this)" data-req="1" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.28);border-radius:4px;color:var(--amber);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Recommended</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Downloading sq_payout_mar.csv')" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;">↓ sq_payout_mar.csv</button>
                 <button onclick="alert('Options:\n• Mark as Required\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
               <!-- AI Processing Analysis -->
@@ -5073,42 +5078,39 @@ function cRB(el) {
             </div>
             <div>
               <!-- Missing: Owner ID Sarah Chen -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(239,68,68,.15);border-left:3px solid var(--red);background:rgba(239,68,68,.025);">
-                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid rgba(239,68,68,.15);background:rgba(239,68,68,.025);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:6px;color:var(--red);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✗ Needed</span>
                 <div style="flex:1;min-width:0;">
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <span style="font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">Owner ID — Sarah Chen</span>
-                    <span style="font-size:9px;padding:1px 6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:4px;color:var(--red);font-weight:600;white-space:nowrap;flex-shrink:0;">✗ Missing</span>
-                  </div>
-                  <div style="font-size:10px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">60% ownership · all processors require this · nudged 16d ago</div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">Owner ID — Sarah Chen</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">60% ownership · all processors require this · nudged 16d ago</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span onclick="cRB(this)" data-req="0" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.28);border-radius:4px;color:var(--red);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Required</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
                 <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-secondary);font-family:var(--font-ui);flex-shrink:0;">↑ Upload<input type="file" style="display:none;"></label>
-                <button class="btn btn-amber" style="padding:4px 9px;font-size:10px;flex-shrink:0;" onclick="nudgeMerchant()">📣 Nudge</button>
+                <button class="btn btn-amber" style="padding:4px 9px;font-size:10px;flex-shrink:0;" onclick="nudgeWithDocs()">📣 Nudge</button>
                 <button onclick="alert('Options:\n• Mark as Optional\n• Mark as Not Required\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
               <!-- Uploaded: Articles of Inc -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--green);">
-                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:6px;color:var(--green);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">✓ Uploaded</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Articles of Incorporation</div>
-                  <div style="font-size:10px;color:var(--text-muted);">State-issued formation document</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">State-issued formation document · M. Wright · Apr 3</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">articles_of_inc.pdf</span>
-                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 3</span>
-                <button onclick="alert('Downloading articles_of_inc.pdf')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
-                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <span onclick="cRB(this)" data-req="0" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.28);border-radius:4px;color:var(--red);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Required</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Downloading articles_of_inc.pdf')" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;">↓ articles_of_inc.pdf</button>
                 <button onclick="alert('Options:\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
               <!-- Optional: Owner ID James Park -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--border-strong);opacity:.45;">
-                <span onclick="cRB(this)" data-req="2" style="font-size:10px;padding:2px 8px;background:rgba(0,0,0,.04);border:1px solid var(--border-strong);border-radius:10px;color:var(--text-muted);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Optional</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);opacity:.45;">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--text-muted);font-weight:600;font-size:10px;white-space:nowrap;flex-shrink:0;">— Optional</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Owner ID — James Park</div>
-                  <div style="font-size:10px;color:var(--text-muted);">&lt;25% ownership · not required</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">&lt;25% ownership · not required by processors</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span onclick="cRB(this)" data-req="2" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:transparent;border:1px solid var(--border-strong);border-radius:4px;color:var(--text-muted);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Optional</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
                 <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-muted);font-family:var(--font-ui);flex-shrink:0;">↑ Upload<input type="file" style="display:none;"></label>
                 <button onclick="alert('Options:\n• Make Required\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
@@ -5125,27 +5127,29 @@ function cRB(el) {
             </div>
             <div>
               <!-- First Data Addendum -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid var(--border);border-left:3px solid var(--amber);">
-                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:6px;color:var(--amber);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">⏳ Pending</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">First Data Application Addendum</div>
-                  <div style="font-size:10px;color:var(--text-muted);">Required for all new merchants</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Pre-filled with merchant data · required for all new First Data merchants</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--amber);font-weight:600;flex-shrink:0;">Pending</span>
-                <button onclick="alert('Generating First Data Addendum...')" style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:5px;color:var(--blue);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">✦ Auto-generate</button>
+                <span onclick="cRB(this)" data-req="0" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.28);border-radius:4px;color:var(--red);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Required</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Adding pre-filled addendum to signature packet...')" style="font-size:10px;padding:4px 10px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">Add to packet</button>
+                <button onclick="alert('Sending addendum to merchant in chat...')" style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:5px;color:var(--blue);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">Ask in chat</button>
                 <button onclick="alert('Options:\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
               <!-- Retail Questionnaire -->
-              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--amber);">
-                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+              <div data-doc-row style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);">
+                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:4px 8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:6px;color:var(--amber);font-weight:700;font-size:10px;white-space:nowrap;flex-shrink:0;">⏳ Pending</span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Retail / Card-Present Questionnaire</div>
-                  <div style="font-size:10px;color:var(--text-muted);">MCC 5812 verification</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MCC 5812 verification · merchant completes via chat or signing packet</div>
                 </div>
-                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
-                <span style="font-size:10px;color:var(--amber);font-weight:600;flex-shrink:0;">Pending</span>
-                <button onclick="alert('Generating Questionnaire...')" style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:5px;color:var(--blue);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">✦ Auto-generate</button>
+                <span onclick="cRB(this)" data-req="0" title="Click to change requirement level" style="font-size:9px;padding:2px 6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.28);border-radius:4px;color:var(--red);cursor:pointer;user-select:none;flex-shrink:0;white-space:nowrap;">Required</span>
+                <span style="font-size:9px;padding:1px 5px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:3px;color:var(--yellow);font-weight:600;flex-shrink:0;" title="AI suggested">✦</span>
+                <button onclick="alert('Adding questionnaire to signature packet...')" style="font-size:10px;padding:4px 10px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">Add to packet</button>
+                <button onclick="alert('Sending questionnaire to merchant in chat...')" style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:5px;color:var(--blue);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">Ask in chat</button>
                 <button onclick="alert('Options:\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
             </div>
@@ -5167,7 +5171,7 @@ function cRB(el) {
             <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr">
               <span style="font-size:11px;color:var(--red);">Owner ID still missing</span>
-              <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
+              <button class="btn btn-amber" onclick="nudgeWithDocs()">📣 Nudge Merchant</button>
               <button class="btn btn-primary" onclick="goStep(7)">Pricing →</button>
             </div>
           </div>
