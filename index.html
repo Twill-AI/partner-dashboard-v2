@@ -4805,6 +4805,22 @@ function cycleReq(el){
   el.style.color = levels[cur].c;
   el.title = levels[cur].tip;
 }
+function cRB(el) {
+  var s = [
+    {t:'Required',    bg:'rgba(239,68,68,.08)',  bc:'rgba(239,68,68,.25)',  c:'var(--red)'},
+    {t:'Recommended', bg:'rgba(245,158,11,.08)', bc:'rgba(245,158,11,.3)', c:'var(--amber)'},
+    {t:'Optional',    bg:'rgba(0,0,0,.04)',       bc:'var(--border-strong)', c:'var(--text-muted)'},
+    {t:'Not Required',bg:'transparent',           bc:'var(--border)',        c:'var(--text-muted)'}
+  ];
+  var n = (+el.dataset.req + 1) % s.length;
+  el.dataset.req = n;
+  el.textContent = s[n].t;
+  el.style.background = s[n].bg;
+  el.style.borderColor = s[n].bc;
+  el.style.color = s[n].c;
+  var row = el.closest('[data-doc-row]');
+  if (row) row.style.opacity = (n === 3) ? '.4' : '';
+}
 </script>
         <!-- ═══ STEP 6: DOCUMENTS ═══ -->
         <div class="step-panel active" id="step-6">
@@ -4813,130 +4829,124 @@ function cycleReq(el){
             <span class="step-hdr-title">Requirements &amp; Documents</span>
           </div>
 
-          <!-- ═══ STATUS OVERVIEW ═══ -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">
-            <!-- Required -->
-            <div style="padding:14px 18px;border-right:1px solid var(--border);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <span style="width:8px;height:8px;border-radius:50%;background:var(--red);"></span>
-                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Required</span>
+          <!-- ══ STATUS TILES — click to expand AI summary ══ -->
+          <div onclick="(function(el){var p=document.getElementById('doc-ai-summary');var open=p.style.display!=='none';p.style.display=open?'none':'block';el.querySelector('.sum-chev').style.transform=open?'':'rotate(180deg)'})(this)" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:0;cursor:pointer;user-select:none;">
+            <div style="padding:13px 16px;border-right:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Required</span>
               </div>
-              <div style="display:flex;align-items:baseline;gap:4px;">
-                <span style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);">7</span>
-                <span style="font-size:13px;color:var(--text-muted);">of 8</span>
+              <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:5px;">
+                <span style="font-size:24px;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);">7</span>
+                <span style="font-size:11px;color:var(--text-muted);">of 8</span>
               </div>
-              <div style="height:4px;background:var(--border-strong);border-radius:4px;margin-top:6px;overflow:hidden;">
-                <div style="height:100%;width:87.5%;background:var(--green);border-radius:4px;"></div>
+              <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;margin-bottom:4px;">
+                <div style="height:100%;width:87.5%;background:var(--green);border-radius:3px;"></div>
               </div>
-              <div style="font-size:10px;color:var(--red);font-weight:600;margin-top:4px;">1 missing — Owner ID (Sarah Chen)</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600;">1 missing — Owner ID</div>
             </div>
-            <!-- Uploaded -->
-            <div style="padding:14px 18px;border-right:1px solid var(--border);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <span style="width:8px;height:8px;border-radius:50%;background:var(--green);"></span>
-                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Uploaded &amp; Verified</span>
+            <div style="padding:13px 16px;border-right:1px solid var(--border);">
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Uploaded</span>
               </div>
-              <div style="display:flex;align-items:baseline;gap:4px;">
-                <span style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--green);">7</span>
-                <span style="font-size:13px;color:var(--text-muted);">documents</span>
+              <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:5px;">
+                <span style="font-size:24px;font-weight:800;font-family:var(--font-mono);color:var(--green);">7</span>
+                <span style="font-size:11px;color:var(--text-muted);">documents</span>
               </div>
-              <div style="font-size:10px;color:var(--text-muted);margin-top:10px;">Bank · Processing · Voided Check · Articles</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:9px;">Bank · Processing · Check · Articles</div>
             </div>
-            <!-- Action -->
-            <div style="padding:14px 18px;background:rgba(239,68,68,.03);">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <span style="width:8px;height:8px;border-radius:50%;background:var(--amber);"></span>
-                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Pending</span>
+            <div style="padding:13px 16px;background:rgba(245,158,11,.02);">
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Pending</span>
+                <span class="sum-chev" style="font-size:9px;color:var(--text-muted);margin-left:auto;transition:transform .2s;">▾</span>
               </div>
-              <div style="display:flex;align-items:baseline;gap:4px;">
-                <span style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--amber);">2</span>
-                <span style="font-size:13px;color:var(--text-muted);">addendums</span>
+              <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:5px;">
+                <span style="font-size:24px;font-weight:800;font-family:var(--font-mono);color:var(--amber);">2</span>
+                <span style="font-size:11px;color:var(--text-muted);">addendums</span>
               </div>
-              <div style="font-size:10px;color:var(--text-muted);margin-top:10px;">Auto-generated on submission</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:9px;">Auto-generated on submit</div>
             </div>
           </div>
 
-          <!-- ═══ MISSING DOCS — COLLAPSED ═══ -->
-          <div style="margin-bottom:12px;">
-            <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-radius:6px;" onclick="let b=document.getElementById('missing-docs-panel');b.style.display=b.style.display==='none'?'':'none';this.querySelector('.md-chev').textContent=b.style.display==='none'?'▸':'▾'" onmouseenter="this.style.background='rgba(239,68,68,.03)'" onmouseleave="this.style.background=''">
-              <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
-              <span style="font-size:11px;color:var(--text-secondary);">1 missing doc</span>
-              <span style="font-size:11px;color:var(--text-muted);">·</span>
-              <span style="font-size:11px;color:var(--text-secondary);font-weight:500;">Owner ID — Sarah Chen (60%)</span>
-              <span style="font-size:10px;color:var(--text-muted);margin-left:2px;">· last nudged 16 days ago</span>
-              <span class="md-chev" style="font-size:9px;color:var(--text-muted);margin-left:auto;">▸</span>
+          <!-- AI Doc Package Summary (collapsed by default) -->
+          <div id="doc-ai-summary" style="display:none;border:1px solid rgba(99,102,241,.18);border-top:none;border-radius:0 0 10px 10px;background:linear-gradient(135deg,rgba(99,102,241,.03),rgba(255,222,0,.015));padding:14px 16px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+              <span style="font-size:11px;color:var(--yellow);">✦</span>
+              <span style="font-size:11px;font-weight:700;color:var(--text-primary);">AI Doc Package Summary</span>
+              <span style="font-size:10px;padding:2px 7px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:4px;color:var(--green);font-weight:600;">Strong</span>
+              <span style="margin-left:auto;font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:4px;color:var(--amber);font-weight:500;">1 action needed</span>
             </div>
-            <div id="missing-docs-panel" style="display:none;padding:10px 14px;margin-top:4px;background:rgba(239,68,68,.03);border:1px solid rgba(239,68,68,.12);border-radius:8px;">
-              <div style="display:flex;align-items:center;gap:12px;">
-                <div style="width:32px;height:32px;background:var(--red-dim);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🪪</div>
-                <div style="flex:1;">
-                  <div style="font-size:12px;font-weight:600;color:var(--text-primary);">Owner ID — Sarah Chen (60%)</div>
-                  <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Required by all matched processors. Can be collected during or after signature. Last nudge sent Feb 22.</div>
-                </div>
-                <div style="display:flex;gap:6px;flex-shrink:0;">
-                  <label style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-secondary);font-family:var(--font-ui);">↑ Upload<input type="file" style="display:none;"></label>
-                  <button class="btn btn-amber" style="padding:5px 12px;font-size:10px;" onclick="nudgeMerchant()">📣 Nudge</button>
-                </div>
-              </div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px;">This package is <strong style="color:var(--text-primary);">nearly complete</strong>. Bank statements show clean cash flow, Square processing history confirms volume, and formation docs are in order. The only blocker is <strong style="color:var(--red);">Sarah Chen's owner ID</strong> — required by all matched processors for 60%+ ownership. Once collected, this application is ready to submit.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+              <span style="font-size:10px;padding:2px 8px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:4px;color:var(--green);">✓ Bank docs clean</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:4px;color:var(--green);">✓ Processing verified</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:4px;color:var(--green);">✓ Formation docs on file</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:4px;color:var(--red);">✗ Owner ID missing</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:4px;color:var(--amber);">⏳ 2 addendums pending</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid rgba(99,102,241,.1);">
+              <span style="font-size:11px;color:var(--text-muted);">Owner ID still needed — send a reminder?</span>
+              <button onclick="nudgeMerchant()" style="padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">📣 Message Fresh Brew Coffee</button>
             </div>
           </div>
 
-          <!-- ═══ DOCUMENT SECTIONS ═══ -->
+          <!-- ══ DOCUMENT SECTIONS ══ -->
 
           <!-- ── BANK STATEMENTS ── -->
-          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;" onclick="let b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.s-caret').textContent=b.style.display==='none'?'▸':'▾'">
-              <span style="font-size:14px;">🏦</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text-primary);">Bank Statements</span>
-              <span style="font-size:11px;color:var(--green);font-weight:600;margin-left:auto;">2 of 2 ✓</span>
-              <span class="s-caret" style="font-size:11px;color:var(--text-muted);">▾</span>
+          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">
+            <div onclick="(function(h){var b=h.nextElementSibling;var o=b.style.display!=='none';b.style.display=o?'none':'block';h.querySelector('.s-caret').textContent=o?'▸':'▾'})(this)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;">
+              <span style="font-size:13px;">🏦</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Bank Statements</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;color:var(--green);font-weight:600;margin-left:auto;">2 of 2 ✓</span>
+              <span class="s-caret" style="font-size:10px;color:var(--text-muted);">▾</span>
             </div>
             <div>
-              <!-- Rows -->
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid var(--border);font-size:12px;">
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Bank Statement (3 months)</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">Chase ••7291 · Jan–Mar 2026</span>
+              <!-- Doc: Bank Statement 3mo -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid var(--border);border-left:3px solid var(--green);">
+                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Bank Statement</div>
+                  <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Chase ••7291 · Jan–Mar 2026</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="0" title="Required — included in signature packet" style="font-size:7px;color:var(--red);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">bank_statements.pdf</span>
-                <span style="font-size:10px;color:var(--green);font-weight:600;">✓</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">bank_statements.pdf</span>
+                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 3</span>
+                <button onclick="alert('Downloading bank_statements.pdf')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
+                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <button onclick="alert('Options:\n• Mark as Recommended\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;" title="More options">⋯</button>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid rgba(0,0,0,0.03);font-size:12px;">
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Voided Check</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">Confirms bank account</span>
+              <!-- Doc: Voided Check -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--green);">
+                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Voided Check</div>
+                  <div style="font-size:10px;color:var(--text-muted);">Confirms bank account</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="0" title="Required — included in signature packet" style="font-size:7px;color:var(--red);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">voided_check.jpg</span>
-                <span style="font-size:10px;color:var(--green);font-weight:600;">✓</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">voided_check.jpg</span>
+                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 3</span>
+                <button onclick="alert('Downloading voided_check.jpg')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
+                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <button onclick="alert('Options:\n• Mark as Recommended\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;" title="More options">⋯</button>
               </div>
-              <!-- AI Analysis toggle -->
-              <div style="padding:6px 16px 6px 42px;border-top:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation();let a=document.getElementById('ai-bank-detail');let c=this.querySelector('.ai-chev');a.style.display=a.style.display==='none'?'':'none';c.textContent=a.style.display==='none'?'▸':'▾'" onmouseenter="this.style.background='rgba(255,222,0,.04)'" onmouseleave="this.style.background=''">
-                <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 6px;background:rgba(255,222,0,.06);border:1px solid rgba(255,222,0,.12);border-radius:4px;">
-                  <span style="font-size:10px;color:var(--yellow);">✦</span>
-                  <span style="font-size:10px;color:var(--text-secondary);font-weight:500;">AI Analysis</span>
-                  <span class="ai-chev" style="font-size:9px;color:var(--text-muted);margin-left:2px;">▸</span>
-                </span>
-                <span style="font-size:10px;color:var(--green);">Deposits from Square detected · No other processors</span>
-              </div>
-              <div id="ai-bank-detail" style="display:none;padding:12px 16px 14px 42px;background:rgba(255,222,0,.02);border-top:1px solid rgba(255,222,0,.1);">
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <div style="display:flex;gap:8px;align-items:flex-start;">
-                    <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                    <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Bank statements are clean and healthy.</strong> 3-month average balance of $18,420 with zero overdrafts or NSFs. Revenue trending +8% MoM. No loan servicing or unusual large debits identified.</div>
-                  </div>
-                  <div style="display:flex;gap:8px;align-items:flex-start;">
-                    <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                    <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Processor deposits detected — Square (SQ *GOSQ.COM).</strong> Identified recurring ACH deposits totaling ~$28,400/mo across 3 months. Deposits are consistent and match a card-present processing pattern. Processing statements from Square have been requested and uploaded.</div>
-                  </div>
-                  <div style="display:flex;gap:8px;align-items:flex-start;">
-                    <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                    <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">No other processor deposits found.</strong> Only Square deposits identified. No split processing. Cash deposits averaging $3,200/mo consistent with a coffee shop.</div>
-                  </div>
-                  <div style="display:flex;gap:8px;align-items:flex-start;">
-                    <span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span>
-                    <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;"><strong style="color:var(--text-primary);">Voided check matches bank account on file.</strong> Routing 121042882 and account ••••7291 confirmed against deposit account. No discrepancies.</div>
+              <!-- AI Bank Analysis -->
+              <div style="border-top:1px solid var(--border);">
+                <div onclick="(function(h){var a=document.getElementById('ai-bank-detail');var o=a.style.display!=='none';a.style.display=o?'none':'block';h.querySelector('.ai-chev').textContent=o?'▸':'▾'})(this)" style="padding:7px 12px 7px 17px;cursor:pointer;display:flex;align-items:center;gap:8px;background:rgba(255,222,0,.02);" onmouseenter="this.style.background='rgba(255,222,0,.04)'" onmouseleave="this.style.background='rgba(255,222,0,.02)'">
+                  <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(255,222,0,.09);border:1px solid rgba(255,222,0,.22);border-radius:5px;">
+                    <span style="font-size:11px;color:var(--yellow);">✦</span>
+                    <span style="font-size:10px;font-weight:600;color:var(--text-secondary);">AI Bank Analysis</span>
+                    <span class="ai-chev" style="font-size:9px;color:var(--text-muted);margin-left:1px;">▸</span>
+                  </span>
+                  <span style="font-size:10px;color:var(--green);">Clean · $18.4K avg balance · No NSFs · +8% MoM</span>
+                </div>
+                <div id="ai-bank-detail" style="display:none;padding:12px 16px 14px 20px;background:rgba(255,222,0,.02);border-top:1px solid rgba(255,222,0,.1);">
+                  <div style="border-left:2px solid rgba(255,222,0,.35);padding-left:12px;display:flex;flex-direction:column;gap:7px;">
+                    <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span><div style="font-size:11px;color:var(--text-secondary);line-height:1.55;"><strong style="color:var(--text-primary);">Statements are clean and healthy.</strong> 3-month average balance of $18,420 with zero overdrafts or NSFs. Revenue trending +8% MoM. No loan servicing or unusual large debits.</div></div>
+                    <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span><div style="font-size:11px;color:var(--text-secondary);line-height:1.55;"><strong style="color:var(--text-primary);">Square deposits detected.</strong> Recurring ACH deposits totaling ~$28,400/mo across 3 months — consistent with a card-present processing pattern. Statements have been uploaded and verified.</div></div>
+                    <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span><div style="font-size:11px;color:var(--text-secondary);line-height:1.55;"><strong style="color:var(--text-primary);">No split processing.</strong> Only Square deposits found. Cash deposits avg $3,200/mo — consistent with a coffee shop.</div></div>
+                    <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--green);font-size:11px;flex-shrink:0;margin-top:1px;">✓</span><div style="font-size:11px;color:var(--text-secondary);line-height:1.55;"><strong style="color:var(--text-primary);">Voided check confirmed.</strong> Routing 121042882 and account ••••7291 match deposit account. No discrepancies.</div></div>
                   </div>
                 </div>
               </div>
@@ -4944,241 +4954,219 @@ function cycleReq(el){
           </div>
 
           <!-- ── PROCESSING STATEMENTS ── -->
-          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;" onclick="let b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.s-caret').textContent=b.style.display==='none'?'▸':'▾'">
-              <span style="font-size:14px;">📑</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text-primary);">Processing Statements</span>
-              <span style="font-size:11px;color:var(--green);font-weight:600;margin-left:auto;">3 of 3 ✓</span>
-              <span class="s-caret" style="font-size:11px;color:var(--text-muted);">▾</span>
+          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">
+            <div onclick="(function(h){var b=h.nextElementSibling;var o=b.style.display!=='none';b.style.display=o?'none':'block';h.querySelector('.s-caret').textContent=o?'▸':'▾'})(this)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;">
+              <span style="font-size:13px;">📑</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Processing Statements</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;color:var(--green);font-weight:600;margin-left:auto;">3 of 3 ✓</span>
+              <span class="s-caret" style="font-size:10px;color:var(--text-muted);">▾</span>
             </div>
             <div>
-              <!-- Rows -->
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid var(--border);font-size:12px;">
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Square — Jan 2026</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">$28,910 · 2,614 txns</span>
+              <!-- Square Jan -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid var(--border);border-left:3px solid var(--amber);">
+                <span onclick="cRB(this)" data-req="1" style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Recommended</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Square — Jan 2026</div>
+                  <div style="font-size:10px;color:var(--text-muted);">$28,910 · 2,614 txns</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="1" title="Recommended — improves approval odds" style="font-size:7px;color:var(--amber);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">sq_payout_jan.csv</span>
-                <span style="font-size:10px;color:var(--green);font-weight:600;">✓</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">sq_payout_jan.csv</span>
+                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 5</span>
+                <button onclick="alert('Downloading sq_payout_jan.csv')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
+                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <button onclick="alert('Options:\n• Mark as Required\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid rgba(0,0,0,0.03);font-size:12px;">
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Square — Feb 2026</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">$31,420 · 2,891 txns</span>
+              <!-- Square Feb -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--amber);">
+                <span onclick="cRB(this)" data-req="1" style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Recommended</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Square — Feb 2026</div>
+                  <div style="font-size:10px;color:var(--text-muted);">$31,420 · 2,891 txns</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="1" title="Recommended — improves approval odds" style="font-size:7px;color:var(--amber);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">sq_payout_feb.csv</span>
-                <span style="font-size:10px;color:var(--green);font-weight:600;">✓</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">sq_payout_feb.csv</span>
+                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 5</span>
+                <button onclick="alert('Downloading sq_payout_feb.csv')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
+                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <button onclick="alert('Options:\n• Mark as Required\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid rgba(0,0,0,0.03);font-size:12px;">
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Square — Mar 2026</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">$33,411 · 3,036 txns</span>
+              <!-- Square Mar -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--amber);">
+                <span onclick="cRB(this)" data-req="1" style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:10px;color:var(--amber);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Recommended</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Square — Mar 2026</div>
+                  <div style="font-size:10px;color:var(--text-muted);">$33,411 · 3,036 txns</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="1" title="Recommended — improves approval odds" style="font-size:7px;color:var(--amber);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">sq_payout_mar.csv</span>
-                <span style="font-size:10px;color:var(--green);font-weight:600;">✓</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">sq_payout_mar.csv</span>
+                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 5</span>
+                <button onclick="alert('Downloading sq_payout_mar.csv')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
+                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <button onclick="alert('Options:\n• Mark as Required\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
-              <!-- AI Analysis toggle -->
-              <div style="padding:6px 16px 6px 42px;border-top:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation();let a=document.getElementById('ai-proc-detail');let c=this.querySelector('.ai-chev');a.style.display=a.style.display==='none'?'':'none';c.textContent=a.style.display==='none'?'▸':'▾'" onmouseenter="this.style.background='rgba(255,222,0,.04)'" onmouseleave="this.style.background=''">
-                <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 6px;background:rgba(255,222,0,.06);border:1px solid rgba(255,222,0,.12);border-radius:4px;">
-                  <span style="font-size:10px;color:var(--yellow);">✦</span>
-                  <span style="font-size:10px;color:var(--text-secondary);font-weight:500;">AI Processing Analysis</span>
-                  <span class="ai-chev" style="font-size:9px;color:var(--text-muted);margin-left:2px;">▸</span>
-                </span>
-                <span style="font-size:10px;color:var(--green);">$31K/mo avg · 0.02% CB · Est. savings $287/mo</span>
-              </div>
-              <!-- FULL PROCESSING BREAKDOWN -->
-              <div id="ai-proc-detail" style="display:none;padding:14px 16px;background:rgba(255,222,0,.02);border-top:1px solid rgba(255,222,0,.1);">
-                <!-- Volume Tiles -->
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">$31,247</div>
-                    <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Monthly Volume</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">2,847</div>
-                    <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Monthly Transactions</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">$10.98</div>
-                    <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Avg Ticket</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-                    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">$47.20</div>
-                    <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">High Ticket</div>
-                  </div>
+              <!-- AI Processing Analysis -->
+              <div style="border-top:1px solid var(--border);">
+                <div onclick="(function(h){var a=document.getElementById('ai-proc-detail');var o=a.style.display!=='none';a.style.display=o?'none':'block';h.querySelector('.ai-chev').textContent=o?'▸':'▾'})(this)" style="padding:7px 12px 7px 17px;cursor:pointer;display:flex;align-items:center;gap:8px;background:rgba(255,222,0,.02);" onmouseenter="this.style.background='rgba(255,222,0,.04)'" onmouseleave="this.style.background='rgba(255,222,0,.02)'">
+                  <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(255,222,0,.09);border:1px solid rgba(255,222,0,.22);border-radius:5px;">
+                    <span style="font-size:11px;color:var(--yellow);">✦</span>
+                    <span style="font-size:10px;font-weight:600;color:var(--text-secondary);">AI Processing Analysis</span>
+                    <span class="ai-chev" style="font-size:9px;color:var(--text-muted);margin-left:1px;">▸</span>
+                  </span>
+                  <span style="font-size:10px;color:var(--green);">$31K/mo avg · 0.02% CB · Est. savings $287/mo</span>
                 </div>
-                <!-- Card Mix + Entry -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
-                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Card Mix</div>
-                    <div style="display:flex;flex-direction:column;gap:5px;">
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Visa</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">44.2%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:44.2%;background:var(--blue);border-radius:3px;"></div></div>
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Mastercard</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">31.8%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:31.8%;background:var(--amber);border-radius:3px;"></div></div>
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Amex</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">12.4%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:12.4%;background:var(--green);border-radius:3px;"></div></div>
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Discover / Other</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">11.6%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:11.6%;background:var(--text-muted);border-radius:3px;"></div></div>
+                <div id="ai-proc-detail" style="display:none;padding:14px 16px 14px 20px;background:rgba(255,222,0,.02);border-top:1px solid rgba(255,222,0,.1);">
+                  <div style="border-left:2px solid rgba(255,222,0,.35);padding-left:12px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+                      <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">$31,247</div><div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Monthly Volume</div></div>
+                      <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">2,847</div><div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Transactions/mo</div></div>
+                      <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:-1px;">$10.98</div><div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Avg Ticket</div></div>
+                      <div style="background:var(--bg-elevated);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:10px 12px;text-align:center;"><div style="font-size:18px;font-weight:800;color:var(--green);font-family:var(--font-mono);letter-spacing:-1px;">$287</div><div style="font-size:9px;color:var(--green);font-weight:600;margin-top:2px;">Savings/mo</div></div>
                     </div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
-                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Entry Method</div>
-                    <div style="display:flex;flex-direction:column;gap:5px;">
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">EMV Chip (dip)</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">52.1%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:52.1%;background:var(--green);border-radius:3px;"></div></div>
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">NFC / Contactless</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">38.7%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:38.7%;background:var(--blue);border-radius:3px;"></div></div>
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Keyed / Manual</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">7.8%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:7.8%;background:var(--amber);border-radius:3px;"></div></div>
-                      <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Swiped</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">1.4%</span></div>
-                      <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:1.4%;background:var(--text-muted);border-radius:3px;"></div></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                      <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Card Mix</div>
+                        <div style="display:flex;flex-direction:column;gap:5px;">
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Visa</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">44.2%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:44.2%;background:var(--blue);border-radius:3px;"></div></div>
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Mastercard</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">31.8%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:31.8%;background:var(--amber);border-radius:3px;"></div></div>
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Amex</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">12.4%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:12.4%;background:var(--green);border-radius:3px;"></div></div>
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Discover</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">11.6%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:11.6%;background:var(--text-muted);border-radius:3px;"></div></div>
+                        </div>
+                      </div>
+                      <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Entry Method</div>
+                        <div style="display:flex;flex-direction:column;gap:5px;">
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">EMV Chip</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">52.1%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:52.1%;background:var(--green);border-radius:3px;"></div></div>
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">NFC / Tap</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">38.7%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:38.7%;background:var(--blue);border-radius:3px;"></div></div>
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Keyed</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">7.8%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:7.8%;background:var(--amber);border-radius:3px;"></div></div>
+                          <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Swipe</span><span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">1.4%</span></div>
+                          <div style="height:3px;background:var(--border-strong);border-radius:3px;overflow:hidden;"><div style="height:100%;width:1.4%;background:var(--text-muted);border-radius:3px;"></div></div>
+                        </div>
+                      </div>
                     </div>
+                    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
+                      <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong style="color:var(--text-primary);">Volume matches bank deposits.</strong> $31,247/mo aligns with $28,400/mo ACH after Square fees.</div></div>
+                      <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong style="color:var(--text-primary);">90.8% card-present.</strong> EMV + NFC dominates. True countertop environment, minimal CNP risk.</div></div>
+                      <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong style="color:var(--text-primary);">Volume trending up.</strong> $28.9K → $31.4K → $33.4K (+8% MoM).</div></div>
+                      <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">💡</span><div><strong style="color:var(--green);">Savings: $287/mo ($3,444/yr)</strong> switching from Square 2.6% flat to IC+ through First Data Omaha.</div></div>
+                    </div>
+                    <button onclick="alert('Generating savings proposal...')" style="padding:7px 14px;background:var(--green);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui);">📊 Generate Savings Proposal</button>
                   </div>
                 </div>
-                <!-- Risk & Fees -->
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:18px;font-weight:800;color:var(--green);font-family:var(--font-mono);">0.02%</div>
-                    <div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">CB Rate</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:18px;font-weight:800;color:var(--green);font-family:var(--font-mono);">0.8%</div>
-                    <div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Refund Rate</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:18px;font-weight:800;color:var(--red);font-family:var(--font-mono);">2.6%</div>
-                    <div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Current (Square)</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:18px;font-weight:800;color:var(--text-primary);font-family:var(--font-mono);">$812</div>
-                    <div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Current Fees/mo</div>
-                  </div>
-                  <div style="background:var(--bg-elevated);border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:10px;text-align:center;">
-                    <div style="font-size:18px;font-weight:800;color:var(--green);font-family:var(--font-mono);">$287</div>
-                    <div style="font-size:9px;color:var(--green);font-weight:600;margin-top:2px;">Savings/mo</div>
-                  </div>
-                </div>
-                <!-- Findings + Proposal -->
-                <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
-                  <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong style="color:var(--text-primary);">Volume matches bank deposits.</strong> $31,247/mo processing aligns with $28,400/mo ACH after Square fees.</div></div>
-                  <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong style="color:var(--text-primary);">90.8% card-present.</strong> EMV + NFC dominates. True countertop environment, minimal CNP risk.</div></div>
-                  <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--green);flex-shrink:0;">✓</span><div><strong style="color:var(--text-primary);">Volume trending up.</strong> $28.9K → $31.4K → $33.4K (+8% MoM). Seasonal spring increase.</div></div>
-                  <div style="display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--text-secondary);line-height:1.5;"><span style="color:var(--blue);flex-shrink:0;">💡</span><div><strong style="color:var(--green);">Savings: $287/mo ($3,444/yr)</strong> switching from Square 2.6% flat to IC+ through First Data Omaha.</div></div>
-                </div>
-                <button onclick="alert('Generating savings proposal...')" style="padding:8px 16px;background:var(--green);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui);display:flex;align-items:center;gap:6px;">📊 Generate Savings Proposal</button>
               </div>
             </div>
           </div>
 
           <!-- ── BUSINESS INFORMATION ── -->
-          <div style="background:var(--bg-surface);border:1px solid rgba(239,68,68,.2);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;" onclick="let b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.s-caret').textContent=b.style.display==='none'?'▸':'▾'">
-              <span style="font-size:14px;">🏢</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text-primary);">Business Information</span>
-              <span style="font-size:11px;color:var(--red);font-weight:600;margin-left:auto;">1 of 2 · 1 missing</span>
-              <span class="s-caret" style="font-size:11px;color:var(--text-muted);">▾</span>
+          <div style="background:var(--bg-surface);border:1px solid rgba(239,68,68,.22);border-radius:10px;overflow:hidden;margin-bottom:8px;">
+            <div onclick="(function(h){var b=h.nextElementSibling;var o=b.style.display!=='none';b.style.display=o?'none':'block';h.querySelector('.s-caret').textContent=o?'▸':'▾'})(this)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;">
+              <span style="font-size:13px;">🏢</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Business Information</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:10px;color:var(--red);font-weight:600;margin-left:auto;">1 missing</span>
+              <span class="s-caret" style="font-size:10px;color:var(--text-muted);">▾</span>
             </div>
             <div>
-              <!-- Missing row — highlighted -->
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 16px 10px 42px;border-top:1px solid rgba(239,68,68,.15);background:rgba(239,68,68,.04);font-size:12px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;"></span>
-                <div style="flex:1;">
-                  <span style="font-weight:600;color:var(--text-primary);">Owner ID — Sarah Chen (60%)</span>
-                  <div style="font-size:10px;color:var(--red);margin-top:1px;">Required · Not uploaded · 16 days since last nudge</div>
+              <!-- Missing: Owner ID Sarah Chen -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(239,68,68,.15);border-left:3px solid var(--red);background:rgba(239,68,68,.025);">
+                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;">Owner ID — Sarah Chen</span>
+                    <span style="font-size:9px;padding:1px 6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:4px;color:var(--red);font-weight:600;white-space:nowrap;flex-shrink:0;">✗ Missing</span>
+                  </div>
+                  <div style="font-size:10px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">60% ownership · all processors require this · nudged 16d ago</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="0" title="Required — included in signature packet" style="font-size:7px;color:var(--red);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-secondary);font-family:var(--font-ui);">↑ Upload<input type="file" style="display:none;"></label>
-                <span style="font-size:10px;color:var(--red);font-weight:700;">Missing</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-secondary);font-family:var(--font-ui);flex-shrink:0;">↑ Upload<input type="file" style="display:none;"></label>
+                <button class="btn btn-amber" style="padding:4px 9px;font-size:10px;flex-shrink:0;" onclick="nudgeMerchant()">📣 Nudge</button>
+                <button onclick="alert('Options:\n• Mark as Optional\n• Mark as Not Required\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
-              <!-- Uploaded row -->
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid rgba(0,0,0,0.03);font-size:12px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Articles of Incorporation</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">State-issued formation document</span>
+              <!-- Uploaded: Articles of Inc -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--green);">
+                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Articles of Incorporation</div>
+                  <div style="font-size:10px;color:var(--text-muted);">State-issued formation document</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="0" title="Required — included in signature packet" style="font-size:7px;color:var(--red);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">articles_of_inc.pdf</span>
-                <span style="font-size:10px;color:var(--green);font-weight:600;">✓</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">articles_of_inc.pdf</span>
+                <span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">M. Wright · Apr 3</span>
+                <button onclick="alert('Downloading articles_of_inc.pdf')" style="padding:3px 7px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;font-size:10px;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);flex-shrink:0;" title="Download">↓</button>
+                <span style="font-size:11px;color:var(--green);font-weight:700;flex-shrink:0;">✓</span>
+                <button onclick="alert('Options:\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
-              <!-- Optional row -->
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid rgba(0,0,0,0.03);font-size:12px;opacity:.5;">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--border-strong);flex-shrink:0;"></span>
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Owner ID — James Park (40%)</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">Optional · &lt;25% ownership</span>
+              <!-- Optional: Owner ID James Park -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--border-strong);opacity:.45;">
+                <span onclick="cRB(this)" data-req="2" style="font-size:10px;padding:2px 8px;background:rgba(0,0,0,.04);border:1px solid var(--border-strong);border-radius:10px;color:var(--text-muted);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Optional</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Owner ID — James Park</div>
+                  <div style="font-size:10px;color:var(--text-muted);">&lt;25% ownership · not required</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="2" title="Optional — not required for submission" style="font-size:7px;color:var(--text-muted);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">○</span>
-                <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-muted);font-family:var(--font-ui);">↑ Upload<input type="file" style="display:none;"></label>
-                <span style="font-size:10px;color:var(--text-muted);">—</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <label style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:10px;color:var(--text-muted);font-family:var(--font-ui);flex-shrink:0;">↑ Upload<input type="file" style="display:none;"></label>
+                <button onclick="alert('Options:\n• Make Required\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
             </div>
           </div>
 
           <!-- ── ADDENDUMS & QUESTIONNAIRES ── -->
-          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;" onclick="let b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.s-caret').textContent=b.style.display==='none'?'▸':'▾'">
-              <span style="font-size:14px;">📝</span>
-              <span style="font-size:13px;font-weight:700;color:var(--text-primary);">Addendums &amp; Questionnaires</span>
-              <span style="font-size:11px;color:var(--amber);font-weight:600;margin-left:auto;">2 pending · First Data Omaha</span>
-              <span class="s-caret" style="font-size:11px;color:var(--text-muted);">▾</span>
+          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">
+            <div onclick="(function(h){var b=h.nextElementSibling;var o=b.style.display!=='none';b.style.display=o?'none':'block';h.querySelector('.s-caret').textContent=o?'▸':'▾'})(this)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;">
+              <span style="font-size:13px;">📝</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Addendums &amp; Questionnaires</span>
+              <span style="font-size:10px;padding:2px 8px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;color:var(--amber);font-weight:600;margin-left:auto;">2 pending · First Data Omaha</span>
+              <span class="s-caret" style="font-size:10px;color:var(--text-muted);">▾</span>
             </div>
             <div>
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid var(--border);font-size:12px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
-                <div style="flex:1;">
-                  <span style="font-weight:500;">First Data Application Addendum</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">Required for all new merchants</span>
+              <!-- First Data Addendum -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid var(--border);border-left:3px solid var(--amber);">
+                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">First Data Application Addendum</div>
+                  <div style="font-size:10px;color:var(--text-muted);">Required for all new merchants</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="0" title="Required — included in signature packet" style="font-size:7px;color:var(--red);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;padding:3px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;color:var(--blue);cursor:pointer;">Auto-generate ✦</span>
-                <span style="font-size:10px;color:var(--amber);font-weight:600;">Pending</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--amber);font-weight:600;flex-shrink:0;">Pending</span>
+                <button onclick="alert('Generating First Data Addendum...')" style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:5px;color:var(--blue);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">✦ Auto-generate</button>
+                <button onclick="alert('Options:\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 8px 42px;border-top:1px solid rgba(0,0,0,0.03);font-size:12px;">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;"></span>
-                <div style="flex:1;">
-                  <span style="font-weight:500;">Retail / Card-Present Questionnaire</span>
-                  <span style="color:var(--text-muted);font-size:10px;margin-left:6px;">MCC 5812 verification</span>
+              <!-- Retail Questionnaire -->
+              <div data-doc-row style="display:flex;align-items:center;gap:8px;padding:9px 10px 9px 14px;border-top:1px solid rgba(0,0,0,.04);border-left:3px solid var(--amber);">
+                <span onclick="cRB(this)" data-req="0" style="font-size:10px;padding:2px 8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;flex-shrink:0;" title="Click to change">Required</span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);white-space:nowrap;">Retail / Card-Present Questionnaire</div>
+                  <div style="font-size:10px;color:var(--text-muted);">MCC 5812 verification</div>
                 </div>
-                <span onclick="cycleReq(this)" data-req="0" title="Required — included in signature packet" style="font-size:7px;color:var(--red);cursor:pointer;flex-shrink:0;user-select:none;padding:4px;">●</span>
-                <span style="font-size:10px;padding:3px 8px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:4px;color:var(--blue);cursor:pointer;">Auto-generate ✦</span>
-                <span style="font-size:10px;color:var(--amber);font-weight:600;">Pending</span>
+                <span style="font-size:9px;padding:1px 6px;background:rgba(255,222,0,.07);border:1px solid rgba(255,222,0,.18);border-radius:4px;color:var(--yellow);font-weight:600;flex-shrink:0;">✦ AI</span>
+                <span style="font-size:10px;color:var(--amber);font-weight:600;flex-shrink:0;">Pending</span>
+                <button onclick="alert('Generating Questionnaire...')" style="font-size:10px;padding:4px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:5px;color:var(--blue);cursor:pointer;font-family:var(--font-ui);font-weight:600;flex-shrink:0;">✦ Auto-generate</button>
+                <button onclick="alert('Options:\n• Mark as Optional\n• Remove from list')" style="background:none;border:none;font-size:15px;color:var(--text-muted);cursor:pointer;padding:2px 4px;line-height:1;flex-shrink:0;">⋯</button>
               </div>
             </div>
           </div>
 
-          <!-- ── ADD / UPLOAD ── -->
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;">
-            <input id="new-doc-label" placeholder="Add document type (e.g. Lease Agreement, Tax Return…)" style="flex:1;background:transparent;border:none;outline:none;font-size:12px;color:var(--text-secondary);font-family:var(--font-ui);" onfocus="this.style.color='var(--text-primary)'" onblur="this.style.color='var(--text-secondary)'">
-            <select id="new-doc-req" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:10px;padding:4px 8px;font-family:var(--font-ui);outline:none;"><option>Optional</option><option>Recommended</option><option>Required</option></select>
-            <button onclick="addDocRow()" style="padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-secondary);font-size:11px;cursor:pointer;font-family:var(--font-ui);">+ Add</button>
-            <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;background:var(--yellow);border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700;color:#09091A;font-family:var(--font-ui);">↑ Upload Files<input type="file" style="display:none;" multiple></label>
+          <!-- ── ADD DOCUMENT ── -->
+          <div style="background:var(--bg-surface);border:1px dashed var(--border-strong);border-radius:10px;margin-bottom:4px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;">
+              <span style="font-size:13px;color:var(--text-muted);">+</span>
+              <input id="new-doc-label" placeholder="Add a document type (e.g. Lease Agreement, Tax Return…)" style="flex:1;background:transparent;border:none;outline:none;font-size:12px;color:var(--text-secondary);font-family:var(--font-ui);" onfocus="this.style.color='var(--text-primary)'" onblur="this.style.color='var(--text-secondary)'">
+              <select id="new-doc-req" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:10px;padding:4px 8px;font-family:var(--font-ui);outline:none;"><option>Optional</option><option>Recommended</option><option>Required</option></select>
+              <button onclick="addDocRow()" style="padding:5px 11px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-secondary);font-size:11px;cursor:pointer;font-family:var(--font-ui);">+ Add</button>
+              <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:var(--yellow);border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700;color:#09091A;font-family:var(--font-ui);">↑ Upload Files<input type="file" style="display:none;" multiple></label>
+            </div>
           </div>
           <div id="custom-doc-rows"></div>
 
-          <!-- Why these docs? -->
-          <div style="padding:4px 0;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="let t=document.getElementById('why-docs-v3');t.style.display=t.style.display==='none'?'':'none'">
-            <span style="font-size:11px;color:var(--yellow);">✦</span>
-            <span style="font-size:11px;color:var(--text-muted);">Why these docs? · AI Merchant Classification</span>
-          </div>
-          <div id="why-docs-v3" style="display:none;margin-top:6px;padding:12px 16px;background:linear-gradient(135deg,rgba(255,222,0,.04),rgba(59,130,246,.02));border:1px solid rgba(255,222,0,.12);border-radius:8px;margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-              <span class="p-badge bg">Standard Retail</span>
-              <span class="p-badge bb">Card Present</span>
-              <span class="p-badge bm">MCC 5812</span>
-              <span style="margin-left:auto;font-size:11px;color:var(--text-muted);">Confidence: 94%</span>
-            </div>
-            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;">Fresh Brew Coffee Co. is classified as a <strong style="color:var(--text-primary);">standard low-risk food service merchant</strong>. Documentation requirements are <strong style="color:var(--green);">minimal</strong> — government ID for the primary owner, bank statements, and processing history are sufficient.</div>
-          </div>
-
-          <div class="form-nav">
+          <div class="form-nav" style="margin-top:12px;">
             <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
             <div class="fnr">
-              <span style="font-size:11px;color:var(--amber);">1 doc pending collection</span>
+              <span style="font-size:11px;color:var(--red);">Owner ID still missing</span>
               <button class="btn btn-amber" onclick="nudgeMerchant()">📣 Nudge Merchant</button>
               <button class="btn btn-primary" onclick="goStep(7)">Pricing →</button>
             </div>
@@ -12378,7 +12366,8 @@ async function nmCreateMerchant() {
       sic:'0782 — Lawn and Garden Services', naics:'561730',
       state:'SC', stateOfInc:'South Carolina', yearStarted:'2024', yearsInBiz:'2',
       owner:'Santiago (Santi)', ownerTitle:'Owner / Managing Member',
-      phone:'', email:'',
+      phone:'(803) 555-0147', email:'santi@santilandscaping.org',
+      address:'1247 Augusta Hwy, Lexington, SC 29072',
       website:'santilandscaping.org',
       description:'Professional landscaping services including lawn maintenance, mowing, edging, trimming, seasonal cleanups, and property care for residential and commercial properties in the Lexington, SC area.',
       services:'Lawn Maintenance & Mowing, Edging & Trimming, Seasonal Cleanups, French Drain Installation, Pressure Washing',
@@ -12407,7 +12396,9 @@ async function nmCreateMerchant() {
       '• <strong>NAICS:</strong> ' + demo.naics + '\n' +
       '• <strong>State of Inc:</strong> ' + demo.stateOfInc + '\n' +
       '• <strong>Years in Business:</strong> ' + demo.yearsInBiz + '\n' +
-      (address ? '• <strong>Address:</strong> ' + address + ' ✅ verified\n' : '') +
+      '• <strong>Address:</strong> ' + demo.address + ' ✅ verified\n' +
+      '• <strong>Phone:</strong> ' + demo.phone + '\n' +
+      '• <strong>Email:</strong> ' + demo.email + '\n' +
       (ein ? '• <strong>EIN:</strong> ' + ein + ' ✅ confirmed\n' : ''));
   } else {
     enrichedData = {
@@ -12439,7 +12430,9 @@ async function nmCreateMerchant() {
     nmChatAgent('Found registered agent in SC Secretary of State filings.\n\n' +
       '• <strong>Owner:</strong> ' + demo.owner + '\n' +
       '• <strong>Title:</strong> ' + demo.ownerTitle + '\n' +
-      '• <strong>Year Started:</strong> ' + demo.yearStarted);
+      '• <strong>Year Started:</strong> ' + demo.yearStarted + '\n' +
+      '• <strong>Business Phone:</strong> ' + demo.phone + '\n' +
+      '• <strong>Business Email:</strong> ' + demo.email);
   } else {
     nmChatAgent('Found registered agent and business filings. Extracting owner details.');
   }
@@ -12524,7 +12517,9 @@ async function nmCreateMerchant() {
     name: name,
     website: website,
     ein: ein,
-    address: address,
+    address: enrichedData.address || address,
+    phone: enrichedData.phone || '',
+    email: enrichedData.email || '',
     notes: notes,
     files: nmFiles.map(f => f.name),
     enriched: enrichedData,
@@ -12555,7 +12550,22 @@ function nmOpenApplication(name) {
     const view = document.getElementById('view-merchant-detail');
     if (!view) return;
 
-    // Helper: find input by label text match and fill it
+    // 1. Blank every input/select in the form so only AI-filled fields have values
+    view.querySelectorAll('.finput').forEach(inp => {
+      if (inp.tagName === 'SELECT') {
+        inp.selectedIndex = 0;
+      } else {
+        inp.value = '';
+      }
+      inp.classList.remove('filled');
+      inp.style.borderColor = '';
+      inp.style.background = '';
+      inp.removeAttribute('data-ai-filled');
+    });
+    // Remove any previously added AI badge chips
+    view.querySelectorAll('.ai-filled-chip').forEach(el => el.remove());
+
+    // 2. Helper: fill a field by its label text and optionally mark as AI-filled
     function fillByLabel(labelText, value, isAI) {
       if (!value) return;
       const labels = view.querySelectorAll('.flabel');
@@ -12567,16 +12577,15 @@ function nmOpenApplication(name) {
             inp.value = value;
             inp.classList.add('filled');
             if (isAI) {
-              inp.style.borderColor = 'rgba(99,102,241,0.4)';
+              inp.style.borderColor = 'rgba(99,102,241,0.35)';
               inp.style.background = 'rgba(99,102,241,0.04)';
-              // Add 🤖 indicator
-              if (!group.querySelector('.ai-tag')) {
-                const tag = document.createElement('span');
-                tag.className = 'ai-tag';
-                tag.style.cssText = 'position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;opacity:0.5;pointer-events:none;';
-                tag.textContent = '🤖';
-                const wrapper = inp.parentElement;
-                if (wrapper) { wrapper.style.position = 'relative'; wrapper.appendChild(tag); }
+              inp.setAttribute('data-ai-filled', '1');
+              if (!lbl.querySelector('.ai-filled-chip')) {
+                const chip = document.createElement('span');
+                chip.className = 'ai-filled-chip';
+                chip.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:4px;font-size:9px;font-weight:600;color:#6366F1;letter-spacing:.3px;vertical-align:middle;';
+                chip.textContent = 'AI';
+                lbl.appendChild(chip);
               }
             }
           }
@@ -12585,81 +12594,115 @@ function nmOpenApplication(name) {
       }
     }
 
-    // Parse address
+    // Parse address from demo enrichment
     const addrParts = (e.address || '').match(/^(.+?),\s*(.+?),\s*([A-Z]{2})\s*(\d{5})?/i);
     const street = addrParts ? addrParts[1] : e.address;
     const city = addrParts ? addrParts[2] : '';
     const addrState = addrParts ? addrParts[3] : '';
     const zip = addrParts ? (addrParts[4] || '') : '';
 
-    // Step 1: Business Info
+    // Step 1: Business Info — AI-filled fields only
     fillByLabel('Business Legal Name', d.legalName || name, true);
-    fillByLabel('DBA', d.dba || name, true);
+    fillByLabel('DBA', d.dba || '', true);
     fillByLabel('MCC Code', d.sic || '', true);
-    fillByLabel('Business Website', d.website || e.website, !!d.website);
-    fillByLabel('Years in Business', d.yearsInBiz || d.yearStarted || '', true);
-    fillByLabel('Street Address', street, !!e.address);
-    fillByLabel('City', city, !!city);
-    fillByLabel('ZIP', zip, !!zip);
+    fillByLabel('Business Website', d.website || e.website || '', true);
+    fillByLabel('Years in Business', d.yearsInBiz || '', true);
+    fillByLabel('Business Phone', e.phone || '', true);
+    fillByLabel('Business Email', e.email || '', true);
+    fillByLabel('Street Address', street || '', !!street);
+    fillByLabel('City', city || '', !!city);
+    fillByLabel('ZIP', zip || '', !!zip);
 
-    // Set business type select
+    // Set business type select (AI-filled)
     const selects = view.querySelectorAll('.fselect');
     selects.forEach(sel => {
-      const lbl = sel.closest('.fgroup')?.querySelector('.flabel')?.textContent || '';
-      if (lbl.includes('Business Type') && d.bizType) {
+      const lbl = sel.closest('.fgroup')?.querySelector('.flabel');
+      const lblText = lbl?.textContent || '';
+      if (lblText.includes('Business Type') && d.bizType) {
         for (const opt of sel.options) {
           if (opt.textContent.includes(d.bizType)) { sel.value = opt.value; break; }
         }
-        sel.style.borderColor = 'rgba(99,102,241,0.4)';
-      }
-      if (lbl.includes('State') && addrState) {
-        for (const opt of sel.options) {
-          if (opt.textContent === addrState || opt.value === addrState) { sel.value = opt.value; break; }
+        sel.style.borderColor = 'rgba(99,102,241,0.35)';
+        sel.style.background = 'rgba(99,102,241,0.04)';
+        if (lbl && !lbl.querySelector('.ai-filled-chip')) {
+          const chip = document.createElement('span');
+          chip.className = 'ai-filled-chip';
+          chip.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:4px;font-size:9px;font-weight:600;color:#6366F1;letter-spacing:.3px;vertical-align:middle;';
+          chip.textContent = 'AI';
+          lbl.appendChild(chip);
         }
-        // Add SC if not in options
-        if (!sel.value || sel.value === 'CA') {
+      }
+      if (lblText.includes('State') && addrState) {
+        let matched = false;
+        for (const opt of sel.options) {
+          if (opt.textContent === addrState || opt.value === addrState) { sel.value = opt.value; matched = true; break; }
+        }
+        if (!matched) {
           const newOpt = document.createElement('option');
           newOpt.value = addrState; newOpt.textContent = addrState; newOpt.selected = true;
           sel.appendChild(newOpt);
         }
+        sel.style.borderColor = 'rgba(99,102,241,0.35)';
+        sel.style.background = 'rgba(99,102,241,0.04)';
+        if (lbl && !lbl.querySelector('.ai-filled-chip')) {
+          const chip = document.createElement('span');
+          chip.className = 'ai-filled-chip';
+          chip.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:4px;font-size:9px;font-weight:600;color:#6366F1;letter-spacing:.3px;vertical-align:middle;';
+          chip.textContent = 'AI';
+          lbl.appendChild(chip);
+        }
       }
     });
 
-    // Step 3: Officers — populate owner
+    // Step 3: Officers — owner name + title only (AI-filled)
     if (d.owner) {
       const officerInputs = view.querySelectorAll('.finput');
       officerInputs.forEach(inp => {
-        const lbl = inp.closest('.fgroup')?.querySelector('.flabel')?.textContent || '';
-        if (lbl.includes('First Name') && !inp.dataset.aiFilled) {
+        const group = inp.closest('.fgroup');
+        const lbl = group?.querySelector('.flabel');
+        const lblText = lbl?.textContent || '';
+        if (lblText.includes('First Name') && !inp.getAttribute('data-ai-filled')) {
           inp.value = d.owner.split(' ')[0] || d.owner;
           inp.classList.add('filled');
-          inp.style.borderColor = 'rgba(99,102,241,0.4)';
-          inp.dataset.aiFilled = '1';
+          inp.style.borderColor = 'rgba(99,102,241,0.35)';
+          inp.style.background = 'rgba(99,102,241,0.04)';
+          inp.setAttribute('data-ai-filled', '1');
+          if (lbl && !lbl.querySelector('.ai-filled-chip')) {
+            const chip = document.createElement('span'); chip.className = 'ai-filled-chip';
+            chip.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:4px;font-size:9px;font-weight:600;color:#6366F1;letter-spacing:.3px;vertical-align:middle;';
+            chip.textContent = 'AI'; lbl.appendChild(chip);
+          }
         }
-        if (lbl.includes('Last Name') && !inp.dataset.aiFilled) {
+        if (lblText.includes('Last Name') && !inp.getAttribute('data-ai-filled')) {
           inp.value = d.owner.split(' ').slice(1).join(' ') || '';
           inp.classList.add('filled');
-          inp.style.borderColor = 'rgba(99,102,241,0.4)';
-          inp.dataset.aiFilled = '1';
+          inp.style.borderColor = 'rgba(99,102,241,0.35)';
+          inp.style.background = 'rgba(99,102,241,0.04)';
+          inp.setAttribute('data-ai-filled', '1');
+          if (lbl && !lbl.querySelector('.ai-filled-chip')) {
+            const chip = document.createElement('span'); chip.className = 'ai-filled-chip';
+            chip.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:4px;font-size:9px;font-weight:600;color:#6366F1;letter-spacing:.3px;vertical-align:middle;';
+            chip.textContent = 'AI'; lbl.appendChild(chip);
+          }
         }
-        if (lbl.includes('Title') && !inp.dataset.aiFilled) {
+        if (lblText.includes('Title') && !inp.getAttribute('data-ai-filled')) {
           inp.value = d.ownerTitle || 'Owner';
           inp.classList.add('filled');
-          inp.style.borderColor = 'rgba(99,102,241,0.4)';
-          inp.dataset.aiFilled = '1';
-        }
-        if (lbl.includes('Ownership') && !inp.dataset.aiFilled) {
-          inp.value = '100%';
-          inp.classList.add('filled');
-          inp.style.borderColor = 'rgba(99,102,241,0.4)';
-          inp.dataset.aiFilled = '1';
+          inp.style.borderColor = 'rgba(99,102,241,0.35)';
+          inp.style.background = 'rgba(99,102,241,0.04)';
+          inp.setAttribute('data-ai-filled', '1');
+          if (lbl && !lbl.querySelector('.ai-filled-chip')) {
+            const chip = document.createElement('span'); chip.className = 'ai-filled-chip';
+            chip.style.cssText = 'display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 5px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:4px;font-size:9px;font-weight:600;color:#6366F1;letter-spacing:.3px;vertical-align:middle;';
+            chip.textContent = 'AI'; lbl.appendChild(chip);
+          }
         }
       });
     }
 
-    // Step 4: Processing — fill volume estimates
+    // Step 4: Processing — volume estimates (AI-filled)
     if (d.monthlyVolume) {
-      fillByLabel('Monthly Volume', d.monthlyVolume, true);
+      fillByLabel('Monthly', d.monthlyVolume, true);
       fillByLabel('Average Ticket', d.avgTicket || '', true);
     }
 
@@ -12677,6 +12720,9 @@ function nmOpenApplication(name) {
           • Legal Name: ${d.legalName}<br>
           • Entity: ${d.bizType} · SIC ${d.sic}<br>
           • State: ${d.stateOfInc} · Started ${d.yearStarted}<br>
+          • Address: ${d.address || e.address || '—'}<br>
+          • Phone: ${d.phone || '—'}<br>
+          • Email: ${d.email || '—'}<br>
           • Owner: ${d.owner} (${d.ownerTitle})<br><br>
           <strong>Website Analysis:</strong><br>
           • ${d.services}<br>
@@ -12777,10 +12823,9 @@ function navigateToMerchant(name, status) {
       setTimeout(() => thread.scrollTop = thread.scrollHeight, 50);
     }
     showView('merchant-detail', null);
-    // Render Solution Builder for lead-status merchants
-    if (status === 'lead') {
-      setTimeout(() => renderSolutionBuilder(name), 50);
-    }
+    // Render Solution Builder for all application merchants
+    _currentSBMerchant = name;
+    setTimeout(() => renderSolutionBuilder(name), 50);
   }
 }
 
@@ -13767,6 +13812,7 @@ function filterPartnersTable(q) {
 function navToMerchant(name) {
   const nameEl = document.getElementById('md-merchant-name');
   if (nameEl) nameEl.textContent = name;
+  _currentSBMerchant = name;
   showView('merchant-detail', null);
 }
 
@@ -14634,10 +14680,12 @@ function goStep(n) {
   if (si) si.classList.add('active');
   const fc = document.querySelector('#view-merchant-detail .form-content');
   if (fc) fc.scrollTop = 0;
-  // Re-render Solution Builder for lead merchants when navigating to step 5
-  if (n === 5 && _currentSBMerchant) {
-    const m = merchantData.find(x => x.name === _currentSBMerchant);
-    if (m && m.status === 'lead') renderSolutionBuilder(_currentSBMerchant);
+  // Render Solution Builder for any merchant when navigating to step 5
+  if (n === 5) {
+    // Pick up merchant name from DOM in case we arrived via nmOpenApplication
+    const nameFromDom = document.querySelector('#view-merchant-detail .merch-name, #view-merchant-detail #md-merchant-name')?.textContent?.trim();
+    if (nameFromDom) _currentSBMerchant = nameFromDom;
+    if (_currentSBMerchant) renderSolutionBuilder(_currentSBMerchant);
   }
 }
 
@@ -15016,6 +15064,109 @@ function expandCard(id) {
    ══════════════════════════════════════════════════ */
 
 const SB_PROFILES = {
+  'Santi Landscaping': {
+    type:'landscaping', mcc:'0782', mccLabel:'Lawn and Garden Services',
+    aiClass:'Landscaping / Lawn Care — Low Risk Service Business', appCompletion:62,
+    risk:'Low', confidence:74, outlook:'Favorable', coverage:60,
+    preSubmission: {
+      riskScore:78, riskLabel:'Low Risk', riskColor:'var(--green)',
+      confidencePct:74, confidenceNote:'+14% with processing history',
+      outlookEmoji:'🟢', outlookLabel:'Likely Approved', outlookNote:'Low-risk SIC, recurring revenue model', processorsMatched:3,
+      dataCoverage: [
+        { label:'Business Info', status:'✓ Complete', ok:true },
+        { label:'Bank Analysis', status:'✗ Missing', ok:false },
+        { label:'Identity Verify', status:'✗ Missing', ok:false },
+        { label:'Processing Hist.', status:'✗ Missing', ok:false },
+        { label:'Website', status:'✓ Analyzed', ok:true },
+      ],
+      issues: [
+        { severity:'warn', icon:'⚠', color:'var(--amber)', title:'No bank statements on file.', detail:'3 months of business bank statements required before submission to any processor. Most critical missing item.' },
+        { severity:'warn', icon:'⚠', color:'var(--amber)', title:'Owner ID not yet collected.', detail:'Government-issued photo ID for Santiago required by all processors before approval.' },
+        { severity:'info', icon:'ℹ', color:'var(--blue)', title:'No prior processing history.', detail:'Merchant may be new to card processing. Not a blocker for this SIC — many lawn care businesses start cash-only. Processors will set a provisional volume ceiling.' },
+      ],
+      website: [
+        { ok:true, title:'Business website verified — santilandscaping.org.', detail:'Active site with service listing, pricing, and contact form. Supports credibility.' },
+        { ok:true, title:'700+ client testimonials referenced.', detail:'Established client base signals stable recurring revenue.' },
+        { ok:false, title:'No online payment portal detected.', detail:'Card-present only likely — no gateway needed for online orders.' },
+      ],
+    },
+    aiSources: [
+      { type:'app', label:'Application Data', pct:62, detail:'Business info, owner details, address filled via AI enrichment' },
+      { type:'chat', label:'Chat History', pct:0, detail:'No messages yet' },
+      { type:'transcript', label:'Call Transcripts', pct:0, detail:'None uploaded' },
+      { type:'web', label:'Web Presence', pct:70, detail:'santilandscaping.org analyzed — services, pricing, client base confirmed' },
+    ],
+    aiInsights: [
+      { icon:'🌐', text:'Website confirmed: <strong>santilandscaping.org</strong> — lawn maintenance, French drain, pressure washing services in Lexington, SC.', source:'Web Scan', auto:true },
+      { icon:'💳', text:'Card-present only — no e-commerce detected. Simple terminal solution is the right fit.', source:'Web Scan', auto:true },
+      { icon:'🔁', text:'Recurring revenue model ($239/mo maintenance plans) — strong profile for any standard processor.', source:'AI Analysis', auto:true },
+      { icon:'⚠️', text:'No call transcript uploaded — a short discovery call would increase confidence to ~88%.', source:'AI Analysis', auto:false },
+    ],
+    questions: [
+      { id:'q1', q:'Does Santi accept payments on-site (cash/card) or invoice-based?', why:'Determines terminal vs. virtual terminal / invoicing solution', priority:'critical', aiPrefill:'Likely card-present — lawn care is on-site service', aiSource:'AI Analysis', category:'Operations' },
+      { id:'q2', q:'How many transactions per month currently?', why:'Sets volume tier for pricing', priority:'critical', aiPrefill:'', category:'Volume' },
+      { id:'q3', q:'Current payment method — cash, Venmo, Zelle, or card reader?', why:'Migration complexity and competitive context', priority:'high', aiPrefill:'', category:'Operations' },
+      { id:'q4', q:'Does Santiago need to take payments in the field (mobile)?', why:'Determines if mobile terminal needed vs. countertop', priority:'high', aiPrefill:'Likely yes — on-site lawn service requires mobile', aiSource:'AI Analysis', category:'Equipment' },
+      { id:'q5', q:'Does the business bill monthly recurring clients?', why:'Recurring billing feature may be needed', priority:'medium', aiPrefill:'Yes — $239/mo maintenance plans on website', aiSource:'Web Scan', category:'Features' },
+    ],
+    solutions: [
+      {
+        id:'sol1', name:'Priority Commerce + PAX A920 Pro', fit:88, badge:'Best Match', risk:'Low', type:'Card Present',
+        approval:'24–48 hrs', pricing:'IC+ 0.28% + $0.08', terminal:'PAX A920 Pro', gateway:'None',
+        shortWhy:'Best rate + free terminal for low-risk service business with recurring clients.',
+        whyWorks: [
+          { point:'SIC 0782 low-risk — standard approval, no addendum required', source:'Compliance Engine', hasData:true },
+          { point:'IC+ 0.28% + $0.08 competitive for estimated $15K–$23K/mo volume', source:'Pricing Engine', hasData:true },
+          { point:'PAX A920 Pro included free with 2-year agreement', source:'Equipment DB', hasData:true },
+          { point:'No gateway needed — card-present only business', source:'Web Scan', hasData:true },
+        ],
+        risks: [
+          { point:'Volume estimate is AI-derived — need confirmation from owner', severity:'medium' },
+          { point:'2-year contract required for free terminal — confirm owner is comfortable', severity:'low' },
+        ],
+        marketing: [
+          { name:'Priority Commerce Rate Card', icon:'📄', type:'PDF' },
+          { name:'PAX A920 Pro Features', icon:'📱', type:'PDF' },
+        ],
+        setupSteps: ['Submit application','UW review (24-48 hrs)','PAX A920 ships free','Live processing — est. Day 4-5'],
+      },
+      {
+        id:'sol2', name:'NovaPay — IC+ Mobile', fit:81, badge:'', risk:'Low', type:'Card Present',
+        approval:'3–5 days', pricing:'IC+ 0.30% + $0.10', terminal:'PAX A920 Pro', gateway:'None',
+        shortWhy:'Fast approval, next-day funding — good for a new business establishing cash flow.',
+        whyWorks: [
+          { point:'Next-day funding — strong benefit for service businesses waiting on invoice cycles', source:'Product Knowledge', hasData:false },
+          { point:'Simple onboarding for first-time card processors', source:'Product Knowledge', hasData:false },
+          { point:'Strong approval rate for service SIC codes', source:'Compliance Engine', hasData:true },
+        ],
+        risks: [
+          { point:'Slightly higher markup than Priority Commerce at this volume tier', severity:'low' },
+          { point:'Longer approval timeline vs. Priority', severity:'low' },
+        ],
+        marketing: [
+          { name:'NovaPay Service Biz One-Pager', icon:'📄', type:'PDF' },
+        ],
+        setupSteps: ['Submit application','UW review (3-5 days)','Terminal ships','Live processing — est. Day 6-7'],
+      },
+      {
+        id:'sol3', name:'Summit Lending — IC+ Standard', fit:71, badge:'', risk:'Low', type:'Card Present',
+        approval:'24–48 hrs', pricing:'IC+ 0.25% + $0.10', terminal:'Dejavoo Z9', gateway:'None',
+        shortWhy:'Lowest markup available but requires more docs for new-to-processing merchants.',
+        whyWorks: [
+          { point:'Lowest IC+ rate available at this volume tier', source:'Pricing Engine', hasData:true },
+          { point:'Fast approval for low-risk SIC 0782', source:'Compliance Engine', hasData:true },
+        ],
+        risks: [
+          { point:'May require 3 months bank statements AND processing history — harder for new processors', severity:'high' },
+          { point:'Lower terminal selection — Dejavoo Z9 not as capable as PAX A920', severity:'medium' },
+        ],
+        marketing: [
+          { name:'Summit Lending Overview', icon:'📄', type:'PDF' },
+        ],
+        setupSteps: ['Gather docs','Submit application','UW review','Terminal ships','Live — est. Day 6-8'],
+      },
+    ],
+  },
   'Fresh Brew Coffee Co.': {
     type:'restaurant', mcc:'5812', mccLabel:'Eating Places & Restaurants',
     aiClass:'Coffee Shop / Quick-Service Restaurant', appCompletion:42,
@@ -15197,7 +15348,7 @@ let _sbSelectedQuestions = new Set();
 
 function renderSolutionBuilder(merchantName) {
   const m = merchantData.find(x => x.name === merchantName);
-  if (!m || m.status !== 'lead') return;
+  if (!m) return;
 
   _currentSBMerchant = merchantName;
   _sbSelectedQuestions = new Set();
