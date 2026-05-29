@@ -4311,12 +4311,12 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               </div>
               <div style="font-size:10px;color:var(--text-muted);">Likely approved &middot; Est. 24&ndash;48h</div>
             </div>
-            <div class="sig-uw-rail-sec" style="border-bottom:none;display:flex;flex-direction:column;gap:6px;">
+            <div id="sig-uw-quick-actions" class="sig-uw-rail-sec" style="border-bottom:none;display:flex;flex-direction:column;gap:6px;">
               <div class="sig-uw-rail-title">Quick Actions</div>
-              <button class="sig-uw-action-btn" onclick="alert('Resending DocuSign request to sarah@freshbrewcoffee.com…')">&#x1F4E8; Resend Signature</button>
+              <button class="sig-uw-action-btn" onclick="alert('Resending DocuSign request…')">&#x1F4E8; Resend Signature</button>
               <button class="sig-uw-action-btn" onclick="alert('Creating ticket…')">&#x1F3AB; Create Ticket</button>
               <button class="sig-uw-action-btn" onclick="nudgeWithDocs()">&#x1F4E3; Message Merchant</button>
-              <button class="sig-uw-action-btn uw" onclick="alert('Composing email to First Data Omaha UW team…')">&#x1F4E7; Contact UW Team</button>
+              <button class="sig-uw-action-btn uw" onclick="alert('Composing email to UW team…')">&#x1F4E7; Contact UW Team</button>
             </div>
           </div><!-- /sig-uw-rail -->
           <!-- MAIN CHAT AREA -->
@@ -15000,8 +15000,10 @@ function sendForSignature() {
 
   // Enter sig/UW full-screen chat mode
   const currentName = (typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant) ? _currentSBMerchant : 'Fresh Brew Coffee Co.';
+  const isFreshBrewDemo = currentName === 'Fresh Brew Coffee Co.';
   setTimeout(() => {
-    enterSigUWMode(currentName, 'signature');
+    enterSigUWMode(currentName, 'signature', { liveDemo: isFreshBrewDemo });
+    if (isFreshBrewDemo) runFreshBrewLiveDemo();
   }, 600);
 }
 
@@ -15052,7 +15054,8 @@ async function pwait(ms) { return new Promise(r => setTimeout(r, ms)); }
    SIG / UW FULL-SCREEN CHAT MODE
    ────────────────────────────────────────────────── */
 
-function enterSigUWMode(name, status) {
+function enterSigUWMode(name, status, options) {
+  options = options || {};
   const view = document.getElementById('view-merchant-detail');
   if (!view) return;
 
@@ -15106,7 +15109,11 @@ function enterSigUWMode(name, status) {
   view.classList.add('sig-uw-active');
   const banner = document.getElementById('locked-banner');
   if (banner) banner.style.display = 'none';
-  populateSigUWThread();
+
+  if (!options.liveDemo) {
+    populateSigUWThread();
+  }
+  // if liveDemo: caller is responsible for populating thread (via runFreshBrewLiveDemo)
 }
 
 function minimizeSigUWChat() {
@@ -15123,6 +15130,133 @@ function expandSigUWChat() {
   view.classList.add('sig-uw-active');
   const banner = document.getElementById('locked-banner');
   if (banner) banner.style.display = 'none';
+}
+
+/* ── Sig/UW thread helpers (used by live demo + BroadcastChannel handlers) ── */
+function _sigUWUpdateCount() {
+  const thread = document.getElementById('sig-uw-thread');
+  const ct = document.getElementById('sig-uw-event-count');
+  if (thread && ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
+}
+
+function sigUWAddSys(text, color) {
+  const thread = document.getElementById('sig-uw-thread');
+  if (!thread) return;
+  const d = document.createElement('div');
+  d.className = 'act sys';
+  const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  d.innerHTML = '<div class="syse"><div class="sysd" style="background:' + (color||'var(--blue)') + ';"></div>' +
+    '<div class="syst">' + text + '</div><div class="systt">' + time + '</div></div>';
+  thread.appendChild(d);
+  thread.scrollTop = thread.scrollHeight;
+  _sigUWUpdateCount();
+}
+
+function sigUWAddMessage(role, html) {
+  const thread = document.getElementById('sig-uw-thread');
+  if (!thread) return;
+  const d = document.createElement('div');
+  d.className = 'act';
+  const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  const configs = {
+    ai:       {av:'<div class="aav" style="background:var(--navy);color:var(--yellow);">&#x2736;</div>', name:'Twill AI', mode:'int'},
+    merchant: {av:'<div class="aav" style="background:var(--green);color:#fff;">SC</div>', name:'Sarah Chen', mode:'out'},
+    user:     {av:'<div class="aav" style="background:var(--yellow);color:var(--text-inverse);">MW</div>', name:'M. Wright', mode:'int'}
+  };
+  const cfg = configs[role] || configs.ai;
+  const modeLabel = {int:'Internal', out:'&#x2192; Merchant', uw:'&#x2192; UW'}[cfg.mode] || '';
+  d.innerHTML = '<div class="ah">' + cfg.av + '<span class="aname">' + cfg.name + '</span>' +
+    '<span class="amode ' + cfg.mode + '">' + modeLabel + '</span>' +
+    '<span class="atime">' + time + '</span></div>' +
+    '<div class="abub ' + cfg.mode + '">' + html + '</div>';
+  thread.appendChild(d);
+  thread.scrollTop = thread.scrollHeight;
+  _sigUWUpdateCount();
+}
+
+function sigUWAddTyping() {
+  const thread = document.getElementById('sig-uw-thread');
+  if (!thread) return;
+  const act = document.createElement('div');
+  act.className = 'act typing-act';
+  act.innerHTML = '<div class="ah"><div class="aav" style="background:var(--navy);color:var(--yellow);">&#x2736;</div>' +
+    '<span class="aname">Twill AI</span></div>' +
+    '<div class="abub"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+  thread.appendChild(act);
+  thread.scrollTop = thread.scrollHeight;
+  return act;
+}
+
+function sigUWRemoveTyping() {
+  const t = document.querySelector('#sig-uw-thread .typing-act');
+  if (t) t.remove();
+}
+
+/* ── Fresh Brew live demo — animated signature sequence ─────────────────── */
+async function runFreshBrewLiveDemo() {
+  const thread = document.getElementById('sig-uw-thread');
+  if (!thread) return;
+
+  // Inject demo simulator controls into the Quick Actions rail
+  const qa = document.getElementById('sig-uw-quick-actions');
+  if (qa) {
+    qa.innerHTML = '<div class="sig-uw-rail-title">Quick Actions</div>' +
+      '<button class="sig-uw-action-btn" onclick="alert(\'Resending DocuSign to sarah@freshbrewcoffee.com…\')">&#x1F4E8; Resend Signature</button>' +
+      '<button class="sig-uw-action-btn" onclick="alert(\'Creating ticket…\')">&#x1F3AB; Create Ticket</button>' +
+      '<button class="sig-uw-action-btn" onclick="nudgeWithDocs()">&#x1F4E3; Message Merchant</button>' +
+      '<button class="sig-uw-action-btn uw" onclick="alert(\'Composing email to First Data Omaha UW team…\')">&#x1F4E7; Contact UW Team</button>' +
+      '<div class="sig-uw-rail-title" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">Demo Controls</div>' +
+      '<button id="demo-btn-pend" class="sig-uw-action-btn" style="background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.3);color:var(--amber);" onclick="triggerUWPend()">&#x26A0;&#xFE0F; Simulate UW Pend</button>' +
+      '<button id="demo-btn-approve" class="sig-uw-action-btn" style="background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.25);color:var(--green);" onclick="triggerApproval()">&#x2705; Simulate Approval</button>' +
+      '<button class="sig-uw-action-btn" style="background:rgba(99,102,241,.07);border-color:rgba(99,102,241,.25);color:var(--blue);" onclick="partnerResetDemo()">&#x21BA; Reset Demo</button>';
+  }
+
+  // Date separator
+  const dateDiv = document.createElement('div');
+  dateDiv.className = 'dsep';
+  dateDiv.innerHTML = '<div class="dsep-lbl">Today &middot; May 28, 2026</div>';
+  thread.appendChild(dateDiv);
+
+  await pwait(500);
+  sigUWAddSys('Application submitted &middot; 8 of 8 documents complete &middot; package score 94/100', 'var(--green)');
+
+  await pwait(800);
+  sigUWAddTyping();
+  await pwait(1200);
+  sigUWRemoveTyping();
+  sigUWAddMessage('ai',
+    '&#x1F4E8; <strong>Signature packet sent to Sarah Chen</strong> via DocuSign at sarah@freshbrewcoffee.com<br><br>' +
+    'Package contains: Merchant Processing Agreement, First Data IC+ Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
+    'I\'ll surface all activity here in real-time as she reviews and signs.');
+
+  await pwait(2000);
+  sigUWAddSys('Sarah Chen opened the signature request', 'var(--blue)');
+
+  await pwait(2500);
+  sigUWAddSys('Sarah is reviewing the agreement&hellip;', 'var(--amber)');
+
+  await pwait(1500);
+  sigUWAddTyping();
+  await pwait(1400);
+  sigUWRemoveTyping();
+  sigUWAddMessage('ai',
+    '&#x1F4CB; Running <strong>final UW package review</strong> in the background while we wait for signature&hellip;<br><br>' +
+    '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">&#x2713;</span> Bank statements &mdash; clean, $18.4K avg balance, zero NSFs</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">&#x2713;</span> Processing history &mdash; $31K/mo, 90.8% card-present, 0.02% CB</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">&#x2713;</span> Business docs &mdash; Articles, Owner ID, voided check all on file</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">&#x2713;</span> Owner identity &mdash; Sarah Chen 60% stake, validated</div>' +
+    '</div>');
+
+  await pwait(1500);
+  sigUWAddTyping();
+  await pwait(1000);
+  sigUWRemoveTyping();
+  sigUWAddMessage('ai',
+    '&#x1F4CA; Package score: <strong style="color:var(--green);">94 / 100</strong> &mdash; Strong. ' +
+    'No UW red flags detected. Approval likelihood: <strong style="color:var(--green);">High</strong>.');
+
+  // waiting for merchant_signed BroadcastChannel message from merchant portal
 }
 
 function setSUMode(mode) {
@@ -33812,47 +33946,108 @@ window.twillBC.onmessage = function(e) {
 };
 
 async function handleMerchantSigned() {
-  await pwait(800);
-  partnerAddNotification('<span class="pn-icon">🎉</span> <strong>Sarah Chen signed the agreement!</strong>');
+  const inSigUW = document.getElementById('view-merchant-detail') &&
+                  document.getElementById('view-merchant-detail').classList.contains('sig-uw-active');
 
-  await pwait(600);
-  const t = partnerAddTyping();
-  await pwait(800);
-  partnerRemoveTyping();
+  if (inSigUW) {
+    // ── Sig/UW full-screen demo flow ──────────────────────────────
+    await pwait(800);
+    sigUWAddSys('&#x1F389; Sarah Chen signed! Full execution complete.', 'var(--green)');
 
-  partnerAddMessage('ai', '🎉 <strong>Congratulations!</strong> Sarah Chen has signed the Merchant Processing Agreement!<br><br>The application for Fresh Brew Coffee Co. is now moving to the next phase. Here\'s what\'s happening on the merchant side:');
+    await pwait(600);
+    sigUWAddTyping();
+    await pwait(900);
+    sigUWRemoveTyping();
+    sigUWAddMessage('ai',
+      '&#x2705; <strong>Merchant signed.</strong> Submitting complete package to First Data Omaha underwriting&hellip;<br><br>' +
+      'Submission includes all 8 documents, AI analysis summary, IC+ pricing schedule, and equipment order.');
 
-  await pwait(1000);
-  const t2 = partnerAddTyping();
-  await pwait(700);
-  partnerRemoveTyping();
+    await pwait(1500);
+    sigUWAddSys('Submitted to First Data Omaha UW &middot; Case #FD-2026-04891 created', 'var(--blue)');
 
-  partnerAddMessage('ai', 'I\'m now working with Sarah to collect any remaining documents and complete the underwriting questionnaire. You\'ll see everything here in real-time.<br><br>' +
-    '<div style="font-size:11px;color:var(--text-muted);padding:8px 12px;background:var(--bg-elevated);border-radius:6px;border:1px solid var(--border);">' +
-    '💡 <strong>Transparency mode:</strong> All AI messages sent to the merchant appear here so you have full visibility into the onboarding process.</div>');
+    await pwait(800);
+    sigUWAddTyping();
+    await pwait(1100);
+    sigUWRemoveTyping();
+    sigUWAddMessage('ai',
+      '&#x1F4EC; <strong>UW submission confirmed.</strong> Case <strong>#FD-2026-04891</strong> assigned to First Data Omaha.<br><br>' +
+      'Estimated decision: <strong>24&ndash;48 hours.</strong> Current queue position: 3 of 18. ' +
+      'I\'ll monitor for any UW questions, pends, or decisions and surface them here automatically.');
+
+    partnerLaunchConfetti();
+
+    // Swap the "Awaiting signature" rail step to green
+    const awaitingCheck = document.getElementById('sig-uw-check-awaiting');
+    if (awaitingCheck) {
+      awaitingCheck.innerHTML = '<div class="sig-uw-check-icon" style="background:rgba(34,197,94,.12);color:var(--green);">&#x2713;</div>' +
+        '<div><div style="color:var(--text-primary);font-weight:500;">Merchant signed</div><div style="font-size:10px;color:var(--text-muted);">Sarah Chen &middot; just now</div></div>';
+    }
+    const uwCheck = document.getElementById('sig-uw-check-uw');
+    if (uwCheck) {
+      uwCheck.style.opacity = '1';
+      uwCheck.innerHTML = '<div class="sig-uw-check-icon" style="background:rgba(245,158,11,.12);color:var(--amber);">&#x23F3;</div>' +
+        '<div><div style="color:var(--text-primary);font-weight:500;">Submitted to UW</div><div style="font-size:10px;color:var(--text-muted);">Case #FD-2026-04891</div></div>';
+    }
+  } else {
+    // ── Original expanded-chat flow ───────────────────────────────
+    await pwait(800);
+    partnerAddNotification('<span class="pn-icon">&#x1F389;</span> <strong>Sarah Chen signed the agreement!</strong>');
+
+    await pwait(600);
+    partnerAddTyping();
+    await pwait(800);
+    partnerRemoveTyping();
+    partnerAddMessage('ai', '&#x1F389; <strong>Congratulations!</strong> Sarah Chen has signed the Merchant Processing Agreement!<br><br>The application for Fresh Brew Coffee Co. is now moving to the next phase. Here\'s what\'s happening on the merchant side:');
+
+    await pwait(1000);
+    partnerAddTyping();
+    await pwait(700);
+    partnerRemoveTyping();
+    partnerAddMessage('ai', 'I\'m now working with Sarah to collect any remaining documents and complete the underwriting questionnaire. You\'ll see everything here in real-time.<br><br>' +
+      '<div style="font-size:11px;color:var(--text-muted);padding:8px 12px;background:var(--bg-elevated);border-radius:6px;border:1px solid var(--border);">' +
+      '&#x1F4A1; <strong>Transparency mode:</strong> All AI messages sent to the merchant appear here so you have full visibility into the onboarding process.</div>');
+  }
 }
 
 async function handleDocUploaded(data) {
+  const inSigUW = document.getElementById('view-merchant-detail')?.classList.contains('sig-uw-active');
   await pwait(400);
-  partnerAddNotification('<span class="pn-icon">📄</span> <strong>Document received:</strong> ' + (data.doc || 'Unknown document'));
-
-  await pwait(500);
-  partnerAddMessage('ai', '✅ <strong>Document verified:</strong> ' + (data.doc || 'Document') + '<br><span style="font-size:11px;color:var(--text-muted);">Auto-verified and matched to application. No action needed from you.</span>');
+  if (inSigUW) {
+    sigUWAddSys('&#x1F4C4; Document received: ' + (data.doc || 'Unknown document'), 'var(--blue)');
+    await pwait(500);
+    sigUWAddMessage('ai', '&#x2705; <strong>Document verified:</strong> ' + (data.doc || 'Document') + '<br><span style="font-size:11px;color:var(--text-muted);">Auto-verified and matched to application. No action needed from you.</span>');
+  } else {
+    partnerAddNotification('<span class="pn-icon">&#x1F4C4;</span> <strong>Document received:</strong> ' + (data.doc || 'Unknown document'));
+    await pwait(500);
+    partnerAddMessage('ai', '&#x2705; <strong>Document verified:</strong> ' + (data.doc || 'Document') + '<br><span style="font-size:11px;color:var(--text-muted);">Auto-verified and matched to application. No action needed from you.</span>');
+  }
 }
 
 async function handleQuestionnaireAnswer(data) {
+  const inSigUW = document.getElementById('view-merchant-detail')?.classList.contains('sig-uw-active');
   await pwait(300);
-  partnerAddMessage('merchant', '→ ' + (data.answer || 'Response'), {merchantMsg: true});
+  if (inSigUW) {
+    sigUWAddMessage('merchant', '&#x2192; ' + (data.answer || 'Response'));
+  } else {
+    partnerAddMessage('merchant', '&#x2192; ' + (data.answer || 'Response'), {merchantMsg: true});
+  }
 }
 
 async function handleQuestionnaireDone() {
+  const inSigUW = document.getElementById('view-merchant-detail')?.classList.contains('sig-uw-active');
   await pwait(800);
-  partnerAddNotification('<span class="pn-icon">✅</span> <strong>All questionnaires completed</strong> — application is ready for underwriting review');
-
-  await pwait(600);
-  partnerAddMessage('ai', '📋 All merchant questionnaires are complete. The First Data Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
-    '<strong>Application status:</strong> Ready for UW review<br>' +
-    '<span style="font-size:11px;color:var(--text-muted);">Use the buttons below to simulate underwriting actions.</span>');
+  if (inSigUW) {
+    sigUWAddSys('&#x2705; All questionnaires completed &mdash; ready for UW review', 'var(--green)');
+    await pwait(600);
+    sigUWAddMessage('ai', '&#x1F4CB; All merchant questionnaires are complete. The First Data Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
+      '<strong>Application status:</strong> Ready for UW review');
+  } else {
+    partnerAddNotification('<span class="pn-icon">&#x2705;</span> <strong>All questionnaires completed</strong> &mdash; application is ready for underwriting review');
+    await pwait(600);
+    partnerAddMessage('ai', '&#x1F4CB; All merchant questionnaires are complete. The First Data Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
+      '<strong>Application status:</strong> Ready for UW review<br>' +
+      '<span style="font-size:11px;color:var(--text-muted);">Use the buttons below to simulate underwriting actions.</span>');
+  }
 }
 
 // ═══ UW PEND (triggered by partner) ═══
@@ -33865,23 +34060,37 @@ function triggerUWPend() {
     }});
   }
 
-  partnerAddNotification('<span class="pn-icon">⚠️</span> <strong>UW Pend sent to merchant</strong> — question about volume discrepancy');
-
-  partnerAddMessage('ai', '⚠️ <strong>Underwriting Pend</strong> — Volume Verification<br><br>' +
-    'Bank deposits show ~$28K/mo against a stated $85K volume. Sending clarification request to merchant...<br>' +
-    '<span style="font-size:11px;color:var(--text-muted);">Waiting for merchant response...</span>');
-
-  // Disable the pend button
-  const pendBtn = document.querySelector('.partner-ctrl-btn.pend');
-  if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; pendBtn.textContent = '⚠️ Pend Sent'; }
+  const inSigUW = document.getElementById('view-merchant-detail') &&
+                  document.getElementById('view-merchant-detail').classList.contains('sig-uw-active');
+  if (inSigUW) {
+    sigUWAddSys('&#x26A0;&#xFE0F; UW Pend sent to merchant &mdash; volume verification', 'var(--amber)');
+    sigUWAddMessage('ai', '&#x26A0;&#xFE0F; <strong>Underwriting Pend</strong> &mdash; Volume Verification<br><br>' +
+      'Bank deposits show ~$28K/mo against stated $85K volume. Sending clarification request to merchant&hellip;<br>' +
+      '<span style="font-size:11px;color:var(--text-muted);">Waiting for merchant response&hellip;</span>');
+    const pendBtn = document.getElementById('demo-btn-pend');
+    if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; pendBtn.textContent = '&#x26A0;&#xFE0F; Pend Sent'; }
+  } else {
+    partnerAddNotification('<span class="pn-icon">&#x26A0;&#xFE0F;</span> <strong>UW Pend sent to merchant</strong> &mdash; question about volume discrepancy');
+    partnerAddMessage('ai', '&#x26A0;&#xFE0F; <strong>Underwriting Pend</strong> &mdash; Volume Verification<br><br>' +
+      'Bank deposits show ~$28K/mo against a stated $85K volume. Sending clarification request to merchant...<br>' +
+      '<span style="font-size:11px;color:var(--text-muted);">Waiting for merchant response...</span>');
+    const pendBtn = document.querySelector('.partner-ctrl-btn.pend');
+    if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; pendBtn.textContent = '&#x26A0;&#xFE0F; Pend Sent'; }
+  }
 }
 
 async function handleUWResponse(data) {
+  const inSigUW = document.getElementById('view-merchant-detail')?.classList.contains('sig-uw-active');
   await pwait(500);
-  partnerAddMessage('merchant', data.answer || 'Response from merchant', {merchantMsg: true});
-
-  await pwait(400);
-  partnerAddMessage('ai', '📬 <strong>Merchant responded to UW pend.</strong> Response forwarded to underwriting team for review.');
+  if (inSigUW) {
+    sigUWAddMessage('merchant', data.answer || 'Response from merchant');
+    await pwait(400);
+    sigUWAddMessage('ai', '&#x1F4EC; <strong>Merchant responded to UW pend.</strong> Response forwarded to underwriting team for review.');
+  } else {
+    partnerAddMessage('merchant', data.answer || 'Response from merchant', {merchantMsg: true});
+    await pwait(400);
+    partnerAddMessage('ai', '&#x1F4EC; <strong>Merchant responded to UW pend.</strong> Response forwarded to underwriting team for review.');
+  }
 }
 
 // ═══ APPROVAL (triggered by partner) ═══
@@ -33890,22 +34099,36 @@ function triggerApproval() {
     window.twillBC.postMessage({type: 'approved', data: {timestamp: Date.now()}});
   }
 
-  // Partner celebration
   partnerLaunchConfetti();
 
-  partnerAddMessage('ai', '🎉🎉🎉 <strong style="font-size:16px;">APPLICATION APPROVED!</strong> 🎉🎉🎉<br><br>' +
-    'Fresh Brew Coffee Co. has been approved by First Data Omaha!<br><br>' +
-    '<div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">' +
-      '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">✓</span> <strong>MID:</strong> 4847-XXXX-8821</div>' +
-      '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">✓</span> <strong>Terminal:</strong> PAX A920 Pro shipping today</div>' +
-      '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">✓</span> <strong>Go-live ETA:</strong> 2-3 business days</div>' +
-    '</div>');
-
-  // Disable approve button
-  const approveBtn = document.querySelector('.partner-ctrl-btn.approve');
-  if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.5'; approveBtn.textContent = '✅ Approved'; }
-  const pendBtn = document.querySelector('.partner-ctrl-btn.pend');
-  if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; }
+  const inSigUW = document.getElementById('view-merchant-detail') &&
+                  document.getElementById('view-merchant-detail').classList.contains('sig-uw-active');
+  if (inSigUW) {
+    sigUWAddSys('&#x2705; Application approved by First Data Omaha!', 'var(--green)');
+    sigUWAddMessage('ai', '&#x1F389;&#x1F389;&#x1F389; <strong style="font-size:15px;">APPLICATION APPROVED!</strong> &#x1F389;&#x1F389;&#x1F389;<br><br>' +
+      'Fresh Brew Coffee Co. has been approved by First Data Omaha!<br><br>' +
+      '<div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">&#x2713;</span> <strong>MID:</strong> 4847-XXXX-8821</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">&#x2713;</span> <strong>Terminal:</strong> PAX A920 Pro shipping today</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">&#x2713;</span> <strong>Go-live ETA:</strong> 2&ndash;3 business days</div>' +
+      '</div>');
+    const approveBtn = document.getElementById('demo-btn-approve');
+    if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.5'; approveBtn.textContent = '&#x2705; Approved'; }
+    const pendBtn = document.getElementById('demo-btn-pend');
+    if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; }
+  } else {
+    partnerAddMessage('ai', '&#x1F389;&#x1F389;&#x1F389; <strong style="font-size:16px;">APPLICATION APPROVED!</strong> &#x1F389;&#x1F389;&#x1F389;<br><br>' +
+      'Fresh Brew Coffee Co. has been approved by First Data Omaha!<br><br>' +
+      '<div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">&#x2713;</span> <strong>MID:</strong> 4847-XXXX-8821</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">&#x2713;</span> <strong>Terminal:</strong> PAX A920 Pro shipping today</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--green);">&#x2713;</span> <strong>Go-live ETA:</strong> 2-3 business days</div>' +
+      '</div>');
+    const approveBtn = document.querySelector('.partner-ctrl-btn.approve');
+    if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.5'; approveBtn.textContent = '&#x2705; Approved'; }
+    const pendBtn = document.querySelector('.partner-ctrl-btn.pend');
+    if (pendBtn) { pendBtn.disabled = true; pendBtn.style.opacity = '0.5'; }
+  }
 }
 
 // ═══ RESET DEMO ═══
