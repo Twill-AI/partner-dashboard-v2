@@ -4909,6 +4909,18 @@ function nudgeWithDocs() {
 
           <!-- ══ DOCUMENT SECTIONS ══ -->
 
+          <!-- ── ADD DOCUMENT / UPLOAD ── -->
+          <div style="background:var(--bg-surface);border:1px dashed var(--border-strong);border-radius:10px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;">
+              <span style="font-size:13px;color:var(--text-muted);">+</span>
+              <input id="new-doc-label" placeholder="Add a document type (e.g. Lease Agreement, Tax Return…)" style="flex:1;background:transparent;border:none;outline:none;font-size:12px;color:var(--text-secondary);font-family:var(--font-ui);" onfocus="this.style.color='var(--text-primary)'" onblur="this.style.color='var(--text-secondary)'">
+              <select id="new-doc-req" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:10px;padding:4px 8px;font-family:var(--font-ui);outline:none;"><option>Optional</option><option>Recommended</option><option>Required</option></select>
+              <button onclick="addDocRow()" style="padding:5px 11px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-secondary);font-size:11px;cursor:pointer;font-family:var(--font-ui);">+ Add</button>
+              <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:var(--yellow);border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700;color:#09091A;font-family:var(--font-ui);">↑ Upload Files<input type="file" style="display:none;" multiple></label>
+            </div>
+          </div>
+          <div id="custom-doc-rows"></div>
+
           <!-- ── BANK STATEMENTS ── -->
           <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">
             <div onclick="(function(h){var b=h.nextElementSibling;var o=b.style.display!=='none';b.style.display=o?'none':'block';h.querySelector('.s-caret').textContent=o?'▸':'▾'})(this)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none;">
@@ -5154,18 +5166,6 @@ function nudgeWithDocs() {
               </div>
             </div>
           </div>
-
-          <!-- ── ADD DOCUMENT ── -->
-          <div style="background:var(--bg-surface);border:1px dashed var(--border-strong);border-radius:10px;margin-bottom:4px;">
-            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;">
-              <span style="font-size:13px;color:var(--text-muted);">+</span>
-              <input id="new-doc-label" placeholder="Add a document type (e.g. Lease Agreement, Tax Return…)" style="flex:1;background:transparent;border:none;outline:none;font-size:12px;color:var(--text-secondary);font-family:var(--font-ui);" onfocus="this.style.color='var(--text-primary)'" onblur="this.style.color='var(--text-secondary)'">
-              <select id="new-doc-req" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-muted);font-size:10px;padding:4px 8px;font-family:var(--font-ui);outline:none;"><option>Optional</option><option>Recommended</option><option>Required</option></select>
-              <button onclick="addDocRow()" style="padding:5px 11px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;color:var(--text-secondary);font-size:11px;cursor:pointer;font-family:var(--font-ui);">+ Add</button>
-              <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:var(--yellow);border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700;color:#09091A;font-family:var(--font-ui);">↑ Upload Files<input type="file" style="display:none;" multiple></label>
-            </div>
-          </div>
-          <div id="custom-doc-rows"></div>
 
           <div class="form-nav" style="margin-top:12px;">
             <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
