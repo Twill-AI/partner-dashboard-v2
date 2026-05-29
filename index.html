@@ -1119,6 +1119,26 @@
 
 /* Partner control buttons */
 .partner-controls { display:flex; gap:8px; padding:10px 20px; justify-content:center; border-top:1px solid var(--border); background:var(--bg-surface); max-width:680px; margin:0 auto; width:100%; }
+
+/* ── SIGNATURE / UW FULL-SCREEN CHAT MODE ─────────────────── */
+#sig-uw-overlay { display:none; flex:1; flex-direction:column; min-height:0; overflow:hidden; }
+.sig-uw-active #sig-uw-overlay { display:flex; }
+.sig-uw-active .body-row { display:none !important; }
+#locked-banner { display:none; }
+.sig-uw-sub-hdr { display:flex; align-items:center; gap:10px; padding:9px 16px; background:var(--bg-surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+.sig-uw-body { display:flex; flex:1; min-height:0; overflow:hidden; }
+.sig-uw-rail { width:256px; flex-shrink:0; border-right:1px solid var(--border); background:var(--bg-surface); display:flex; flex-direction:column; overflow-y:auto; }
+.sig-uw-chat { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+.sig-uw-rail-sec { padding:14px 16px; border-bottom:1px solid var(--border); }
+.sig-uw-rail-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:10px; }
+.sig-uw-check-row { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; font-size:11px; }
+.sig-uw-check-icon { flex-shrink:0; width:17px; height:17px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; margin-top:1px; }
+.sig-uw-detail-row { display:flex; justify-content:space-between; align-items:baseline; font-size:11px; color:var(--text-secondary); margin-bottom:6px; }
+.sig-uw-detail-row strong { font-weight:600; color:var(--text-primary); }
+.sig-uw-action-btn { text-align:left; padding:7px 10px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:6px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; font-family:var(--font-ui); width:100%; }
+.sig-uw-action-btn:hover { background:var(--bg-surface); color:var(--text-primary); }
+.sig-uw-action-btn.uw { background:rgba(99,102,241,.05); border-color:rgba(99,102,241,.2); color:#6366F1; }
+.sig-uw-action-btn.uw:hover { background:rgba(99,102,241,.1); }
 .partner-ctrl-btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-ui); border:1px solid; transition:all .15s; }
 .partner-ctrl-btn.pend { background:var(--amber-dim); color:var(--amber); border-color:rgba(166,124,91,0.3); }
 .partner-ctrl-btn.pend:hover { background:rgba(166,124,91,0.15); }
@@ -4220,6 +4240,118 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;">✓ Approve</button>
         </div>
       </div>
+
+      <!-- LOCKED BANNER — shown when sig-uw overlay is minimized -->
+      <div id="locked-banner" style="display:none;align-items:center;gap:10px;padding:9px 20px;background:rgba(245,158,11,.05);border-bottom:1px solid rgba(245,158,11,.2);flex-shrink:0;">
+        <span style="font-size:14px;">&#x1F512;</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--text-primary);">Out for Signature</span><span style="font-size:12px;color:var(--text-secondary);"> &#x2014; Application is read-only while awaiting merchant signature</span></div>
+        <div style="margin-left:auto;"><button onclick="expandSigUWChat()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">&#x1F4AC; Return to Chat</button></div>
+      </div>
+
+      <!-- SIG / UW FULL-SCREEN CHAT OVERLAY — default view for Out for Signature + Underwriting stages -->
+      <div id="sig-uw-overlay">
+        <div class="sig-uw-sub-hdr">
+          <span id="sig-uw-status-badge" style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:5px;font-size:11px;font-weight:700;color:var(--amber);">&#x1F510; Out for Signature</span>
+          <span style="font-size:12px;font-weight:600;color:var(--text-primary);" id="sig-uw-merchant-name">Fresh Brew Coffee Co.</span>
+          <span style="font-size:11px;color:var(--text-muted);">/ Application &middot; Summit Lending</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+            <button onclick="minimizeSigUWChat()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);" title="View locked application form">&#x229F; View Application</button>
+          </div>
+        </div>
+        <div class="sig-uw-body">
+          <!-- LEFT RAIL -->
+          <div class="sig-uw-rail">
+            <div class="sig-uw-rail-sec">
+              <div class="sig-uw-rail-title">Progress</div>
+              <div class="sig-uw-check-row">
+                <div class="sig-uw-check-icon" style="background:rgba(34,197,94,.12);color:var(--green);">&#x2713;</div>
+                <div><div style="color:var(--text-primary);font-weight:500;">Application complete</div><div style="font-size:10px;color:var(--text-muted);">8/8 docs &middot; 6 steps done</div></div>
+              </div>
+              <div class="sig-uw-check-row">
+                <div class="sig-uw-check-icon" style="background:rgba(34,197,94,.12);color:var(--green);">&#x2713;</div>
+                <div><div style="color:var(--text-primary);font-weight:500;">Signature sent</div><div style="font-size:10px;color:var(--text-muted);">DocuSign &middot; Today 2:28 PM</div></div>
+              </div>
+              <div class="sig-uw-check-row" id="sig-uw-check-awaiting">
+                <div class="sig-uw-check-icon" style="background:rgba(245,158,11,.12);color:var(--amber);">&#x23F3;</div>
+                <div><div style="color:var(--text-primary);font-weight:500;">Awaiting signature</div><div style="font-size:10px;color:var(--text-muted);">Sarah Chen &middot; opened 2h ago</div></div>
+              </div>
+              <div class="sig-uw-check-row" id="sig-uw-check-uw" style="opacity:.38;">
+                <div class="sig-uw-check-icon" style="background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-muted);">&#x25CB;</div>
+                <div><div style="color:var(--text-secondary);">Submit to UW</div></div>
+              </div>
+              <div class="sig-uw-check-row" style="opacity:.38;">
+                <div class="sig-uw-check-icon" style="background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-muted);">&#x25CB;</div>
+                <div><div style="color:var(--text-secondary);">UW decision</div></div>
+              </div>
+              <div class="sig-uw-check-row" style="opacity:.38;">
+                <div class="sig-uw-check-icon" style="background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-muted);">&#x25CB;</div>
+                <div><div style="color:var(--text-secondary);">Board &amp; activate</div></div>
+              </div>
+            </div>
+            <div class="sig-uw-rail-sec">
+              <div class="sig-uw-rail-title">Deal Details</div>
+              <div class="sig-uw-detail-row"><span>Processor</span><strong>First Data Omaha</strong></div>
+              <div class="sig-uw-detail-row"><span>Pricing</span><strong>IC+ 0.25% + $0.10</strong></div>
+              <div class="sig-uw-detail-row"><span>Volume</span><strong>$31K/mo</strong></div>
+              <div class="sig-uw-detail-row"><span>Avg ticket</span><strong>$10.98</strong></div>
+              <div class="sig-uw-detail-row"><span>MCC</span><strong>5812 &middot; Restaurants</strong></div>
+              <div class="sig-uw-detail-row"><span>Equipment</span><strong>PAX A920 Pro</strong></div>
+              <div class="sig-uw-detail-row"><span>Partner</span><strong>Summit Lending</strong></div>
+              <div class="sig-uw-detail-row"><span>Rep</span><strong>Sara Reyes</strong></div>
+            </div>
+            <div class="sig-uw-rail-sec">
+              <div class="sig-uw-rail-title">UW Package Score</div>
+              <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:7px;">
+                <span style="font-size:30px;font-weight:800;color:var(--green);font-family:var(--font-mono);line-height:1;">94</span>
+                <span style="font-size:12px;color:var(--text-muted);">/ 100</span>
+                <span style="font-size:10px;padding:2px 7px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:4px;color:var(--green);font-weight:600;">Strong</span>
+              </div>
+              <div style="height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-bottom:6px;">
+                <div style="height:100%;width:94%;background:var(--green);border-radius:4px;"></div>
+              </div>
+              <div style="font-size:10px;color:var(--text-muted);">Likely approved &middot; Est. 24&ndash;48h</div>
+            </div>
+            <div class="sig-uw-rail-sec" style="border-bottom:none;display:flex;flex-direction:column;gap:6px;">
+              <div class="sig-uw-rail-title">Quick Actions</div>
+              <button class="sig-uw-action-btn" onclick="alert('Resending DocuSign request to sarah@freshbrewcoffee.com…')">&#x1F4E8; Resend Signature</button>
+              <button class="sig-uw-action-btn" onclick="alert('Creating ticket…')">&#x1F3AB; Create Ticket</button>
+              <button class="sig-uw-action-btn" onclick="nudgeWithDocs()">&#x1F4E3; Message Merchant</button>
+              <button class="sig-uw-action-btn uw" onclick="alert('Composing email to First Data Omaha UW team…')">&#x1F4E7; Contact UW Team</button>
+            </div>
+          </div><!-- /sig-uw-rail -->
+          <!-- MAIN CHAT AREA -->
+          <div class="sig-uw-chat">
+            <div class="cf" style="flex-shrink:0;">
+              <div class="cftab active" onclick="cfSwitch(this)">All</div>
+              <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
+              <div class="cftab" onclick="cfSwitch(this)">Internal</div>
+              <div class="cftab" onclick="cfSwitch(this)">UW</div>
+              <div class="cfsp"></div>
+              <span class="cfct" id="sig-uw-event-count">0 events</span>
+            </div>
+            <div class="ch-thread" id="sig-uw-thread"></div>
+            <div class="ch-inp" id="sig-uw-inp">
+              <div class="mode-row">
+                <div class="mbtn int-on" id="suInt" onclick="setSUMode('int')">Internal</div>
+                <div class="mbtn off" id="suOut" onclick="setSUMode('out')">Merchant</div>
+                <div class="mbtn off" id="suUW" onclick="setSUMode('uw')" style="border-left:1px solid var(--border);">&#x1F4E7; UW Team</div>
+              </div>
+              <div class="ta-wrap">
+                <textarea class="chat-ta" id="sigUWInput" placeholder="Type your internal note…" rows="3"></textarea>
+                <button class="send-btn" onclick="sendSigUWMessage()">&#x2192;</button>
+              </div>
+              <div class="tools-row">
+                <div class="tool" title="Attach">&#x1F4CE;</div>
+                <div class="tool" title="Mention">@</div>
+                <div class="tool" title="Templates">&#x26A1;</div>
+                <div style="flex:1;"></div>
+                <div style="font-size:11px;color:var(--text-muted);">Fresh Brew Coffee Co.</div>
+              </div>
+            </div>
+          </div><!-- /sig-uw-chat -->
+        </div><!-- /sig-uw-body -->
+      </div><!-- /sig-uw-overlay -->
+
       <!-- Body: step nav + form + chat -->
       <div class="body-row">
 
@@ -14857,10 +14989,10 @@ function sendForSignature() {
     window.twillBC.postMessage({type: 'signature_sent', data: {timestamp: Date.now(), merchant: 'Fresh Brew Coffee Co.'}});
   }
 
-  // Expand partner chat to full screen
+  // Enter sig/UW full-screen chat mode
   setTimeout(() => {
-    expandPartnerChat();
-  }, 800);
+    enterSigUWMode();
+  }, 600);
 }
 
 function expandPartnerChat() {
@@ -14905,6 +15037,158 @@ function expandPartnerChat() {
 }
 
 async function pwait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ──────────────────────────────────────────────────
+   SIG / UW FULL-SCREEN CHAT MODE
+   ────────────────────────────────────────────────── */
+
+function enterSigUWMode() {
+  const view = document.getElementById('view-merchant-detail');
+  if (!view) return;
+  view.classList.add('sig-uw-active');
+  const banner = document.getElementById('locked-banner');
+  if (banner) banner.style.display = 'none';
+  populateSigUWThread();
+}
+
+function minimizeSigUWChat() {
+  const view = document.getElementById('view-merchant-detail');
+  if (!view) return;
+  view.classList.remove('sig-uw-active');
+  const banner = document.getElementById('locked-banner');
+  if (banner) banner.style.display = 'flex';
+}
+
+function expandSigUWChat() {
+  const view = document.getElementById('view-merchant-detail');
+  if (!view) return;
+  view.classList.add('sig-uw-active');
+  const banner = document.getElementById('locked-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function setSUMode(mode) {
+  ['suInt','suOut','suUW'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'mbtn off';
+  });
+  const ta = document.getElementById('sigUWInput');
+  if (mode === 'int') {
+    const el = document.getElementById('suInt'); if (el) el.className = 'mbtn int-on';
+    if (ta) ta.placeholder = 'Type your internal note…';
+  } else if (mode === 'out') {
+    const el = document.getElementById('suOut'); if (el) el.className = 'mbtn int-on';
+    if (ta) ta.placeholder = 'Message to Fresh Brew Coffee Co.…';
+  } else if (mode === 'uw') {
+    const el = document.getElementById('suUW'); if (el) el.className = 'mbtn int-on';
+    if (ta) ta.placeholder = 'Message to First Data UW team (uw@firstdataomaha.com)…';
+  }
+}
+
+function sendSigUWMessage() {
+  const ta = document.getElementById('sigUWInput');
+  const thread = document.getElementById('sig-uw-thread');
+  if (!ta || !thread || !ta.value.trim()) return;
+  const text = ta.value.trim();
+  const isOut = document.getElementById('suOut') && document.getElementById('suOut').className.includes('int-on');
+  const isUW  = document.getElementById('suUW')  && document.getElementById('suUW').className.includes('int-on');
+  const mode  = isOut ? 'out' : isUW ? 'uw' : 'int';
+  const modeLabel = {int:'Internal', out:'→ Merchant', uw:'→ UW'}[mode];
+  ta.value = '';
+  const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  const d = document.createElement('div');
+  d.className = 'act';
+  d.innerHTML = '<div class="ah"><div class="aav" style="background:var(--yellow);color:var(--text-inverse);">MW</div>' +
+    '<span class="aname">M. Wright</span><span class="amode ' + mode + '">' + modeLabel + '</span>' +
+    '<span class="atime">' + time + '</span></div>' +
+    '<div class="abub ' + mode + '">' + text + '</div>';
+  thread.appendChild(d);
+  thread.scrollTop = thread.scrollHeight;
+  // update event count
+  const ct = document.getElementById('sig-uw-event-count');
+  if (ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
+}
+
+function populateSigUWThread() {
+  const thread = document.getElementById('sig-uw-thread');
+  if (!thread || thread.dataset.populated) return;
+  thread.dataset.populated = '1';
+  thread.innerHTML = '';
+
+  function sys(text, time, color) {
+    const d = document.createElement('div');
+    d.className = 'act sys';
+    d.innerHTML = '<div class="syse"><div class="sysd" style="background:' + (color||'var(--green)') + ';"></div>' +
+      '<div class="syst">' + text + '</div><div class="systt">' + time + '</div></div>';
+    thread.appendChild(d);
+  }
+  function msg(av, avBg, avColor, name, modeLabel, modeCls, bubble, time) {
+    const d = document.createElement('div');
+    d.className = 'act';
+    d.innerHTML = '<div class="ah"><div class="aav" style="background:' + avBg + ';color:' + avColor + ';">' + av + '</div>' +
+      '<span class="aname">' + name + '</span><span class="amode ' + modeCls + '">' + modeLabel + '</span>' +
+      '<span class="atime">' + time + '</span></div><div class="abub ' + modeCls + '">' + bubble + '</div>';
+    thread.appendChild(d);
+  }
+  function date(label) {
+    const d = document.createElement('div');
+    d.className = 'dsep';
+    d.innerHTML = '<div class="dsep-lbl">' + label + '</div>';
+    thread.appendChild(d);
+  }
+
+  const AI_BG = 'var(--navy)', AI_C = 'var(--yellow)', AI_AV = '✶';
+  const MW_BG = 'var(--yellow)', MW_C = 'var(--text-inverse)', MW_AV = 'MW';
+
+  date('Today · May 28, 2026');
+  sys('Application submitted · 8 of 8 documents complete · package score 94/100', '2:24 PM', 'var(--green)');
+
+  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+    '📨 <strong>Signature packet sent to Sarah Chen</strong> via DocuSign at sarah@freshbrewcoffee.com<br><br>' +
+    'Package contains: Merchant Processing Agreement, First Data IC+ Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
+    'I’ll surface all activity here in real-time as she reviews and signs.',
+    '2:28 PM');
+
+  sys('Sarah Chen opened the signature request', '2:31 PM', 'var(--blue)');
+  sys('Sarah is reviewing the agreement…', '2:33 PM', 'var(--amber)');
+
+  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+    '📋 Running <strong>final UW package review</strong> in the background while we wait for signature…<br><br>' +
+    '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Bank statements — clean, $18.4K avg balance, zero NSFs</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Processing history — $31K/mo, 90.8% card-present, 0.02% CB</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Business docs — Articles, Owner ID, voided check all on file</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Owner identity — Sarah Chen 60% stake, validated</div>' +
+    '</div>',
+    '2:35 PM');
+
+  msg(MW_AV, MW_BG, MW_C, 'M. Wright', 'Internal', 'int',
+    'Going to be a fast one — super clean app, existing Square history is solid proof of volume.',
+    '2:41 PM');
+
+  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+    '📊 Package score: <strong style="color:var(--green);">94 / 100</strong> — Strong. No UW red flags detected. Approval likelihood: <strong style="color:var(--green);">High</strong>.',
+    '2:41 PM');
+
+  sys('🎉 Sarah Chen signed! Full execution complete.', '2:47 PM', 'var(--green)');
+
+  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+    '✅ <strong>Merchant signed.</strong> Submitting complete package to First Data Omaha underwriting…<br><br>' +
+    'Submission includes all 8 documents, AI analysis summary, IC+ pricing schedule, and equipment order.',
+    '2:48 PM');
+
+  sys('Submitted to First Data Omaha UW · Case #FD-2026-04891 created', '2:48 PM', 'var(--blue)');
+
+  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+    '📬 <strong>UW submission confirmed.</strong> Case <strong>#FD-2026-04891</strong> assigned to First Data Omaha.<br><br>' +
+    'Estimated decision: <strong>24–48 hours.</strong> Current queue position: 3 of 18. ' +
+    'I’ll monitor for any UW questions, pends, or decisions and surface them here automatically.',
+    '2:49 PM');
+
+  thread.scrollTop = thread.scrollHeight;
+  const ct = document.getElementById('sig-uw-event-count');
+  if (ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
+}
 
 function partnerAddMessage(sender, html, options = {}) {
   const activeView = document.querySelector('#view-merchant-detail.active') || document.querySelector('#view-merchant-detail');
