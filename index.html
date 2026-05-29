@@ -4244,8 +4244,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <!-- LOCKED BANNER — shown when sig-uw overlay is minimized -->
       <div id="locked-banner" style="display:none;align-items:center;gap:10px;padding:9px 20px;background:rgba(245,158,11,.05);border-bottom:1px solid rgba(245,158,11,.2);flex-shrink:0;">
         <span style="font-size:14px;">&#x1F512;</span>
-        <div><span style="font-size:12px;font-weight:600;color:var(--text-primary);">Out for Signature</span><span style="font-size:12px;color:var(--text-secondary);"> &#x2014; Application is read-only while awaiting merchant signature</span></div>
-        <div style="margin-left:auto;"><button onclick="expandSigUWChat()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">&#x1F4AC; Return to Chat</button></div>
+        <div><span id="locked-banner-title" style="font-size:12px;font-weight:600;color:var(--text-primary);">Out for Signature</span><span id="locked-banner-sub" style="font-size:12px;color:var(--text-secondary);"> &#x2014; Application is read-only while awaiting merchant signature</span></div>
+        <div style="margin-left:auto;"><button onclick="expandSigUWChat()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">&#x1F4AC; Open Chat</button></div>
       </div>
 
       <!-- SIG / UW FULL-SCREEN CHAT OVERLAY — default view for Out for Signature + Underwriting stages -->
@@ -4253,9 +4253,9 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="sig-uw-sub-hdr">
           <span id="sig-uw-status-badge" style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:5px;font-size:11px;font-weight:700;color:var(--amber);">&#x1F510; Out for Signature</span>
           <span style="font-size:12px;font-weight:600;color:var(--text-primary);" id="sig-uw-merchant-name">Fresh Brew Coffee Co.</span>
-          <span style="font-size:11px;color:var(--text-muted);">/ Application &middot; Summit Lending</span>
+          <span id="sig-uw-partner-line" style="font-size:11px;color:var(--text-muted);">/ Application &middot; Summit Lending</span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-            <button onclick="minimizeSigUWChat()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);" title="View locked application form">&#x229F; View Application</button>
+            <button onclick="minimizeSigUWChat()" style="display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-primary);cursor:pointer;font-family:var(--font-ui);box-shadow:0 1px 3px rgba(0,0,0,.08);" title="Go back to application form">&#x2190; Back to Application</button>
           </div>
         </div>
         <div class="sig-uw-body">
@@ -4345,7 +4345,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
                 <div class="tool" title="Mention">@</div>
                 <div class="tool" title="Templates">&#x26A1;</div>
                 <div style="flex:1;"></div>
-                <div style="font-size:11px;color:var(--text-muted);">Fresh Brew Coffee Co.</div>
+                <div id="sig-uw-footer-name" style="font-size:11px;color:var(--text-muted);">Fresh Brew Coffee Co.</div>
               </div>
             </div>
           </div><!-- /sig-uw-chat -->
@@ -12926,7 +12926,16 @@ function navigateToMerchant(name, status) {
   const m = merchantData.find(x => x.name === name);
   const alertsHTML = m ? buildAlertEventsHTML(m) : '';
 
-  // Deal Room for signature through approval/decline
+  // Sig / UW — full-screen chat overlay (takes priority over deal room)
+  if (status === 'signature' || status === 'underwriting') {
+    _currentSBMerchant = name;
+    document.getElementById('md-merchant-name').textContent = name;
+    showView('merchant-detail', null);
+    setTimeout(() => { enterSigUWMode(name, status); }, 50);
+    return;
+  }
+
+  // Deal Room for approved / declined / boarding
   if (DEAL_ROOM_STATUSES.has(status) && DEAL_ROOM_DATA[name]) {
     populateDealRoom(m);
     showView('deal-room', null);
@@ -14990,8 +14999,9 @@ function sendForSignature() {
   }
 
   // Enter sig/UW full-screen chat mode
+  const currentName = (typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant) ? _currentSBMerchant : 'Fresh Brew Coffee Co.';
   setTimeout(() => {
-    enterSigUWMode();
+    enterSigUWMode(currentName, 'signature');
   }, 600);
 }
 
@@ -15042,9 +15052,57 @@ async function pwait(ms) { return new Promise(r => setTimeout(r, ms)); }
    SIG / UW FULL-SCREEN CHAT MODE
    ────────────────────────────────────────────────── */
 
-function enterSigUWMode() {
+function enterSigUWMode(name, status) {
   const view = document.getElementById('view-merchant-detail');
   if (!view) return;
+
+  // Resolve merchant data
+  const m = (name && typeof merchantData !== 'undefined') ? merchantData.find(x => x.name === name) : null;
+  const resolvedStatus = status || (m ? m.status : 'signature');
+  const resolvedName   = name || (m ? m.name : 'Merchant');
+  const isSig = resolvedStatus === 'signature';
+
+  // -- Update sub-header badge --
+  const badge = document.getElementById('sig-uw-status-badge');
+  if (badge) {
+    if (isSig) {
+      badge.style.background    = 'rgba(167,139,250,.1)';
+      badge.style.borderColor   = 'rgba(167,139,250,.3)';
+      badge.style.color         = '#a78bfa';
+      badge.innerHTML           = '&#x1F510; Out for Signature';
+    } else {
+      badge.style.background    = 'rgba(245,158,11,.08)';
+      badge.style.borderColor   = 'rgba(245,158,11,.25)';
+      badge.style.color         = 'var(--amber)';
+      badge.innerHTML           = '&#x1F4CB; In Underwriting';
+    }
+  }
+
+  // -- Update merchant name + partner line --
+  const nameEl = document.getElementById('sig-uw-merchant-name');
+  if (nameEl) nameEl.textContent = resolvedName;
+
+  const partnerLine = document.getElementById('sig-uw-partner-line');
+  if (partnerLine && m) {
+    partnerLine.textContent = '/ Application · ' + (m.partner || '');
+  }
+
+  // -- Update locked banner (minimized state) --
+  const bannerTitle = document.getElementById('locked-banner-title');
+  const bannerSub   = document.getElementById('locked-banner-sub');
+  if (bannerTitle) bannerTitle.textContent = isSig ? 'Out for Signature' : 'In Underwriting';
+  if (bannerSub)   bannerSub.innerHTML     = isSig
+    ? ' — Application is read-only while awaiting merchant signature'
+    : ' — Application is read-only while under review';
+
+  // -- Update chat input footer name --
+  const footerName = document.getElementById('sig-uw-footer-name');
+  if (footerName) footerName.textContent = resolvedName;
+
+  // -- Reset thread so each merchant gets fresh content --
+  const thread = document.getElementById('sig-uw-thread');
+  if (thread) delete thread.dataset.populated;
+
   view.classList.add('sig-uw-active');
   const banner = document.getElementById('locked-banner');
   if (banner) banner.style.display = 'none';
@@ -15078,7 +15136,8 @@ function setSUMode(mode) {
     if (ta) ta.placeholder = 'Type your internal note…';
   } else if (mode === 'out') {
     const el = document.getElementById('suOut'); if (el) el.className = 'mbtn int-on';
-    if (ta) ta.placeholder = 'Message to Fresh Brew Coffee Co.…';
+    const mNameEl = document.getElementById('sig-uw-merchant-name');
+    if (ta) ta.placeholder = 'Message to ' + (mNameEl ? mNameEl.textContent.trim() : 'merchant') + '…';
   } else if (mode === 'uw') {
     const el = document.getElementById('suUW'); if (el) el.className = 'mbtn int-on';
     if (ta) ta.placeholder = 'Message to First Data UW team (uw@firstdataomaha.com)…';
@@ -15115,6 +15174,14 @@ function populateSigUWThread() {
   thread.dataset.populated = '1';
   thread.innerHTML = '';
 
+  // Resolve current merchant + status from the overlay
+  const nameEl = document.getElementById('sig-uw-merchant-name');
+  const resolvedName = (nameEl && nameEl.textContent) ? nameEl.textContent.trim() : 'Fresh Brew Coffee Co.';
+  const badge = document.getElementById('sig-uw-status-badge');
+  const isUW = badge && badge.innerHTML.includes('Underwriting');
+  const m = (typeof merchantData !== 'undefined') ? merchantData.find(x => x.name === resolvedName) : null;
+  const partner = m ? (m.partner || 'the processor') : 'the processor';
+
   function sys(text, time, color) {
     const d = document.createElement('div');
     d.className = 'act sys';
@@ -15140,50 +15207,100 @@ function populateSigUWThread() {
   const AI_BG = 'var(--navy)', AI_C = 'var(--yellow)', AI_AV = '✶';
   const MW_BG = 'var(--yellow)', MW_C = 'var(--text-inverse)', MW_AV = 'MW';
 
-  date('Today · May 28, 2026');
-  sys('Application submitted · 8 of 8 documents complete · package score 94/100', '2:24 PM', 'var(--green)');
+  // ── Fresh Brew Coffee Co. — full demo narrative ──────────────────
+  if (resolvedName === 'Fresh Brew Coffee Co.') {
+    date('Today · May 28, 2026');
+    sys('Application submitted · 8 of 8 documents complete · package score 94/100', '2:24 PM', 'var(--green)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📨 <strong>Signature packet sent to Sarah Chen</strong> via DocuSign at sarah@freshbrewcoffee.com<br><br>' +
+      'Package contains: Merchant Processing Agreement, First Data IC+ Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
+      'I\'ll surface all activity here in real-time as she reviews and signs.',
+      '2:28 PM');
+    sys('Sarah Chen opened the signature request', '2:31 PM', 'var(--blue)');
+    sys('Sarah is reviewing the agreement…', '2:33 PM', 'var(--amber)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📋 Running <strong>final UW package review</strong> in the background while we wait for signature…<br><br>' +
+      '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Bank statements — clean, $18.4K avg balance, zero NSFs</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Processing history — $31K/mo, 90.8% card-present, 0.02% CB</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Business docs — Articles, Owner ID, voided check all on file</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Owner identity — Sarah Chen 60% stake, validated</div>' +
+      '</div>',
+      '2:35 PM');
+    msg(MW_AV, MW_BG, MW_C, 'M. Wright', 'Internal', 'int',
+      'Going to be a fast one — super clean app, existing Square history is solid proof of volume.', '2:41 PM');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📊 Package score: <strong style="color:var(--green);">94 / 100</strong> — Strong. No UW red flags detected. Approval likelihood: <strong style="color:var(--green);">High</strong>.', '2:41 PM');
+    sys('🎉 Sarah Chen signed! Full execution complete.', '2:47 PM', 'var(--green)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '✅ <strong>Merchant signed.</strong> Submitting complete package to First Data Omaha underwriting…<br><br>' +
+      'Submission includes all 8 documents, AI analysis summary, IC+ pricing schedule, and equipment order.', '2:48 PM');
+    sys('Submitted to First Data Omaha UW · Case #FD-2026-04891 created', '2:48 PM', 'var(--blue)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📬 <strong>UW submission confirmed.</strong> Case <strong>#FD-2026-04891</strong> assigned to First Data Omaha.<br><br>' +
+      'Estimated decision: <strong>24–48 hours.</strong> Current queue position: 3 of 18. ' +
+      'I\'ll monitor for any UW questions, pends, or decisions and surface them here automatically.', '2:49 PM');
 
-  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-    '📨 <strong>Signature packet sent to Sarah Chen</strong> via DocuSign at sarah@freshbrewcoffee.com<br><br>' +
-    'Package contains: Merchant Processing Agreement, First Data IC+ Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
-    'I’ll surface all activity here in real-time as she reviews and signs.',
-    '2:28 PM');
+  } else if (isUW) {
+    // ── Underwriting narrative (generic, merchant-aware) ────────────
+    const vol = m ? (m.potVol || 'N/A') : 'N/A';
+    const risk = m ? (m.risk || 'Medium') : 'Medium';
+    const riskColor = risk === 'Low' ? 'var(--green)' : risk === 'High' ? 'var(--red)' : 'var(--amber)';
+    date('Today · May 28, 2026');
+    sys('Application complete · Signature received · Submitted to underwriting', '9:14 AM', 'var(--green)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📋 <strong>' + resolvedName + '</strong> is now in underwriting review with ' + partner + '.<br><br>' +
+      'I\'m monitoring the UW queue and will surface any questions, pends, or decisions here automatically. ' +
+      'Stated monthly volume: <strong>' + vol + '</strong> · Risk tier: <strong style="color:' + riskColor + ';">' + risk + '</strong>.',
+      '9:15 AM');
+    if (m && m.notes && m.notes.some(n => n.tip && n.tip.includes('pend'))) {
+      const pendNote = m.notes.find(n => n.tip && n.tip.includes('pend'));
+      sys('⚠️ UW pend received — action required', '10:02 AM', 'var(--amber)');
+      msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+        '⚠️ <strong>UW pend:</strong> ' + (pendNote ? pendNote.tip.replace(/^[^:]+:\s*/,'') : 'Additional documentation requested.') + '<br><br>' +
+        'I\'ve drafted a response with the available documents. Review and send when ready.',
+        '10:03 AM');
+    } else {
+      msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+        '📊 Pre-submission package review complete:<br><br>' +
+        '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">' +
+        '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Business documentation — complete and verified</div>' +
+        '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Owner identity — validated, no adverse matches</div>' +
+        '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Bank statements — consistent cash flow, clean history</div>' +
+        '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Processing agreement — signed and on file</div>' +
+        '</div>',
+        '9:22 AM');
+      msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+        '⏳ Waiting on UW decision. I\'ll notify you the moment there\'s a status update, pend request, or approval. Est. decision: <strong>24–48 hours.</strong>',
+        '9:24 AM');
+    }
 
-  sys('Sarah Chen opened the signature request', '2:31 PM', 'var(--blue)');
-  sys('Sarah is reviewing the agreement…', '2:33 PM', 'var(--amber)');
-
-  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-    '📋 Running <strong>final UW package review</strong> in the background while we wait for signature…<br><br>' +
-    '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">' +
-    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Bank statements — clean, $18.4K avg balance, zero NSFs</div>' +
-    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Processing history — $31K/mo, 90.8% card-present, 0.02% CB</div>' +
-    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Business docs — Articles, Owner ID, voided check all on file</div>' +
-    '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Owner identity — Sarah Chen 60% stake, validated</div>' +
-    '</div>',
-    '2:35 PM');
-
-  msg(MW_AV, MW_BG, MW_C, 'M. Wright', 'Internal', 'int',
-    'Going to be a fast one — super clean app, existing Square history is solid proof of volume.',
-    '2:41 PM');
-
-  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-    '📊 Package score: <strong style="color:var(--green);">94 / 100</strong> — Strong. No UW red flags detected. Approval likelihood: <strong style="color:var(--green);">High</strong>.',
-    '2:41 PM');
-
-  sys('🎉 Sarah Chen signed! Full execution complete.', '2:47 PM', 'var(--green)');
-
-  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-    '✅ <strong>Merchant signed.</strong> Submitting complete package to First Data Omaha underwriting…<br><br>' +
-    'Submission includes all 8 documents, AI analysis summary, IC+ pricing schedule, and equipment order.',
-    '2:48 PM');
-
-  sys('Submitted to First Data Omaha UW · Case #FD-2026-04891 created', '2:48 PM', 'var(--blue)');
-
-  msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-    '📬 <strong>UW submission confirmed.</strong> Case <strong>#FD-2026-04891</strong> assigned to First Data Omaha.<br><br>' +
-    'Estimated decision: <strong>24–48 hours.</strong> Current queue position: 3 of 18. ' +
-    'I’ll monitor for any UW questions, pends, or decisions and surface them here automatically.',
-    '2:49 PM');
+  } else {
+    // ── Signature narrative (generic, merchant-aware) ───────────────
+    const vol = m ? (m.potVol || 'N/A') : 'N/A';
+    date('Today · May 28, 2026');
+    sys('Application complete · Signature packet generated', '11:30 AM', 'var(--green)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📨 <strong>DocuSign sent to ' + resolvedName + '</strong> via email.<br><br>' +
+      'Package contains: Merchant Processing Agreement and Pricing Schedule. ' +
+      'Stated volume: <strong>' + vol + '</strong> via <strong>' + partner + '</strong>. ' +
+      'I\'ll surface all activity here in real-time.',
+      '11:32 AM');
+    sys('Merchant opened the signature request', '11:41 AM', 'var(--blue)');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '📋 Running background UW pre-check while awaiting signature…<br><br>' +
+      '<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> All required documents on file</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Owner identity validated</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--green);">✓</span> Bank statements reviewed — no red flags</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span style="color:var(--amber);">⏳</span> Awaiting merchant e-signature</div>' +
+      '</div>',
+      '11:44 AM');
+    msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
+      '⏳ Signature still pending. I\'ll notify you immediately when the merchant signs. ' +
+      'If needed, use the Quick Actions → Resend Signature to follow up.',
+      '1:15 PM');
+  }
 
   thread.scrollTop = thread.scrollHeight;
   const ct = document.getElementById('sig-uw-event-count');
