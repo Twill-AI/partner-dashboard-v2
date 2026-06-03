@@ -2075,46 +2075,63 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
 /* ── PIPELINE strip ── */
 .cc-pipeline { background: transparent; border: none; overflow: visible; }
+.cc-pip-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: .01em; text-transform: none; }
+.cc-pip-sub b { color: var(--text-secondary); font-weight: 700; }
 .cc-pip-track {
   display: flex; align-items: stretch;
   background: var(--bg-surface); border: 1px solid var(--border);
   border-radius: 10px; overflow: hidden;
 }
 .cc-pip-stage {
-  flex: 1; min-width: 72px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 3px;
-  padding: 11px 8px; border-right: 1px solid var(--border);
+  flex: 1; min-width: 92px; display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: flex-start; gap: 6px;
+  padding: 13px 14px 12px; border-right: 1px solid var(--border);
   cursor: pointer; transition: background .12s; position: relative;
+}
+.cc-pip-stage::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--pip-c, transparent); opacity: .85;
 }
 .cc-pip-stage:last-child { border-right: none; }
 .cc-pip-stage:hover { background: var(--bg-hover); }
-.cc-pip-stage.pip-active { background: rgba(255,222,0,.05); box-shadow: inset 0 -2px 0 var(--yellow); }
-.cc-pip-stage.has-attn::after {
-  content: ''; position: absolute; top: 9px; right: 10px;
-  width: 6px; height: 6px; border-radius: 50%; background: var(--red);
-}
+.cc-pip-stage.pip-active { background: rgba(255,222,0,.06); box-shadow: inset 0 -2.5px 0 var(--yellow); }
+.cc-pip-stage.has-attn { background: rgba(239,68,68,.028); }
+.cc-pip-stage.has-attn:hover { background: rgba(239,68,68,.05); }
+.cc-pip-stage-top { display: flex; align-items: center; gap: 6px; }
+.cc-pip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--pip-c, var(--text-muted)); }
 .cc-pip-lbl {
-  font-size: 9.5px; font-weight: 600; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
+  font-size: 9.5px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em; white-space: nowrap;
 }
-.cc-pip-ct { font-size: 19px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); line-height: 1; }
-.cc-pip-attn-txt { font-size: 9px; font-weight: 700; color: var(--red); }
-.cc-pip-acc { margin-top: 6px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; }
+.cc-pip-ct-row { display: flex; align-items: baseline; gap: 4px; }
+.cc-pip-ct { font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); line-height: 1; }
+.cc-pip-ct-u { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+.cc-pip-val { font-size: 11px; font-weight: 600; color: var(--text-secondary); font-family: var(--font-mono); white-space: nowrap; }
+.cc-pip-attn-txt { font-size: 10px; font-weight: 700; color: var(--red); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.cc-pip-attn-txt::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.cc-pip-attn-txt.is-clear { color: var(--text-muted); opacity: .55; font-weight: 600; }
+.cc-pip-acc { margin-top: 8px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; }
 .cc-pip-acc.open { display: block; }
-.cc-pip-acc-hdr { display: flex; align-items: center; padding: 9px 14px; background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
+.cc-pip-acc-hdr { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
 .cc-pip-acc-ttl { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }
 .cc-pip-acc-cls { margin-left: auto; font-size: 11px; color: var(--text-muted); cursor: pointer; padding: 2px 8px; border-radius: 4px; }
 .cc-pip-acc-cls:hover { background: var(--bg-hover); }
-.cc-pip-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,.04); cursor: pointer; }
+.cc-pip-row { display: flex; align-items: center; gap: 11px; padding: 10px 14px; border-bottom: 1px solid rgba(0,0,0,.04); cursor: pointer; transition: background .1s; }
 .cc-pip-row:last-child { border-bottom: none; }
 .cc-pip-row:hover { background: var(--bg-hover); }
-.cc-pip-row-av { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-elevated); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
-.cc-pip-row-name { font-size: 12px; font-weight: 600; color: var(--text-primary); flex: 1; }
-.cc-pip-row-partner { font-size: 11px; color: var(--text-muted); }
-.cc-pip-row-age { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); width: 36px; text-align: right; }
-.cc-pip-flag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
-.cc-pip-flag.attn { background: rgba(239,68,68,.09); color: var(--red); }
-.cc-pip-flag.ok { background: var(--bg-elevated); color: var(--text-muted); }
+.cc-pip-row-av { width: 28px; height: 28px; border-radius: 7px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.cc-pip-row-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cc-pip-row-name { font-size: 12.5px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-pip-row-sub { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+.cc-pip-row-sub .dotsep { width: 2.5px; height: 2.5px; border-radius: 50%; background: var(--border-strong); flex-shrink: 0; }
+.cc-pip-row-val { font-size: 11.5px; font-weight: 700; font-family: var(--font-mono); color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; }
+.cc-pip-row-rep { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 8px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid var(--bg-surface); }
+.cc-pip-row-age { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); width: 34px; text-align: right; flex-shrink: 0; }
+.cc-pip-flag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+.cc-pip-flag.attn { background: rgba(239,68,68,.09); color: var(--red); border: 1px solid rgba(239,68,68,.18); }
+.cc-pip-flag.ok { background: rgba(34,197,94,.08); color: var(--green); border: 1px solid rgba(34,197,94,.16); }
+.cc-pip-row-act { font-size: 11px; font-weight: 600; color: var(--text-secondary); background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 6px; padding: 4px 10px; cursor: pointer; white-space: nowrap; font-family: var(--font-ui); flex-shrink: 0; transition: all .12s; }
+.cc-pip-row-act:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
 
 /* ── WORK — tabbed list ── */
 .cc-work-wrap { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -2140,9 +2157,16 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 }
 .cc-wrow:last-child { border-bottom: none; }
 .cc-wrow:hover { background: var(--bg-hover); }
-.cc-wrow.pri-now { border-left-color: var(--red); }
+.cc-wrow.pri-now { border-left: 3px solid var(--red); background: rgba(239,68,68,.04); }
+.cc-wrow.pri-now:hover { background: rgba(239,68,68,.07); }
 .cc-wrow.pri-today { border-left-color: var(--amber); }
 .cc-wrow.cc-gone { opacity: 0; transform: translateX(20px); transition: all .2s; }
+.cc-now-pill {
+  font-size: 8.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; background: var(--red); padding: 2px 6px; border-radius: 4px;
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px;
+  box-shadow: 0 1px 3px rgba(239,68,68,.35);
+}
 .cc-wrow-cat { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; opacity: .7; }
 .cc-kind {
   display: inline-flex; align-items: center; justify-content: center; gap: 4px;
@@ -2729,6 +2753,19 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- BRIEFING -->
         <div class="cc-brief" id="ccBrief"></div>
 
+        <!-- PIPELINE (top) -->
+        <div class="cc-section">
+          <div class="cc-sec-hdr">
+            <span class="cc-sec-ttl">&#x1F4E5; Application pipeline</span>
+            <span class="cc-pip-sub" id="ccPipSub"></span>
+            <button class="cc-sec-link" onclick="showView('applications',null)">View all &#x2192;</button>
+          </div>
+          <div class="cc-pipeline">
+            <div class="cc-pip-track" id="ccPipTrack"></div>
+            <div class="cc-pip-acc" id="ccPipAcc"></div>
+          </div>
+        </div>
+
         <!-- PAGE FILTER BAR -->
         <div class="cc-filterbar" id="ccFilterBar">
           <span class="cc-fb-label">Filter</span>
@@ -2736,27 +2773,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <div class="cc-fb-dd" id="fb-partner"><div class="cc-fb-trigger" onclick="toggleFB('partner')"><span class="cc-fb-k">Partner</span><span class="cc-fb-v" id="fbv-partner">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-partner"></div></div>
           <div class="cc-fb-dd" id="fb-processor"><div class="cc-fb-trigger" onclick="toggleFB('processor')"><span class="cc-fb-k">Processor</span><span class="cc-fb-v" id="fbv-processor">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-processor"></div></div>
           <button class="cc-fb-clear" id="fbClear" onclick="clearFB()" style="display:none;">&#x2715; Clear</button>
-        </div>
-
-        <!-- NEEDS YOU NOW -->
-        <div class="cc-section">
-          <div class="cc-sec-hdr">
-            <span class="cc-sec-ttl urgent">&#x26A1; Needs you now</span>
-            <span class="cc-sec-count" id="ccNowCount"></span>
-          </div>
-          <div class="cc-hero-grid" id="ccHeroGrid"></div>
-        </div>
-
-        <!-- PIPELINE -->
-        <div class="cc-section">
-          <div class="cc-sec-hdr">
-            <span class="cc-sec-ttl">Application pipeline</span>
-            <button class="cc-sec-link" onclick="showView('applications',null)">View all &#x2192;</button>
-          </div>
-          <div class="cc-pipeline">
-            <div class="cc-pip-track" id="ccPipTrack"></div>
-            <div class="cc-pip-acc" id="ccPipAcc"></div>
-          </div>
         </div>
 
         <!-- WORK (tabbed) -->
@@ -35060,25 +35076,25 @@ const CC_ST_CLS = {lead:'st-lead',inreview:'st-inreview',underwriting:'st-underw
 const CC_ST_LBL = {lead:'Lead',inreview:'Review',underwriting:'UW',signature:'Sig',approved:'Approved',boarding:'Boarding',active:'Active'};
 
 const ccPipStages = [
-  {key:'lead',label:'Lead',count:3,attn:0,merchants:[
-    {name:'Fresh Brew Coffee Co.',partner:'Internal',age:'1h',flag:'New',ft:'ok',status:'lead'},
-    {name:'Harborlight Dental',partner:'NovaPay',age:'6h',flag:'Follow up',ft:'attn',status:'lead'},
-    {name:'Sunrise Bakery',partner:'Apex Elite',age:'3m',flag:'Just submitted',ft:'ok',status:'inreview'}]},
-  {key:'inreview',label:'In Review',count:2,attn:1,merchants:[
-    {name:'Desert Sun Dispensary',partner:'Internal',age:'11d',flag:'⚠ Risk memo needed',ft:'attn',status:'inreview'},
-    {name:'Sunrise Bakery',partner:'Apex Elite',age:'3m',flag:'New',ft:'ok',status:'inreview'}]},
-  {key:'underwriting',label:'Underwriting',count:3,attn:2,merchants:[
-    {name:'Pacific Coast Retail',partner:'Summit Lending',age:'8d',flag:'⚠ Bank stmts overdue',ft:'attn',status:'underwriting'},
-    {name:'Maple Street Bakery',partner:'Summit Lending',age:'4d',flag:'⚠ 2 pends open',ft:'attn',status:'underwriting'},
-    {name:'TechForge Solutions',partner:'Priority Commerce',age:'3d',flag:'Site inspection today',ft:'ok',status:'underwriting'}]},
-  {key:'signature',label:'Signature',count:2,attn:1,merchants:[
-    {name:'Metro Print Shop',partner:'Rivermark',age:'2d',flag:'⚠ Expiring tonight',ft:'attn',status:'signature'},
-    {name:'Neon Nightclub LA',partner:'NovaPay',age:'1d',flag:'Awaiting sig',ft:'ok',status:'signature'}]},
-  {key:'approved',label:'Approved',count:1,attn:0,merchants:[
-    {name:'Urban Salon Collective',partner:'Summit Lending',age:'2d',flag:'Ready to board',ft:'ok',status:'approved'}]},
-  {key:'boarding',label:'Boarding',count:2,attn:1,merchants:[
-    {name:'Bright Star Solar',partner:'Coastal Commerce',age:'18d',flag:'⚠ Activation overdue',ft:'attn',status:'boarding'},
-    {name:'Bella Cucina Restaurant',partner:'NovaPay',age:'5d',flag:'On track',ft:'ok',status:'boarding'}]},
+  {key:'lead',label:'Lead',count:3,attn:1,c:'#6B839B',pot:'$140K',merchants:[
+    {name:'Fresh Brew Coffee Co.',partner:'Internal',age:'1h',flag:'New',ft:'ok',status:'lead',proc:'First Data',val:'$18K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#6366F1'},
+    {name:'Harborlight Dental',partner:'NovaPay',age:'6h',flag:'Follow up',ft:'attn',status:'lead',proc:'Elavon',val:'$80K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#5B7A5E'},
+    {name:'Sunrise Bakery',partner:'Apex Elite',age:'3m',flag:'Just submitted',ft:'ok',status:'lead',proc:'TSYS',val:'$42K',rep:'J. Rivera',repAv:'JR',repAvc:'#6B839B',avc:'#A67C5B'}]},
+  {key:'inreview',label:'In Review',count:2,attn:1,c:'#6366F1',pot:'$162K',merchants:[
+    {name:'Desert Sun Dispensary',partner:'Internal',age:'11d',flag:'⚠ Risk memo needed',ft:'attn',status:'inreview',proc:'—',val:'$120K',rep:'J. Rivera',repAv:'JR',repAvc:'#6B839B',avc:'#9B6B5B'},
+    {name:'Sunrise Bakery',partner:'Apex Elite',age:'3m',flag:'New',ft:'ok',status:'inreview',proc:'TSYS',val:'$42K',rep:'J. Rivera',repAv:'JR',repAvc:'#6B839B',avc:'#A67C5B'}]},
+  {key:'underwriting',label:'Underwriting',count:3,attn:2,c:'#A67C5B',pot:'$423K',merchants:[
+    {name:'Pacific Coast Retail',partner:'Summit Lending',age:'8d',flag:'⚠ Bank stmts overdue',ft:'attn',status:'underwriting',proc:'First Data',val:'$210K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#6B839B'},
+    {name:'Maple Street Bakery',partner:'Summit Lending',age:'4d',flag:'⚠ 2 pends open',ft:'attn',status:'underwriting',proc:'First Data',val:'$38K',rep:'S. Patel',repAv:'SP',repAvc:'#5B7A5E',avc:'#C58B4E'},
+    {name:'TechForge Solutions',partner:'Priority Commerce',age:'3d',flag:'Site inspection today',ft:'ok',status:'underwriting',proc:'Priority',val:'$175K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#8358A8'}]},
+  {key:'signature',label:'Signature',count:2,attn:1,c:'#8358A8',pot:'$119K',merchants:[
+    {name:'Metro Print Shop',partner:'Rivermark',age:'2d',flag:'⚠ Expiring tonight',ft:'attn',status:'signature',proc:'TSYS',val:'$24K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#A67C5B'},
+    {name:'Neon Nightclub LA',partner:'NovaPay',age:'1d',flag:'Awaiting sig',ft:'ok',status:'signature',proc:'Elavon',val:'$95K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#8358A8'}]},
+  {key:'approved',label:'Approved',count:1,attn:0,c:'#5B7A5E',pot:'$31K',merchants:[
+    {name:'Urban Salon Collective',partner:'Summit Lending',age:'2d',flag:'Ready to board',ft:'ok',status:'approved',proc:'First Data',val:'$31K',rep:'M. Wright',repAv:'MW',repAvc:'#A09E9A',avc:'#5B7A5E'}]},
+  {key:'boarding',label:'Boarding',count:2,attn:1,c:'#C58B4E',pot:'$192K',merchants:[
+    {name:'Bright Star Solar',partner:'Coastal Commerce',age:'18d',flag:'⚠ Activation overdue',ft:'attn',status:'boarding',proc:'Fiserv',val:'$140K',rep:'J. Rivera',repAv:'JR',repAvc:'#6B839B',avc:'#C58B4E'},
+    {name:'Bella Cucina Restaurant',partner:'NovaPay',age:'5d',flag:'On track',ft:'ok',status:'boarding',proc:'Elavon',val:'$52K',rep:'S. Patel',repAv:'SP',repAvc:'#5B7A5E',avc:'#9B6B5B'}]},
 ];
 
 const ccQ = [
@@ -35193,12 +35209,15 @@ function ccSourceBadge(source) {
    Today for the rep currently being viewed (added reps get items pinned to
    their Today regardless of the item's base priority). */
 function inTodayView(item) {
-  if (item.pri === 'today') return true;
+  if (item.pri === 'now' || item.pri === 'today') return true;
   if (item.pinnedToday && item.pinnedToday.length) {
     return ccFilter.rep === 'all' ? true : item.pinnedToday.includes(ccFilter.rep);
   }
   return false;
 }
+/* Sort: urgent (now) first, then today, then week — stable within a tier */
+const CC_PRI_RANK = { now:0, today:1, week:2 };
+function ccSortByUrgency(a, b) { return (CC_PRI_RANK[a.pri] ?? 3) - (CC_PRI_RANK[b.pri] ?? 3); }
 function ccActiveNow()   { return ccQ.filter(i => i.pri==='now' && !i.done && !i.snoozed && passesPageFilter(i)); }
 function ccActiveToday() { return ccQ.filter(i => inTodayView(i) && i.pri!=='now' && !i.done && !i.snoozed && passesPageFilter(i)); }
 
@@ -35214,8 +35233,8 @@ function renderCCBrief() {
   if (nowN === 0) {
     txt = 'You\'re caught up on urgent items. <b class="b-amber">' + todayN + '</b> queued for today, and your pipeline has <b>' + pipAttn + '</b> applications flagged.';
   } else {
-    txt = 'You have <b class="b-red">' + nowN + ' item' + (nowN!==1?'s':'') + '</b> that need you now' +
-      (slaN ? ' &mdash; <b>' + slaN + '</b> ' + (slaN!==1?'are':'is') + ' SLA-critical' : '') +
+    txt = 'You have <b class="b-red">' + nowN + ' item' + (nowN!==1?'s':'') + '</b> that need you now &mdash; <span style="color:var(--red);font-weight:700;">flagged in red below</span>' +
+      (slaN ? ', <b>' + slaN + '</b> SLA-critical' : '') +
       '. <b class="b-amber">' + todayN + ' more</b> queued for today. Pipeline has <b>' + pipAttn + '</b> application' + (pipAttn!==1?'s':'') + ' flagged for attention.';
   }
   el.innerHTML = txt;
@@ -35256,12 +35275,20 @@ function renderCCPipeline() {
   if (!track) return;
   track.innerHTML = ccPipStages.map(s => {
     const on = ccActivePip === s.key;
-    return '<div class="cc-pip-stage' + (on?' pip-active':'') + (s.attn>0?' has-attn':'') + '" onclick="togglePip(\'' + s.key + '\')">' +
-      '<div class="cc-pip-lbl">' + s.label + '</div>' +
-      '<div class="cc-pip-ct">' + s.count + '</div>' +
-      (s.attn>0 ? '<div class="cc-pip-attn-txt">' + s.attn + ' flagged</div>' : '<div class="cc-pip-attn-txt" style="color:var(--text-muted);opacity:.55;">clear</div>') +
+    return '<div class="cc-pip-stage' + (on?' pip-active':'') + (s.attn>0?' has-attn':'') + '" style="--pip-c:' + s.c + ';" onclick="togglePip(\'' + s.key + '\')">' +
+      '<div class="cc-pip-stage-top"><span class="cc-pip-dot"></span><span class="cc-pip-lbl">' + s.label + '</span></div>' +
+      '<div class="cc-pip-ct-row"><span class="cc-pip-ct">' + s.count + '</span><span class="cc-pip-ct-u">app' + (s.count!==1?'s':'') + '</span></div>' +
+      '<div class="cc-pip-val">' + s.pot + ' / mo</div>' +
+      (s.attn>0 ? '<div class="cc-pip-attn-txt">' + s.attn + ' flagged</div>' : '<div class="cc-pip-attn-txt is-clear">on track</div>') +
       '</div>';
   }).join('');
+  const sub = document.getElementById('ccPipSub');
+  if (sub) {
+    const totalCount = ccPipStages.reduce((a,s)=>a+s.count,0);
+    const totalAttn  = ccPipStages.reduce((a,s)=>a+s.attn,0);
+    sub.innerHTML = '<b>' + totalCount + '</b> in flight &middot; <b>$1.07M</b>/mo potential' +
+      (totalAttn ? ' &middot; <span style="color:var(--red);font-weight:700;">' + totalAttn + ' flagged</span>' : '');
+  }
 }
 
 function togglePip(key) {
@@ -35274,11 +35301,16 @@ function togglePip(key) {
       '<span class="cc-pip-acc-cls" onclick="togglePip(\'' + key + '\')">&#x2715; Close</span></div>';
     s.merchants.forEach(m => {
       h += '<div class="cc-pip-row" onclick="navigateToMerchant(\'' + m.name + '\',\'' + m.status + '\')">' +
-        '<div class="cc-pip-row-av">' + m.name.substring(0,2).toUpperCase() + '</div>' +
-        '<div class="cc-pip-row-name">' + m.name + '</div>' +
-        '<div class="cc-pip-row-partner">' + m.partner + '</div>' +
+        '<div class="cc-pip-row-av" style="background:' + (m.avc || s.c) + ';">' + m.name.substring(0,2).toUpperCase() + '</div>' +
+        '<div class="cc-pip-row-info">' +
+          '<div class="cc-pip-row-name">' + m.name + '</div>' +
+          '<div class="cc-pip-row-sub">' + m.partner + '<span class="dotsep"></span>' + (m.proc || '—') + '</div>' +
+        '</div>' +
         '<span class="cc-pip-flag ' + m.ft + '">' + m.flag + '</span>' +
+        '<div class="cc-pip-row-val">' + (m.val || '') + (m.val ? '/mo' : '') + '</div>' +
+        '<div class="cc-pip-row-rep" style="background:' + m.repAvc + ';" title="Owner: ' + m.rep + '">' + m.repAv + '</div>' +
         '<div class="cc-pip-row-age">' + m.age + '</div>' +
+        '<button class="cc-pip-row-act" onclick="event.stopPropagation();navigateToMerchant(\'' + m.name + '\',\'' + m.status + '\')">Open &#x2192;</button>' +
         '</div>';
     });
     acc.innerHTML = h;
@@ -35315,7 +35347,7 @@ function renderCCWork() {
     return;
   }
 
-  const items = ccQ.filter(i => !i.done && !i.snoozed && f(i) && passesPageFilter(i));
+  const items = ccQ.filter(i => !i.done && !i.snoozed && f(i) && passesPageFilter(i)).sort(ccSortByUrgency);
   const doneItems = ccQ.filter(i => i.done && f(i) && passesPageFilter(i));
 
   let h = '';
@@ -35362,6 +35394,7 @@ function ccWorkRowHTML(item, isSnoozed) {
   return '<div class="cc-wrow' + priCls + '" data-ccid="' + item.id + '" onclick="' + item.fn + '" title="Open ' + (item.merchant||'task') + '">' +
     ccKindChip(item) +
     '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
+      (item.pri === 'now' ? '<span class="cc-now-pill">&#x26A1; Now</span>' : '') +
       '<span class="cc-wrow-name">' + (item.merchant || 'Internal Task') + '</span>' +
       (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
       ccSourceBadge(item.source) +
@@ -35402,7 +35435,7 @@ function updateWorkTabCounts() {
   set('ct-snoozed', ccQ.filter(i => i.snoozed && !i.done && passesPageFilter(i)).length);
 }
 
-function renderAllCC() { renderCCBrief(); renderCCHero(); renderCCWork(); }
+function renderAllCC() { renderCCBrief(); renderCCWork(); }
 
 /* ── Item actions ── */
 function doneCC(id) {
@@ -35804,7 +35837,6 @@ function initCC() {
   updateBellBadge();
   renderNotifs();
   renderCCBrief();
-  renderCCHero();
   renderCCPipeline();
   renderCCWork();
 }
