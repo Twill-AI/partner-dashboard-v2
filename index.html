@@ -2126,6 +2126,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-wtab.on { color: var(--text-primary); border-bottom-color: var(--yellow); }
 .cc-wtab-ct { font-size: 10px; font-weight: 700; font-family: var(--font-mono); background: var(--bg-base); border: 1px solid var(--border); color: var(--text-secondary); padding: 0px 6px; border-radius: 9px; min-width: 16px; text-align: center; }
 .cc-wtab.on .cc-wtab-ct { background: var(--navy); border-color: var(--navy); color: #fff; }
+.cc-wtab-div { width: 1px; height: 16px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
 .cc-work-asgn { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--text-secondary); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 6px; padding: 3px 9px; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 .cc-work-asgn:hover { background: var(--bg-hover); }
 
@@ -2141,6 +2142,12 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-wrow.pri-today { border-left-color: var(--amber); }
 .cc-wrow.cc-gone { opacity: 0; transform: translateX(20px); transition: all .2s; }
 .cc-wrow-cat { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; opacity: .7; }
+.cc-kind {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  min-width: 74px; padding: 3px 8px; border-radius: 5px;
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  border: 1px solid var(--border); flex-shrink: 0; white-space: nowrap;
+}
 .cc-wrow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .cc-wrow-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .cc-wrow-name { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; flex-shrink: 0; }
@@ -2351,9 +2358,11 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             <div class="cc-worktabs" id="ccWorkTabs">
               <div class="cc-wtab on" data-t="today" onclick="setCCWorkTab('today',this)">Today <span class="cc-wtab-ct" id="ct-today">0</span></div>
               <div class="cc-wtab" data-t="week" onclick="setCCWorkTab('week',this)">This Week <span class="cc-wtab-ct" id="ct-week">0</span></div>
-              <div class="cc-wtab" data-t="message" onclick="setCCWorkTab('message',this)">Messages <span class="cc-wtab-ct" id="ct-message">0</span></div>
-              <div class="cc-wtab" data-t="task" onclick="setCCWorkTab('task',this)">Tasks <span class="cc-wtab-ct" id="ct-task">0</span></div>
-              <div class="cc-wtab" data-t="ticket" onclick="setCCWorkTab('ticket',this)">Tickets <span class="cc-wtab-ct" id="ct-ticket">0</span></div>
+              <div class="cc-wtab-div"></div>
+              <div class="cc-wtab" data-t="alert" onclick="setCCWorkTab('alert',this)"><span style="color:var(--blue);">&#x1F4CB;</span> Alerts <span class="cc-wtab-ct" id="ct-alert">0</span></div>
+              <div class="cc-wtab" data-t="message" onclick="setCCWorkTab('message',this)"><span style="color:var(--green);">&#x1F4AC;</span> Messages <span class="cc-wtab-ct" id="ct-message">0</span></div>
+              <div class="cc-wtab" data-t="task" onclick="setCCWorkTab('task',this)"><span style="color:#9B6BD6;">&#x2713;</span> Tasks <span class="cc-wtab-ct" id="ct-task">0</span></div>
+              <div class="cc-wtab" data-t="ticket" onclick="setCCWorkTab('ticket',this)"><span style="color:var(--amber);">&#x1F3AB;</span> Tickets <span class="cc-wtab-ct" id="ct-ticket">0</span></div>
               <div class="cc-work-asgn" onclick="cycleAssignee()"><span id="ccAsgnLbl">All Team</span><span>&#x25BE;</span></div>
             </div>
             <div id="ccWorkList"></div>
@@ -14922,11 +14931,13 @@ Chart.defaults.font.family = "'Inter',sans-serif";
 Chart.defaults.font.size = 11;
 
 (function() {
+  const cv = document.getElementById('volumeTrend');
+  if (!cv) return; // dashboard charts removed in Command Center redesign
   const labels = [];
   const d = new Date(); d.setDate(d.getDate()-29);
   for(let i=0;i<30;i++){ labels.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'})); d.setDate(d.getDate()+1); }
   const seed = [110,98,125,134,119,144,160,152,148,162,178,155,190,204,196,211,225,218,230,245,238,252,261,248,270,285,278,290,304,312];
-  const ctx = document.getElementById('volumeTrend').getContext('2d');
+  const ctx = cv.getContext('2d');
   const gradient = ctx.createLinearGradient(0,0,0,180);
   gradient.addColorStop(0,'rgba(34,46,72,0.15)');
   gradient.addColorStop(1,'rgba(34,46,72,0)');
@@ -14934,7 +14945,9 @@ Chart.defaults.font.size = 11;
 })();
 
 (function() {
-  const ctx = document.getElementById('statusDonut').getContext('2d');
+  const cv = document.getElementById('statusDonut');
+  if (!cv) return; // dashboard charts removed in Command Center redesign
+  const ctx = cv.getContext('2d');
   new Chart(ctx,{type:'doughnut',data:{labels:['Active','Pending','Inactive','Suspended'],datasets:[{data:[612,23,189,23],backgroundColor:[C.green,C.amber,'#A09E9A',C.red],borderColor:'#FFFFFF',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#FFFFFF',borderColor:C.border,borderWidth:1,bodyColor:'#37352F'}}}});
 })();
 
@@ -34666,6 +34679,25 @@ const CC_HERO = {
   'wq-003': {why:'&#x26A0; Threshold breached', sub:'Active Merchant &middot; Coastal Commerce'},
 };
 
+/* Item TYPE taxonomy — what kind of thing each queue row is.
+   sla overrides (it's the most urgent signal); else by category. */
+const CC_KIND = {
+  sla:      {label:'SLA',      icon:'&#x23F1;', col:'var(--red)',   bg:'rgba(239,68,68,.1)',  bd:'rgba(239,68,68,.3)'},
+  activity: {label:'Alert',    icon:'&#x1F4CB;', col:'var(--blue)',  bg:'rgba(99,102,241,.1)', bd:'rgba(99,102,241,.28)'},
+  message:  {label:'Message',  icon:'&#x1F4AC;', col:'var(--green)', bg:'rgba(34,197,94,.1)',  bd:'rgba(34,197,94,.28)'},
+  task:     {label:'Task',     icon:'&#x2713;',  col:'#9B6BD6',      bg:'rgba(155,107,214,.12)',bd:'rgba(155,107,214,.3)'},
+  ticket:   {label:'Ticket',   icon:'&#x1F3AB;', col:'var(--amber)', bg:'rgba(245,158,11,.1)', bd:'rgba(245,158,11,.28)'},
+};
+function ccKindOf(item) {
+  if (item.sla) return 'sla';
+  if (item.cat === 'application') return 'activity';
+  return item.cat; // message | task | ticket
+}
+function ccKindChip(item) {
+  const m = CC_KIND[ccKindOf(item)] || CC_KIND.activity;
+  return '<span class="cc-kind" style="color:' + m.col + ';background:' + m.bg + ';border-color:' + m.bd + ';">' + m.icon + ' ' + m.label + '</span>';
+}
+
 function ccActiveNow()   { return ccQ.filter(i => i.pri==='now'   && !i.done && !i.snoozed); }
 function ccActiveToday() { return ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed); }
 
@@ -34758,6 +34790,7 @@ function togglePip(key) {
 function workTabFilter(tab) {
   if (tab === 'today')   return i => i.pri === 'today';
   if (tab === 'week')    return i => i.pri === 'week';
+  if (tab === 'alert')   return i => i.cat === 'application';
   if (tab === 'message') return i => i.cat === 'message';
   if (tab === 'task')    return i => i.cat === 'task';
   if (tab === 'ticket')  return i => i.cat === 'ticket';
@@ -34788,27 +34821,25 @@ function renderCCWork() {
 function ccWorkRowHTML(item) {
   const stLbl = CC_ST_LBL[item.mst] || '';
   const stCls = CC_ST_CLS[item.mst] || '';
-  const icon = CC_CAT_ICONS[item.cat] || '';
   const priCls = (item.pri==='now'?' pri-now':(item.pri==='today'?' pri-today':''));
   if (item.done) {
     return '<div class="cc-wrow" style="opacity:.4;cursor:default;">' +
-      '<div class="cc-wrow-cat">' + icon + '</div>' +
+      '<span class="cc-kind" style="opacity:.6;">' + (CC_KIND[ccKindOf(item)]||CC_KIND.activity).label + '</span>' +
       '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
         '<span class="cc-wrow-name" style="text-decoration:line-through;color:var(--text-muted);">' + (item.merchant||'Task') + '</span>' +
         '<span class="cc-wrow-desc" style="text-decoration:line-through;">' + item.title + '</span>' +
       '</div></div>' +
       '<span style="font-size:11px;color:var(--green);">&#x2713;</span></div>';
   }
-  return '<div class="cc-wrow' + priCls + '" data-ccid="' + item.id + '" onclick="' + item.fn + '">' +
-    '<div class="cc-wrow-cat">' + icon + '</div>' +
+  return '<div class="cc-wrow' + priCls + '" data-ccid="' + item.id + '" onclick="' + item.fn + '" title="Open ' + (item.merchant||'task') + '">' +
+    ccKindChip(item) +
     '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
-      '<span class="cc-wrow-name">' + (item.merchant || 'Task') + '</span>' +
+      '<span class="cc-wrow-name">' + (item.merchant || 'Internal Task') + '</span>' +
       (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
-      (item.sla ? '<span class="cc-wrow-sla">&#x23F1; SLA</span>' : '') +
       '<span class="cc-wrow-desc">' + item.title + '</span>' +
     '</div></div>' +
     '<div class="cc-wrow-meta">' +
-      '<div class="cc-wrow-av" style="background:' + item.avc + ';color:#fff;">' + item.av + '</div>' +
+      '<div class="cc-wrow-av" style="background:' + item.avc + ';color:#fff;" title="' + item.assignee + '">' + item.av + '</div>' +
       '<span class="cc-wrow-age">' + item.age + '</span>' +
       '<button class="cc-wrow-act" onclick="event.stopPropagation();' + item.fn + '">' + item.act + '</button>' +
       '<div class="cc-wrow-hover">' +
@@ -34832,6 +34863,7 @@ function updateWorkTabCounts() {
   const set = (id,n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
   set('ct-today',   c(i => i.pri==='today'));
   set('ct-week',    c(i => i.pri==='week'));
+  set('ct-alert',   c(i => i.cat==='application'));
   set('ct-message', c(i => i.cat==='message'));
   set('ct-task',    c(i => i.cat==='task'));
   set('ct-ticket',  c(i => i.cat==='ticket'));
