@@ -4199,6 +4199,48 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <div class="tkpi"><div class="tkpi-label">Auto-Resolved</div><div class="tkpi-value" style="color:var(--green);">4</div><div class="tkpi-sub">By AI this week</div></div>
       </div>
 
+      <!-- FILTER BAR — same component as Tickets, amber-tinted active state -->
+      <div class="tkt-filterbar">
+        <span class="tkt-filterbar-label">Filter:</span>
+
+        <!-- Severity -->
+        <div class="tkt-filter-wrap" id="fw-alert-sev">
+          <div class="tkt-filter-btn" id="afb-sev" onclick="toggleTktDropdown('alert-sev')">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 13H1z"/></svg>
+            <span id="afb-sev-label">Severity</span>
+            <span id="afb-sev-x" class="tkt-filter-x" style="display:none;" onclick="clearAlertDD(event,'sev')">✕</span>
+            <svg width="8" height="8" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+          </div>
+          <div class="tkt-dropdown" id="dd-alert-sev">
+            <div class="tkt-dd-opt active" data-val="" onclick="applyAlertDD('sev','',this)">All Severities</div>
+            <div class="tkt-dd-sep"></div>
+            <div class="tkt-dd-opt" data-val="high" onclick="applyAlertDD('sev','high',this)"><div class="tkt-dd-dot" style="background:var(--red);"></div> High</div>
+            <div class="tkt-dd-opt" data-val="medium" onclick="applyAlertDD('sev','medium',this)"><div class="tkt-dd-dot" style="background:var(--amber);"></div> Medium</div>
+            <div class="tkt-dd-opt" data-val="low" onclick="applyAlertDD('sev','low',this)"><div class="tkt-dd-dot" style="background:var(--text-muted);"></div> Low</div>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="tkt-filter-wrap" id="fw-alert-type">
+          <div class="tkt-filter-btn" id="afb-type" onclick="toggleTktDropdown('alert-type')">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="3" rx="1"/><rect x="1" y="7" width="14" height="3" rx="1"/><rect x="1" y="12" width="9" height="3" rx="1"/></svg>
+            <span id="afb-type-label">Type</span>
+            <span id="afb-type-x" class="tkt-filter-x" style="display:none;" onclick="clearAlertDD(event,'type')">✕</span>
+            <svg width="8" height="8" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+          </div>
+          <div class="tkt-dropdown" id="dd-alert-type">
+            <div class="tkt-dd-opt active" data-val="" onclick="applyAlertDD('type','',this)">All Types</div>
+            <div class="tkt-dd-sep"></div>
+            <div class="tkt-dd-opt" data-val="Chargeback" onclick="applyAlertDD('type','Chargeback',this)"><div class="tkt-dd-dot" style="background:var(--red);"></div> Chargeback</div>
+            <div class="tkt-dd-opt" data-val="No Batch" onclick="applyAlertDD('type','No Batch',this)"><div class="tkt-dd-dot" style="background:var(--amber);"></div> No Batch</div>
+            <div class="tkt-dd-opt" data-val="Volume Drop" onclick="applyAlertDD('type','Volume Drop',this)"><div class="tkt-dd-dot" style="background:#6B839B;"></div> Volume Drop</div>
+            <div class="tkt-dd-opt" data-val="Auth Rate Drop" onclick="applyAlertDD('type','Auth Rate Drop',this)"><div class="tkt-dd-dot" style="background:#8358A8;"></div> Auth Rate Drop</div>
+          </div>
+        </div>
+
+        <span class="tkt-filter-clear" id="alert-clear-all" style="display:none;" onclick="clearAllAlertDD()">Clear filters</span>
+      </div>
+
       <!-- LIST + DETAIL SPLIT -->
       <div class="tickets-split" id="alerts-split">
 
@@ -4227,90 +4269,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               </div>
             </div>
           </div>
-          <div class="tlist-body" id="alert-list">
-
-            <div class="alert-trow active" onclick="selectAlert(this,0)" data-idx="0" data-sev="high" data-type="chargeback" data-stage="open">
-              <div class="alert-trow-icon sev-high">⚠️</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">Chargeback spike — Harbor Bistro exceeding 1.5% threshold</div>
-                <div class="alert-trow-sub">Harbor Bistro · Coastal Commerce</div>
-              </div>
-              <div class="alert-trow-time">4m ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,1)" data-idx="1" data-sev="high" data-type="no batch" data-stage="open">
-              <div class="alert-trow-icon sev-high">🕐</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">No batch submitted — Pines Auto Group (3 days)</div>
-                <div class="alert-trow-sub">Pines Auto Group · Apex Elite</div>
-              </div>
-              <div class="alert-trow-time">18m ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,2)" data-idx="2" data-sev="high" data-type="volume drop" data-stage="open">
-              <div class="alert-trow-icon sev-high">📉</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">Volume drop 42% WoW — Green Valley Market</div>
-                <div class="alert-trow-sub">Green Valley Market · NovaPay</div>
-              </div>
-              <div class="alert-trow-time">1h ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,3)" data-idx="3" data-sev="medium" data-type="auth rate drop" data-stage="open">
-              <div class="alert-trow-icon sev-medium">🔵</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">Auth rate dropped to 88% — Lakeview Dental</div>
-                <div class="alert-trow-sub">Lakeview Dental · Summit Lending</div>
-              </div>
-              <div class="alert-trow-time">2h ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,4)" data-idx="4" data-sev="medium" data-type="chargeback" data-stage="open">
-              <div class="alert-trow-icon sev-medium">⚠️</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">2 new chargebacks — Metro Print Shop</div>
-                <div class="alert-trow-sub">Metro Print Shop · Rivermark</div>
-              </div>
-              <div class="alert-trow-time">3h ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,5)" data-idx="5" data-sev="medium" data-type="no batch" data-stage="open">
-              <div class="alert-trow-icon sev-medium">🕐</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">No batch submitted — Sunrise Cafe (5 days)</div>
-                <div class="alert-trow-sub">Sunrise Cafe · Apex Elite</div>
-              </div>
-              <div class="alert-trow-time">4h ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,6)" data-idx="6" data-sev="low" data-type="volume drop" data-stage="open">
-              <div class="alert-trow-icon sev-low">📉</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">Volume drop 61% WoW — Coastal Spa &amp; Salon</div>
-                <div class="alert-trow-sub">Coastal Spa &amp; Salon · Coastal Commerce · <span class="p-badge badge-blue" style="font-size:9px;padding:1px 5px;">Monitoring</span></div>
-              </div>
-              <div class="alert-trow-time">5h ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,7)" data-idx="7" data-sev="low" data-type="auth rate drop" data-stage="open">
-              <div class="alert-trow-icon sev-low">🔵</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">Auth rate dip — TechSupply Pro (91.2%)</div>
-                <div class="alert-trow-sub">TechSupply Pro LLC · Summit Lending · <span class="p-badge badge-blue" style="font-size:9px;padding:1px 5px;">Monitoring</span></div>
-              </div>
-              <div class="alert-trow-time">6h ago</div>
-            </div>
-
-            <div class="alert-trow" onclick="selectAlert(this,8)" data-idx="8" data-sev="low" data-type="volume drop" data-stage="resolved">
-              <div class="alert-trow-icon sev-low">📉</div>
-              <div class="alert-trow-meta">
-                <div class="alert-trow-title">Volume drop 28% — Harborlight Dental</div>
-                <div class="alert-trow-sub">Harborlight Dental · Rivermark · <span class="p-badge badge-green" style="font-size:9px;padding:1px 5px;">Resolved</span></div>
-              </div>
-              <div class="alert-trow-time">1d ago</div>
-            </div>
-
-          </div>
+          <div class="tlist-body" id="alert-list"></div>
         </div><!-- /tlist-panel -->
 
         <!-- ALERT DETAIL PANEL -->
@@ -13706,6 +13665,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Position fixed tooltips on note icons
   document.addEventListener('mouseenter', function(e) {
+    if (!(e.target instanceof Element)) return;
     const icon = e.target.closest('.m-note-icon');
     if (!icon) return;
     const tip = icon.querySelector('.m-note-tip');
@@ -13720,6 +13680,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, true);
   document.addEventListener('mouseleave', function(e) {
+    if (!(e.target instanceof Element)) return;
     const icon = e.target.closest('.m-note-icon');
     if (!icon) return;
     const tip = icon.querySelector('.m-note-tip');
@@ -31126,7 +31087,8 @@ function showView(name, clickedNav) {
   if (name === 'residuals' && !resChartsReady) { resChartsReady = true; setTimeout(initResCharts, 50); }
   if (name === 'alerts') {
     setTimeout(function() {
-      var r = document.querySelector('#alert-list .alert-trow');
+      if (typeof renderAlertList === 'function') renderAlertList();
+      var r = document.querySelector('#alert-list .trow');
       if (r) r.click();
     }, 50);
   }
@@ -31158,7 +31120,8 @@ function showView(name, clickedNav) {
 document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('view-alerts')?.classList.contains('active')) {
     setTimeout(function() {
-      var firstRow = document.querySelector('#alert-list .alert-trow');
+      if (typeof renderAlertList === 'function') renderAlertList();
+      var firstRow = document.querySelector('#alert-list .trow');
       if (firstRow) firstRow.click();
     }, 50);
   }
@@ -31509,84 +31472,148 @@ const alertData = [
 
 let currentAlertIdx = null;
 
-function renderAlertList(filter) {
+/* Filter / sort state (mirrors the Tickets list controls) */
+let alertTab = 'all';
+let alertSearch = '';
+let alertSortMode = 'recent';
+const alertFilters = { sev: '', type: '' };
+const _ALERT_SEV_RANK = { high: 0, medium: 1, low: 2 };
+const _ALERT_SEV_PRI  = { high: 'pri-urgent', medium: 'pri-high', low: 'pri-low' };
+const _ALERT_SEV_BADGE = { high: 'badge-warn', medium: 'badge-amber', low: 'badge-muted' };
+const _ALERT_SEV_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
+const _ALERT_STATUS_BADGE = { Resolved: 'badge-green', Monitoring: 'badge-blue', Open: 'badge-warn' };
+
+/* Render the alert list using the exact same .trow component as Tickets */
+function renderAlertList() {
   const list = document.getElementById('alert-list');
   if (!list) return;
-  list.innerHTML = alertData.map((a, i) => {
-    if (filter === 'high' && a.sev !== 'high') return '';
-    if (filter === 'chargeback' && a.type !== 'Chargeback') return '';
-    if (filter === 'resolved' && a.stage !== 'resolved') return '';
-    if (filter === 'open' && a.stage === 'resolved') return '';
+  let ordered = alertData.map((a, i) => ({ a, i }));
+  if (alertSortMode === 'severity') {
+    ordered.sort((x, y) => (_ALERT_SEV_RANK[x.a.sev] - _ALERT_SEV_RANK[y.a.sev]) || (x.i - y.i));
+  }
+  list.innerHTML = ordered.map(({ a, i }) => {
+    const stBadge = _ALERT_STATUS_BADGE[a.status] || 'badge-warn';
     return `
-      <div class="alert-trow${currentAlertIdx === i ? ' active' : ''}" onclick="selectAlert(this, ${i})" data-idx="${i}" data-sev="${a.sev}" data-type="${a.type.toLowerCase()}" data-stage="${a.stage}">
-        <div class="alert-trow-icon ${a.sevClass}">${a.icon}</div>
-        <div class="alert-trow-meta">
-          <div class="alert-trow-title">${a.title}</div>
-          <div class="alert-trow-sub">${a.merchant} · ${a.partner}${a.status && a.status !== 'Open' ? ` · <span class="p-badge ${a.statusClass}" style="font-size:9px;padding:1px 5px;">${a.status}</span>` : ''}</div>
+      <div class="trow alert-row${currentAlertIdx === i ? ' active' : ''}" onclick="selectAlert(this, ${i})" data-idx="${i}" data-sev="${a.sev}" data-type="${a.type.toLowerCase()}" data-stage="${a.stage}" data-partner="${a.partner}">
+        <div class="trow-priority ${_ALERT_SEV_PRI[a.sev]}"></div>
+        <div class="trow-body">
+          <div class="trow-top">
+            <span class="trow-id">${a.id}</span>
+            <span class="p-badge ${_ALERT_SEV_BADGE[a.sev]}">${_ALERT_SEV_LABEL[a.sev]}</span>
+            <span class="kb-dept-badge alert-type-badge" style="margin-left:auto;">${a.type}</span>
+          </div>
+          <div class="trow-title">${a.title}</div>
+          <div class="trow-mid">
+            <span class="trow-merchant">${a.merchant} · ${a.partner}</span>
+            <span class="p-badge ${stBadge}">${a.status}</span>
+          </div>
+          <div class="trow-bot">
+            <div class="trow-assign"><span class="alert-ai-chip">⚡ AI</span> flagged</div>
+            <span class="trow-age">${a.age}</span>
+          </div>
         </div>
-        <div class="alert-trow-time">${a.age}</div>
       </div>`;
   }).join('');
+  applyAllAlertFilters();
 }
 
 function selectAlert(el, idx) {
-  document.querySelectorAll('.alert-trow').forEach(r => r.classList.remove('active'));
+  document.querySelectorAll('#alert-list .trow').forEach(r => r.classList.remove('active'));
   el.classList.add('active');
   currentAlertIdx = idx;
   renderAlertDetail(idx);
 }
 
+/* Tab + search + dropdown filters all compose through one applier */
+function applyAllAlertFilters() {
+  document.querySelectorAll('#alert-list .trow').forEach(row => {
+    const sev = row.dataset.sev, type = row.dataset.type, stage = row.dataset.stage;
+    let show = true;
+    if (alertTab === 'high' && sev !== 'high') show = false;
+    else if (alertTab === 'chargeback' && type !== 'chargeback') show = false;
+    else if (alertTab === 'resolved' && stage !== 'resolved') show = false;
+    if (show && alertFilters.sev && sev !== alertFilters.sev) show = false;
+    if (show && alertFilters.type && type !== alertFilters.type.toLowerCase()) show = false;
+    if (show && alertSearch && !row.textContent.toLowerCase().includes(alertSearch)) show = false;
+    row.style.display = show ? '' : 'none';
+  });
+  updateAlertCount();
+}
+
 function alertTabFilter(el, type) {
   el.closest('.tlist-tabs').querySelectorAll('.ttab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  // Filter static rows by data attributes rather than re-rendering from JS data
-  document.querySelectorAll('#alert-list .alert-trow').forEach(row => {
-    if (type === 'all') { row.style.display = ''; return; }
-    if (type === 'high')        { row.style.display = row.dataset.sev === 'high' ? '' : 'none'; return; }
-    if (type === 'chargeback')  { row.style.display = row.dataset.type === 'chargeback' ? '' : 'none'; return; }
-    if (type === 'resolved')    { row.style.display = row.dataset.stage === 'resolved' ? '' : 'none'; return; }
-    row.style.display = '';
-  });
-  updateAlertCount();
+  alertTab = type;
+  applyAllAlertFilters();
 }
 
 function alertSearchFilter(q) {
-  const lq = q.toLowerCase();
-  document.querySelectorAll('.alert-trow').forEach(row => {
-    const title = row.querySelector('.alert-trow-title').textContent.toLowerCase();
-    const sub   = row.querySelector('.alert-trow-sub').textContent.toLowerCase();
-    row.style.display = (title.includes(lq) || sub.includes(lq)) ? '' : 'none';
-  });
-  updateAlertCount();
+  alertSearch = (q || '').toLowerCase();
+  applyAllAlertFilters();
 }
 
-/* List count + sort (mirrors the Tickets list controls) */
 function updateAlertCount() {
-  const rows = [...document.querySelectorAll('#alert-list .alert-trow')].filter(r => r.style.display !== 'none');
+  const n = [...document.querySelectorAll('#alert-list .trow')].filter(r => r.style.display !== 'none').length;
   const el = document.getElementById('alert-list-count');
-  if (el) el.textContent = rows.length + ' alert' + (rows.length !== 1 ? 's' : '');
+  if (el) el.textContent = n + ' alert' + (n !== 1 ? 's' : '');
 }
+
+/* Filter-bar dropdowns (Severity / Type) — same component as Tickets */
+function applyAlertDD(key, val, el) {
+  alertFilters[key] = val;
+  el.closest('.tkt-dropdown').querySelectorAll('.tkt-dd-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  const def = key === 'sev' ? 'Severity' : 'Type';
+  const btn = document.getElementById('afb-' + key);
+  const lbl = document.getElementById('afb-' + key + '-label');
+  const x   = document.getElementById('afb-' + key + '-x');
+  if (val) { lbl.textContent = (key === 'sev' ? _ALERT_SEV_LABEL[val] : val); btn.classList.add('has-value'); x.style.display = 'inline'; }
+  else { lbl.textContent = def; btn.classList.remove('has-value'); x.style.display = 'none'; }
+  document.getElementById('dd-alert-' + key).classList.remove('open');
+  document.getElementById('alert-clear-all').style.display = (alertFilters.sev || alertFilters.type) ? 'inline-block' : 'none';
+  applyAllAlertFilters();
+}
+function clearAlertDD(e, key) {
+  if (e) e.stopPropagation();
+  alertFilters[key] = '';
+  const dd = document.getElementById('dd-alert-' + key);
+  dd.querySelectorAll('.tkt-dd-opt').forEach(o => o.classList.remove('active'));
+  dd.querySelector('[data-val=""]').classList.add('active');
+  document.getElementById('afb-' + key + '-label').textContent = key === 'sev' ? 'Severity' : 'Type';
+  document.getElementById('afb-' + key).classList.remove('has-value');
+  document.getElementById('afb-' + key + '-x').style.display = 'none';
+  document.getElementById('alert-clear-all').style.display = (alertFilters.sev || alertFilters.type) ? 'inline-block' : 'none';
+  applyAllAlertFilters();
+}
+function clearAllAlertDD() {
+  ['sev', 'type'].forEach(k => {
+    alertFilters[k] = '';
+    document.getElementById('afb-' + k + '-label').textContent = k === 'sev' ? 'Severity' : 'Type';
+    document.getElementById('afb-' + k).classList.remove('has-value');
+    document.getElementById('afb-' + k + '-x').style.display = 'none';
+    const dd = document.getElementById('dd-alert-' + k);
+    dd.querySelectorAll('.tkt-dd-opt').forEach(o => o.classList.remove('active'));
+    dd.querySelector('[data-val=""]').classList.add('active');
+  });
+  document.getElementById('alert-clear-all').style.display = 'none';
+  applyAllAlertFilters();
+}
+
+/* Sort control */
 function toggleAlertSortMenu(e) {
   if (e) e.stopPropagation();
   const m = document.getElementById('alert-sort-menu');
   if (m) m.classList.toggle('open');
 }
-const _ALERT_SEV_RANK = { high: 0, medium: 1, low: 2 };
 function applyAlertSort(mode, el) {
+  alertSortMode = mode;
   document.querySelectorAll('#alert-sort-menu .sort-opt').forEach(o => o.classList.remove('active'));
   if (el) el.classList.add('active');
   const lbl = document.getElementById('alert-sort-label');
   if (lbl) lbl.innerHTML = '<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M4 8h8M6 12h4"/></svg> ' + (mode === 'severity' ? 'Severity' : 'Most recent') + ' ↕';
-  const list = document.getElementById('alert-list');
-  if (list) {
-    const rows = [...list.querySelectorAll('.alert-trow')];
-    rows.sort((a, b) => mode === 'severity'
-      ? (_ALERT_SEV_RANK[a.dataset.sev] - _ALERT_SEV_RANK[b.dataset.sev]) || (+a.dataset.idx - +b.dataset.idx)
-      : (+a.dataset.idx - +b.dataset.idx));
-    rows.forEach(r => list.appendChild(r));
-  }
   const menu = document.getElementById('alert-sort-menu');
   if (menu) menu.classList.remove('open');
+  renderAlertList();
 }
 
 function renderAlertDetail(idx) {
@@ -31849,22 +31876,18 @@ document.addEventListener('keydown', function(e) {
 function openAlertByMerchant(merchantName) {
   showView('alerts', document.getElementById('nav-alerts'));
   setTimeout(function() {
-    var rows = document.querySelectorAll('#alert-list .alert-trow');
+    var rows = document.querySelectorAll('#alert-list .trow');
     var matched = false;
     rows.forEach(function(row) {
       if (matched) return;
-      var title = row.querySelector('.alert-trow-title');
-      var sub   = row.querySelector('.alert-trow-sub');
-      var inTitle = title && title.textContent.includes(merchantName);
-      var inSub   = sub   && sub.textContent.includes(merchantName);
-      if (inTitle || inSub) {
+      if (row.textContent.includes(merchantName)) {
         row.click();
         row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         matched = true;
       }
     });
     if (!matched && rows.length) rows[0].click();
-  }, 80);
+  }, 120);
 }
 
 /* Auto-open first alert when Alerts view becomes visible */
@@ -34601,10 +34624,17 @@ function assignToast(msg) {
 #view-alerts .tdetail-header {
   border-left: 3px solid rgba(245,158,11,0.55);
 }
-/* Amber active-row accent (vs Tickets' navy) keeps the section distinct */
-#view-alerts .alert-trow.active { background: rgba(245,158,11,0.06) !important; border-left: 3px solid #F59E0B !important; padding-left: 11px !important; }
+/* Alerts reuse the Tickets .trow component — recolored amber so the section reads distinct */
+#view-alerts .trow.alert-row.active { background: rgba(245,158,11,0.08); }
+#view-alerts .trow-id { color: #B45309; }
 #view-alerts .ttab.active { border-bottom-color: #F59E0B; }
 #view-alerts .ttab.active .ttab-count { background: rgba(245,158,11,0.14); color: #B45309; }
+/* Amber filter-bar active state (vs Tickets' yellow) */
+#view-alerts .tkt-filter-btn.has-value { background: rgba(245,158,11,0.12); color: #B45309; border-color: rgba(245,158,11,0.5); }
+#view-alerts .tkt-dd-opt.active { color: #B45309; }
+/* Alert type badge + AI source chip on the row */
+.alert-type-badge { background: rgba(245,158,11,0.1); color: #B45309; }
+.alert-ai-chip { display:inline-flex; align-items:center; gap:2px; font-size:9px; font-weight:700; color:#B45309; background:rgba(245,158,11,0.12); padding:1px 5px; border-radius:4px; }
 /* AI Analyst chat tab */
 .rtab.ai-tab { color: #D97706; }
 .rtab.ai-tab.active { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); color: #D97706; }
