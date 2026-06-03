@@ -7296,6 +7296,7 @@ function nudgeWithDocs() {
                   <button class="ma-mtab active" onclick="maChartMetric('volume',this)">Volume</button>
                   <button class="ma-mtab" onclick="maChartMetric('transactions',this)">Transactions</button>
                   <button class="ma-mtab" onclick="maChartMetric('authrate',this)">Auth Rate</button>
+                  <button class="ma-mtab" onclick="maChartMetric('cbrate',this)">CB Rate</button>
                   <button class="ma-mtab" onclick="maChartMetric('avgticket',this)">Avg Ticket</button>
                 </div>
                 <div style="width:1px;height:18px;background:var(--border);"></div>
@@ -17863,7 +17864,8 @@ const MA_SERIES = {
   volume:       { type:'bar',  color:'#5B7A5E', data:[11200,9800,12400,10100,13200,0,0,9210,12840,4821], fmt:v=>'$'+(v/1000).toFixed(1)+'K', desc:'Daily volume · last 10 days' },
   transactions: { type:'bar',  color:'#6B839B', data:[42,38,47,40,51,0,0,36,44,18],                       fmt:v=>Math.round(v)+' txns',               desc:'Daily transaction count · last 10 days' },
   authrate:     { type:'line', color:'#A67C5B', data:[99.1,98.9,99.3,99.0,98.7,null,null,98.4,98.1,97.9],  fmt:v=>(Math.round(v*10)/10).toFixed(1)+'%', desc:'Daily authorization rate · last 10 days' },
-  avgticket:    { type:'line', color:'#222E48', data:[267,258,264,252,259,null,null,256,289,268],          fmt:v=>'$'+Math.round(v),                   desc:'Average ticket size · last 10 days' }
+  avgticket:    { type:'line', color:'#222E48', data:[267,258,264,252,259,null,null,256,289,268],          fmt:v=>'$'+Math.round(v),                   desc:'Average ticket size · last 10 days' },
+  cbrate:       { type:'line', color:'#9B6B5B', data:[0.05,0.04,0.06,0.03,0.04,null,null,0.05,0.04,0.03],  fmt:v=>(Math.round(v*100)/100).toFixed(2)+'%', desc:'Daily chargeback rate · last 10 days' }
 };
 function initMaChart() {
   const ctx = document.getElementById('maVolumeChart');
