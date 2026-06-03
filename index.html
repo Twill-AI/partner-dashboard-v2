@@ -1967,174 +1967,249 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 </style>
 
 <style>
-/* ═══ COMMAND CENTER V3 — REDESIGN ═══════════════════════════════ */
+/* ═══ COMMAND CENTER V3 — FOCUS REDESIGN ═══════════════════════════ */
 
-/* Fix width — align-items:flex-start was collapsing the queue */
-.cc-main { align-items: stretch !important; flex-direction: column !important; gap: 12px !important; }
-.cc-team-wrap { display: none !important; }
-
-/* Stat bar — flat numbers, no colored chips */
-.cc-stat-bar { gap: 0; flex-wrap: nowrap; }
-.cc-stat {
-  background: transparent !important; border: none !important;
-  border-right: 1px solid var(--border) !important;
-  border-radius: 0 !important;
-  padding: 0 16px !important;
-  font-size: 12px !important; font-weight: 500 !important;
-  color: var(--text-secondary) !important; gap: 5px !important;
+.cc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 22px 26px 40px;
+  overflow-y: auto;
+  max-width: 1280px;
 }
-.cc-stat:first-child { padding-left: 0 !important; }
-.cc-stat:last-child { border-right: none !important; }
-.cc-stat-ct { font-size: 15px !important; font-weight: 800 !important; font-family: var(--font-mono) !important; }
-.cc-stat.now .cc-stat-ct { color: var(--red) !important; }
-.cc-stat.today .cc-stat-ct { color: var(--amber) !important; }
-.cc-stat.sla .cc-stat-ct { color: var(--red) !important; }
-.cc-stat.tasks .cc-stat-ct { color: var(--blue) !important; }
-.cc-stat.msgs .cc-stat-ct { color: var(--green) !important; }
-.cc-stat:hover { background: var(--bg-hover) !important; border-radius: 5px !important; }
-.cc-live-dot { margin-left: 6px; }
 
-/* Pipeline — compact inline strip */
-.cc-pipeline { background: transparent; border: none; border-radius: 0; overflow: visible; }
-.cc-pip-track {
-  display: flex; align-items: center; min-height: auto;
+/* ── Briefing line ── */
+.cc-brief {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.cc-brief b { color: var(--text-primary); font-weight: 700; }
+.cc-brief .b-red { color: var(--red); }
+.cc-brief .b-amber { color: var(--amber); }
+.cc-brief .b-green { color: var(--green); }
+
+/* ── Section scaffolding ── */
+.cc-section { display: flex; flex-direction: column; gap: 11px; }
+.cc-sec-hdr { display: flex; align-items: center; gap: 10px; }
+.cc-sec-ttl {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.cc-sec-ttl.urgent { color: var(--red); }
+.cc-sec-count {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+}
+.cc-sec-link {
+  margin-left: auto; font-size: 11px; font-weight: 600;
+  color: var(--text-secondary); background: none; border: none;
+  cursor: pointer; font-family: var(--font-ui); padding: 2px 4px;
+}
+.cc-sec-link:hover { color: var(--text-primary); }
+
+/* ── NEEDS YOU NOW — hero cards ── */
+.cc-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 13px;
+}
+.cc-hero {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow .15s, border-color .15s;
+}
+.cc-hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--red);
+}
+.cc-hero:hover { box-shadow: 0 6px 20px rgba(0,0,0,.06); border-color: var(--border-strong); }
+.cc-hero-pad { padding: 15px 16px 14px; display: flex; flex-direction: column; height: 100%; }
+.cc-hero-why {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 11px;
+}
+.cc-hero-name {
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  cursor: pointer; line-height: 1.2;
+}
+.cc-hero-name:hover { color: var(--yellow); }
+.cc-hero-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.cc-hero-problem {
+  font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;
+  margin-top: 11px; flex: 1;
+}
+.cc-hero-foot { display: flex; align-items: center; gap: 7px; margin-top: 14px; }
+.cc-hero-btn {
+  flex: 1; font-size: 12px; font-weight: 700; padding: 8px 12px;
+  border-radius: 7px; cursor: pointer; font-family: var(--font-ui);
+  border: none; background: var(--navy); color: #fff;
+  white-space: nowrap; transition: all .12s; text-align: center;
+}
+.cc-hero-btn:hover { background: var(--yellow); color: #09091A; }
+.cc-hero-icon {
+  width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; border: 1px solid var(--border);
+  background: var(--bg-base); color: var(--text-muted); transition: all .12s;
+}
+.cc-hero-icon:hover { background: rgba(34,197,94,.1); color: var(--green); border-color: rgba(34,197,94,.3); }
+
+/* All-clear hero */
+.cc-hero-clear {
+  grid-column: 1 / -1;
   background: var(--bg-surface); border: 1px solid var(--border);
-  border-radius: 8px; overflow: hidden; border-radius: 8px; flex-wrap: nowrap;
+  border-radius: 12px; padding: 28px; text-align: center;
+}
+.cc-hero-clear-ic { font-size: 28px; margin-bottom: 8px; }
+.cc-hero-clear-tx { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+
+/* ── PIPELINE strip ── */
+.cc-pipeline { background: transparent; border: none; overflow: visible; }
+.cc-pip-track {
+  display: flex; align-items: stretch;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
 }
 .cc-pip-stage {
-  flex: 1; min-width: 72px; flex-direction: row; justify-content: center;
-  padding: 7px 6px; gap: 6px; border-right: 1px solid var(--border);
-  align-items: center;
+  flex: 1; min-width: 72px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  padding: 11px 8px; border-right: 1px solid var(--border);
+  cursor: pointer; transition: background .12s; position: relative;
 }
 .cc-pip-stage:last-child { border-right: none; }
-.cc-pip-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing:.05em; margin-bottom:0; white-space:nowrap; }
-.cc-pip-ct { font-size: 14px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); }
-.cc-pip-attn { position:static; font-size:9px; font-weight:700; color:var(--red); background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); border-radius:3px; padding:1px 4px; }
-.cc-pip-arrow { display: none; }
-.cc-pip-acc { margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-
-/* Queue — single-row items, full-width */
-.cc-queue-wrap { width: 100%; min-width: 0; border-radius: 10px; }
-.cc-queue-bar {
-  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
-  border-bottom: 1px solid var(--border); background: var(--bg-elevated); flex-wrap: nowrap;
+.cc-pip-stage:hover { background: var(--bg-hover); }
+.cc-pip-stage.pip-active { background: rgba(255,222,0,.05); box-shadow: inset 0 -2px 0 var(--yellow); }
+.cc-pip-stage.has-attn::after {
+  content: ''; position: absolute; top: 9px; right: 10px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--red);
 }
-.cc-queue-ttl { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
-.cc-asgn-sel { font-size: 11px; padding: 3px 8px; white-space: nowrap; flex-shrink: 0; }
-.cc-ptabs { gap: 1px; flex-shrink: 0; }
-.cc-ptab { font-size: 10px; padding: 3px 8px; }
-.cc-cat-pills { display: none; } /* removed from separate row */
-.cc-cat-bar { display: flex; gap: 3px; flex: 1; overflow-x: auto; scrollbar-width: none; }
-.cc-cat-bar::-webkit-scrollbar { display: none; }
-.cc-cpill-sm { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); color: var(--text-muted); background: transparent; transition: all .1s; white-space: nowrap; flex-shrink: 0; }
-.cc-cpill-sm:hover { border-color: var(--border-strong); color: var(--text-secondary); }
-.cc-cpill-sm.on { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-strong); }
-
-/* Tier headers — minimal */
-.cc-tier-hdr {
-  display: flex; align-items: center; gap: 7px;
-  padding: 9px 16px 5px; background: var(--bg-surface);
-  border-top: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 2;
+.cc-pip-lbl {
+  font-size: 9.5px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
 }
-.cc-tier-hdr:first-child { border-top: none; }
-.cc-tier-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.cc-tier-lbl { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.cc-tier-ct { font-size: 10px; color: var(--text-muted); }
+.cc-pip-ct { font-size: 19px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); line-height: 1; }
+.cc-pip-attn-txt { font-size: 9px; font-weight: 700; color: var(--red); }
+.cc-pip-acc { margin-top: 6px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; }
+.cc-pip-acc.open { display: block; }
+.cc-pip-acc-hdr { display: flex; align-items: center; padding: 9px 14px; background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
+.cc-pip-acc-ttl { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }
+.cc-pip-acc-cls { margin-left: auto; font-size: 11px; color: var(--text-muted); cursor: pointer; padding: 2px 8px; border-radius: 4px; }
+.cc-pip-acc-cls:hover { background: var(--bg-hover); }
+.cc-pip-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,.04); cursor: pointer; }
+.cc-pip-row:last-child { border-bottom: none; }
+.cc-pip-row:hover { background: var(--bg-hover); }
+.cc-pip-row-av { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-elevated); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
+.cc-pip-row-name { font-size: 12px; font-weight: 600; color: var(--text-primary); flex: 1; }
+.cc-pip-row-partner { font-size: 11px; color: var(--text-muted); }
+.cc-pip-row-age { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); width: 36px; text-align: right; }
+.cc-pip-flag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.cc-pip-flag.attn { background: rgba(239,68,68,.09); color: var(--red); }
+.cc-pip-flag.ok { background: var(--bg-elevated); color: var(--text-muted); }
 
-/* ── SINGLE-ROW ITEMS ─────────────────────────────────── */
-.cc-item {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  padding: 0 14px 0 0 !important;
-  min-height: 40px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  border-left: 3px solid transparent !important;
-  border-top: 1px solid rgba(0,0,0,.05) !important;
-  gap: 0 !important;
-  cursor: default;
-  transition: background .08s;
-  position: relative;
+/* ── WORK — tabbed list ── */
+.cc-work-wrap { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.cc-worktabs { display: flex; align-items: center; border-bottom: 1px solid var(--border); padding: 0 8px; background: var(--bg-elevated); }
+.cc-wtab {
+  padding: 11px 13px; font-size: 12px; font-weight: 600; color: var(--text-muted);
+  cursor: pointer; border-bottom: 2px solid transparent; display: flex;
+  align-items: center; gap: 7px; transition: color .12s; white-space: nowrap;
 }
-.cc-item:hover { background: var(--bg-hover) !important; }
-.cc-item.pri-now  { border-left-color: var(--red) !important; }
-.cc-item.pri-today { border-left-color: var(--amber) !important; }
-.cc-item.pri-week  { border-left-color: rgba(99,102,241,.5) !important; opacity: .88; }
-.cc-item.cc-gone   { opacity: 0 !important; transform: translateX(20px); transition: all .2s !important; }
+.cc-wtab:hover { color: var(--text-secondary); }
+.cc-wtab.on { color: var(--text-primary); border-bottom-color: var(--yellow); }
+.cc-wtab-ct { font-size: 10px; font-weight: 700; font-family: var(--font-mono); background: var(--bg-base); border: 1px solid var(--border); color: var(--text-secondary); padding: 0px 6px; border-radius: 9px; min-width: 16px; text-align: center; }
+.cc-wtab.on .cc-wtab-ct { background: var(--navy); border-color: var(--navy); color: #fff; }
+.cc-work-asgn { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--text-secondary); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 6px; padding: 3px 9px; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.cc-work-asgn:hover { background: var(--bg-hover); }
 
-/* Hide old child elements */
-.cc-ileft, .cc-ibody, .cc-iactions { display: none !important; }
-
-/* New single-row inner structure */
-.cc-irow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 0 0 0 12px;
-  min-width: 0;
+.cc-wrow {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,.04);
+  cursor: pointer; transition: background .08s; position: relative;
+  border-left: 2px solid transparent;
 }
-.cc-iname {
-  font-size: 12px; font-weight: 700; color: var(--text-primary);
-  cursor: pointer; white-space: nowrap; flex-shrink: 0;
-}
-.cc-iname:hover { color: var(--yellow); text-decoration: underline; }
-.cc-isch { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
-.cc-isla-r { font-size: 9px; font-weight: 700; color: var(--red); background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); border-radius: 3px; padding: 1px 5px; flex-shrink: 0; }
-.cc-isep { color: var(--border-strong); font-size: 11px; flex-shrink: 0; }
-.cc-idesc { font-size: 12px; color: var(--text-secondary); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cc-iav-sm { width: 17px; height: 17px; border-radius: 50%; font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.cc-iage-r { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
-
-/* Action button — always visible */
-.cc-iact-r {
-  font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 5px;
-  cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--border-strong);
-  background: var(--bg-elevated); color: var(--text-primary); white-space: nowrap;
-  transition: all .12s; flex-shrink: 0; margin-left: 8px;
-}
-.cc-iact-r:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
-
-/* Snooze + done — only visible on hover */
-.cc-hover-acts { display: none; align-items: center; gap: 1px; flex-shrink: 0; }
-.cc-item:hover .cc-hover-acts { display: flex; }
-.cc-isnz { font-size: 13px; padding: 3px 6px; border-radius: 4px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: all .1s; }
-.cc-isnz:hover { background: var(--bg-elevated); }
-.cc-idone { font-size: 13px; padding: 3px 6px; border-radius: 4px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: all .1s; }
-.cc-idone:hover { background: rgba(34,197,94,.1); color: var(--green); }
+.cc-wrow:last-child { border-bottom: none; }
+.cc-wrow:hover { background: var(--bg-hover); }
+.cc-wrow.pri-now { border-left-color: var(--red); }
+.cc-wrow.pri-today { border-left-color: var(--amber); }
+.cc-wrow.cc-gone { opacity: 0; transform: translateX(20px); transition: all .2s; }
+.cc-wrow-cat { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; opacity: .7; }
+.cc-wrow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cc-wrow-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cc-wrow-name { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; flex-shrink: 0; }
+.cc-wrow-name:hover { color: var(--yellow); }
+.cc-wrow-sch { font-size: 9.5px; font-weight: 600; padding: 1px 6px; border-radius: 3px; flex-shrink: 0; }
+.cc-wrow-sla { font-size: 9px; font-weight: 700; color: var(--red); background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); border-radius: 3px; padding: 1px 5px; flex-shrink: 0; }
+.cc-wrow-desc { font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-wrow-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.cc-wrow-av { width: 20px; height: 20px; border-radius: 50%; font-size: 8px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cc-wrow-age { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); width: 34px; text-align: right; }
+.cc-wrow-act { font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 6px; cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--border-strong); background: var(--bg-elevated); color: var(--text-primary); white-space: nowrap; transition: all .12s; }
+.cc-wrow-act:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
+.cc-wrow-hover { display: none; align-items: center; gap: 1px; flex-shrink: 0; }
+.cc-wrow:hover .cc-wrow-hover { display: flex; }
+.cc-whbtn { font-size: 13px; padding: 4px 6px; border-radius: 5px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: all .1s; }
+.cc-whbtn:hover { background: var(--bg-elevated); }
+.cc-whbtn.done:hover { background: rgba(34,197,94,.1); color: var(--green); }
+.cc-work-empty { padding: 36px; text-align: center; color: var(--text-muted); font-size: 13px; }
+.cc-work-empty-ic { font-size: 24px; margin-bottom: 6px; }
 
 /* Snooze menu */
 .cc-isnooze { position: relative; }
-.cc-snooze-menu { position: absolute; right: 0; top: calc(100% + 2px); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 7px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 200; overflow: hidden; min-width: 148px; display: none; }
+.cc-snooze-menu { position: absolute; right: 0; top: calc(100% + 2px); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 7px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 200; overflow: hidden; min-width: 150px; display: none; }
 .cc-snooze-menu.open { display: block; }
 .cc-snooze-opt { padding: 8px 14px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
 .cc-snooze-opt:hover { background: var(--bg-hover); color: var(--text-primary); }
 
 /* Done bar */
-.cc-done-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-top: 1px solid rgba(34,197,94,.1); background: rgba(34,197,94,.02); }
+.cc-done-bar { display: flex; align-items: center; gap: 8px; padding: 9px 16px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-top: 1px solid rgba(34,197,94,.1); background: rgba(34,197,94,.02); }
 .cc-done-bar:hover { background: rgba(34,197,94,.04); }
-.cc-done-section { display: none; }
-.cc-done-section.open .cc-item { opacity: .38 !important; }
 
-/* Bottom row — team + portfolio side by side */
-.cc-bottom-row { display: flex; gap: 14px; align-items: flex-start; }
-.cc-bottom-row .cc-team-wrap { display: flex !important; flex-direction: column; width: 210px; flex-shrink: 0; }
-.cc-bottom-row .cc-port-wrap { flex: 1; min-width: 0; }
+/* ── PORTFOLIO + TEAM bottom row ── */
+.cc-bottom-row { display: flex; gap: 16px; align-items: flex-start; }
+.cc-port-wrap { flex: 1; min-width: 0; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.cc-team-wrap { width: 220px; flex-shrink: 0; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.cc-port-hdr { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg-elevated); flex-wrap: wrap; }
+.cc-port-ttl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); }
+.cc-port-tabs { display: flex; gap: 1px; margin-left: auto; }
+.cc-port-tab { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 5px; cursor: pointer; color: var(--text-muted); }
+.cc-port-tab:hover { color: var(--text-primary); }
+.cc-port-tab.on { background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-primary); }
+.cc-port-item { display: flex; align-items: center; gap: 11px; padding: 11px 14px; border-bottom: 1px solid rgba(0,0,0,.04); }
+.cc-port-item:last-child { border-bottom: none; }
+.cc-port-item:hover { background: var(--bg-hover); }
+.cc-port-sev { width: 3px; align-self: stretch; border-radius: 2px; flex-shrink: 0; }
+.cc-port-sev.high { background: var(--red); }
+.cc-port-sev.med { background: var(--amber); }
+.cc-port-sev.low { background: var(--blue); }
+.cc-port-body { flex: 1; min-width: 0; }
+.cc-port-name { font-size: 12px; font-weight: 700; color: var(--text-primary); cursor: pointer; }
+.cc-port-name:hover { color: var(--yellow); }
+.cc-port-text { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+.cc-port-detail { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
+.cc-port-act { font-size: 10px; font-weight: 600; padding: 4px 9px; border-radius: 5px; cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--border-strong); background: var(--bg-elevated); color: var(--text-primary); white-space: nowrap; flex-shrink: 0; }
+.cc-port-act:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
 
-/* Compact team + portfolio */
-.cc-team-hdr { padding: 8px 14px; font-size: 10px; background: var(--bg-elevated); }
-.cc-team-row { padding: 7px 14px; }
-.cc-team-name { font-size: 11px; }
-.cc-port-hdr { padding: 8px 14px; gap: 8px; flex-wrap: wrap; }
-.cc-port-ttl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-.cc-port-tabs { gap: 1px; }
-.cc-port-tab { font-size: 10px; padding: 2px 7px; }
-.cc-port-item { padding: 9px 14px; gap: 10px; }
-.cc-port-text { font-size: 11px; margin-top: 1px; }
-.cc-port-detail { font-size: 10px; }
-.cc-port-acts .cc-iact { font-size: 10px; padding: 3px 8px; }
+.cc-team-hdr { padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-secondary); background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
+.cc-team-row { display: flex; align-items: center; gap: 9px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,.04); cursor: pointer; }
+.cc-team-row:hover { background: var(--bg-hover); }
+.cc-team-av { width: 26px; height: 26px; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cc-team-name { font-size: 11.5px; font-weight: 600; color: var(--text-primary); flex: 1; }
+.cc-team-chips { display: flex; gap: 3px; }
+.cc-tchip { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }
+.cc-tchip.apps { background: rgba(99,102,241,.1); color: var(--blue); }
+.cc-tchip.alrt { background: rgba(239,68,68,.1); color: var(--red); }
+.cc-tchip.msgs { background: rgba(34,197,94,.08); color: var(--green); }
+
+@keyframes ccpulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.cc-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: ccpulse 2s infinite; }
 </style>
 </head>
 <body>
@@ -2231,8 +2306,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="topbar">
         <div class="topbar-left">
           <div>
-            <div class="page-title">Command Center</div>
-            <div class="page-sub">Good morning, M. Wright &mdash; <span id="ccDate"></span></div>
+            <div class="page-title" id="ccGreeting">Good morning, Mike</div>
+            <div class="page-sub"><span id="ccDate">Tuesday, June 3</span> &middot; <span style="display:inline-flex;align-items:center;gap:5px;"><span class="cc-live-dot"></span>Live</span></div>
           </div>
         </div>
         <div class="topbar-right">
@@ -2243,110 +2318,94 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
       <div class="cc-content">
 
-        <!-- STAT BAR -->
-        <div class="cc-stat-bar">
-          <div class="cc-stat now" onclick="setCCPri('now')">
-            <span class="cc-stat-ct" id="ccCtNow">3</span>
-            <span>&#x26A0; Need attention now</span>
+        <!-- BRIEFING -->
+        <div class="cc-brief" id="ccBrief"></div>
+
+        <!-- NEEDS YOU NOW -->
+        <div class="cc-section">
+          <div class="cc-sec-hdr">
+            <span class="cc-sec-ttl urgent">&#x26A1; Needs you now</span>
+            <span class="cc-sec-count" id="ccNowCount"></span>
           </div>
-          <div class="cc-stat today" onclick="setCCPri('today')">
-            <span class="cc-stat-ct" id="ccCtToday">5</span>
-            <span>Today</span>
-          </div>
-          <div class="cc-stat sla">
-            <span class="cc-stat-ct">2</span>
-            <span>&#x23F1; SLA at risk</span>
-          </div>
-          <div class="cc-stat tasks" onclick="setCCCat('task')">
-            <span class="cc-stat-ct">4</span>
-            <span>Tasks due</span>
-          </div>
-          <div class="cc-stat msgs" onclick="setCCCat('message')">
-            <span class="cc-stat-ct">12</span>
-            <span>Unread</span>
-          </div>
-          <div style="flex:1;"></div>
-          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;"><span class="cc-live-dot"></span> Live</span>
+          <div class="cc-hero-grid" id="ccHeroGrid"></div>
         </div>
 
-        <!-- APPLICATION PIPELINE -->
-        <div class="cc-pipeline">
-          <div class="cc-pip-track" id="ccPipTrack"></div>
-          <div class="cc-pip-acc" id="ccPipAcc"></div>
-        </div>
-
-        <!-- QUEUE (full width) -->
-        <div class="cc-main">
-          <div class="cc-queue-wrap">
-            <div class="cc-queue-bar">
-              <span class="cc-queue-ttl">Your Queue</span>
-              <div class="cc-asgn-sel" onclick="cycleAssignee()">
-                <span id="ccAsgnLbl">All Team</span><span>&#x25BE;</span>
-              </div>
-              <div class="cc-ptabs">
-                <div class="cc-ptab on" data-p="all" onclick="setCCPri('all',this)">All</div>
-                <div class="cc-ptab" data-p="now" onclick="setCCPri('now',this)">Now</div>
-                <div class="cc-ptab" data-p="today" onclick="setCCPri('today',this)">Today</div>
-                <div class="cc-ptab" data-p="week" onclick="setCCPri('week',this)">This Week</div>
-                <div class="cc-ptab" data-p="done" onclick="setCCPri('done',this)">Done</div>
-              </div>
-              <div style="width:1px;height:16px;background:var(--border);flex-shrink:0;"></div>
-              <div class="cc-cat-bar">
-                <div class="cc-cpill-sm on" data-c="all" onclick="setCCCatSm('all',this)">All</div>
-                <div class="cc-cpill-sm" data-c="application" onclick="setCCCatSm('application',this)">Apps</div>
-                <div class="cc-cpill-sm" data-c="portfolio" onclick="setCCCatSm('portfolio',this)">Portfolio</div>
-                <div class="cc-cpill-sm" data-c="message" onclick="setCCCatSm('message',this)">Messages</div>
-                <div class="cc-cpill-sm" data-c="task" onclick="setCCCatSm('task',this)">Tasks</div>
-                <div class="cc-cpill-sm" data-c="ticket" onclick="setCCCatSm('ticket',this)">Tickets</div>
-              </div>
-            </div>
-            <div id="ccQueueList"></div>
+        <!-- PIPELINE -->
+        <div class="cc-section">
+          <div class="cc-sec-hdr">
+            <span class="cc-sec-ttl">Application pipeline</span>
+            <button class="cc-sec-link" onclick="showView('applications',null)">View all &#x2192;</button>
+          </div>
+          <div class="cc-pipeline">
+            <div class="cc-pip-track" id="ccPipTrack"></div>
+            <div class="cc-pip-acc" id="ccPipAcc"></div>
           </div>
         </div>
 
-        <!-- BOTTOM ROW: TEAM + PORTFOLIO -->
-        <div class="cc-bottom-row">
-          <div class="cc-team-wrap">
-            <div class="cc-team-hdr">Team</div>
-            <div class="cc-team-row" onclick="setCCAssignee('M. Wright')">
-              <div class="cc-team-av" style="background:#A09E9A;color:#fff;">MW</div>
-              <div style="flex:1;min-width:0;"><div class="cc-team-name">M. Wright</div><div style="font-size:10px;color:var(--text-muted);">You</div></div>
-              <div class="cc-team-chips"><div class="cc-tchip apps">3 apps</div><div class="cc-tchip alrt">4</div></div>
-            </div>
-            <div class="cc-team-row" onclick="setCCAssignee('S. Patel')">
-              <div class="cc-team-av" style="background:#5B7A5E;color:#fff;">SP</div>
-              <div style="flex:1;min-width:0;"><div class="cc-team-name">S. Patel</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
-              <div class="cc-team-chips"><div class="cc-tchip apps">2 apps</div><div class="cc-tchip alrt">1</div></div>
-            </div>
-            <div class="cc-team-row" onclick="setCCAssignee('J. Rivera')">
-              <div class="cc-team-av" style="background:#6B839B;color:#fff;">JR</div>
-              <div style="flex:1;min-width:0;"><div class="cc-team-name">J. Rivera</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
-              <div class="cc-team-chips"><div class="cc-tchip apps">3 apps</div><div class="cc-tchip msgs">2</div></div>
-            </div>
-            <div class="cc-team-row" onclick="setCCAssignee('D. Martinez')">
-              <div class="cc-team-av" style="background:#9B6B5B;color:#fff;">DM</div>
-              <div style="flex:1;min-width:0;"><div class="cc-team-name">D. Martinez</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
-              <div class="cc-team-chips"><div class="cc-tchip apps">1 app</div></div>
-            </div>
-            <div style="padding:8px 14px;border-top:1px solid var(--border);">
-              <button class="btn btn-ghost" style="width:100%;font-size:10px;" onclick="showView('users',null)">&#x1F465; Manage Team</button>
-            </div>
+        <!-- WORK (tabbed) -->
+        <div class="cc-section">
+          <div class="cc-sec-hdr">
+            <span class="cc-sec-ttl">Your work</span>
           </div>
-
-          <div class="cc-port-wrap">
-            <div class="cc-port-hdr">
-              <span class="cc-port-ttl">Portfolio Alerts</span>
-              <div class="cc-port-tabs" style="margin-left:auto;">
-                <div class="cc-port-tab on" onclick="setCCPortTab('all',this)">All</div>
-                <div class="cc-port-tab" onclick="setCCPortTab('chargeback',this)">CB</div>
-                <div class="cc-port-tab" onclick="setCCPortTab('churn',this)">Churn</div>
-                <div class="cc-port-tab" onclick="setCCPortTab('nobatch',this)">No Batch</div>
-                <div class="cc-port-tab" onclick="setCCPortTab('volume',this)">Volume</div>
-                <div class="cc-port-tab" onclick="setCCPortTab('dormant',this)">Dormant</div>
-              </div>
-              <button class="btn btn-ghost" style="font-size:10px;padding:3px 8px;margin-left:6px;" onclick="showView('portfolio-alerts',null)">All</button>
+          <div class="cc-work-wrap">
+            <div class="cc-worktabs" id="ccWorkTabs">
+              <div class="cc-wtab on" data-t="today" onclick="setCCWorkTab('today',this)">Today <span class="cc-wtab-ct" id="ct-today">0</span></div>
+              <div class="cc-wtab" data-t="week" onclick="setCCWorkTab('week',this)">This Week <span class="cc-wtab-ct" id="ct-week">0</span></div>
+              <div class="cc-wtab" data-t="message" onclick="setCCWorkTab('message',this)">Messages <span class="cc-wtab-ct" id="ct-message">0</span></div>
+              <div class="cc-wtab" data-t="task" onclick="setCCWorkTab('task',this)">Tasks <span class="cc-wtab-ct" id="ct-task">0</span></div>
+              <div class="cc-wtab" data-t="ticket" onclick="setCCWorkTab('ticket',this)">Tickets <span class="cc-wtab-ct" id="ct-ticket">0</span></div>
+              <div class="cc-work-asgn" onclick="cycleAssignee()"><span id="ccAsgnLbl">All Team</span><span>&#x25BE;</span></div>
             </div>
-            <div id="ccPortList"></div>
+            <div id="ccWorkList"></div>
+          </div>
+        </div>
+
+        <!-- PORTFOLIO + TEAM -->
+        <div class="cc-section">
+          <div class="cc-sec-hdr">
+            <span class="cc-sec-ttl">Portfolio &amp; team</span>
+            <span class="cc-sec-count">Active merchants &middot; not in application phase</span>
+          </div>
+          <div class="cc-bottom-row">
+            <div class="cc-port-wrap">
+              <div class="cc-port-hdr">
+                <span class="cc-port-ttl">&#x1F4B3; Portfolio Alerts</span>
+                <div class="cc-port-tabs">
+                  <div class="cc-port-tab on" onclick="setCCPortTab('all',this)">All</div>
+                  <div class="cc-port-tab" onclick="setCCPortTab('chargeback',this)">CB</div>
+                  <div class="cc-port-tab" onclick="setCCPortTab('churn',this)">Churn</div>
+                  <div class="cc-port-tab" onclick="setCCPortTab('nobatch',this)">No Batch</div>
+                  <div class="cc-port-tab" onclick="setCCPortTab('volume',this)">Volume</div>
+                  <div class="cc-port-tab" onclick="setCCPortTab('dormant',this)">Dormant</div>
+                </div>
+                <button class="cc-sec-link" style="margin-left:8px;" onclick="showView('portfolio-alerts',null)">All &#x2192;</button>
+              </div>
+              <div id="ccPortList"></div>
+            </div>
+
+            <div class="cc-team-wrap">
+              <div class="cc-team-hdr">Team Load</div>
+              <div class="cc-team-row" onclick="setCCAssignee('M. Wright')">
+                <div class="cc-team-av" style="background:#A09E9A;color:#fff;">MW</div>
+                <div style="flex:1;min-width:0;"><div class="cc-team-name">M. Wright</div><div style="font-size:10px;color:var(--text-muted);">You</div></div>
+                <div class="cc-team-chips"><div class="cc-tchip apps">3</div><div class="cc-tchip alrt">4</div></div>
+              </div>
+              <div class="cc-team-row" onclick="setCCAssignee('S. Patel')">
+                <div class="cc-team-av" style="background:#5B7A5E;color:#fff;">SP</div>
+                <div style="flex:1;min-width:0;"><div class="cc-team-name">S. Patel</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
+                <div class="cc-team-chips"><div class="cc-tchip apps">2</div><div class="cc-tchip alrt">1</div></div>
+              </div>
+              <div class="cc-team-row" onclick="setCCAssignee('J. Rivera')">
+                <div class="cc-team-av" style="background:#6B839B;color:#fff;">JR</div>
+                <div style="flex:1;min-width:0;"><div class="cc-team-name">J. Rivera</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
+                <div class="cc-team-chips"><div class="cc-tchip apps">3</div><div class="cc-tchip msgs">2</div></div>
+              </div>
+              <div class="cc-team-row" onclick="setCCAssignee('D. Martinez')">
+                <div class="cc-team-av" style="background:#9B6B5B;color:#fff;">DM</div>
+                <div style="flex:1;min-width:0;"><div class="cc-team-name">D. Martinez</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
+                <div class="cc-team-chips"><div class="cc-tchip apps">1</div></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -13287,7 +13346,7 @@ function navigateToMerchant(name, status) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('ccQueueList')) initCC();
+  if (document.getElementById('ccWorkList')) initCC();
 
   renderMerchantTabs();
   renderMerchantTable();
@@ -34597,22 +34656,79 @@ const ccPort = [
   {id:'pa-005',type:'volume',sev:'low',merchant:'Green Valley Market',partner:'NovaPay',icon:'📉',title:'Volume down 42% WoW',detail:'May be linked to reported terminal credential issue.',act:'View Alert →',fn:"openAlertByMerchant('Green Valley Market')",done:false},
 ];
 
-let ccPriFilter='all', ccCatFilter='all', ccAsgn='all', ccPortFilter='all', ccActivePip=null;
+let ccWorkTab='today', ccAsgn='all', ccPortFilter='all', ccActivePip=null;
 
+const CC_ST_FULL = {lead:'New Lead',inreview:'In Review',underwriting:'Underwriting',signature:'Out for Signature',approved:'Approved',boarding:'Boarding',active:'Active Merchant'};
+
+const CC_HERO = {
+  'wq-001': {why:'&#x23F1; SLA breach in 4h', sub:'Underwriting &middot; Summit Lending'},
+  'wq-002': {why:'&#x23F1; Expires tonight', sub:'Out for Signature &middot; Rivermark'},
+  'wq-003': {why:'&#x26A0; Threshold breached', sub:'Active Merchant &middot; Coastal Commerce'},
+};
+
+function ccActiveNow()   { return ccQ.filter(i => i.pri==='now'   && !i.done && !i.snoozed); }
+function ccActiveToday() { return ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed); }
+
+/* ── Briefing ── */
+function renderCCBrief() {
+  const el = document.getElementById('ccBrief');
+  if (!el) return;
+  const nowN = ccActiveNow().length;
+  const todayN = ccActiveToday().length;
+  const slaN = ccQ.filter(i => i.sla && !i.done && !i.snoozed).length;
+  const pipAttn = ccPipStages.reduce((s,st) => s + st.attn, 0);
+  let txt;
+  if (nowN === 0) {
+    txt = 'You\'re caught up on urgent items. <b class="b-amber">' + todayN + '</b> queued for today, and your pipeline has <b>' + pipAttn + '</b> applications flagged.';
+  } else {
+    txt = 'You have <b class="b-red">' + nowN + ' item' + (nowN!==1?'s':'') + '</b> that need you now' +
+      (slaN ? ' &mdash; <b>' + slaN + '</b> ' + (slaN!==1?'are':'is') + ' SLA-critical' : '') +
+      '. <b class="b-amber">' + todayN + ' more</b> queued for today. Pipeline has <b>' + pipAttn + '</b> application' + (pipAttn!==1?'s':'') + ' flagged for attention.';
+  }
+  el.innerHTML = txt;
+}
+
+/* ── Needs you now: hero cards ── */
+function renderCCHero() {
+  const grid = document.getElementById('ccHeroGrid');
+  if (!grid) return;
+  const now = ccActiveNow();
+  const cnt = document.getElementById('ccNowCount');
+  if (cnt) cnt.textContent = now.length ? (now.length + ' item' + (now.length!==1?'s':'')) : '';
+  if (!now.length) {
+    grid.innerHTML = '<div class="cc-hero-clear"><div class="cc-hero-clear-ic">&#x2705;</div><div class="cc-hero-clear-tx">Nothing urgent right now &mdash; you\'re all caught up.</div></div>';
+    return;
+  }
+  grid.innerHTML = now.map(ccHeroHTML).join('');
+}
+
+function ccHeroHTML(item) {
+  const meta = CC_HERO[item.id] || {why:(item.sla?'&#x23F1; SLA at risk':'&#x26A0; Needs attention'), sub:(CC_ST_FULL[item.mst]||'')};
+  return '<div class="cc-hero" data-ccid="' + item.id + '"><div class="cc-hero-pad">' +
+      '<div class="cc-hero-why">' + meta.why + '</div>' +
+      '<div class="cc-hero-name" onclick="' + item.fn + '">' + (item.merchant || 'Task') + '</div>' +
+      '<div class="cc-hero-sub">' + meta.sub + '</div>' +
+      '<div class="cc-hero-problem">' + item.detail + '</div>' +
+      '<div class="cc-hero-foot">' +
+        '<button class="cc-hero-btn" onclick="' + item.fn + '">' + item.act + '</button>' +
+        '<div class="cc-isnooze"><div class="cc-hero-icon" onclick="event.stopPropagation();toggleSnooze(this)" title="Snooze">&#x1F4A4;</div>' + ccSnoozeMenu(item.id) + '</div>' +
+        '<div class="cc-hero-icon" onclick="event.stopPropagation();doneCC(\'' + item.id + '\')" title="Mark done">&#x2713;</div>' +
+      '</div>' +
+    '</div></div>';
+}
+
+/* ── Pipeline ── */
 function renderCCPipeline() {
   const track = document.getElementById('ccPipTrack');
   if (!track) return;
-  let h = '';
-  ccPipStages.forEach((s,i) => {
+  track.innerHTML = ccPipStages.map(s => {
     const on = ccActivePip === s.key;
-    h += '<div class="cc-pip-stage'+(on?' pip-active':'')+'" onclick="togglePip(\''+s.key+'\')">' +
-      '<div class="cc-pip-lbl">'+s.label+'</div>' +
-      '<div class="cc-pip-ct">'+s.count+'</div>' +
-      (s.attn > 0 ? '<div class="cc-pip-attn">&#x26A0; '+s.attn+'</div>' : '') +
+    return '<div class="cc-pip-stage' + (on?' pip-active':'') + (s.attn>0?' has-attn':'') + '" onclick="togglePip(\'' + s.key + '\')">' +
+      '<div class="cc-pip-lbl">' + s.label + '</div>' +
+      '<div class="cc-pip-ct">' + s.count + '</div>' +
+      (s.attn>0 ? '<div class="cc-pip-attn-txt">' + s.attn + ' flagged</div>' : '<div class="cc-pip-attn-txt" style="color:var(--text-muted);opacity:.55;">clear</div>') +
       '</div>';
-    if (i < ccPipStages.length-1) h += '<div class="cc-pip-arrow">›</div>';
-  });
-  track.innerHTML = h;
+  }).join('');
 }
 
 function togglePip(key) {
@@ -34621,17 +34737,15 @@ function togglePip(key) {
   else {
     ccActivePip = key;
     const s = ccPipStages.find(x => x.key === key);
-    let h = '<div class="cc-pip-acc-hdr"><span class="cc-pip-acc-ttl">'+s.label+' — '+s.count+' merchants</span>' +
-      '<span class="cc-pip-acc-cls" onclick="togglePip(\''+key+'\')">&#x2715; Close</span></div>';
+    let h = '<div class="cc-pip-acc-hdr"><span class="cc-pip-acc-ttl">' + s.label + ' &mdash; ' + s.count + ' merchant' + (s.count!==1?'s':'') + '</span>' +
+      '<span class="cc-pip-acc-cls" onclick="togglePip(\'' + key + '\')">&#x2715; Close</span></div>';
     s.merchants.forEach(m => {
-      const sn = m.name.replace(/'/g,"\\'");
-      h += '<div class="cc-pip-row" onclick="navigateToMerchant(\''+sn+'\',\''+m.status+'\')">' +
-        '<div class="cc-pip-row-av">'+m.name.substring(0,2).toUpperCase()+'</div>' +
-        '<div class="cc-pip-row-name">'+m.name+'</div>' +
-        '<div class="cc-pip-row-partner">'+m.partner+'</div>' +
-        '<div class="cc-pip-row-age">'+m.age+'</div>' +
-        '<span class="cc-pip-flag '+m.ft+'">'+m.flag+'</span>' +
-        '<button class="cc-pip-row-act" onclick="event.stopPropagation();navigateToMerchant(\''+sn+'\',\''+m.status+'\')">Open &#x2192;</button>' +
+      h += '<div class="cc-pip-row" onclick="navigateToMerchant(\'' + m.name + '\',\'' + m.status + '\')">' +
+        '<div class="cc-pip-row-av">' + m.name.substring(0,2).toUpperCase() + '</div>' +
+        '<div class="cc-pip-row-name">' + m.name + '</div>' +
+        '<div class="cc-pip-row-partner">' + m.partner + '</div>' +
+        '<span class="cc-pip-flag ' + m.ft + '">' + m.flag + '</span>' +
+        '<div class="cc-pip-row-age">' + m.age + '</div>' +
         '</div>';
     });
     acc.innerHTML = h;
@@ -34640,187 +34754,164 @@ function togglePip(key) {
   renderCCPipeline();
 }
 
-function renderCCQueue() {
-  const list = document.getElementById('ccQueueList');
-  if (!list) return;
-  const showDone = ccPriFilter === 'done';
-  const visible = ccQ.filter(i => {
-    if (showDone) return i.done;
-    if (i.done || i.snoozed) return false;
-    if (ccPriFilter !== 'all' && i.pri !== ccPriFilter) return false;
-    if (ccCatFilter !== 'all' && i.cat !== ccCatFilter) return false;
-    if (ccAsgn !== 'all' && i.assignee !== ccAsgn) return false;
-    return true;
-  });
-  const doneItems = ccQ.filter(i => i.done && !showDone);
-
-  if (visible.length === 0 && doneItems.length === 0) {
-    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px;">✅ Queue is clear — all caught up</div>';
-    updateCCCounts(); return;
-  }
-
-  const tiers = showDone ? [] : ['now','today','week'];
-  const tierLbls = {now:'NOW',today:'TODAY',week:'THIS WEEK'};
-  let h = '';
-
-  tiers.forEach(tier => {
-    const items = visible.filter(i => i.pri === tier);
-    if (!items.length) return;
-    h += '<div class="cc-tier-hdr"><div class="cc-tier-dot '+tier+'"></div><div class="cc-tier-lbl '+tier+'">'+tierLbls[tier]+'</div><div class="cc-tier-ct">— '+items.length+' item'+(items.length!==1?'s':'')+'</div></div>';
-    items.forEach(i => { h += ccItemHTML(i); });
-  });
-
-  if (showDone) {
-    visible.forEach(i => { h += ccItemHTML(i, true); });
-  }
-
-  if (doneItems.length > 0) {
-    h += '<div class="cc-done-bar" onclick="this.nextElementSibling.classList.toggle(\'open\')">&#x2705; Done today ('+doneItems.length+') <span style="margin-left:auto;">&#x25BE;</span></div>' +
-      '<div class="cc-done-section">';
-    doneItems.forEach(i => { h += ccItemHTML(i, true); });
-    h += '</div>';
-  }
-
-  list.innerHTML = h;
-  updateCCCounts();
+/* ── Work list (tabbed) ── */
+function workTabFilter(tab) {
+  if (tab === 'today')   return i => i.pri === 'today';
+  if (tab === 'week')    return i => i.pri === 'week';
+  if (tab === 'message') return i => i.cat === 'message';
+  if (tab === 'task')    return i => i.cat === 'task';
+  if (tab === 'ticket')  return i => i.cat === 'ticket';
+  return () => true;
 }
 
-function ccItemHTML(item, isDoneView) {
-  const stCls = CC_ST_CLS[item.mst] || '';
-  const stLbl = CC_ST_LBL[item.mst] || '';
-  const mn = item.merchant ? item.merchant.replace(/'/g,"\\'") : '';
-  const ms = item.mst || 'lead';
-  const priCls = isDoneView ? '' : 'pri-' + item.pri;
+function renderCCWork() {
+  updateWorkTabCounts();
+  const list = document.getElementById('ccWorkList');
+  if (!list) return;
+  const f = workTabFilter(ccWorkTab);
+  const items = ccQ.filter(i => !i.done && !i.snoozed && f(i) && (ccAsgn==='all' || i.assignee===ccAsgn));
+  const doneItems = ccQ.filter(i => i.done && f(i));
 
-  if (isDoneView) {
-    return '<div class="cc-item" id="cqi-' + item.id + '">' +
-      '<div class="cc-irow">' +
-        '<span style="font-size:12px;font-weight:600;color:var(--text-muted);text-decoration:line-through;">' + (item.merchant || 'Standalone') + '</span>' +
-        '<span class="cc-isep">&middot;</span>' +
-        '<span style="font-size:12px;color:var(--text-muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.title + '</span>' +
-        '<span style="font-size:11px;color:var(--green);flex-shrink:0;">&#x2713; Done</span>' +
-      '</div></div>';
+  let h = '';
+  if (!items.length) {
+    h = '<div class="cc-work-empty"><div class="cc-work-empty-ic">&#x2728;</div>All clear in this view.</div>';
+  } else {
+    h = items.map(ccWorkRowHTML).join('');
   }
+  if (doneItems.length) {
+    h += '<div class="cc-done-bar" onclick="var s=this.nextElementSibling;s.style.display=(s.style.display===\'none\'?\'block\':\'none\')">&#x2705; Done today (' + doneItems.length + ') <span style="margin-left:auto;">&#x25BE;</span></div>' +
+      '<div class="cc-done-section" style="display:none;">' + doneItems.map(ccWorkRowHTML).join('') + '</div>';
+  }
+  list.innerHTML = h;
+}
 
-  const nameEl = item.merchant
-    ? '<span class="cc-iname" onclick="navigateToMerchant(\'' + mn + '\',\'' + ms + '\')">' + item.merchant + '</span>'
-    : '<span class="cc-iname" style="color:var(--text-secondary);cursor:default;">Standalone</span>';
-
-  return '<div class="cc-item ' + priCls + '" id="cqi-' + item.id + '">' +
-    '<div class="cc-irow">' +
-      nameEl +
-      (stLbl ? '<span class="cc-isch ' + stCls + '">' + stLbl + '</span>' : '') +
-      (item.sla ? '<span class="cc-isla-r">&#x23F1; SLA</span>' : '') +
-      '<span class="cc-isep">&middot;</span>' +
-      '<span class="cc-idesc">' + item.title + '</span>' +
-      '<div class="cc-iav-sm" style="background:' + item.avc + ';color:#fff;">' + item.av + '</div>' +
-      '<span class="cc-iage-r">' + item.age + '</span>' +
-      '<button class="cc-iact-r" onclick="' + item.fn + '">' + item.act + '</button>' +
-      '<div class="cc-hover-acts">' +
-        '<div class="cc-isnooze">' +
-          '<button class="cc-isnz" onclick="toggleSnooze(\'' + item.id + '\')" title="Snooze">&#x1F4A4;</button>' +
-          '<div class="cc-snooze-menu" id="sm-' + item.id + '">' +
-            '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'2h\')">2 hours</div>' +
-            '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'tomorrow\')">Tomorrow morning</div>' +
-            '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'monday\')">Next Monday</div>' +
-          '</div>' +
-        '</div>' +
-        '<button class="cc-idone" onclick="doneCC(\'' + item.id + '\')" title="Done">&#x2713;</button>' +
+function ccWorkRowHTML(item) {
+  const stLbl = CC_ST_LBL[item.mst] || '';
+  const stCls = CC_ST_CLS[item.mst] || '';
+  const icon = CC_CAT_ICONS[item.cat] || '';
+  const priCls = (item.pri==='now'?' pri-now':(item.pri==='today'?' pri-today':''));
+  if (item.done) {
+    return '<div class="cc-wrow" style="opacity:.4;cursor:default;">' +
+      '<div class="cc-wrow-cat">' + icon + '</div>' +
+      '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
+        '<span class="cc-wrow-name" style="text-decoration:line-through;color:var(--text-muted);">' + (item.merchant||'Task') + '</span>' +
+        '<span class="cc-wrow-desc" style="text-decoration:line-through;">' + item.title + '</span>' +
+      '</div></div>' +
+      '<span style="font-size:11px;color:var(--green);">&#x2713;</span></div>';
+  }
+  return '<div class="cc-wrow' + priCls + '" data-ccid="' + item.id + '" onclick="' + item.fn + '">' +
+    '<div class="cc-wrow-cat">' + icon + '</div>' +
+    '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
+      '<span class="cc-wrow-name">' + (item.merchant || 'Task') + '</span>' +
+      (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
+      (item.sla ? '<span class="cc-wrow-sla">&#x23F1; SLA</span>' : '') +
+      '<span class="cc-wrow-desc">' + item.title + '</span>' +
+    '</div></div>' +
+    '<div class="cc-wrow-meta">' +
+      '<div class="cc-wrow-av" style="background:' + item.avc + ';color:#fff;">' + item.av + '</div>' +
+      '<span class="cc-wrow-age">' + item.age + '</span>' +
+      '<button class="cc-wrow-act" onclick="event.stopPropagation();' + item.fn + '">' + item.act + '</button>' +
+      '<div class="cc-wrow-hover">' +
+        '<div class="cc-isnooze"><button class="cc-whbtn" onclick="event.stopPropagation();toggleSnooze(this)" title="Snooze">&#x1F4A4;</button>' + ccSnoozeMenu(item.id) + '</div>' +
+        '<button class="cc-whbtn done" onclick="event.stopPropagation();doneCC(\'' + item.id + '\')" title="Done">&#x2713;</button>' +
       '</div>' +
     '</div>' +
   '</div>';
 }
 
+function ccSnoozeMenu(id) {
+  return '<div class="cc-snooze-menu">' +
+    '<div class="cc-snooze-opt" onclick="event.stopPropagation();snoozeCC(\'' + id + '\',\'2 hours\')">2 hours</div>' +
+    '<div class="cc-snooze-opt" onclick="event.stopPropagation();snoozeCC(\'' + id + '\',\'tomorrow morning\')">Tomorrow morning</div>' +
+    '<div class="cc-snooze-opt" onclick="event.stopPropagation();snoozeCC(\'' + id + '\',\'next Monday\')">Next Monday</div>' +
+  '</div>';
+}
+
+function updateWorkTabCounts() {
+  const c = (f) => ccQ.filter(i => !i.done && !i.snoozed && f(i) && (ccAsgn==='all'||i.assignee===ccAsgn)).length;
+  const set = (id,n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
+  set('ct-today',   c(i => i.pri==='today'));
+  set('ct-week',    c(i => i.pri==='week'));
+  set('ct-message', c(i => i.cat==='message'));
+  set('ct-task',    c(i => i.cat==='task'));
+  set('ct-ticket',  c(i => i.cat==='ticket'));
+}
+
+function renderAllCC() { renderCCBrief(); renderCCHero(); renderCCWork(); }
+
+/* ── Item actions ── */
 function doneCC(id) {
   const item = ccQ.find(i => i.id === id);
   if (!item) return;
-  const el = document.getElementById('cqi-'+id);
-  if (el) { el.classList.add('cc-gone'); setTimeout(() => { item.done=true; renderCCQueue(); }, 220); }
-  else { item.done=true; renderCCQueue(); }
+  const els = document.querySelectorAll('[data-ccid="' + id + '"]');
+  if (els.length) { els.forEach(el => el.classList.add('cc-gone')); setTimeout(() => { item.done = true; renderAllCC(); }, 220); }
+  else { item.done = true; renderAllCC(); }
+  closeSnoozeMenus();
 }
 
-function snoozeCC(id, dur) {
+function snoozeCC(id, label) {
   const item = ccQ.find(i => i.id === id);
-  if (item) { item.snoozed = true; }
+  if (item) item.snoozed = true;
   closeSnoozeMenus();
-  renderCCQueue();
-  const lbl = {'2h':'2 hours',tomorrow:'tomorrow morning',monday:'next Monday'};
+  renderAllCC();
+  ccToast('&#x1F4A4; Snoozed until ' + label);
+}
+
+function toggleSnooze(btn) {
+  const wasOpen = btn.parentElement.querySelector('.cc-snooze-menu')?.classList.contains('open');
+  closeSnoozeMenus();
+  if (!wasOpen) { const m = btn.parentElement.querySelector('.cc-snooze-menu'); if (m) m.classList.add('open'); }
+}
+function closeSnoozeMenus() { document.querySelectorAll('.cc-snooze-menu.open').forEach(m => m.classList.remove('open')); }
+
+function ccToast(msg) {
   const t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:8px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text-primary);z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.15);';
-  t.textContent = '💤 Snoozed until ' + (lbl[dur]||dur);
+  t.innerHTML = msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2200);
 }
 
-function toggleSnooze(id) { closeSnoozeMenus(); const m = document.getElementById('sm-'+id); if (m) m.classList.toggle('open'); }
-function closeSnoozeMenus() { document.querySelectorAll('.cc-snooze-menu.open').forEach(m => m.classList.remove('open')); }
-
-function setCCPri(val, el) {
-  ccPriFilter = val;
-  document.querySelectorAll('.cc-ptab').forEach(t => t.classList.remove('on'));
-  const tab = el || document.querySelector('.cc-ptab[data-p="'+val+'"]');
-  if (tab) tab.classList.add('on');
-  renderCCQueue();
-}
-function setCCCat(val, el) {
-  ccCatFilter = val;
-  document.querySelectorAll('.cc-cpill').forEach(p => p.classList.remove('on'));
-  const pill = el || document.querySelector('.cc-cpill[data-c="'+val+'"]');
-  if (pill) pill.classList.add('on');
-  renderCCQueue();
-}
-function setCCCatSm(val, el) {
-  ccCatFilter = val;
-  document.querySelectorAll('.cc-cpill-sm').forEach(p => p.classList.remove('on'));
-  const pill = el || document.querySelector('.cc-cpill-sm[data-c="'+val+'"]');
-  if (pill) pill.classList.add('on');
-  renderCCQueue();
+/* ── Tab + assignee ── */
+function setCCWorkTab(tab, el) {
+  ccWorkTab = tab;
+  document.querySelectorAll('.cc-wtab').forEach(t => t.classList.remove('on'));
+  if (el) el.classList.add('on');
+  renderCCWork();
 }
 function setCCAssignee(name) {
-  ccAsgn = name === ccAsgn ? 'all' : name;
+  ccAsgn = (name === ccAsgn) ? 'all' : name;
   const el = document.getElementById('ccAsgnLbl');
   if (el) el.textContent = ccAsgn === 'all' ? 'All Team' : name;
-  renderCCQueue();
+  renderCCWork();
 }
 function cycleAssignee() {
   const reps = ['all','M. Wright','S. Patel','J. Rivera','D. Martinez'];
-  const idx = reps.indexOf(ccAsgn);
-  ccAsgn = reps[(idx+1) % reps.length];
+  ccAsgn = reps[(reps.indexOf(ccAsgn)+1) % reps.length];
   const el = document.getElementById('ccAsgnLbl');
   if (el) el.textContent = ccAsgn === 'all' ? 'All Team' : ccAsgn;
-  renderCCQueue();
-}
-function updateCCCounts() {
-  const nowCt = document.getElementById('ccCtNow');
-  const todayCt = document.getElementById('ccCtToday');
-  if (nowCt) nowCt.textContent = ccQ.filter(i => i.pri==='now' && !i.done && !i.snoozed).length;
-  if (todayCt) todayCt.textContent = ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed).length;
+  renderCCWork();
 }
 
+/* ── Portfolio ── */
 function renderCCPortfolio() {
   const list = document.getElementById('ccPortList');
   if (!list) return;
   const items = ccPort.filter(i => !i.done && (ccPortFilter==='all' || i.type===ccPortFilter));
-  if (!items.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No portfolio alerts</div>'; return; }
+  if (!items.length) { list.innerHTML = '<div class="cc-work-empty">No portfolio alerts in this view.</div>'; return; }
   list.innerHTML = items.map(i =>
     '<div class="cc-port-item">' +
-    '<div class="cc-port-sev '+i.sev+'"></div>' +
-    '<div class="cc-port-icon">'+i.icon+'</div>' +
-    '<div class="cc-port-body">' +
-      '<div style="display:flex;align-items:center;gap:8px;">' +
-        '<span class="cc-port-name" onclick="navigateToMerchant(\''+i.merchant.replace(/'/g,"\\'")+ '\',\'active\')">'+i.merchant+'</span>' +
-        '<span style="font-size:10px;color:var(--text-muted);">'+i.partner+'</span>' +
+      '<div class="cc-port-sev ' + i.sev + '"></div>' +
+      '<div class="cc-port-body">' +
+        '<span class="cc-port-name" onclick="navigateToMerchant(\'' + i.merchant + '\',\'active\')">' + i.merchant + '</span>' +
+        ' <span style="font-size:10px;color:var(--text-muted);">' + i.partner + '</span>' +
+        '<div class="cc-port-text">' + i.title + '</div>' +
+        '<div class="cc-port-detail">' + i.detail + '</div>' +
       '</div>' +
-      '<div class="cc-port-text">'+i.title+'</div>' +
-      '<div class="cc-port-detail">'+i.detail+'</div>' +
-    '</div>' +
-    '<div class="cc-port-acts">' +
-      '<button class="cc-iact" onclick="'+i.fn+'">'+i.act+'</button>' +
-      '<button class="cc-idone-btn" onclick="donePort(\''+i.id+'\')" title="Dismiss">✕</button>' +
-    '</div></div>'
+      '<button class="cc-port-act" onclick="' + i.fn + '">' + i.act + '</button>' +
+    '</div>'
   ).join('');
 }
-function donePort(id) { const i = ccPort.find(x => x.id===id); if(i){ i.done=true; renderCCPortfolio(); } }
 function setCCPortTab(val, el) {
   ccPortFilter = val;
   document.querySelectorAll('.cc-port-tab').forEach(t => t.classList.remove('on'));
@@ -34828,35 +34919,43 @@ function setCCPortTab(val, el) {
   renderCCPortfolio();
 }
 
-function openCCTask() { const o = document.getElementById('ccTaskOverlay'); if(o) o.classList.add('open'); }
-function closeCCTask() { const o = document.getElementById('ccTaskOverlay'); if(o) o.classList.remove('open'); }
+/* ── Task modal ── */
+function openCCTask() { const o = document.getElementById('ccTaskOverlay'); if (o) o.classList.add('open'); }
+function closeCCTask() { const o = document.getElementById('ccTaskOverlay'); if (o) o.classList.remove('open'); }
 function submitCCTask() {
   const title = document.getElementById('ccTaskTitle')?.value.trim();
   if (!title) return;
   const asgn = document.getElementById('ccTaskAsgn')?.value || 'M. Wright';
   const avMap = {'M. Wright':{av:'MW',c:'#A09E9A'},'S. Patel':{av:'SP',c:'#5B7A5E'},'J. Rivera':{av:'JR',c:'#6B839B'},'D. Martinez':{av:'DM',c:'#9B6B5B'}};
-  const {av,c} = avMap[asgn]||{av:'MW',c:'#A09E9A'};
-  const merchant = document.getElementById('ccTaskMerchant')?.value.trim()||null;
-  ccQ.unshift({id:'wq-t-'+Date.now(),pri:'today',cat:'task',merchant,mst:null,assignee:asgn,av,avc:c,title,detail:'Created just now'+(merchant?' · '+merchant:''),act:'View →',fn:'openCCTask()',age:'just now',sla:false,done:false,snoozed:false});
+  const m = avMap[asgn] || {av:'MW',c:'#A09E9A'};
+  const merchant = document.getElementById('ccTaskMerchant')?.value.trim() || null;
+  ccQ.unshift({id:'wq-t-'+(ccQ.length+1),pri:'today',cat:'task',merchant,mst:null,assignee:asgn,av:m.av,avc:m.c,title,detail:'Created just now',act:'View →',fn:'openCCTask()',age:'now',sla:false,done:false,snoozed:false});
   closeCCTask();
-  ['ccTaskTitle','ccTaskMerchant'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  renderCCQueue();
+  ['ccTaskTitle','ccTaskMerchant'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  setCCWorkTab('task', document.querySelector('.cc-wtab[data-t="task"]'));
+  renderAllCC();
+  ccToast('&#x2705; Task created');
 }
 
 function toggleCCOverview(btn) {
-  btn.textContent = btn.textContent.includes('Overview') ? '🎯 Work Mode' : '📊 Overview';
-  const t = document.createElement('div');
-  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:8px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text-primary);z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.15);';
-  t.textContent = btn.textContent.includes('Work') ? '📊 Overview mode coming soon' : '🎯 Back to work mode';
-  document.body.appendChild(t); setTimeout(()=>t.remove(),2000);
+  const toWork = btn.textContent.includes('Overview');
+  btn.innerHTML = toWork ? '&#x1F3AF; Work Mode' : '&#x1F4CA; Overview';
+  ccToast(toWork ? '&#x1F4CA; Overview mode coming soon' : '&#x1F3AF; Back to work mode');
 }
 
+/* ── Init ── */
 function initCC() {
   const d = new Date();
-  const el = document.getElementById('ccDate');
-  if (el) el.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const hr = d.getHours();
+  const greet = hr < 12 ? 'Good morning' : (hr < 18 ? 'Good afternoon' : 'Good evening');
+  const gEl = document.getElementById('ccGreeting');
+  if (gEl) gEl.textContent = greet + ', Mike';
+  const dEl = document.getElementById('ccDate');
+  if (dEl) dEl.textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  renderCCBrief();
+  renderCCHero();
   renderCCPipeline();
-  renderCCQueue();
+  renderCCWork();
   renderCCPortfolio();
 }
 
