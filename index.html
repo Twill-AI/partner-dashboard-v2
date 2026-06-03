@@ -2563,7 +2563,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="nav-item" id="nav-tickets" onclick="showView('tickets', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a5 5 0 00-5 5v1H2v3h1a5 5 0 0010 0h1V7h-1V6a5 5 0 00-5-5zm0 12a3 3 0 01-3-3h6a3 3 0 01-3 3z" opacity=".8"/></svg>
         Tickets
-        <span style="margin-left:auto;background:rgba(155,107,91,0.12);color:#9B6B5B;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">3</span>
+        <span id="nav-tickets-badge" style="margin-left:auto;background:rgba(155,107,91,0.12);color:#9B6B5B;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">3</span>
       </div>
       <div class="nav-item" id="nav-alerts" onclick="showView('alerts', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a.75.75 0 01.75.75V3.5a4.5 4.5 0 014.5 4.5v2.25l1.25 2H1.5L2.75 10.25V8A4.5 4.5 0 017.25 3.5V1.75A.75.75 0 018 1zm0 14a2 2 0 002-2H6a2 2 0 002 2z" opacity=".85"/></svg>
@@ -36350,7 +36350,41 @@ function prependProcessorTicketRows(){
     list.insertBefore(row, list.firstElementChild);
   });
 }
-function initTicketDashboard(){ applyTicketDashSources(); prependProcessorTicketRows(); }
+/* Designed base counts (the static placeholders) + live processor-ticket deltas */
+const TKT_DASH_BASE = { open:12, mine:3, urgent:2, review:4, resolved:7, total:12 };
+function updateTicketDashCounts(){
+  let open=TKT_DASH_BASE.open, mine=TKT_DASH_BASE.mine, urgent=TKT_DASH_BASE.urgent,
+      review=TKT_DASH_BASE.review, resolved=TKT_DASH_BASE.resolved, total=TKT_DASH_BASE.total;
+  if (typeof TKT !== 'undefined') {
+    Object.values(TKT).filter(t => t.seeded).forEach(t => {
+      total++;
+      const live = t.status !== 'resolved';
+      if (live) open++; else resolved++;
+      if (live && t.priority === 'urgent') urgent++;
+      if (live && t.members[0] && t.members[0].name === 'M. Wright') mine++;
+      if (live && (t.status === 'inprogress' || t.status === 'waiting_merchant' || t.status === 'waiting_processor')) review++;
+    });
+  }
+  const v = document.querySelectorAll('#view-tickets .tkpi-value');
+  if (v[0]) v[0].textContent = open;
+  if (v[1]) v[1].textContent = mine;
+  if (v[2]) v[2].textContent = urgent;
+  const sub = document.querySelector('#view-tickets .page-sub');
+  if (sub) sub.textContent = open + ' open · ' + mine + ' assigned to you · ' + urgent + ' urgent';
+  const tabs = document.querySelectorAll('#view-tickets .tlist-tabs .ttab-count');
+  if (tabs[0]) tabs[0].textContent = open;
+  if (tabs[1]) tabs[1].textContent = mine;
+  if (tabs[2]) tabs[2].textContent = urgent;
+  if (tabs[3]) tabs[3].textContent = review;
+  if (tabs[4]) tabs[4].textContent = resolved;
+  const cnt = document.getElementById('tlist-count');
+  if (cnt) cnt.textContent = total + ' tickets';
+  const navB = document.getElementById('nav-tickets-badge');
+  if (navB) navB.textContent = urgent;
+}
+function initTicketDashboard(){ applyTicketDashSources(); prependProcessorTicketRows(); updateTicketDashCounts(); }
+/* keep the nav badge current even before the dashboard is opened */
+setTimeout(updateTicketDashCounts, 350);
 
 /* Insert seeded ticket anchors into the active merchant thread (merchant-scoped) */
 function ensureSeededAnchors(){
