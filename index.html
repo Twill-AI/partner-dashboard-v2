@@ -50,7 +50,7 @@
     --green-mid:     rgba(45,122,79,0.14);
     --yellow-mid:    rgba(255,222,0,0.14);
     --steps-w:       228px;
-    --chat-w:        390px;
+    --chat-w:        440px;
   }
 
   html,body { height:100%; background:var(--bg-base); color:var(--text-primary); font-family:var(--font-data); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; -webkit-font-smoothing:antialiased; overflow:hidden; }
@@ -2330,6 +2330,31 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-tcard .cc-addrep { display: flex; }                 /* always visible in the card */
 .cc-tcard .cc-addrep-menu { top: auto; bottom: calc(100% + 5px); }  /* open upward (thread scrolls) */
 .cc-tcard .cc-wrow-reps { align-items: center; }
+</style>
+
+<style>
+/* ── Active merchant overview — analytics redesign ── */
+.ma-metric-tabs { display: flex; gap: 3px; }
+.ma-mtab { font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: 6px; cursor: pointer; color: var(--text-muted); background: transparent; border: 1px solid transparent; font-family: var(--font-ui); transition: all .12s; }
+.ma-mtab:hover { color: var(--text-secondary); }
+.ma-mtab.active { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-strong); }
+.ma-an-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.ma-donut-wrap { position: relative; height: 130px; padding: 6px 0; }
+.ma-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.ma-donut-center .v { font-size: 19px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); line-height: 1; }
+.ma-donut-center .l { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+.ma-legend { display: flex; flex-direction: column; gap: 5px; padding: 4px 16px 14px; }
+.ma-legend-row { display: flex; align-items: center; gap: 7px; font-size: 11px; }
+.ma-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.ma-legend-name { color: var(--text-secondary); flex: 1; }
+.ma-legend-val { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+.ma-snap { padding: 12px 16px; display: flex; flex-direction: column; gap: 0; }
+.ma-snap-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,.04); }
+.ma-snap-row:last-child { border-bottom: none; }
+.ma-snap-k { font-size: 11px; color: var(--text-muted); }
+.ma-snap-v { font-size: 12px; font-weight: 600; font-family: var(--font-mono); color: var(--text-primary); }
+.ma-snap-v.up { color: var(--green); }
+.ma-snap-v.warn { color: var(--amber); }
 </style>
 
 </head>
@@ -7228,142 +7253,104 @@ function nudgeWithDocs() {
           <!-- OVERVIEW PANEL -->
           <div id="ma-panel-overview" class="ma-panel">
 
-          <!-- Section 1: AI Alerts strip -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.25);border-radius:8px;">
-              <span style="font-size:16px;flex-shrink:0;">⚠</span>
-              <div>
-                <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:2px;">Auth Rate Dip</div>
-                <div style="font-size:11px;color:var(--text-secondary);">Auth rate dropped 1.2% this week (99.3% → 98.1%). Possible issuer friction on debit cards. Monitor closely.</div>
-                <div style="margin-top:6px;display:flex;gap:6px;">
-                  <button style="padding:3px 10px;background:var(--amber);border:none;border-radius:4px;color:#09091A;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-ui);">View Transactions</button>
-                  <button style="padding:3px 10px;background:transparent;border:1px solid rgba(245,158,11,.4);border-radius:4px;color:var(--amber);font-size:12px;cursor:pointer;font-family:var(--font-ui);">Dismiss</button>
-                </div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);border-radius:8px;">
-              <span style="font-size:16px;flex-shrink:0;">✓</span>
-              <div>
-                <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:2px;">Clean CB Month</div>
-                <div style="font-size:11px;color:var(--text-secondary);">0 chargebacks MTD. CB rate 0.04% trailing 90 days — well below 1% threshold. No action needed.</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--blue-dim);border:1px solid rgba(59,130,246,.2);border-radius:8px;">
-              <span style="font-size:16px;flex-shrink:0;">ℹ</span>
-              <div>
-                <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:2px;">Contract Renewal in 47 Days</div>
-                <div style="font-size:11px;color:var(--text-secondary);">Current agreement expires Apr 26, 2026. Consider rate review before renewal. Volume up 22% YoY.</div>
-                <div style="margin-top:6px;">
-                  <button style="padding:3px 10px;background:var(--blue);border:none;border-radius:4px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-ui);">Schedule Review</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2: KPI strip -->
+          <!-- KPI strip -->
           <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
-            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
-              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">MTD Volume</div>
-              <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--green);line-height:1.1;">$142,830</div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">↑ 18% vs last month</div>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">MTD Volume</div>
+              <div style="font-size:21px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);line-height:1.1;">$142,830</div>
+              <div style="font-size:11px;color:var(--green);margin-top:4px;">&#x2191; 18% vs last month</div>
             </div>
-            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
-              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">MTD Residual</div>
-              <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--yellow);line-height:1.1;">$1,712</div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">IC+ blended 1.20%</div>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">MTD Residual</div>
+              <div style="font-size:21px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);line-height:1.1;">$1,712</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">IC+ blended 1.20%</div>
             </div>
-            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
-              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Auth Rate</div>
-              <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--amber);line-height:1.1;">98.1%</div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">↓ from 99.3% (7d)</div>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Auth Rate</div>
+              <div style="font-size:21px;font-weight:700;font-family:var(--font-mono);color:var(--amber);line-height:1.1;">98.1%</div>
+              <div style="font-size:11px;color:var(--amber);margin-top:4px;">&#x2193; from 99.3% (7d)</div>
             </div>
-            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
-              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">CB Rate</div>
-              <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--green);line-height:1.1;">0.04%</div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">0 disputes MTD</div>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">CB Rate</div>
+              <div style="font-size:21px;font-weight:700;font-family:var(--font-mono);color:var(--green);line-height:1.1;">0.04%</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">0 disputes MTD</div>
             </div>
-            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
-              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Last Batch</div>
-              <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);line-height:1.1;">Mar 9</div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">$12,840 · 44 txns</div>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Last Batch</div>
+              <div style="font-size:21px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);line-height:1.1;">Mar 9</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">$12,840 &middot; 44 txns</div>
             </div>
-            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
-              <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;">Avg Ticket</div>
-              <div style="font-size:22px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);line-height:1.1;">$289</div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">↑ from $261 last mo</div>
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Avg Ticket</div>
+              <div style="font-size:21px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);line-height:1.1;">$289</div>
+              <div style="font-size:11px;color:var(--green);margin-top:4px;">&#x2191; from $261 last mo</div>
             </div>
           </div>
 
-          <!-- Section 3: Chart + Stats -->
-          <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;">
-            <div class="sc blue">
-              <div class="sc-hdr blue">
-                <div class="sc-hdr-left"><span class="sc-icon">📈</span><div><div class="sc-title">Processing Volume</div><div class="sc-desc">Harbor View Hotels · MID 7823-4491-0012</div></div></div>
+          <!-- Flexible processing-trends chart -->
+          <div class="sc">
+            <div class="sc-hdr" style="flex-wrap:wrap;gap:10px;">
+              <div class="sc-hdr-left"><span class="sc-icon">&#x1F4C8;</span><div><div class="sc-title">Processing Trends</div><div class="sc-desc" id="ma-trend-desc">Daily volume &middot; last 10 days</div></div></div>
+              <div style="display:flex;align-items:center;gap:14px;margin-left:auto;flex-wrap:wrap;">
+                <div class="ma-metric-tabs">
+                  <button class="ma-mtab active" onclick="maChartMetric('volume',this)">Volume</button>
+                  <button class="ma-mtab" onclick="maChartMetric('transactions',this)">Transactions</button>
+                  <button class="ma-mtab" onclick="maChartMetric('authrate',this)">Auth Rate</button>
+                  <button class="ma-mtab" onclick="maChartMetric('avgticket',this)">Avg Ticket</button>
+                </div>
+                <div style="width:1px;height:18px;background:var(--border);"></div>
                 <div style="display:flex;gap:4px;">
                   <button onclick="maChartPeriod('mtd',this)" class="ma-ptab active">MTD</button>
                   <button onclick="maChartPeriod('90d',this)" class="ma-ptab">90D</button>
                   <button onclick="maChartPeriod('1y',this)" class="ma-ptab">1Y</button>
-                  <button onclick="maChartPeriod('all',this)" class="ma-ptab">All</button>
                 </div>
               </div>
-              <div style="padding:14px 16px;"><canvas id="maVolumeChart" height="160"></canvas></div>
-              <div style="padding:0 16px 12px;display:flex;gap:16px;">
-                <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:3px;background:var(--green);border-radius:2px;"></div><span style="font-size:13px;color:var(--text-secondary);">Processing Volume</span></div>
-                <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:3px;background:var(--yellow);border-radius:2px;"></div><span style="font-size:13px;color:var(--text-secondary);">Residual</span></div>
-              </div>
             </div>
-            <div class="sc">
-              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">📊</span><div><div class="sc-title">Portfolio Stats</div><div class="sc-desc">Trailing 90 days</div></div></div></div>
-              <div style="padding:10px 16px;display:flex;flex-direction:column;gap:6px;">
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Total Volume (90D)</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$381,200</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Total Transactions</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">1,318</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Avg Auth Rate</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">98.7%</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Refund Rate</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">1.2%</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Decline Rate</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">1.3%</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Processing Fees Paid</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$8,767</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Effective Rate</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">2.30%</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">YoY Volume Growth</span><span style="font-size:11px;color:var(--green);font-family:var(--font-mono);">+22%</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Batches (90D)</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">87</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Avg Batch Size</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$4,382</span></div>
-              </div>
-            </div>
+            <div style="padding:14px 16px 16px;"><canvas id="maVolumeChart" height="150"></canvas></div>
           </div>
 
-          <!-- Section 4: Config grid -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+          <!-- Processing breakdown: card mix, entry mode, approvals, 90-day snapshot -->
+          <div class="ma-an-grid">
             <div class="sc">
-              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">💰</span><div><div class="sc-title">Pricing Config</div><div class="sc-desc">Rate model &amp; markups</div></div></div><span class="p-badge bb">IC+</span></div>
-              <div style="padding:10px 16px;display:flex;flex-direction:column;gap:6px;">
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Rate Model</span><span style="font-size:11px;color:var(--text-primary);">Interchange Plus</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">V/MC/D Markup</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">0.25% + $0.10</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Amex Markup</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">0.35% + $0.15</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Debit Non-PIN</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">0.20% + $0.10</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Effective Rate</span><span style="font-size:11px;color:var(--amber);font-family:var(--font-mono);">2.30%</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Monthly Volume</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$142,830</span></div>
+              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">&#x1F4B3;</span><div><div class="sc-title">Card Brand Mix</div><div class="sc-desc">Share of volume</div></div></div></div>
+              <div class="ma-donut-wrap"><canvas id="maCardMixChart"></canvas><div class="ma-donut-center"><div class="v">52%</div><div class="l">Visa</div></div></div>
+              <div class="ma-legend">
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#5B7A5E;"></span><span class="ma-legend-name">Visa</span><span class="ma-legend-val">52%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#A67C5B;"></span><span class="ma-legend-name">Mastercard</span><span class="ma-legend-val">28%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#6B839B;"></span><span class="ma-legend-name">Amex</span><span class="ma-legend-val">12%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#8C7A5E;"></span><span class="ma-legend-name">Discover</span><span class="ma-legend-val">5%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#A09E9A;"></span><span class="ma-legend-name">Debit</span><span class="ma-legend-val">3%</span></div>
               </div>
             </div>
             <div class="sc">
-              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">📋</span><div><div class="sc-title">Fee Schedule</div><div class="sc-desc">Monthly &amp; per-item fees</div></div></div><span class="p-badge bm">7 fees</span></div>
-              <div style="padding:10px 16px;display:flex;flex-direction:column;gap:6px;">
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Monthly Fee</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$10.00</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Statement Fee</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$5.00</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Batch Fee</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$0.10/batch</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Chargeback Fee</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$25.00</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">NSF / Retrieval</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$15.00</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">PCI Compliance</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$9.99/mo</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Gateway Fee</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">$10.00/mo</span></div>
+              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">&#x1F4F1;</span><div><div class="sc-title">Entry Mode</div><div class="sc-desc">How cards are read</div></div></div></div>
+              <div class="ma-donut-wrap"><canvas id="maEntryChart"></canvas><div class="ma-donut-center"><div class="v">82%</div><div class="l">Card present</div></div></div>
+              <div class="ma-legend">
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#5B7A5E;"></span><span class="ma-legend-name">Chip</span><span class="ma-legend-val">58%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#6B839B;"></span><span class="ma-legend-name">Contactless</span><span class="ma-legend-val">24%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#A67C5B;"></span><span class="ma-legend-name">Swipe</span><span class="ma-legend-val">11%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#9B6B5B;"></span><span class="ma-legend-name">Keyed</span><span class="ma-legend-val">7%</span></div>
               </div>
             </div>
             <div class="sc">
-              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">🖥</span><div><div class="sc-title">Equipment &amp; Setup</div><div class="sc-desc">Terminal &amp; gateway info</div></div></div><span class="p-badge bg">Live</span></div>
-              <div style="padding:10px 16px;display:flex;flex-direction:column;gap:6px;">
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Terminal</span><span style="font-size:11px;color:var(--text-primary);">PAX A920 Pro</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Serial #</span><span style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono);">PAX-4821-7734</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Gateway</span><span style="font-size:11px;color:var(--text-primary);">NMI</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Processor</span><span style="font-size:11px;color:var(--text-primary);">First Data Omaha</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">First Batch</span><span style="font-size:11px;color:var(--text-primary);">Nov 14, 2023</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Terminal Count</span><span style="font-size:11px;color:var(--text-primary);">2 units</span></div>
-                <div style="padding:6px 10px;background:var(--bg-elevated);border-radius:5px;display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-muted);">Support</span><span style="font-size:11px;color:var(--text-primary);">24/7 First Data</span></div>
+              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">&#x2705;</span><div><div class="sc-title">Approvals</div><div class="sc-desc">Auth outcomes &middot; 90d</div></div></div></div>
+              <div class="ma-donut-wrap"><canvas id="maApprovalChart"></canvas><div class="ma-donut-center"><div class="v">98.1%</div><div class="l">Approved</div></div></div>
+              <div class="ma-legend">
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#5B7A5E;"></span><span class="ma-legend-name">Approved</span><span class="ma-legend-val">98.1%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#9B6B5B;"></span><span class="ma-legend-name">Declined</span><span class="ma-legend-val">1.3%</span></div>
+                <div class="ma-legend-row"><span class="ma-legend-dot" style="background:#A67C5B;"></span><span class="ma-legend-name">Refunded</span><span class="ma-legend-val">0.6%</span></div>
+              </div>
+            </div>
+            <div class="sc">
+              <div class="sc-hdr"><div class="sc-hdr-left"><span class="sc-icon">&#x1F4CA;</span><div><div class="sc-title">90-Day Snapshot</div><div class="sc-desc">Trailing performance</div></div></div></div>
+              <div class="ma-snap">
+                <div class="ma-snap-row"><span class="ma-snap-k">Total Volume</span><span class="ma-snap-v">$381,200</span></div>
+                <div class="ma-snap-row"><span class="ma-snap-k">Transactions</span><span class="ma-snap-v">1,318</span></div>
+                <div class="ma-snap-row"><span class="ma-snap-k">Batches</span><span class="ma-snap-v">87</span></div>
+                <div class="ma-snap-row"><span class="ma-snap-k">Avg Batch</span><span class="ma-snap-v">$4,382</span></div>
+                <div class="ma-snap-row"><span class="ma-snap-k">Fees Paid</span><span class="ma-snap-v">$8,767</span></div>
+                <div class="ma-snap-row"><span class="ma-snap-k">Effective Rate</span><span class="ma-snap-v warn">2.30%</span></div>
+                <div class="ma-snap-row"><span class="ma-snap-k">YoY Growth</span><span class="ma-snap-v up">+22%</span></div>
               </div>
             </div>
           </div>
@@ -13533,7 +13520,7 @@ function navigateToMerchant(name, status) {
       setTimeout(() => thread.scrollTop = thread.scrollHeight, 50);
     }
     showView('merchant-active', null);
-    setTimeout(initMaChart, 50);
+    setTimeout(initMaOverviewCharts, 50);
   } else {
     _currentSBMerchant = name;
     document.getElementById('md-merchant-name').textContent = name;
@@ -17863,37 +17850,83 @@ if (ct) ct.scrollTop = 9999;
 
 // Active merchant chart
 let maVolumeChartInstance = null;
+let maCardMixInstance = null, maEntryInstance = null, maApprovalInstance = null;
+let maChartMetricCur = 'volume';
+
+/* Light-theme chart helpers */
+const MA_TT = { backgroundColor:'#FFFFFF', titleColor:'#787774', bodyColor:'#37352F', borderColor:'rgba(0,0,0,.08)', borderWidth:1, padding:9, cornerRadius:6 };
+const MA_GRID = 'rgba(0,0,0,.06)', MA_AXIS = '#8A8A86';
+
+/* Flexible main chart — one of: volume | transactions | authrate | avgticket */
+const MA_LABELS = ['Mar 1','Mar 2','Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8','Mar 9','Mar 10'];
+const MA_SERIES = {
+  volume:       { type:'bar',  color:'#5B7A5E', data:[11200,9800,12400,10100,13200,0,0,9210,12840,4821], fmt:v=>'$'+(v/1000).toFixed(1)+'K', desc:'Daily volume · last 10 days' },
+  transactions: { type:'bar',  color:'#6B839B', data:[42,38,47,40,51,0,0,36,44,18],                       fmt:v=>Math.round(v)+' txns',               desc:'Daily transaction count · last 10 days' },
+  authrate:     { type:'line', color:'#A67C5B', data:[99.1,98.9,99.3,99.0,98.7,null,null,98.4,98.1,97.9],  fmt:v=>(Math.round(v*10)/10).toFixed(1)+'%', desc:'Daily authorization rate · last 10 days' },
+  avgticket:    { type:'line', color:'#222E48', data:[267,258,264,252,259,null,null,256,289,268],          fmt:v=>'$'+Math.round(v),                   desc:'Average ticket size · last 10 days' }
+};
 function initMaChart() {
   const ctx = document.getElementById('maVolumeChart');
   if (!ctx || !window.Chart) return;
   if (maVolumeChartInstance) { maVolumeChartInstance.destroy(); maVolumeChartInstance = null; }
-  const labels = ['Mar 1','Mar 2','Mar 3','Mar 4','Mar 5','Mar 6','Mar 7','Mar 8','Mar 9','Mar 10'];
-  const volumes = [11200, 9800, 12400, 10100, 13200, 0, 0, 9210, 12840, 4821];
+  const s = MA_SERIES[maChartMetricCur] || MA_SERIES.volume;
+  const desc = document.getElementById('ma-trend-desc');
+  if (desc) desc.textContent = s.desc;
+  const isBar = s.type === 'bar';
+  let bg = 'transparent';
+  if (isBar) { bg = s.color + '40'; }
+  else {
+    const g = ctx.getContext('2d').createLinearGradient(0,0,0,170);
+    g.addColorStop(0, s.color + '26'); g.addColorStop(1, s.color + '00'); bg = g;
+  }
   maVolumeChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Volume', data: volumes, backgroundColor: 'rgba(91,122,94,.25)', borderColor: 'rgba(91,122,94,.8)', borderWidth: 1.5, borderRadius: 3 },
-        { label: 'Residual', data: volumes.map(v => Math.round(v * 0.012)), type: 'line', borderColor: 'rgba(34,46,72,.8)', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, tension: 0.4, yAxisID: 'y1' }
-      ]
-    },
+    type: s.type,
+    data: { labels: MA_LABELS, datasets: [{
+      label: maChartMetricCur, data: s.data,
+      backgroundColor: bg, borderColor: s.color, borderWidth: isBar ? 1.5 : 2,
+      borderRadius: isBar ? 4 : 0, pointRadius: isBar ? 0 : 3, pointBackgroundColor: s.color,
+      tension: 0.35, fill: !isBar, spanGaps: true
+    }] },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: '#1a1b2e', titleColor: '#e2e8f0', bodyColor: '#94a3b8', borderColor: '#2d3748', borderWidth: 1 } },
+      plugins: { legend: { display:false }, tooltip: { ...MA_TT, mode:'index', intersect:false, callbacks:{ label: c => ' ' + s.fmt(c.parsed.y) } } },
       scales: {
-        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#64748b', font: { size: 9 } } },
-        y: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#64748b', font: { size: 9 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' } },
-        y1: { position: 'right', grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 }, callback: v => '$' + v } }
+        x: { grid:{ display:false }, border:{ display:false }, ticks:{ color:MA_AXIS, font:{ size:10 } } },
+        y: { grid:{ color:MA_GRID }, border:{ display:false }, ticks:{ color:MA_AXIS, font:{ size:10 }, callback:v=>s.fmt(v) } }
       }
     }
   });
 }
 
+function maChartMetric(metric, btn) {
+  maChartMetricCur = metric;
+  if (btn) { document.querySelectorAll('.ma-mtab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+  initMaChart();
+}
 function maChartPeriod(period, btn) {
   document.querySelectorAll('.ma-ptab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   initMaChart();
+}
+
+/* Donut helper */
+function maDonut(id, inst, labels, data, colors) {
+  const ctx = document.getElementById(id);
+  if (!ctx || !window.Chart) return null;
+  if (inst) inst.destroy();
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor:'#FFFFFF', borderWidth:2, hoverOffset:5 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'68%', plugins:{ legend:{ display:false }, tooltip:{ ...MA_TT, callbacks:{ label:c=>' '+c.label+': '+c.parsed+'%' } } } }
+  });
+}
+
+/* Init all overview charts */
+function initMaOverviewCharts() {
+  initMaChart();
+  maCardMixInstance  = maDonut('maCardMixChart', maCardMixInstance, ['Visa','Mastercard','Amex','Discover','Debit'], [52,28,12,5,3], ['#5B7A5E','#A67C5B','#6B839B','#8C7A5E','#A09E9A']);
+  maEntryInstance    = maDonut('maEntryChart', maEntryInstance, ['Chip','Contactless','Swipe','Keyed'], [58,24,11,7], ['#5B7A5E','#6B839B','#A67C5B','#9B6B5B']);
+  maApprovalInstance = maDonut('maApprovalChart', maApprovalInstance, ['Approved','Declined','Refunded'], [98.1,1.3,0.6], ['#5B7A5E','#9B6B5B','#A67C5B']);
 }
 
 // Active merchant top-level tab nav
@@ -17904,7 +17937,7 @@ function maTab(panel, btn) {
     const el = document.getElementById('ma-panel-' + p);
     if (el) el.style.display = p === panel ? 'flex' : 'none';
   });
-  if (panel === 'overview') setTimeout(initMaChart, 50);
+  if (panel === 'overview') setTimeout(initMaOverviewCharts, 50);
   if (panel === 'waterfall') setTimeout(function() { wfInit(document.getElementById('ma-panel-waterfall')); }, 50);
 }
 
@@ -30925,7 +30958,7 @@ function showView(name, clickedNav) {
   if (name === 'dashboard') { setTimeout(initDashCharts, 30); }
   if (name === 'command-center' && typeof initCC === 'function') { setTimeout(initCC, 20); }
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
-  if (name === 'merchant-active') { setTimeout(initMaChart, 50); }
+  if (name === 'merchant-active') { setTimeout(initMaOverviewCharts, 50); }
   if (name === 'residuals' && !resChartsReady) { resChartsReady = true; setTimeout(initResCharts, 50); }
   if (name === 'alerts') {
     setTimeout(function() {
