@@ -2325,6 +2325,13 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-tcard-act:disabled { opacity: .5; cursor: default; }
 </style>
 
+<style>
+/* Add-rep control inside merchant-thread CC cards */
+.cc-tcard .cc-addrep { display: flex; }                 /* always visible in the card */
+.cc-tcard .cc-addrep-menu { top: auto; bottom: calc(100% + 5px); }  /* open upward (thread scrolls) */
+.cc-tcard .cc-wrow-reps { align-items: center; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -35316,7 +35323,28 @@ function addRepToTask(id, repName) {
   closeCCMenus();
   renderAllCC();
   buildFBMenus();
+  ccRefreshMerchantThreadIfViewing(item.merchant); // update the card + show the note in-thread
   ccToast('&#x1F4CC; Pinned to ' + repName + '&rsquo;s Today &middot; notified');
+}
+
+/* Name of the merchant currently on screen (application / active views) */
+function ccCurrentMerchantName() {
+  const v = document.querySelector('.view.active');
+  if (!v) return null;
+  if (v.id === 'view-merchant-detail') {
+    return ((document.getElementById('sig-uw-merchant-name') || {}).textContent ||
+            (document.getElementById('md-merchant-name') || {}).textContent || '').trim();
+  }
+  if (v.id === 'view-merchant-active') {
+    return ((document.getElementById('ma-merchant-name') || {}).textContent || '').trim();
+  }
+  return null;
+}
+/* Re-inject the CC cards/notes if we're currently looking at that merchant */
+function ccRefreshMerchantThreadIfViewing(name) {
+  if (name && ccCurrentMerchantName() === name && typeof injectMerchantThread === 'function') {
+    injectMerchantThread(name);
+  }
 }
 
 /* ── Create a ticket from a work item ── */
@@ -35343,6 +35371,7 @@ function createTicketFromTask(id) {
   closeCCMenus();
   renderAllCC();
   buildFBMenus();
+  ccRefreshMerchantThreadIfViewing(item.merchant);
   ccToast('&#x1F3AB; Ticket created from ' + (item.merchant || 'task'));
 }
 
@@ -35431,9 +35460,8 @@ function ccItemThreadCardHTML(item, merchantName) {
   const stLbl = CC_ST_LBL[item.mst] || '';
   const stCls = CC_ST_CLS[item.mst] || '';
   const priCls = item.pri === 'now' ? 'pri-now' : (item.pri === 'today' ? 'pri-today' : 'pri-week');
-  const reps = ccItemReps(item).map(r =>
-    '<div class="cc-wrow-av stacked" style="background:' + r.avc + ';color:#fff;" title="' + r.name + '">' + r.av + '</div>'
-  ).join('');
+  // Full rep stack with the "+" add-rep menu — same control as the CC rows
+  const reps = ccRepStackHTML(item);
   // Items whose action points back to THIS merchant get a Resolve action (no circular nav)
   const selfNav = item.fn && item.fn.indexOf("navigateToMerchant('" + merchantName + "'") === 0;
   const action = selfNav
@@ -35450,7 +35478,7 @@ function ccItemThreadCardHTML(item, merchantName) {
     '<div class="cc-tcard-title">' + item.title + '</div>' +
     '<div class="cc-tcard-detail">' + item.detail + '</div>' +
     '<div class="cc-tcard-foot">' +
-      '<div class="cc-wrow-reps">' + reps + '</div>' +
+      reps +
       '<span class="cc-wrow-age">' + item.age + '</span>' +
       '<div style="flex:1;"></div>' + action +
     '</div>' +
