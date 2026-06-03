@@ -4166,25 +4166,19 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
     ══════════════════════════════════════════════════ -->
     <div class="view" id="view-alerts">
 
-      <!-- Amber-tinted topbar to differentiate from Tickets -->
-      <div class="topbar" style="border-bottom-color:rgba(245,158,11,0.25);background:var(--bg-surface);">
+      <!-- Topbar — neutral, with an amber 'Alerts' section identity -->
+      <div class="topbar">
         <div class="topbar-left">
           <div>
-            <div class="page-title" style="display:flex;align-items:center;gap:8px;">
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:rgba(245,158,11,0.15);border-radius:6px;font-size:13px;">⚡</span>
+            <div class="page-title" style="display:flex;align-items:center;gap:9px;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:rgba(245,158,11,0.14);color:#D97706;border-radius:7px;font-size:13px;">⚡</span>
               Portfolio Alerts
-              <span style="font-size:11px;font-weight:600;background:rgba(245,158,11,0.15);color:#D97706;padding:2px 8px;border-radius:10px;border:1px solid rgba(245,158,11,0.25);">AI-Powered</span>
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(245,158,11,0.12);color:#B45309;padding:3px 8px;border-radius:6px;border:1px solid rgba(245,158,11,0.22);">AI-Powered</span>
             </div>
-            <div class="page-sub" id="alerts-page-sub">9 active · 3 high severity · AI analyst ready</div>
+            <div class="page-sub" id="alerts-page-sub">9 active · 3 high severity</div>
           </div>
         </div>
         <div class="topbar-right">
-          <div class="view-toggle">
-            <button class="vt-btn active" id="avt-list" onclick="setAlertView('list')">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h12v2H2z"/></svg>
-              List
-            </button>
-          </div>
           <button class="btn btn-ghost">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
             Filter
@@ -4193,11 +4187,11 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         </div>
       </div>
 
-      <!-- Amber accent bar -->
-      <div style="height:3px;background:linear-gradient(90deg,rgba(245,158,11,0.7) 0%,rgba(245,158,11,0.15) 60%,transparent 100%);flex-shrink:0;"></div>
+      <!-- Amber section accent bar — the 'you're in Alerts' signature -->
+      <div class="alerts-accent-bar"></div>
 
-      <!-- KPI STRIP -->
-      <div class="tkpi-strip" style="background:rgba(245,158,11,0.03);border-bottom-color:rgba(245,158,11,0.12);">
+      <!-- KPI STRIP — neutral, values carry the color -->
+      <div class="tkpi-strip">
         <div class="tkpi"><div class="tkpi-label">Active Alerts</div><div class="tkpi-value" style="color:#D97706;">9</div><div class="tkpi-sub">↑ 2 since yesterday</div></div>
         <div class="tkpi"><div class="tkpi-label">High Severity</div><div class="tkpi-value" style="color:var(--red);">3</div><div class="tkpi-sub">Needs immediate action</div></div>
         <div class="tkpi"><div class="tkpi-label">AI Analyzed</div><div class="tkpi-value" style="color:var(--green);">9/9</div><div class="tkpi-sub">All alerts have AI notes</div></div>
@@ -4209,7 +4203,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="tickets-split" id="alerts-split">
 
         <!-- ALERT LIST PANEL -->
-        <div class="tlist-panel" style="border-right-color:rgba(245,158,11,0.15);">
+        <div class="tlist-panel">
           <div class="tlist-search">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4"/><path d="M10 10l3 3"/></svg>
             <input type="text" placeholder="Search alerts…" style="border:none;background:none;outline:none;font-size:12px;color:var(--text-primary);font-family:var(--font-ui);flex:1;" oninput="alertSearchFilter(this.value)">
@@ -4219,6 +4213,19 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             <div class="ttab" onclick="alertTabFilter(this,'high')">High <span class="ttab-count">3</span></div>
             <div class="ttab" onclick="alertTabFilter(this,'chargeback')">Chargeback <span class="ttab-count">2</span></div>
             <div class="ttab" onclick="alertTabFilter(this,'resolved')">Resolved <span class="ttab-count">4</span></div>
+          </div>
+          <div class="tlist-sort">
+            <span class="tlist-count" id="alert-list-count">9 alerts</span>
+            <div class="sort-dropdown">
+              <span class="tlist-sort-btn" id="alert-sort-label" onclick="toggleAlertSortMenu(event)">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+                Most recent ↕
+              </span>
+              <div class="sort-menu" id="alert-sort-menu">
+                <div class="sort-opt active" onclick="applyAlertSort('recent',this)">Most recent <span class="sort-check">✓</span></div>
+                <div class="sort-opt" onclick="applyAlertSort('severity',this)">Severity <span class="sort-check">✓</span></div>
+              </div>
+            </div>
           </div>
           <div class="tlist-body" id="alert-list">
 
@@ -14972,6 +14979,8 @@ function toggleSortMenu(e) {
 document.addEventListener('click', () => {
   const m = document.getElementById('sort-menu');
   if (m) m.classList.remove('open');
+  const am = document.getElementById('alert-sort-menu');
+  if (am) am.classList.remove('open');
 });
 
 function applySort(key, el) {
@@ -31538,6 +31547,7 @@ function alertTabFilter(el, type) {
     if (type === 'resolved')    { row.style.display = row.dataset.stage === 'resolved' ? '' : 'none'; return; }
     row.style.display = '';
   });
+  updateAlertCount();
 }
 
 function alertSearchFilter(q) {
@@ -31547,6 +31557,36 @@ function alertSearchFilter(q) {
     const sub   = row.querySelector('.alert-trow-sub').textContent.toLowerCase();
     row.style.display = (title.includes(lq) || sub.includes(lq)) ? '' : 'none';
   });
+  updateAlertCount();
+}
+
+/* List count + sort (mirrors the Tickets list controls) */
+function updateAlertCount() {
+  const rows = [...document.querySelectorAll('#alert-list .alert-trow')].filter(r => r.style.display !== 'none');
+  const el = document.getElementById('alert-list-count');
+  if (el) el.textContent = rows.length + ' alert' + (rows.length !== 1 ? 's' : '');
+}
+function toggleAlertSortMenu(e) {
+  if (e) e.stopPropagation();
+  const m = document.getElementById('alert-sort-menu');
+  if (m) m.classList.toggle('open');
+}
+const _ALERT_SEV_RANK = { high: 0, medium: 1, low: 2 };
+function applyAlertSort(mode, el) {
+  document.querySelectorAll('#alert-sort-menu .sort-opt').forEach(o => o.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const lbl = document.getElementById('alert-sort-label');
+  if (lbl) lbl.innerHTML = '<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M4 8h8M6 12h4"/></svg> ' + (mode === 'severity' ? 'Severity' : 'Most recent') + ' ↕';
+  const list = document.getElementById('alert-list');
+  if (list) {
+    const rows = [...list.querySelectorAll('.alert-trow')];
+    rows.sort((a, b) => mode === 'severity'
+      ? (_ALERT_SEV_RANK[a.dataset.sev] - _ALERT_SEV_RANK[b.dataset.sev]) || (+a.dataset.idx - +b.dataset.idx)
+      : (+a.dataset.idx - +b.dataset.idx));
+    rows.forEach(r => list.appendChild(r));
+  }
+  const menu = document.getElementById('alert-sort-menu');
+  if (menu) menu.classList.remove('open');
 }
 
 function renderAlertDetail(idx) {
@@ -31576,8 +31616,8 @@ function renderAlertDetail(idx) {
   }).join('');
 
   dc.innerHTML = `
-    <div class="tdetail-header" style="border-bottom:1px solid rgba(245,158,11,0.2);">
-      <div class="tdetail-id" style="color:#D97706;">${a.id} · ${a.type} · Triggered ${a.age}</div>
+    <div class="tdetail-header">
+      <div class="tdetail-id" style="color:#B45309;">${a.id} · ${a.type} · Triggered ${a.age}</div>
       <div class="tdetail-title-row">
         <div class="tdetail-title">${a.title}</div>
       </div>
@@ -31604,13 +31644,13 @@ function renderAlertDetail(idx) {
         </div>
 
         <!-- REPLY BOX with AI Analyst tab -->
-        <div class="treply-box" style="border-top-color:rgba(245,158,11,0.2);">
+        <div class="treply-box">
           <div class="treply-tabs">
-            <div class="rtab" onclick="alertReplyTab(this,'merchant')">Reply to Merchant</div>
             <div class="rtab active ai-tab" onclick="alertReplyTab(this,'ai')">⚡ AI Analyst</div>
+            <div class="rtab" onclick="alertReplyTab(this,'merchant')">Reply to Merchant</div>
             <div class="rtab" onclick="alertReplyTab(this,'internal')">Internal Note</div>
           </div>
-          <textarea class="treply-textarea" id="alert-reply-ta" placeholder="Ask the AI analyst anything about this alert…" style="border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.03);"></textarea>
+          <textarea class="treply-textarea" id="alert-reply-ta" placeholder="Ask the AI analyst anything about this alert…"></textarea>
           <div class="treply-actions">
             <div class="treply-tools">
               <div class="treply-tool" title="Attach file">📎</div>
@@ -31618,7 +31658,7 @@ function renderAlertDetail(idx) {
             </div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Save Draft</button>
-              <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;background:rgba(245,158,11,0.9);color:#1C1F4A;border-color:transparent;" onclick="alertSendReply(this, ${idx})">Send →</button>
+              <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;" onclick="alertSendReply(this, ${idx})">Send →</button>
             </div>
           </div>
         </div>
@@ -34557,12 +34597,14 @@ function assignToast(msg) {
 </script>
 <style id="alerts-css">
 /* ── Alerts view: amber accent header ─── */
+.alerts-accent-bar { height:2px; background:linear-gradient(90deg,#F59E0B 0%,rgba(245,158,11,0.30) 50%,transparent 100%); flex-shrink:0; }
 #view-alerts .tdetail-header {
-  border-left: 3px solid rgba(245,158,11,0.5);
+  border-left: 3px solid rgba(245,158,11,0.55);
 }
-#view-alerts .tlist-panel {
-  border-right: 1px solid rgba(245,158,11,0.15);
-}
+/* Amber active-row accent (vs Tickets' navy) keeps the section distinct */
+#view-alerts .alert-trow.active { background: rgba(245,158,11,0.06) !important; border-left: 3px solid #F59E0B !important; padding-left: 11px !important; }
+#view-alerts .ttab.active { border-bottom-color: #F59E0B; }
+#view-alerts .ttab.active .ttab-count { background: rgba(245,158,11,0.14); color: #B45309; }
 /* AI Analyst chat tab */
 .rtab.ai-tab { color: #D97706; }
 .rtab.ai-tab.active { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); color: #D97706; }
@@ -34646,7 +34688,7 @@ function assignToast(msg) {
 #view-alerts .tmsg-sender { font-size:12px; font-weight:600; }
 #view-alerts .tmsg-time   { font-size:11px; }
 #view-alerts .tmsg-badge  { font-size:10px; padding:2px 6px; }
-#view-alerts .tmsg-ai .tmsg-bubble { font-size:14px; line-height:1.6; padding:14px 16px; border-radius:10px; max-width:none; }
+#view-alerts .tmsg-ai .tmsg-bubble { font-size:14px; line-height:1.6; padding:14px 16px 14px 18px; border-radius:10px; max-width:none; background:var(--bg-surface); border:1px solid var(--border); border-left:3px solid rgba(245,158,11,0.55); color:var(--text-primary); }
 #view-alerts .tmsg-event .tmsg-bubble { font-size:12px; padding:6px 0; }
 /* Reply box — slightly roomier */
 #view-alerts .treply-box { padding:14px 20px; }
