@@ -609,11 +609,13 @@
   .ch-portal { background:var(--blue-dim);   color:var(--blue); }
   .ch-email  { background:var(--green-dim);  color:var(--green); }
   .ch-sms    { background:var(--purple-dim); color:var(--purple); }
+  .ch-api    { background:rgba(131,88,168,0.12); color:#8358A8; }
 
   /* channel pill in meta row */
   .meta-pill.ch-meta-portal { border-color:rgba(59,130,246,0.2); }
   .meta-pill.ch-meta-email  { border-color:rgba(34,197,94,0.2); }
   .meta-pill.ch-meta-sms    { border-color:rgba(139,92,246,0.2); }
+  .meta-pill.ch-meta-api    { border-color:rgba(131,88,168,0.28); }
 
   /* reply box */
   .treply-box { border-top:1px solid var(--border); padding:12px 16px; flex-shrink:0; }
@@ -15020,12 +15022,27 @@ function _renderDetail(idx, targetId) {
         <div class="meta-pill" onclick="tktMetaClick(this,'assigned')"><span class="meta-label">Assigned</span> <span class="meta-sep">·</span> <span class="meta-assigned-val">${assignedBadge}</span></div>
         <div class="meta-pill"><span class="meta-label">Partner</span> <span class="meta-sep">·</span> ${t.partner}</div>
         <div class="meta-pill"><span class="meta-label">Created by</span> <span class="meta-sep">·</span> ${t.createdBy}</div>
-        <div class="meta-pill ch-meta-${t.channel}" title="Merchant contacted via ${t.channelLabel}"><span class="meta-label">Channel</span> <span class="meta-sep">·</span> <span class="ch-badge ch-${t.channel}">${t.channelIcon} ${t.channelLabel}</span></div>
+        ${t.source ? `<div class="meta-pill"><span class="meta-label">Source</span> <span class="meta-sep">·</span> ${ccSourceBadge(t.source)}</div>` : ''}
+        <div class="meta-pill ch-meta-${t.channel}" title="${t.source && t.source.kind==='processor' ? 'Ingested via '+t.channelLabel : 'Merchant contacted via '+t.channelLabel}"><span class="meta-label">Channel</span> <span class="meta-sep">·</span> <span class="ch-badge ch-${t.channel}">${t.channelIcon} ${t.channelLabel}</span></div>
       </div>
     </div>
     <div class="tdetail-body">
       <div class="tthread">
         <div class="tthread-msgs">
+          ${t.source && t.source.kind === 'processor' ? `
+          <div class="tmsg tmsg-event"><div class="tmsg-bubble">⚙ Auto-created from ${t.source.name} via ${t.source.via} · ${d.created}</div></div>
+          <div class="tmsg tmsg-inbound">
+            <div class="tmsg-header">
+              <span class="tmsg-sender">${t.source.name}</span>
+              <span class="ch-badge ch-${t.channel}" style="text-transform:none;">${t.channelIcon} Processor · ${t.channelLabel}</span>
+              <span class="tmsg-time">${d.created}</span>
+            </div>
+            <div class="tmsg-bubble">${t.procMsg || 'Processor request received.'}</div>
+          </div>
+          <div class="tmsg tmsg-note">
+            <div class="tmsg-header"><span class="tmsg-sender">${t.assigned === 'You' ? 'You' : t.assigned}</span><span class="tmsg-badge note-badge">Internal Note</span><span class="tmsg-time">${d.lastAct}</span></div>
+            <div class="tmsg-bubble">Reviewing the ${t.source.name} request — gathering the docs needed to respond before the ${d.sla} SLA.</div>
+          </div>` : `
           <div class="tmsg tmsg-event"><div class="tmsg-bubble">Ticket created · ${d.created}</div></div>
           <div class="tmsg tmsg-inbound">
             <div class="tmsg-header"><span class="tmsg-sender">System</span><span class="tmsg-badge sys-badge">Auto</span><span class="tmsg-time">${d.created}</span></div>
@@ -15042,14 +15059,15 @@ function _renderDetail(idx, targetId) {
           <div class="tmsg tmsg-note">
             <div class="tmsg-header"><span class="tmsg-sender">${t.partner}</span><span class="tmsg-badge note-badge">Internal Note</span><span class="tmsg-time">${d.lastAct}</span></div>
             <div class="tmsg-bubble">Merchant has been contacted and is cooperative. Awaiting resolution.</div>
-          </div>
+          </div>`}
         </div>
         <div class="treply-box">
           <div class="treply-tabs">
-            <div class="rtab active">Reply to Merchant</div>
+            ${t.source && t.source.kind === 'processor' ? `<div class="rtab active" onclick="toggleNoteTab(this)">Reply to ${t.source.name}</div>` : ''}
+            <div class="rtab${t.source && t.source.kind === 'processor' ? '' : ' active'}" onclick="toggleNoteTab(this)">Reply to Merchant</div>
             <div class="rtab" onclick="toggleNoteTab(this)">Internal Note</div>
           </div>
-          <textarea class="treply-textarea" placeholder="Write a reply to ${m.name}…"></textarea>
+          <textarea class="treply-textarea" placeholder="${t.source && t.source.kind === 'processor' ? 'Write a reply to '+t.source.name+'…' : 'Write a reply to '+m.name+'…'}"></textarea>
           <div class="treply-actions">
             <div class="treply-tools">
               <div class="treply-tool" title="Attach file">📎</div>
@@ -36328,20 +36346,62 @@ function applyTicketDashSources(){
     if (mid) mid.insertAdjacentHTML('beforeend', ccSourceBadge(src));
   });
 }
+/* Light per-merchant display data for the dashboard sidebar (processor tickets) */
+const PROC_MERCHANT_INFO = {
+  'Harbor Bistro':      { initials:'HB', color:'#6366F1', sub:'Restaurant · MRC-2291', vol:'$218K', auth:'94.1%', authColor:'var(--text-secondary)', lastBatch:'Today', cb:'1.8%', cbColor:'var(--red)', partner:'Coastal Commerce', tags:['Active','CB Watch'], tagClasses:['badge-green','badge-amber'] },
+  'Green Valley Market':{ initials:'GV', color:'#5B7A5E', sub:'Grocery · MRC-3140', vol:'$96K', auth:'91.2%', authColor:'var(--text-secondary)', lastBatch:'Held', cb:'0.4%', cbColor:'var(--green)', partner:'Apex Elite', tags:['Funding Hold'], tagClasses:['badge-amber'] },
+  'Riverside MCA Group':{ initials:'RM', color:'#6B839B', sub:'Services · MRC-2884', vol:'$340K', auth:'95.6%', authColor:'var(--green)', lastBatch:'Yesterday', cb:'0.2%', cbColor:'var(--green)', partner:'Rivermark', tags:['Active','MCA'], tagClasses:['badge-green','badge-blue'] }
+};
+const PROC_CHANNEL = { API:{ ch:'api', icon:'⚙', label:'API' }, Email:{ ch:'email', icon:'✉', label:'Email' }, Portal:{ ch:'portal', icon:'🖥', label:'Portal' } };
+/* Map a chat-ticket (TKT) into a dashboard ticketData record so the dashboard
+   detail panel (selectTicket → _renderDetail) can render it natively. */
+function tktToTicketData(t){
+  const live = t.status !== 'resolved';
+  const dashStatus = t.status === 'open' ? 'Open' : (t.status === 'resolved' ? 'Resolved' : 'In Review');
+  const statusClass = dashStatus === 'Open' ? 'badge-blue' : (dashStatus === 'Resolved' ? 'badge-green' : 'badge-amber');
+  const mi = PROC_MERCHANT_INFO[t.merchant] || { initials:(t.merchant||'?').slice(0,2).toUpperCase(), color:'#8358A8', sub:(t.processor||'')+' merchant', vol:'—', auth:'—', authColor:'var(--text-muted)', lastBatch:'—', cb:'—', cbColor:'var(--text-muted)', partner:'—', tags:['Active'], tagClasses:['badge-green'] };
+  const ch = PROC_CHANNEL[t.source && t.source.via] || PROC_CHANNEL.API;
+  const procMsg = (t.thread.find(e => e.kind === 'procmsg') || {}).text || '';
+  const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
+  return {
+    id:'#'+t.id, title:t.title, openedAgo:t.created,
+    status:dashStatus, statusClass:statusClass, stage: live ? 'new' : 'resolved',
+    priority:TKT_PRI_LBL[t.priority], priColor:TKT_PRI_COLOR[t.priority],
+    type:cap(t.type), dept:cap(t.dept),
+    assigned:'You', assignedColor:'var(--yellow)', assignedAv:'MA',
+    partner:mi.partner, createdBy:(t.source ? t.source.name+' · '+t.source.via : 'System'),
+    channel:ch.ch, channelLabel:ch.label, channelIcon:ch.icon,
+    source:t.source, procMsg:procMsg,
+    merchant:{ name:t.merchant, sub:mi.sub, initials:mi.initials, color:mi.color,
+      vol:mi.vol, auth:mi.auth, authColor:mi.authColor, lastBatch:mi.lastBatch, cb:mi.cb, cbColor:mi.cbColor,
+      mca:0, mcaLabel:'—', tags:mi.tags, tagClasses:mi.tagClasses },
+    details:{ created:t.created, lastAct:'just now', processor:t.processor||'—', reason:cap(t.type),
+      total:'—', totalColor:'var(--text-muted)', sla:t.sla, slaColor:'var(--text-muted)' },
+    related:[]
+  };
+}
 function prependProcessorTicketRows(){
   const list = document.getElementById('ticket-list');
   if (!list || list.querySelector('[data-tkt]')) return;
   Object.values(TKT).filter(t => t.seeded).forEach(t => {
+    // Register the ticket in ticketData so it opens in the dashboard's own detail panel
+    if (t._dashIdx === undefined) { t._dashIdx = ticketData.length; ticketData.push(tktToTicketData(t)); }
+    const idx = t._dashIdx;
+    const td = ticketData[idx];
     const st = TKT_STATUS[t.status];
     const row = document.createElement('div');
-    row.className = 'trow';
+    row.className = 'trow' + (td.assigned === 'You' ? ' mine' : '');
     row.setAttribute('data-tkt', t.id);
-    row.setAttribute('onclick', "ccOpenTicket('"+t.id+"','"+t.merchant+"')");
+    row.setAttribute('data-idx', idx);
+    row.setAttribute('data-assigned', td.assigned);
+    row.setAttribute('data-dept', td.dept);
+    row.setAttribute('onclick', 'selectTicket(this, '+idx+')');
     row.innerHTML = '<div class="trow-priority pri-'+t.priority+'"></div>' +
       '<div class="trow-body">' +
         '<div class="trow-top"><span class="trow-id">#'+t.id+'</span>' +
           '<span class="p-badge" style="background:'+TKT_PRI_COLOR[t.priority]+'1a;color:'+TKT_PRI_COLOR[t.priority]+';">'+TKT_PRI_LBL[t.priority]+'</span>' +
           ccSourceBadge(t.source) +
+          (td.assigned === 'You' ? '<span class="mine-dot" title="Assigned to you"></span>' : '') +
           '<span class="kb-dept-badge" style="margin-left:auto;text-transform:capitalize;">'+t.dept+'</span></div>' +
         '<div class="trow-title">'+tEsc(t.title)+'</div>' +
         '<div class="trow-mid"><span class="trow-merchant">'+t.merchant+'</span><span class="p-badge" style="background:'+st.color+'1a;color:'+st.color+';">'+st.label+'</span></div>' +
