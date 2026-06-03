@@ -1967,25 +1967,21 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 </style>
 
 <style>
-/* ═══ COMMAND CENTER V3 — CLEAN REDESIGN ═══════════════════════════ */
+/* ═══ COMMAND CENTER V3 — REDESIGN ═══════════════════════════════ */
 
-/* Reset layout — queue full width, no sidebar competing */
-.cc-main { flex-direction: column; gap: 0; }
-.cc-queue-wrap { border-radius: 10px; }
-.cc-team-wrap { display: none; } /* moved to bottom row */
+/* Fix width — align-items:flex-start was collapsing the queue */
+.cc-main { align-items: stretch !important; flex-direction: column !important; gap: 12px !important; }
+.cc-team-wrap { display: none !important; }
 
-/* Compact stat bar — quiet numbers, no loud colored chips */
-.cc-stat-bar { gap: 0; background: transparent; padding: 0; }
+/* Stat bar — flat numbers, no colored chips */
+.cc-stat-bar { gap: 0; flex-wrap: nowrap; }
 .cc-stat {
-  background: transparent !important;
-  border: none !important;
+  background: transparent !important; border: none !important;
   border-right: 1px solid var(--border) !important;
   border-radius: 0 !important;
-  padding: 0 18px !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  color: var(--text-secondary) !important;
-  gap: 6px !important;
+  padding: 0 16px !important;
+  font-size: 12px !important; font-weight: 500 !important;
+  color: var(--text-secondary) !important; gap: 5px !important;
 }
 .cc-stat:first-child { padding-left: 0 !important; }
 .cc-stat:last-child { border-right: none !important; }
@@ -1995,249 +1991,150 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-stat.sla .cc-stat-ct { color: var(--red) !important; }
 .cc-stat.tasks .cc-stat-ct { color: var(--blue) !important; }
 .cc-stat.msgs .cc-stat-ct { color: var(--green) !important; }
-.cc-stat:hover { opacity: 1 !important; background: var(--bg-hover) !important; border-radius: 6px !important; }
-.cc-live-dot { margin-left: 8px; }
+.cc-stat:hover { background: var(--bg-hover) !important; border-radius: 5px !important; }
+.cc-live-dot { margin-left: 6px; }
 
-/* Compact pipeline — single-line chip strip, not tall boxes */
+/* Pipeline — compact inline strip */
 .cc-pipeline { background: transparent; border: none; border-radius: 0; overflow: visible; }
 .cc-pip-track {
-  display: flex;
-  align-items: center;
-  min-height: auto;
-  border-radius: 0;
-  gap: 0;
-  flex-wrap: wrap;
-  padding: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
+  display: flex; align-items: center; min-height: auto;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden; border-radius: 8px; flex-wrap: nowrap;
 }
 .cc-pip-stage {
-  flex: 1;
-  min-width: 80px;
-  flex-direction: row;
-  justify-content: center;
-  padding: 8px 10px;
-  gap: 8px;
-  border-right: 1px solid var(--border);
+  flex: 1; min-width: 72px; flex-direction: row; justify-content: center;
+  padding: 7px 6px; gap: 6px; border-right: 1px solid var(--border);
+  align-items: center;
 }
 .cc-pip-stage:last-child { border-right: none; }
-.cc-pip-lbl {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  margin-bottom: 0;
-}
-.cc-pip-ct {
-  font-size: 14px;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  color: var(--text-primary);
-}
-.cc-pip-attn {
-  position: static;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--red);
-  background: rgba(239,68,68,.1);
-  border: 1px solid rgba(239,68,68,.2);
-  border-radius: 3px;
-  padding: 1px 4px;
-}
+.cc-pip-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing:.05em; margin-bottom:0; white-space:nowrap; }
+.cc-pip-ct { font-size: 14px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); }
+.cc-pip-attn { position:static; font-size:9px; font-weight:700; color:var(--red); background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); border-radius:3px; padding:1px 4px; }
 .cc-pip-arrow { display: none; }
-.cc-pip-acc {
-  margin-top: 4px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-.cc-pip-acc.open { display: block; }
+.cc-pip-acc { margin-top: 4px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 
-/* Simplified filter bar — everything in one row */
+/* Queue — single-row items, full-width */
+.cc-queue-wrap { width: 100%; min-width: 0; border-radius: 10px; }
 .cc-queue-bar {
-  padding: 8px 16px;
-  gap: 6px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-elevated);
-  flex-wrap: nowrap;
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  border-bottom: 1px solid var(--border); background: var(--bg-elevated); flex-wrap: nowrap;
 }
 .cc-queue-ttl { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
-.cc-asgn-sel { font-size: 11px; padding: 3px 8px; white-space: nowrap; }
-.cc-ptabs { gap: 1px; }
+.cc-asgn-sel { font-size: 11px; padding: 3px 8px; white-space: nowrap; flex-shrink: 0; }
+.cc-ptabs { gap: 1px; flex-shrink: 0; }
 .cc-ptab { font-size: 10px; padding: 3px 8px; }
-.cc-cat-pills {
-  padding: 0 16px 0;
-  border-bottom: none;
-  border-top: none;
-  gap: 3px;
-  display: none; /* collapsed into filter bar */
-}
+.cc-cat-pills { display: none; } /* removed from separate row */
+.cc-cat-bar { display: flex; gap: 3px; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.cc-cat-bar::-webkit-scrollbar { display: none; }
+.cc-cpill-sm { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); color: var(--text-muted); background: transparent; transition: all .1s; white-space: nowrap; flex-shrink: 0; }
+.cc-cpill-sm:hover { border-color: var(--border-strong); color: var(--text-secondary); }
+.cc-cpill-sm.on { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-strong); }
 
-/* QUEUE ITEMS — complete visual overhaul */
+/* Tier headers — minimal */
 .cc-tier-hdr {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px 6px;
-  background: transparent;
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 16px 5px; background: var(--bg-surface);
   border-top: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--bg-surface);
+  position: sticky; top: 0; z-index: 2;
 }
 .cc-tier-hdr:first-child { border-top: none; }
-.cc-tier-dot { width: 6px; height: 6px; }
-.cc-tier-lbl { font-size: 10px; letter-spacing: .08em; }
+.cc-tier-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cc-tier-lbl { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .cc-tier-ct { font-size: 10px; color: var(--text-muted); }
 
-/* The new item design — card with colored left border */
+/* ── SINGLE-ROW ITEMS ─────────────────────────────────── */
 .cc-item {
-  padding: 0;
-  border-top: 1px solid var(--border);
-  gap: 0;
-  flex-direction: column;
-  border-left: 3px solid transparent;
-  transition: background .1s, border-left-color .1s;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 0 14px 0 0 !important;
+  min-height: 40px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-left: 3px solid transparent !important;
+  border-top: 1px solid rgba(0,0,0,.05) !important;
+  gap: 0 !important;
+  cursor: default;
+  transition: background .08s;
+  position: relative;
 }
-.cc-item:hover { background: var(--bg-hover); }
-.cc-item.pri-now { border-left-color: var(--red); }
-.cc-item.pri-now:hover { background: rgba(239,68,68,.025); }
-.cc-item.pri-today { border-left-color: var(--amber); }
-.cc-item.pri-today:hover { background: rgba(245,158,11,.018); }
-.cc-item.pri-week { border-left-color: var(--blue); opacity: .9; }
-.cc-item.cc-gone { opacity: 0; transform: translateX(20px); transition: all .22s; }
+.cc-item:hover { background: var(--bg-hover) !important; }
+.cc-item.pri-now  { border-left-color: var(--red) !important; }
+.cc-item.pri-today { border-left-color: var(--amber) !important; }
+.cc-item.pri-week  { border-left-color: rgba(99,102,241,.5) !important; opacity: .88; }
+.cc-item.cc-gone   { opacity: 0 !important; transform: translateX(20px); transition: all .2s !important; }
 
-/* Item inner layout */
-.cc-item-row1 {
+/* Hide old child elements */
+.cc-ileft, .cc-ibody, .cc-iactions { display: none !important; }
+
+/* New single-row inner structure */
+.cc-irow {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px 3px 14px;
+  width: 100%;
+  padding: 0 0 0 12px;
   min-width: 0;
 }
-.cc-item-row2 {
-  padding: 1px 14px 3px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1.4;
+.cc-iname {
+  font-size: 12px; font-weight: 700; color: var(--text-primary);
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
 }
-.cc-item-row3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 14px 9px 14px;
+.cc-iname:hover { color: var(--yellow); text-decoration: underline; }
+.cc-isch { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+.cc-isla-r { font-size: 9px; font-weight: 700; color: var(--red); background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); border-radius: 3px; padding: 1px 5px; flex-shrink: 0; }
+.cc-isep { color: var(--border-strong); font-size: 11px; flex-shrink: 0; }
+.cc-idesc { font-size: 12px; color: var(--text-secondary); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-iav-sm { width: 17px; height: 17px; border-radius: 50%; font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cc-iage-r { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+/* Action button — always visible */
+.cc-iact-r {
+  font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 5px;
+  cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--border-strong);
+  background: var(--bg-elevated); color: var(--text-primary); white-space: nowrap;
+  transition: all .12s; flex-shrink: 0; margin-left: 8px;
 }
-.cc-item-row3-text { font-size: 11px; color: var(--text-muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cc-iact-r:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
 
-/* Tighten up action buttons in row1 */
-.cc-ileft { display: none; } /* Remove left icon column */
-.cc-ibody { display: none; } /* Replaced by row1/row2/row3 */
-.cc-iactions { display: none; } /* Replaced inline */
+/* Snooze + done — only visible on hover */
+.cc-hover-acts { display: none; align-items: center; gap: 1px; flex-shrink: 0; }
+.cc-item:hover .cc-hover-acts { display: flex; }
+.cc-isnz { font-size: 13px; padding: 3px 6px; border-radius: 4px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: all .1s; }
+.cc-isnz:hover { background: var(--bg-elevated); }
+.cc-idone { font-size: 13px; padding: 3px 6px; border-radius: 4px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: all .1s; }
+.cc-idone:hover { background: rgba(34,197,94,.1); color: var(--green); }
 
-/* Override for new item layout */
-.cc-item-inner { width: 100%; }
+/* Snooze menu */
+.cc-isnooze { position: relative; }
+.cc-snooze-menu { position: absolute; right: 0; top: calc(100% + 2px); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 7px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 200; overflow: hidden; min-width: 148px; display: none; }
+.cc-snooze-menu.open { display: block; }
+.cc-snooze-opt { padding: 8px 14px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
+.cc-snooze-opt:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* Done bar */
+.cc-done-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-top: 1px solid rgba(34,197,94,.1); background: rgba(34,197,94,.02); }
+.cc-done-bar:hover { background: rgba(34,197,94,.04); }
+.cc-done-section { display: none; }
+.cc-done-section.open .cc-item { opacity: .38 !important; }
 
 /* Bottom row — team + portfolio side by side */
-.cc-bottom-row {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-.cc-bottom-row .cc-team-wrap {
-  display: flex !important;
-  flex-direction: column;
-  width: 220px;
-  flex-shrink: 0;
-}
+.cc-bottom-row { display: flex; gap: 14px; align-items: flex-start; }
+.cc-bottom-row .cc-team-wrap { display: flex !important; flex-direction: column; width: 210px; flex-shrink: 0; }
 .cc-bottom-row .cc-port-wrap { flex: 1; min-width: 0; }
 
-/* Portfolio alerts — compact */
-.cc-port-hdr { padding: 8px 14px; gap: 8px; }
+/* Compact team + portfolio */
+.cc-team-hdr { padding: 8px 14px; font-size: 10px; background: var(--bg-elevated); }
+.cc-team-row { padding: 7px 14px; }
+.cc-team-name { font-size: 11px; }
+.cc-port-hdr { padding: 8px 14px; gap: 8px; flex-wrap: wrap; }
 .cc-port-ttl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 .cc-port-tabs { gap: 1px; }
 .cc-port-tab { font-size: 10px; padding: 2px 7px; }
-.cc-port-item { padding: 9px 14px; }
-.cc-port-text { font-size: 11px; }
+.cc-port-item { padding: 9px 14px; gap: 10px; }
+.cc-port-text { font-size: 11px; margin-top: 1px; }
 .cc-port-detail { font-size: 10px; }
-
-/* Team sidebar compact */
-.cc-team-hdr { padding: 8px 14px; font-size: 10px; }
-.cc-team-row { padding: 7px 14px; }
-.cc-team-name { font-size: 11px; }
-
-/* Done section */
-.cc-done-bar { padding: 7px 14px; font-size: 11px; }
-
-/* Action buttons — inline in row1 */
-.cc-iact-sm {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: var(--font-ui);
-  border: 1px solid var(--border-strong);
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  white-space: nowrap;
-  transition: all .12s;
-  flex-shrink: 0;
-}
-.cc-iact-sm:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
-.cc-isnooze-sm {
-  font-size: 12px;
-  padding: 3px 7px;
-  border-radius: 5px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  transition: all .12s;
-  flex-shrink: 0;
-}
-.cc-isnooze-sm:hover { background: var(--bg-elevated); border-color: var(--border); }
-.cc-idone-sm {
-  font-size: 13px;
-  padding: 3px 7px;
-  border-radius: 5px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  transition: all .12s;
-  flex-shrink: 0;
-}
-.cc-idone-sm:hover { background: rgba(34,197,94,.1); color: var(--green); border-color: rgba(34,197,94,.25); }
-
-/* Category filter as inline pills in queue bar */
-.cc-cat-bar {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.cc-cat-bar::-webkit-scrollbar { display: none; }
-.cc-cpill-sm {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 20px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  background: transparent;
-  transition: all .1s;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.cc-cpill-sm:hover { border-color: var(--border-strong); color: var(--text-secondary); }
-.cc-cpill-sm.on { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border-strong); }
+.cc-port-acts .cc-iact { font-size: 10px; padding: 3px 8px; }
 </style>
 </head>
 <body>
@@ -34795,43 +34692,42 @@ function ccItemHTML(item, isDoneView) {
   const ms = item.mst || 'lead';
   const priCls = isDoneView ? '' : 'pri-' + item.pri;
 
-  const merchantSpan = item.merchant
-    ? '<span class="cc-imerchant" onclick="navigateToMerchant(\'' + mn + '\',\'' + ms + '\')">' + item.merchant + '</span>'
-    : '<span style="font-size:12px;font-weight:600;color:var(--text-secondary);">Standalone</span>';
-
-  const snoozeBlock = '<div class="cc-isnooze" style="position:relative;">' +
-    '<button class="cc-isnooze-sm" onclick="toggleSnooze(\'' + item.id + '\')" title="Snooze">&#x1F4A4;</button>' +
-    '<div class="cc-snooze-menu" id="sm-' + item.id + '">' +
-      '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'2h\')">2 hours</div>' +
-      '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'tomorrow\')">Tomorrow morning</div>' +
-      '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'monday\')">Next Monday</div>' +
-    '</div></div>';
-
   if (isDoneView) {
-    return '<div class="cc-item" id="cqi-' + item.id + '" style="opacity:.38;">' +
-      '<div class="cc-item-row1">' +
-        merchantSpan +
-        '<span style="color:var(--border-strong);font-size:11px;">&middot;</span>' +
-        '<span style="font-size:11px;color:var(--text-muted);flex:1;">' + item.title + '</span>' +
-        '<span style="font-size:11px;color:var(--green);">&#x2713; Done</span>' +
-      '</div>' +
-    '</div>';
+    return '<div class="cc-item" id="cqi-' + item.id + '">' +
+      '<div class="cc-irow">' +
+        '<span style="font-size:12px;font-weight:600;color:var(--text-muted);text-decoration:line-through;">' + (item.merchant || 'Standalone') + '</span>' +
+        '<span class="cc-isep">&middot;</span>' +
+        '<span style="font-size:12px;color:var(--text-muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.title + '</span>' +
+        '<span style="font-size:11px;color:var(--green);flex-shrink:0;">&#x2713; Done</span>' +
+      '</div></div>';
   }
 
+  const nameEl = item.merchant
+    ? '<span class="cc-iname" onclick="navigateToMerchant(\'' + mn + '\',\'' + ms + '\')">' + item.merchant + '</span>'
+    : '<span class="cc-iname" style="color:var(--text-secondary);cursor:default;">Standalone</span>';
+
   return '<div class="cc-item ' + priCls + '" id="cqi-' + item.id + '">' +
-    '<div class="cc-item-row1">' +
-      merchantSpan +
-      (stLbl ? '<span class="cc-istatus ' + stCls + '">' + stLbl + '</span>' : '') +
-      (item.sla ? '<span class="cc-isla">&#x23F1; SLA</span>' : '') +
-      '<div style="flex:1;"></div>' +
-      '<div class="cc-iav" style="background:' + item.avc + ';color:#fff;width:18px;height:18px;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + item.av + '</div>' +
-      '<span style="font-size:10px;color:var(--text-muted);white-space:nowrap;">' + item.age + ' ago</span>' +
-      '<button class="cc-iact-sm" onclick="' + item.fn + '">' + item.act + '</button>' +
-      snoozeBlock +
-      '<button class="cc-idone-sm" onclick="doneCC(\'' + item.id + '\')" title="Mark done">&#x2713;</button>' +
+    '<div class="cc-irow">' +
+      nameEl +
+      (stLbl ? '<span class="cc-isch ' + stCls + '">' + stLbl + '</span>' : '') +
+      (item.sla ? '<span class="cc-isla-r">&#x23F1; SLA</span>' : '') +
+      '<span class="cc-isep">&middot;</span>' +
+      '<span class="cc-idesc">' + item.title + '</span>' +
+      '<div class="cc-iav-sm" style="background:' + item.avc + ';color:#fff;">' + item.av + '</div>' +
+      '<span class="cc-iage-r">' + item.age + '</span>' +
+      '<button class="cc-iact-r" onclick="' + item.fn + '">' + item.act + '</button>' +
+      '<div class="cc-hover-acts">' +
+        '<div class="cc-isnooze">' +
+          '<button class="cc-isnz" onclick="toggleSnooze(\'' + item.id + '\')" title="Snooze">&#x1F4A4;</button>' +
+          '<div class="cc-snooze-menu" id="sm-' + item.id + '">' +
+            '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'2h\')">2 hours</div>' +
+            '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'tomorrow\')">Tomorrow morning</div>' +
+            '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'monday\')">Next Monday</div>' +
+          '</div>' +
+        '</div>' +
+        '<button class="cc-idone" onclick="doneCC(\'' + item.id + '\')" title="Done">&#x2713;</button>' +
+      '</div>' +
     '</div>' +
-    '<div class="cc-item-row2">' + item.title + '</div>' +
-    '<div class="cc-item-row3"><span class="cc-item-row3-text">' + item.detail + '</span></div>' +
   '</div>';
 }
 
