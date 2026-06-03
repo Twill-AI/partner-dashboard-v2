@@ -2357,6 +2357,128 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .ma-snap-v.warn { color: var(--amber); }
 </style>
 
+<style>
+/* ═══ TICKETS V2 — full-screen focus overlay + anchor cards + hover icons ═══ */
+
+/* Hover create icons on chat messages / activities */
+.cc-msg-actions { position:absolute; top:6px; right:8px; display:none; gap:3px; z-index:5; }
+.act:hover > .cc-msg-actions, .syse:hover .cc-msg-actions { display:flex; }
+.cc-msg-act { width:24px; height:24px; border-radius:6px; border:1px solid var(--border-strong); background:var(--bg-surface); color:var(--text-secondary); font-size:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .12s; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.cc-msg-act:hover { background:var(--yellow); color:#09091A; border-color:var(--yellow); }
+.act, .syse { position:relative; }
+
+/* Anchor card (ticket marker in the merchant thread) */
+.tkt-anchor { background:var(--bg-surface); border:1px solid var(--border); border-left:3px solid var(--amber); border-radius:9px; padding:10px 12px; margin:8px 0; cursor:pointer; transition:box-shadow .12s, border-color .12s; }
+.tkt-anchor:hover { box-shadow:0 3px 12px rgba(0,0,0,.07); border-color:var(--border-strong); }
+.tkt-anchor.st-resolved { border-left-color:var(--green); opacity:.85; }
+.tkt-anchor.st-waiting_merchant, .tkt-anchor.st-waiting_processor { border-left-color:#A78BFA; }
+.tkt-anchor.st-open { border-left-color:var(--blue); }
+.tkt-a-top { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.tkt-a-id { font-size:10px; font-weight:800; font-family:var(--font-mono); color:var(--amber); letter-spacing:.02em; }
+.tkt-a-status { font-size:9.5px; font-weight:700; padding:1px 7px; border-radius:4px; text-transform:uppercase; letter-spacing:.03em; }
+.tkt-a-dots { display:flex; gap:3px; margin-left:2px; }
+.tkt-a-dot { width:6px; height:6px; border-radius:50%; background:var(--border-strong); }
+.tkt-a-dot.on { background:var(--amber); }
+.tkt-a-dot.done { background:var(--green); }
+.tkt-a-tag { font-size:9px; font-weight:700; padding:1px 6px; border-radius:3px; text-transform:uppercase; }
+.tkt-a-tag.overdue { background:rgba(239,68,68,.1); color:var(--red); border:1px solid rgba(239,68,68,.25); }
+.tkt-a-tag.escalated { background:rgba(245,158,11,.1); color:var(--amber); border:1px solid rgba(245,158,11,.25); }
+.tkt-a-count { margin-left:auto; font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:4px; white-space:nowrap; }
+.tkt-a-title { font-size:12.5px; font-weight:600; color:var(--text-primary); margin-top:6px; line-height:1.35; }
+.tkt-a-last { font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.4; display:flex; align-items:center; gap:6px; }
+.tkt-a-last .pv { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-style:italic; }
+.tkt-a-foot { display:flex; align-items:center; gap:8px; margin-top:9px; }
+.tkt-a-docs { font-size:10px; color:var(--text-muted); display:inline-flex; align-items:center; gap:3px; }
+.tkt-a-open { margin-left:auto; font-size:11px; font-weight:600; padding:4px 11px; border-radius:6px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); cursor:pointer; font-family:var(--font-ui); }
+.tkt-a-open:hover { background:var(--yellow); color:#09091A; border-color:var(--yellow); }
+
+/* Full-screen focus overlay */
+.cc-fs { position:fixed; inset:0; background:var(--bg-base); z-index:600; display:none; flex-direction:column; }
+.cc-fs.open { display:flex; }
+.cc-fs-hdr { display:flex; align-items:center; gap:12px; padding:11px 18px; background:var(--bg-surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+.cc-fs-min { display:flex; align-items:center; gap:6px; padding:6px 13px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:7px; font-size:11px; font-weight:600; color:var(--text-primary); cursor:pointer; font-family:var(--font-ui); }
+.cc-fs-min:hover { background:var(--bg-hover); }
+.cc-fs-hi { display:flex; align-items:center; gap:8px; min-width:0; }
+.cc-fs-hi-id { font-size:11px; font-weight:800; font-family:var(--font-mono); color:var(--amber); }
+.cc-fs-hi-title { font-size:14px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cc-fs-hi-sub { font-size:11px; color:var(--text-muted); }
+.cc-fs-body { display:flex; flex:1; min-height:0; overflow:hidden; }
+.cc-fs-rail { width:288px; flex-shrink:0; border-right:1px solid var(--border); background:var(--bg-surface); overflow-y:auto; padding:0; }
+.cc-fs-chat { flex:1; display:flex; flex-direction:column; min-width:0; }
+.cc-fs-thread { flex:1; overflow-y:auto; padding:16px 22px; display:flex; flex-direction:column; gap:2px; max-width:900px; width:100%; margin:0 auto; }
+.cc-fs-inp { border-top:1px solid var(--border); padding:10px 16px 12px; background:var(--bg-surface); flex-shrink:0; max-width:900px; width:100%; margin:0 auto; box-sizing:border-box; }
+.cc-fs-tabs { display:flex; gap:2px; margin-bottom:8px; }
+.cc-fs-tab { font-size:11px; font-weight:600; padding:5px 12px; border-radius:6px 6px 0 0; cursor:pointer; color:var(--text-muted); border-bottom:2px solid transparent; }
+.cc-fs-tab:hover { color:var(--text-secondary); }
+.cc-fs-tab.on { color:var(--text-primary); border-bottom-color:var(--yellow); }
+.cc-fs-tab.ai.on { border-bottom-color:#A78BFA; color:#7c5cc4; }
+.cc-fs-ta-wrap { display:flex; gap:8px; align-items:flex-end; }
+.cc-fs-ta-wrap textarea { flex:1; padding:9px 12px; background:var(--bg-base); border:1px solid var(--border-strong); border-radius:8px; font-size:12px; color:var(--text-primary); font-family:var(--font-ui); resize:none; outline:none; }
+.cc-fs-ta-wrap textarea:focus { border-color:var(--yellow); }
+.cc-fs-send { width:36px; height:36px; border-radius:8px; border:none; background:var(--yellow); color:#09091A; font-size:16px; cursor:pointer; flex-shrink:0; }
+.cc-fs-tools { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.cc-fs-tool { font-size:11px; color:var(--text-muted); background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:4px; padding:2px 4px; }
+.cc-fs-tool:hover { color:var(--text-secondary); }
+
+/* Rail sections */
+.fsr-sec { padding:14px 16px; border-bottom:1px solid var(--border); }
+.fsr-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px; }
+/* status stepper */
+.fsr-stepper { display:flex; align-items:center; gap:0; margin-bottom:4px; }
+.fsr-step { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; }
+.fsr-step-dot { width:18px; height:18px; border-radius:50%; background:var(--bg-elevated); border:1.5px solid var(--border-strong); display:flex; align-items:center; justify-content:center; font-size:9px; color:var(--text-muted); z-index:1; }
+.fsr-step.done .fsr-step-dot { background:var(--green); border-color:var(--green); color:#fff; }
+.fsr-step.current .fsr-step-dot { background:var(--amber); border-color:var(--amber); color:#fff; }
+.fsr-step-lbl { font-size:8.5px; color:var(--text-muted); text-align:center; }
+.fsr-step.current .fsr-step-lbl, .fsr-step.done .fsr-step-lbl { color:var(--text-secondary); font-weight:600; }
+.fsr-step-line { position:absolute; top:9px; left:50%; width:100%; height:1.5px; background:var(--border-strong); z-index:0; }
+.fsr-step.done .fsr-step-line { background:var(--green); }
+.fsr-status-btns { display:flex; flex-direction:column; gap:5px; margin-top:10px; }
+.fsr-sbtn { display:flex; align-items:center; gap:7px; padding:7px 10px; border-radius:7px; border:1px solid var(--border); background:var(--bg-base); font-size:11px; font-weight:600; color:var(--text-secondary); cursor:pointer; text-align:left; font-family:var(--font-ui); }
+.fsr-sbtn:hover { border-color:var(--border-strong); }
+.fsr-sbtn.active { background:var(--bg-elevated); color:var(--text-primary); border-color:var(--navy); }
+.fsr-sbtn .d { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+/* selects */
+.fsr-field { margin-bottom:9px; }
+.fsr-field label { display:block; font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+.fsr-field select { width:100%; padding:7px 9px; background:var(--bg-base); border:1px solid var(--border-strong); border-radius:6px; font-size:11px; color:var(--text-primary); font-family:var(--font-ui); outline:none; cursor:pointer; }
+.fsr-field select:focus { border-color:var(--yellow); }
+/* members */
+.fsr-member { display:flex; align-items:center; gap:8px; padding:6px 0; }
+.fsr-member-av { width:24px; height:24px; border-radius:50%; font-size:9px; font-weight:700; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.fsr-member-name { font-size:12px; color:var(--text-primary); flex:1; }
+.fsr-member-x { font-size:13px; color:var(--text-muted); cursor:pointer; padding:2px 5px; border-radius:4px; }
+.fsr-member-x:hover { background:rgba(239,68,68,.1); color:var(--red); }
+.fsr-addmem { position:relative; margin-top:6px; }
+.fsr-addmem-btn { width:100%; padding:7px; border:1px dashed var(--border-strong); border-radius:7px; background:transparent; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; font-family:var(--font-ui); }
+.fsr-addmem-btn:hover { color:var(--text-secondary); border-color:var(--navy); }
+.fsr-addmem-menu { position:absolute; left:0; right:0; top:calc(100% + 4px); background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.14); z-index:10; padding:4px; display:none; }
+.fsr-addmem-menu.open { display:block; }
+.fsr-addmem-opt { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; cursor:pointer; font-size:12px; color:var(--text-secondary); }
+.fsr-addmem-opt:hover { background:var(--bg-hover); color:var(--text-primary); }
+/* tags */
+.fsr-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.fsr-tag-tog { font-size:10px; font-weight:700; padding:4px 9px; border-radius:5px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; text-transform:uppercase; letter-spacing:.03em; font-family:var(--font-ui); }
+.fsr-tag-tog.on.overdue { background:rgba(239,68,68,.1); color:var(--red); border-color:rgba(239,68,68,.3); }
+.fsr-tag-tog.on.escalated { background:rgba(245,158,11,.1); color:var(--amber); border-color:rgba(245,158,11,.3); }
+.fsr-resolve { width:100%; padding:9px; border-radius:8px; border:none; background:var(--green); color:#fff; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font-ui); }
+.fsr-resolve:hover { opacity:.9; }
+.fsr-reopen { width:100%; padding:9px; border-radius:8px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-ui); }
+.fsr-meta-row { display:flex; justify-content:space-between; font-size:11px; padding:4px 0; }
+.fsr-meta-row .k { color:var(--text-muted); }
+.fsr-meta-row .v { color:var(--text-primary); font-weight:600; }
+/* attachments */
+.fsr-doc { display:flex; align-items:center; gap:8px; padding:6px 8px; background:var(--bg-base); border:1px solid var(--border); border-radius:6px; margin-bottom:5px; font-size:11px; }
+.fsr-doc .ic { font-size:13px; }
+.fsr-doc .nm { flex:1; min-width:0; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* Conversation entries (reuse .act styling but ensure good spacing) */
+.cc-fs-thread .act { padding:8px 0; }
+.tkt-doc-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:7px; font-size:11px; color:var(--text-secondary); margin-top:4px; }
+.tkt-ai-bub { background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.2); border-radius:9px; padding:10px 12px; font-size:12px; color:var(--text-secondary); line-height:1.5; }
+.tkt-ai-bub strong { color:var(--text-primary); }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -6949,7 +7071,7 @@ function nudgeWithDocs() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
+            <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -11003,7 +11125,7 @@ function nudgeWithDocs() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
+            <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -17969,19 +18091,9 @@ const ASSIGNEES = [
 ];
 
 /* ── Inject hover buttons onto chat messages ── */
-function initChatTicketing() {
-  document.querySelectorAll('.ch-thread .act, #drActivityThread .act, #maActivityThread .act').forEach(act => {
-    if (act.classList.contains('sys')) return;
-    if (act.querySelector('.chat-tkt-actions')) return;
-    if (act.closest('.inline-ticket')) return; // don't add to ticket replies
-    const actions = document.createElement('div');
-    actions.className = 'chat-tkt-actions';
-    actions.innerHTML = '<div class="chat-tkt-btn" onclick="event.stopPropagation(); startInlineTicket(this.closest(\'.act\'))">🎫 Create Ticket</div>';
-    act.appendChild(actions);
-  });
-}
-
-setTimeout(initChatTicketing, 200);
+/* RETIRED: old inline-ticket hover button. Replaced by Tickets V2
+   (injectChatHoverActions + createTicketFromMsg/createTaskFromMsg). */
+function initChatTicketing() { /* no-op */ }
 
 /* ── Get merchant context ── */
 function getCurrentMerchantContext() {
@@ -21520,7 +21632,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
+            <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -24379,7 +24491,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
+            <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -27239,7 +27351,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
+            <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -30098,7 +30210,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
+            <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -35698,5 +35810,399 @@ document.addEventListener('click', e => {
   </div>
 </div>
 
+<!-- ═══ TICKETS V2 — full-screen focus overlay ═══ -->
+<div class="cc-fs" id="cc-fs">
+  <div class="cc-fs-hdr">
+    <button class="cc-fs-min" onclick="closeFS()">&#x2190; Back to thread</button>
+    <div class="cc-fs-hi">
+      <span class="cc-fs-hi-id" id="cc-fs-hi-id"></span>
+      <span class="cc-fs-hi-title" id="cc-fs-hi-title"></span>
+      <span class="cc-fs-hi-sub" id="cc-fs-hi-sub"></span>
+    </div>
+  </div>
+  <div class="cc-fs-body">
+    <div class="cc-fs-rail" id="cc-fs-rail"></div>
+    <div class="cc-fs-chat">
+      <div class="cc-fs-thread" id="cc-fs-thread"></div>
+      <div class="cc-fs-inp">
+        <div class="cc-fs-tabs">
+          <div class="cc-fs-tab on" data-m="int" onclick="fsMode('int',this)">&#x1F512; Internal</div>
+          <div class="cc-fs-tab" data-m="out" onclick="fsMode('out',this)">&#x1F4AC; Merchant</div>
+          <div class="cc-fs-tab ai" data-m="ai" onclick="fsMode('ai',this)">&#x2726; Ask AI</div>
+        </div>
+        <div class="cc-fs-ta-wrap">
+          <textarea id="fsInput" rows="2" placeholder="Add an internal note to this ticket&hellip;"></textarea>
+          <button class="cc-fs-send" onclick="fsSend()">&#x2192;</button>
+        </div>
+        <div class="cc-fs-tools">
+          <button class="cc-fs-tool" onclick="fsAttach()">&#x1F4CE; Attach document</button>
+          <button class="cc-fs-tool">@ Mention</button>
+          <div style="flex:1;"></div>
+          <span class="cc-fs-tool" id="cc-fs-foot-name" style="cursor:default;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   TICKETS V2 — create from chat, anchor card, full-screen focus,
+   threaded conversation, status lifecycle, members, Ask AI.
+   Replaces the retired inline-ticket system.
+   ═══════════════════════════════════════════════════════════════ */
+
+const TKT = {};                 // id -> ticket object
+let TKT_SEQ = 50;
+let fsCur = null;               // current ticket id open in the overlay
+let fsInputMode = 'int';
+
+const TKT_MEMBERS = [
+  {name:'M. Wright',   av:'MW', avc:'#A09E9A'},
+  {name:'S. Patel',    av:'SP', avc:'#5B7A5E'},
+  {name:'J. Rivera',   av:'JR', avc:'#6B839B'},
+  {name:'D. Martinez', av:'DM', avc:'#9B6B5B'},
+  {name:'Sara Reyes',  av:'SR', avc:'#A67C5B'},
+];
+const TKT_STATUS = {
+  open:              {label:'Open',                 stage:0, color:'var(--blue)',  cls:'st-open'},
+  inprogress:        {label:'In Progress',          stage:1, color:'var(--amber)', cls:'st-inprogress'},
+  waiting_merchant:  {label:'Waiting · Merchant',   stage:2, color:'#A78BFA',      cls:'st-waiting_merchant'},
+  waiting_processor: {label:'Waiting · Processor',  stage:2, color:'#A78BFA',      cls:'st-waiting_processor'},
+  resolved:          {label:'Resolved',             stage:3, color:'var(--green)', cls:'st-resolved'},
+};
+const TKT_STAGES = ['Open','In Progress','Waiting','Resolved'];
+
+function tNow() { return new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+function tEsc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function tStrip(s){ return (s||'').replace(/<[^>]*>/g,' ').replace(/&[a-z]+;/g,' ').replace(/\s+/g,' ').trim(); }
+
+/* ── Create a ticket from a chat message/activity ── */
+function createTicketFromMsg(srcEl) {
+  const merchant = (typeof ccCurrentMerchantName === 'function' && ccCurrentMerchantName()) || 'Pacific Coast Retail';
+  const bubble = srcEl.querySelector('.abub');
+  const sysTxt = srcEl.querySelector('.syst');
+  const text = (bubble ? bubble.textContent : (sysTxt ? sysTxt.textContent : '')).trim();
+  const title = text.length > 70 ? text.slice(0,67) + '…' : (text || 'New ticket');
+  const id = 'TKT-' + String(TKT_SEQ++).padStart(3,'0');
+  const t = {
+    id, title, merchant, status:'open', priority:'normal', type:'general', dept:'support',
+    members:[{name:'M. Wright', av:'MW', avc:'#A09E9A'}],
+    sla:'24h left', tags:[], docs:[], thread:[], created:tNow(),
+    sourceText:text
+  };
+  // seed the conversation with the originating message + an opened event
+  t.thread.push({kind:'src', text:text, time:t.created});
+  t.thread.push({kind:'sys', text:'Ticket opened from chat by M. Wright', time:t.created});
+  TKT[id] = t;
+
+  // find the thread the source message lives in, drop the anchor there
+  const thread = srcEl.closest('.ch-thread') || findVisibleThread();
+  insertAnchor(t, thread);
+
+  ccToast('&#x1F3AB; ' + id + ' created');
+  openTicket(id);   // auto-open the focused full-screen view
+}
+
+/* ── Create a task from a chat message (lightweight CC item) ── */
+function createTaskFromMsg(srcEl) {
+  const merchant = (typeof ccCurrentMerchantName === 'function' && ccCurrentMerchantName()) || null;
+  const bubble = srcEl.querySelector('.abub');
+  const sysTxt = srcEl.querySelector('.syst');
+  const text = (bubble ? bubble.textContent : (sysTxt ? sysTxt.textContent : '')).trim();
+  const title = text.length > 70 ? text.slice(0,67) + '…' : (text || 'Follow up');
+  if (typeof ccQ !== 'undefined') {
+    ccQ.unshift({ id:'wq-tk-'+(ccQ.length+1), pri:'today', cat:'task', merchant, mst:null,
+      assignee:'M. Wright', av:'MW', avc:'#A09E9A', partner:'', processor:'—',
+      title, detail:'Task created from chat', act:'View →', fn: merchant ? "navigateToMerchant('"+merchant+"','active')" : 'openCCTask()',
+      age:'now', sla:false, done:false, snoozed:false });
+    if (typeof renderAllCC === 'function') renderAllCC();
+    if (merchant && typeof ccRefreshMerchantThreadIfViewing === 'function') ccRefreshMerchantThreadIfViewing(merchant);
+  }
+  ccToast('&#x2713; Task created from message');
+}
+
+/* ── Anchor card ── */
+function tDocsIcon(t){ return t.docs.length ? '<span class="tkt-a-docs">&#x1F4CE; ' + t.docs.length + '</span>' : ''; }
+function tDots(t){
+  const stage = TKT_STATUS[t.status].stage;
+  let h = '<div class="tkt-a-dots">';
+  for (let i=0;i<4;i++){ h += '<div class="tkt-a-dot ' + (t.status==='resolved'&&i<=stage?'done':(i<stage?'done':(i===stage?'on':''))) + '"></div>'; }
+  return h + '</div>';
+}
+function tLastEntry(t){
+  for (let i=t.thread.length-1;i>=0;i--){ const e=t.thread[i]; if (e.kind==='msg'||e.kind==='ai') return e; }
+  return null;
+}
+function anchorHTML(t){
+  const st = TKT_STATUS[t.status];
+  const last = tLastEntry(t);
+  const lastTxt = last ? (last.kind==='ai' ? '✦ AI research added' : tEsc(tStrip(last.text).slice(0,80))) : '';
+  const lastLine = last
+    ? '<div class="tkt-a-last"><span class="pv">' + (last.kind==='ai' ? lastTxt : '&ldquo;'+lastTxt+'&rdquo;') + '</span><span>&mdash; ' + (last.author||'M. Wright') + ' &middot; ' + last.time + '</span></div>'
+    : '<div class="tkt-a-last"><span class="pv">Opened &middot; awaiting first response</span></div>';
+  const members = t.members.map(m=>'<div class="cc-wrow-av stacked" style="background:'+m.avc+';color:#fff;" title="'+m.name+'">'+m.av+'</div>').join('');
+  const tags = t.tags.map(tg=>'<span class="tkt-a-tag '+tg+'">'+tg+'</span>').join('');
+  return '<div class="tkt-a-top">' +
+      '<span class="tkt-a-id">&#x1F3AB; ' + t.id + '</span>' +
+      '<span class="tkt-a-status" style="background:'+st.color+'1a;color:'+st.color+';">' + st.label + '</span>' +
+      tDots(t) + tags +
+      '<span class="tkt-a-count">&#x1F4AC; ' + t.thread.filter(e=>e.kind==='msg'||e.kind==='ai').length + ' &middot; ' + tDocsIcon2(t) + '</span>' +
+    '</div>' +
+    '<div class="tkt-a-title">' + tEsc(t.title) + '</div>' +
+    lastLine +
+    '<div class="tkt-a-foot"><div class="cc-wrow-reps">' + members + '</div>' +
+      '<button class="tkt-a-open" onclick="event.stopPropagation();openTicket(\'' + t.id + '\')">Open &#x2192;</button>' +
+    '</div>';
+}
+function tDocsIcon2(t){ return t.docs.length ? ('&#x1F4CE; ' + t.docs.length) : 'no docs'; }
+
+function insertAnchor(t, thread){
+  if (!thread) return;
+  const el = document.createElement('div');
+  el.className = 'tkt-anchor ' + TKT_STATUS[t.status].cls;
+  el.id = 'tkt-anchor-' + t.id;
+  el.setAttribute('onclick', "openTicket('" + t.id + "')");
+  el.innerHTML = anchorHTML(t);
+  thread.appendChild(el);
+  t.threadEl = thread;
+  thread.scrollTop = thread.scrollHeight;
+  // mirror to docked Activity panel if this is the sig thread
+  if (thread.id === 'sig-uw-thread' && typeof syncActivityFromSig === 'function') syncActivityFromSig();
+}
+/* Bump the anchor to most-recent and refresh its content */
+function bumpAnchor(t){
+  document.querySelectorAll('.tkt-anchor#tkt-anchor-' + t.id + ', [id="tkt-anchor-' + t.id + '"]').forEach(()=>{});
+  const all = document.querySelectorAll('#tkt-anchor-' + t.id);
+  all.forEach(el => {
+    el.className = 'tkt-anchor ' + TKT_STATUS[t.status].cls;
+    el.innerHTML = anchorHTML(t);
+    const thread = el.parentElement;
+    if (thread) { thread.appendChild(el); thread.scrollTop = thread.scrollHeight; }
+  });
+  if (t.threadEl && t.threadEl.id === 'sig-uw-thread' && typeof syncActivityFromSig === 'function') syncActivityFromSig();
+}
+
+/* ── Open / close the full-screen focus overlay ── */
+function restoreExpandedThread(){
+  if (_expandedThreadHome) {
+    const { node, parent, next } = _expandedThreadHome;
+    if (next && next.parentNode === parent) parent.insertBefore(node, next); else parent.appendChild(node);
+    _expandedThreadHome = null;
+  }
+}
+function openTicket(id){
+  const t = TKT[id]; if (!t) return;
+  restoreExpandedThread();   // if a merchant conversation was moved in, return it home first
+  fsCur = id;
+  document.getElementById('cc-fs-hi-id').textContent = t.id;
+  document.getElementById('cc-fs-hi-title').textContent = t.title;
+  document.getElementById('cc-fs-hi-sub').textContent = '/ ' + t.merchant;
+  document.getElementById('cc-fs-foot-name').textContent = t.merchant;
+  renderFsRail(t);
+  renderFsThread(t);
+  document.getElementById('cc-fs').classList.add('open');
+}
+function closeFS(){ document.getElementById('cc-fs').classList.remove('open'); fsCur = null; }
+
+/* ── Rail (ticket controls) ── */
+function renderFsRail(t){
+  const st = TKT_STATUS[t.status];
+  const stage = st.stage;
+  let steps = '';
+  TKT_STAGES.forEach((lbl,i) => {
+    const cls = (t.status==='resolved') ? (i<=stage?'done':'') : (i<stage?'done':(i===stage?'current':''));
+    steps += '<div class="fsr-step ' + cls + '">' + (i<TKT_STAGES.length-1?'<div class="fsr-step-line"></div>':'') +
+      '<div class="fsr-step-dot">' + (cls==='done'?'&#x2713;':(i+1)) + '</div><div class="fsr-step-lbl">' + lbl + '</div></div>';
+  });
+  const statusBtn = (key) => {
+    const s = TKT_STATUS[key];
+    return '<button class="fsr-sbtn ' + (t.status===key?'active':'') + '" onclick="tktSetStatus(\'' + t.id + '\',\'' + key + '\')"><span class="d" style="background:'+s.color+';"></span>' + s.label + '</button>';
+  };
+  const members = t.members.map(m =>
+    '<div class="fsr-member"><div class="fsr-member-av" style="background:'+m.avc+';">'+m.av+'</div><span class="fsr-member-name">'+m.name+'</span>' +
+    (t.members.length>1 ? '<span class="fsr-member-x" onclick="tktRemoveMember(\''+t.id+'\',\''+m.name+'\')" title="Remove">&#x2715;</span>' : '') + '</div>'
+  ).join('');
+  const avail = TKT_MEMBERS.filter(m => !t.members.some(x=>x.name===m.name));
+  const addMenu = avail.length ? avail.map(m =>
+    '<div class="fsr-addmem-opt" onclick="tktAddMember(\''+t.id+'\',\''+m.name+'\')"><div class="fsr-member-av" style="background:'+m.avc+';width:18px;height:18px;font-size:8px;">'+m.av+'</div>'+m.name+'</div>'
+  ).join('') : '<div class="fsr-addmem-opt" style="cursor:default;color:var(--text-muted);">Everyone is on this ticket</div>';
+  const docs = t.docs.length ? t.docs.map(d=>'<div class="fsr-doc"><span class="ic">&#x1F4C4;</span><span class="nm">'+tEsc(d)+'</span></div>').join('') : '<div style="font-size:11px;color:var(--text-muted);">No documents yet</div>';
+
+  document.getElementById('cc-fs-rail').innerHTML =
+    '<div class="fsr-sec"><div class="fsr-title">Status</div>' +
+      '<div class="fsr-stepper">' + steps + '</div>' +
+      '<div class="fsr-status-btns">' + statusBtn('open') + statusBtn('inprogress') + statusBtn('waiting_merchant') + statusBtn('waiting_processor') + statusBtn('resolved') + '</div>' +
+    '</div>' +
+    '<div class="fsr-sec"><div class="fsr-title">Classification</div>' +
+      '<div class="fsr-field"><label>Priority</label><select onchange="tktField(\''+t.id+'\',\'priority\',this.value)">' + opt(['low','normal','high','urgent'],t.priority) + '</select></div>' +
+      '<div class="fsr-field"><label>Type</label><select onchange="tktField(\''+t.id+'\',\'type\',this.value)">' + opt(['general','support','chargeback','underwriting','activation','residuals','pricing','document'],t.type) + '</select></div>' +
+      '<div class="fsr-field"><label>Department</label><select onchange="tktField(\''+t.id+'\',\'dept\',this.value)">' + opt(['support','sales','underwriting','operations'],t.dept) + '</select></div>' +
+    '</div>' +
+    '<div class="fsr-sec"><div class="fsr-title">Flags</div><div class="fsr-tags">' +
+      '<button class="fsr-tag-tog overdue ' + (t.tags.includes('overdue')?'on':'') + '" onclick="tktTag(\''+t.id+'\',\'overdue\')">&#x23F1; Overdue</button>' +
+      '<button class="fsr-tag-tog escalated ' + (t.tags.includes('escalated')?'on':'') + '" onclick="tktTag(\''+t.id+'\',\'escalated\')">&#x26A0; Escalated</button>' +
+    '</div></div>' +
+    '<div class="fsr-sec"><div class="fsr-title">Members</div>' + members +
+      '<div class="fsr-addmem"><button class="fsr-addmem-btn" onclick="this.nextElementSibling.classList.toggle(\'open\')">+ Add member</button>' +
+      '<div class="fsr-addmem-menu">' + addMenu + '</div></div>' +
+    '</div>' +
+    '<div class="fsr-sec"><div class="fsr-title">Documents</div>' + docs + '</div>' +
+    '<div class="fsr-sec"><div class="fsr-title">Details</div>' +
+      '<div class="fsr-meta-row"><span class="k">Opened</span><span class="v">' + t.created + '</span></div>' +
+      '<div class="fsr-meta-row"><span class="k">SLA</span><span class="v">' + t.sla + '</span></div>' +
+      '<div class="fsr-meta-row"><span class="k">Merchant</span><span class="v">' + t.merchant + '</span></div>' +
+    '</div>' +
+    '<div class="fsr-sec" style="border-bottom:none;">' +
+      (t.status==='resolved'
+        ? '<button class="fsr-reopen" onclick="tktSetStatus(\''+t.id+'\',\'inprogress\',true)">&#x21BA; Re-open ticket</button>'
+        : '<button class="fsr-resolve" onclick="tktSetStatus(\''+t.id+'\',\'resolved\')">&#x2713; Resolve ticket</button>') +
+    '</div>';
+}
+function opt(arr, cur){ return arr.map(o=>'<option value="'+o+'"'+(o===cur?' selected':'')+'>'+o.charAt(0).toUpperCase()+o.slice(1)+'</option>').join(''); }
+
+/* ── Conversation thread in the overlay ── */
+function renderFsThread(t){
+  const thread = document.getElementById('cc-fs-thread');
+  let h = '';
+  t.thread.forEach(e => {
+    if (e.kind==='src') {
+      h += '<div class="dsep"><div class="dsep-lbl">Ticket opened from this message</div></div>' +
+        '<div class="act"><div class="abub int" style="border-left:3px solid var(--amber);">' + tEsc(e.text) + '</div></div>';
+    } else if (e.kind==='sys') {
+      h += '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--amber);"></div><div class="syst">' + e.text + '</div><div class="systt">' + e.time + '</div></div></div>';
+    } else if (e.kind==='doc') {
+      h += '<div class="act"><div class="ah"><div class="aav" style="background:'+(e.avc||'var(--yellow)')+';color:#fff;">'+(e.av||'MW')+'</div><span class="aname">'+(e.author||'M. Wright')+'</span><span class="atime">'+e.time+'</span></div>' +
+        '<div class="tkt-doc-chip">&#x1F4C4; '+tEsc(e.text)+'</div></div>';
+    } else if (e.kind==='ai') {
+      h += '<div class="act"><div class="ah"><div class="aav" style="background:var(--navy);color:#A78BFA;">&#x2726;</div><span class="aname">Twill AI</span><span class="amode int">Research</span><span class="atime">'+e.time+'</span></div>' +
+        '<div class="tkt-ai-bub">'+e.text+'</div></div>';
+    } else {
+      const mc = e.mode==='out'?'out':'int';
+      const ml = e.mode==='out'?'&#x2192; Merchant':'Internal';
+      h += '<div class="act"><div class="ah"><div class="aav" style="background:'+(e.avc||'var(--yellow)')+';color:'+(e.mode==='out'?'#fff':'var(--text-inverse)')+';">'+(e.av||'MW')+'</div><span class="aname">'+(e.author||'M. Wright')+'</span><span class="amode '+mc+'">'+ml+'</span><span class="atime">'+e.time+'</span></div>' +
+        '<div class="abub '+mc+'">'+tEsc(e.text)+'</div></div>';
+    }
+  });
+  thread.innerHTML = h;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+/* ── Ticket mutations ── */
+function tktSetStatus(id, status, isReopen){
+  const t = TKT[id]; if (!t) return;
+  t.status = status;
+  if (isReopen) { t.tags = t.tags.filter(x=>x!=='resolved'); t.thread.push({kind:'sys', text:'Ticket re-opened by M. Wright', time:tNow()}); }
+  else t.thread.push({kind:'sys', text:'Status → ' + TKT_STATUS[status].label + ' · M. Wright', time:tNow()});
+  renderFsRail(t); renderFsThread(t); bumpAnchor(t);
+}
+function tktField(id, field, val){ const t=TKT[id]; if(!t)return; t[field]=val; t.thread.push({kind:'sys', text:field.charAt(0).toUpperCase()+field.slice(1)+' set to ' + val, time:tNow()}); renderFsThread(t); bumpAnchor(t); }
+function tktTag(id, tag){ const t=TKT[id]; if(!t)return; const i=t.tags.indexOf(tag); if(i>=0)t.tags.splice(i,1); else t.tags.push(tag); renderFsRail(t); bumpAnchor(t); }
+function tktAddMember(id, name){ const t=TKT[id]; const m=TKT_MEMBERS.find(x=>x.name===name); if(!t||!m)return; if(!t.members.some(x=>x.name===name)){ t.members.push(m); t.thread.push({kind:'sys', text:name+' added to ticket', time:tNow()}); if(typeof pushNotif==='function') pushNotif({icon:'&#x1F465;', title:name+' added to '+t.id, sub:t.title, merchant:t.merchant, mst:'active'}); } renderFsRail(t); renderFsThread(t); bumpAnchor(t); }
+function tktRemoveMember(id, name){ const t=TKT[id]; if(!t)return; t.members=t.members.filter(x=>x.name!==name); t.thread.push({kind:'sys', text:name+' removed from ticket', time:tNow()}); renderFsRail(t); renderFsThread(t); bumpAnchor(t); }
+function fsAttach(){ const t=TKT[fsCur]; if(!t)return; const n = 'document_' + (t.docs.length+1) + '.pdf'; t.docs.push(n); t.thread.push({kind:'doc', text:n, author:'M. Wright', av:'MW', avc:'var(--yellow)', time:tNow()}); renderFsRail(t); renderFsThread(t); bumpAnchor(t); }
+
+function fsMode(m, el){
+  fsInputMode = m;
+  document.querySelectorAll('.cc-fs-tab').forEach(x=>x.classList.remove('on'));
+  if (el) el.classList.add('on');
+  const ta = document.getElementById('fsInput');
+  ta.placeholder = m==='ai' ? 'Ask Twill AI to research this ticket…' : (m==='out' ? 'Message the merchant…' : 'Add an internal note to this ticket…');
+}
+function fsSend(){
+  const ta = document.getElementById('fsInput');
+  const text = ta.value.trim(); if (!text) return;
+  // Expanded merchant conversation (no ticket open) — post to the moved thread
+  if (!fsCur) {
+    ta.value = '';
+    const thr = document.querySelector('#cc-fs-thread .ch-thread') || document.getElementById('cc-fs-thread');
+    const mc = fsInputMode==='out'?'out':'int';
+    const ml = fsInputMode==='out'?'&#x2192; Merchant':'Internal';
+    const d = document.createElement('div'); d.className = 'act';
+    d.innerHTML = '<div class="ah"><div class="aav" style="background:var(--yellow);color:var(--text-inverse);">MW</div><span class="aname">M. Wright</span><span class="amode '+mc+'">'+ml+'</span><span class="atime">'+tNow()+'</span></div><div class="abub '+mc+'">'+tEsc(text)+'</div>';
+    thr.appendChild(d); thr.scrollTop = thr.scrollHeight;
+    return;
+  }
+  const t = TKT[fsCur];
+  ta.value = '';
+  if (fsInputMode === 'ai') {
+    t.thread.push({kind:'msg', mode:'int', author:'M. Wright', av:'MW', text:text, time:tNow()});
+    renderFsThread(t);
+    setTimeout(() => {
+      t.thread.push({kind:'ai', text:tktAIResponse(t, text), time:tNow()});
+      renderFsThread(t); bumpAnchor(t);
+    }, 700);
+  } else {
+    t.thread.push({kind:'msg', mode:fsInputMode, author:'M. Wright', av:'MW', text:text, time:tNow()});
+    renderFsThread(t); bumpAnchor(t);
+  }
+}
+function tktAIResponse(t, q){
+  return '<strong>Research on ' + t.id + ' (' + tEsc(t.merchant) + ')</strong><br>' +
+    'Based on the account history and the issue described, here&rsquo;s what I found:<br><br>' +
+    '• This matches a known pattern — similar tickets resolved by re-provisioning gateway credentials.<br>' +
+    '• No open chargebacks or UW holds on this MID. SLA clock: ' + t.sla + '.<br>' +
+    '• Suggested next step: confirm terminal connectivity, then escalate to the processor if unresolved in 2h.<br><br>' +
+    '<span style="font-size:11px;color:var(--text-muted);">Ask a follow-up or switch to Internal/Merchant to act on this.</span>';
+}
+
+/* ── Inject clean hover icons (ticket + task) on messages & activities ── */
+function injectChatHoverActions(root){
+  const scope = root || document;
+  scope.querySelectorAll('.ch-thread .act, .ch-thread .syse').forEach(el => {
+    if (el.querySelector(':scope > .cc-msg-actions')) return;
+    if (el.closest('.tkt-anchor') || el.closest('.cc-tcard') || el.closest('.cc-ti-block')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'cc-msg-actions';
+    wrap.innerHTML =
+      '<div class="cc-msg-act" title="Create ticket" onclick="event.stopPropagation();createTicketFromMsg(this.closest(\'.act,.syse\'))">&#x1F3AB;</div>' +
+      '<div class="cc-msg-act" title="Create task" onclick="event.stopPropagation();createTaskFromMsg(this.closest(\'.act,.syse\'))">&#x2713;</div>';
+    el.appendChild(wrap);
+  });
+}
+/* keep injecting as threads update */
+setInterval(() => injectChatHoverActions(), 1200);
+setTimeout(() => injectChatHoverActions(), 400);
+
+/* ── Expand button: open the merchant chat full-screen (fixes ⤢) ── */
+function expandChat(){
+  // sig/UW merchant detail keeps its dedicated overlay
+  const md = document.getElementById('view-merchant-detail');
+  if (md && md.classList.contains('active')) { if (typeof expandSigUWChat==='function') expandSigUWChat(); return; }
+  // otherwise open the active merchant conversation full-screen
+  expandMerchantConversation();
+}
+let _expandedThreadHome = null;
+function expandMerchantConversation(){
+  const name = (typeof ccCurrentMerchantName==='function' && ccCurrentMerchantName()) || 'this merchant';
+  const thread = findVisibleThread();
+  if (!thread) return;
+  fsCur = null;
+  document.getElementById('cc-fs-hi-id').textContent = '';
+  document.getElementById('cc-fs-hi-title').textContent = name;
+  document.getElementById('cc-fs-hi-sub').textContent = '/ Activity';
+  document.getElementById('cc-fs-foot-name').textContent = name;
+  // rail: lightweight merchant context
+  document.getElementById('cc-fs-rail').innerHTML =
+    '<div class="fsr-sec"><div class="fsr-title">Conversation</div>' +
+    '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Full-screen view of the activity thread for <strong>'+tEsc(name)+'</strong>. Create tickets or tasks from any message, then open them here.</div></div>';
+  // move the live thread node into the overlay so it stays one source of truth
+  _expandedThreadHome = { node: thread, parent: thread.parentNode, next: thread.nextSibling };
+  const fsThread = document.getElementById('cc-fs-thread');
+  fsThread.innerHTML = '';
+  fsThread.appendChild(thread);
+  document.getElementById('cc-fs').classList.add('open');
+  const ta = document.getElementById('fsInput');
+  if (ta) ta.placeholder = fsInputMode==='out' ? 'Message the merchant…' : 'Add to the conversation…';
+  injectChatHoverActions(fsThread);
+  thread.scrollTop = thread.scrollHeight;
+}
+/* When closing the overlay, return a moved conversation thread to its home */
+const _origCloseFS = closeFS;
+closeFS = function(){
+  restoreExpandedThread();
+  _origCloseFS();
+};
+</script>
 </body>
 </html>
