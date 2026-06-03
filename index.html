@@ -2276,6 +2276,31 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-wrow-hover { gap: 2px; }
 </style>
 
+<style>
+/* ── Command Center notifications ── */
+.cc-bell-wrap { position: relative; display: inline-flex; }
+.cc-bell { position: relative; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 15px; cursor: pointer; line-height: 1; transition: all .12s; }
+.cc-bell:hover { background: var(--bg-hover); }
+.cc-bell-badge { position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px; padding: 0 4px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; font-family: var(--font-mono); border-radius: 9px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--bg-base); }
+.cc-notif-panel { position: absolute; right: 0; top: calc(100% + 6px); width: 332px; max-height: 420px; overflow-y: auto; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: 0 10px 34px rgba(0,0,0,.18); z-index: 400; display: none; }
+.cc-notif-panel.open { display: block; }
+.cc-notif-hdr { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; color: var(--text-primary); position: sticky; top: 0; background: var(--bg-surface); }
+.cc-notif-clear { font-size: 10px; font-weight: 600; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
+.cc-notif-clear:hover { color: var(--text-primary); }
+.cc-notif-item { display: flex; gap: 10px; padding: 11px 14px; border-bottom: 1px solid rgba(0,0,0,.04); cursor: pointer; transition: background .1s; }
+.cc-notif-item:hover { background: var(--bg-hover); }
+.cc-notif-item.unread { background: rgba(99,102,241,.04); }
+.cc-notif-ic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: var(--bg-elevated); border: 1px solid var(--border); }
+.cc-notif-body { flex: 1; min-width: 0; }
+.cc-notif-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.cc-notif-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; line-height: 1.4; }
+.cc-notif-time { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.cc-notif-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); flex-shrink: 0; align-self: center; }
+.cc-notif-empty { padding: 30px; text-align: center; font-size: 12px; color: var(--text-muted); }
+/* injected rep-assignment note in merchant threads */
+.cc-rep-note { margin: 2px 0; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -2494,6 +2519,13 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
         </div>
         <div class="topbar-right">
+          <div class="cc-bell-wrap">
+            <button class="cc-bell" onclick="toggleCCNotifs(event)" title="Notifications">&#x1F514;<span class="cc-bell-badge" id="ccBellBadge" style="display:none;">0</span></button>
+            <div class="cc-notif-panel" id="ccNotifPanel">
+              <div class="cc-notif-hdr"><span>Notifications</span><button class="cc-notif-clear" onclick="clearCCNotifs(event)">Mark all read</button></div>
+              <div id="ccNotifList"></div>
+            </div>
+          </div>
           <button class="btn btn-ghost" id="ccOverviewBtn" onclick="toggleCCOverview(this)">&#x1F4CA; Overview</button>
           <button class="btn btn-primary" onclick="openCCTask()">+ Task</button>
         </div>
@@ -13443,6 +13475,10 @@ function buildAlertEventsHTML(m) {
 function navigateToMerchant(name, status) {
   const m = merchantData.find(x => x.name === name);
   const alertsHTML = m ? buildAlertEventsHTML(m) : '';
+  // Inject any rep-assignment / ticket notes into the merchant thread once it's shown
+  if (typeof ccMerchantNotes !== 'undefined' && ccMerchantNotes[name]) {
+    setTimeout(() => injectMerchantNotes(name), 180);
+  }
 
   // Sig / UW — full-screen chat overlay (takes priority over deal room)
   if (status === 'signature' || status === 'underwriting') {
@@ -34857,6 +34893,9 @@ const ccPort = [
 
 let ccWorkTab='today', ccPortFilter='all', ccActivePip=null;
 const ccFilter = { rep:'all', partner:'all', processor:'all' };
+let ccNotifications = [];          // notification feed
+let ccNotifSeq = 0;                // id counter
+const ccMerchantNotes = {};        // merchant name -> [note HTML, ...] injected into thread on open
 
 /* Rep roster — used by the assignee filter and the "+ add rep" menu */
 const CC_REPS = [
@@ -35192,12 +35231,30 @@ function addRepToTask(id, repName) {
   const item = ccQ.find(i => i.id === id);
   const rep = CC_REPS.find(r => r.name === repName);
   if (!item || !rep) return;
+  if (ccItemRepNames(item).includes(repName)) { closeCCMenus(); return; }
   if (!item.addl) item.addl = [];
-  if (!ccItemRepNames(item).includes(repName)) item.addl.push({name:rep.name, av:rep.av, avc:rep.avc});
+  item.addl.push({name:rep.name, av:rep.av, avc:rep.avc});
+
+  const subject = item.merchant || item.title;
+  // 1) Send a notification to the assigned rep
+  pushNotif({
+    icon:'&#x1F465;',
+    title:repName + ' assigned to ' + subject,
+    sub:'M. Wright added you &middot; ' + (CC_KIND[ccKindOf(item)]||CC_KIND.activity).label + ' &middot; ' + item.title,
+    merchant:item.merchant, mst:item.mst
+  });
+  // 2) Drop a note into the merchant's thread
+  if (item.merchant) {
+    if (!ccMerchantNotes[item.merchant]) ccMerchantNotes[item.merchant] = [];
+    ccMerchantNotes[item.merchant].push(
+      ccRepNoteHTML('&#x1F465; <strong>' + repName + '</strong> was added to this application by M. Wright.')
+    );
+  }
+
   closeCCMenus();
   renderAllCC();
   buildFBMenus();
-  ccToast('&#x1F465; Added ' + repName + ' &mdash; now on their Command Center');
+  ccToast('&#x1F514; ' + repName + ' notified &middot; note added to thread');
 }
 
 /* ── Create a ticket from a work item ── */
@@ -35211,6 +35268,16 @@ function createTicketFromTask(id) {
     title:'Ticket: ' + item.title, detail:'Created from alert' + (item.merchant ? ' · ' + item.merchant : ''),
     act:'View Ticket →', fn:item.fn, age:'now', sla:false, done:false, snoozed:false
   });
+  pushNotif({
+    icon:'&#x1F3AB;',
+    title:'Ticket created' + (item.merchant ? ' &middot; ' + item.merchant : ''),
+    sub:'From alert: ' + item.title,
+    merchant:item.merchant, mst:item.mst
+  });
+  if (item.merchant) {
+    if (!ccMerchantNotes[item.merchant]) ccMerchantNotes[item.merchant] = [];
+    ccMerchantNotes[item.merchant].push(ccRepNoteHTML('&#x1F3AB; A support ticket was opened from an alert by M. Wright.'));
+  }
   closeCCMenus();
   renderAllCC();
   buildFBMenus();
@@ -35220,6 +35287,85 @@ function createTicketFromTask(id) {
 /* Close all CC popovers (snooze, add-rep) */
 function closeCCMenus() {
   document.querySelectorAll('.cc-snooze-menu.open, .cc-addrep-menu.open').forEach(m => m.classList.remove('open'));
+}
+
+/* ── Notifications ── */
+function ccNow() { return new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+function pushNotif(n) {
+  ccNotifications.unshift({ id:'ntf-' + (++ccNotifSeq), icon:n.icon||'&#x1F514;', title:n.title, sub:n.sub||'', time:'just now', merchant:n.merchant||null, mst:n.mst||null, read:false });
+  updateBellBadge();
+  renderNotifs();
+}
+function updateBellBadge() {
+  const badge = document.getElementById('ccBellBadge');
+  if (!badge) return;
+  const unread = ccNotifications.filter(n => !n.read).length;
+  badge.textContent = unread;
+  badge.style.display = unread ? 'flex' : 'none';
+}
+function renderNotifs() {
+  const list = document.getElementById('ccNotifList');
+  if (!list) return;
+  if (!ccNotifications.length) {
+    list.innerHTML = '<div class="cc-notif-empty">No notifications yet.</div>';
+    return;
+  }
+  list.innerHTML = ccNotifications.map(n => {
+    const nav = n.merchant ? ' onclick="navigateToMerchant(\'' + n.merchant + '\',\'' + (n.mst||'active') + '\')"' : '';
+    return '<div class="cc-notif-item' + (n.read?'':' unread') + '"' + nav + '>' +
+      '<div class="cc-notif-ic">' + n.icon + '</div>' +
+      '<div class="cc-notif-body">' +
+        '<div class="cc-notif-title">' + n.title + '</div>' +
+        (n.sub ? '<div class="cc-notif-sub">' + n.sub + '</div>' : '') +
+        '<div class="cc-notif-time">' + n.time + '</div>' +
+      '</div>' +
+      (n.read ? '' : '<div class="cc-notif-dot"></div>') +
+    '</div>';
+  }).join('');
+}
+function toggleCCNotifs(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById('ccNotifPanel');
+  if (!panel) return;
+  const open = panel.classList.toggle('open');
+  if (open) {
+    renderNotifs();
+    // mark read shortly after opening
+    setTimeout(() => { ccNotifications.forEach(n => n.read = true); updateBellBadge(); renderNotifs(); }, 1400);
+  }
+}
+function clearCCNotifs(e) {
+  if (e) e.stopPropagation();
+  ccNotifications.forEach(n => n.read = true);
+  updateBellBadge();
+  renderNotifs();
+}
+
+/* ── Merchant-thread notes (injected when the merchant is opened) ── */
+function ccRepNoteHTML(text) {
+  return '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--blue);"></div>' +
+    '<div class="syst">' + text + '</div><div class="systt">' + ccNow() + '</div></div></div>';
+}
+function findVisibleThread() {
+  const activeView = document.querySelector('.view.active');
+  if (!activeView) return null;
+  const threads = activeView.querySelectorAll('.ch-thread');
+  for (const t of threads) { if (t.offsetParent !== null) return t; }
+  return threads[0] || null;
+}
+function injectMerchantNotes(name) {
+  const notes = ccMerchantNotes[name];
+  if (!notes || !notes.length) return;
+  const thread = findVisibleThread();
+  if (!thread) return;
+  thread.querySelectorAll('.cc-rep-note').forEach(el => el.remove());
+  notes.forEach(html => {
+    const d = document.createElement('div');
+    d.className = 'cc-rep-note';
+    d.innerHTML = html;
+    thread.appendChild(d);
+  });
+  setTimeout(() => { thread.scrollTop = thread.scrollHeight; }, 40);
 }
 
 /* ── Page filters (rep / partner / processor) ── */
@@ -35316,6 +35462,8 @@ function initCC() {
   if (dEl) dEl.textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   buildFBMenus();
   applyFBState();
+  updateBellBadge();
+  renderNotifs();
   renderCCBrief();
   renderCCHero();
   renderCCPipeline();
@@ -35329,6 +35477,9 @@ document.addEventListener('click', e => {
   if (!inSnooze && !inAddRep) closeCCMenus();
   if (!e.target.closest || !e.target.closest('.cc-fb-dd')) {
     document.querySelectorAll('.cc-fb-menu.open').forEach(m => m.classList.remove('open'));
+  }
+  if (!e.target.closest || !e.target.closest('.cc-bell-wrap')) {
+    const p = document.getElementById('ccNotifPanel'); if (p) p.classList.remove('open');
   }
 });
 
