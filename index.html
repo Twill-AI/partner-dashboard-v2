@@ -2232,6 +2232,31 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .dash-funnel-pct { font-size: 11px; font-weight: 700; font-family: var(--font-mono); color: var(--text-primary); width: 34px; text-align: right; flex-shrink: 0; }
 </style>
 
+<style>
+/* ── Command Center page filter bar ── */
+.cc-filterbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: -6px; }
+.cc-fb-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.cc-fb-dd { position: relative; }
+.cc-fb-trigger { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 7px; cursor: pointer; transition: all .12s; user-select: none; }
+.cc-fb-trigger:hover { background: var(--bg-hover); }
+.cc-fb-dd.active .cc-fb-trigger { border-color: var(--navy); background: rgba(34,46,72,.05); }
+.cc-fb-k { font-size: 11px; color: var(--text-muted); }
+.cc-fb-v { font-size: 11px; font-weight: 700; color: var(--text-primary); }
+.cc-fb-cv { font-size: 9px; color: var(--text-muted); }
+.cc-fb-menu { position: absolute; left: 0; top: calc(100% + 4px); min-width: 180px; max-height: 280px; overflow-y: auto; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 8px; box-shadow: 0 6px 22px rgba(0,0,0,.14); z-index: 300; display: none; padding: 4px; }
+.cc-fb-menu.open { display: block; }
+.cc-fb-opt { padding: 7px 11px; font-size: 12px; color: var(--text-secondary); cursor: pointer; border-radius: 5px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cc-fb-opt:hover { background: var(--bg-hover); color: var(--text-primary); }
+.cc-fb-opt.sel { color: var(--text-primary); font-weight: 600; }
+.cc-fb-opt.sel::after { content: '\2713'; color: var(--green); font-size: 11px; }
+.cc-fb-opt-ct { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); }
+.cc-fb-clear { font-size: 11px; font-weight: 600; color: var(--red); background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.2); border-radius: 7px; padding: 5px 10px; cursor: pointer; font-family: var(--font-ui); }
+.cc-fb-clear:hover { background: rgba(239,68,68,.12); }
+/* unsnooze button shown in Snoozed tab */
+.cc-wrow-resume { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: var(--font-ui); border: 1px solid var(--border-strong); background: var(--bg-elevated); color: var(--text-primary); white-space: nowrap; }
+.cc-wrow-resume:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -2460,6 +2485,15 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- BRIEFING -->
         <div class="cc-brief" id="ccBrief"></div>
 
+        <!-- PAGE FILTER BAR -->
+        <div class="cc-filterbar" id="ccFilterBar">
+          <span class="cc-fb-label">Filter</span>
+          <div class="cc-fb-dd" id="fb-rep"><div class="cc-fb-trigger" onclick="toggleFB('rep')"><span class="cc-fb-k">Rep</span><span class="cc-fb-v" id="fbv-rep">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-rep"></div></div>
+          <div class="cc-fb-dd" id="fb-partner"><div class="cc-fb-trigger" onclick="toggleFB('partner')"><span class="cc-fb-k">Partner</span><span class="cc-fb-v" id="fbv-partner">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-partner"></div></div>
+          <div class="cc-fb-dd" id="fb-processor"><div class="cc-fb-trigger" onclick="toggleFB('processor')"><span class="cc-fb-k">Processor</span><span class="cc-fb-v" id="fbv-processor">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-processor"></div></div>
+          <button class="cc-fb-clear" id="fbClear" onclick="clearFB()" style="display:none;">&#x2715; Clear</button>
+        </div>
+
         <!-- NEEDS YOU NOW -->
         <div class="cc-section">
           <div class="cc-sec-hdr">
@@ -2488,6 +2522,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
           <div class="cc-work-wrap">
             <div class="cc-worktabs" id="ccWorkTabs">
+              <div class="cc-wtab" data-t="all" onclick="setCCWorkTab('all',this)">All <span class="cc-wtab-ct" id="ct-all">0</span></div>
               <div class="cc-wtab on" data-t="today" onclick="setCCWorkTab('today',this)">Today <span class="cc-wtab-ct" id="ct-today">0</span></div>
               <div class="cc-wtab" data-t="week" onclick="setCCWorkTab('week',this)">This Week <span class="cc-wtab-ct" id="ct-week">0</span></div>
               <div class="cc-wtab-div"></div>
@@ -2495,58 +2530,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="cc-wtab" data-t="message" onclick="setCCWorkTab('message',this)"><span style="color:var(--green);">&#x1F4AC;</span> Messages <span class="cc-wtab-ct" id="ct-message">0</span></div>
               <div class="cc-wtab" data-t="task" onclick="setCCWorkTab('task',this)"><span style="color:#9B6BD6;">&#x2713;</span> Tasks <span class="cc-wtab-ct" id="ct-task">0</span></div>
               <div class="cc-wtab" data-t="ticket" onclick="setCCWorkTab('ticket',this)"><span style="color:var(--amber);">&#x1F3AB;</span> Tickets <span class="cc-wtab-ct" id="ct-ticket">0</span></div>
-              <div class="cc-work-asgn" onclick="cycleAssignee()"><span id="ccAsgnLbl">All Team</span><span>&#x25BE;</span></div>
+              <div class="cc-wtab-div"></div>
+              <div class="cc-wtab" data-t="snoozed" onclick="setCCWorkTab('snoozed',this)"><span style="color:var(--text-muted);">&#x1F4A4;</span> Snoozed <span class="cc-wtab-ct" id="ct-snoozed">0</span></div>
             </div>
             <div id="ccWorkList"></div>
-          </div>
-        </div>
-
-        <!-- PORTFOLIO + TEAM -->
-        <div class="cc-section">
-          <div class="cc-sec-hdr">
-            <span class="cc-sec-ttl">Portfolio &amp; team</span>
-            <span class="cc-sec-count">Active merchants &middot; not in application phase</span>
-          </div>
-          <div class="cc-bottom-row">
-            <div class="cc-port-wrap">
-              <div class="cc-port-hdr">
-                <span class="cc-port-ttl">&#x1F4B3; Portfolio Alerts</span>
-                <div class="cc-port-tabs">
-                  <div class="cc-port-tab on" onclick="setCCPortTab('all',this)">All</div>
-                  <div class="cc-port-tab" onclick="setCCPortTab('chargeback',this)">CB</div>
-                  <div class="cc-port-tab" onclick="setCCPortTab('churn',this)">Churn</div>
-                  <div class="cc-port-tab" onclick="setCCPortTab('nobatch',this)">No Batch</div>
-                  <div class="cc-port-tab" onclick="setCCPortTab('volume',this)">Volume</div>
-                  <div class="cc-port-tab" onclick="setCCPortTab('dormant',this)">Dormant</div>
-                </div>
-                <button class="cc-sec-link" style="margin-left:8px;" onclick="showView('portfolio-alerts',null)">All &#x2192;</button>
-              </div>
-              <div id="ccPortList"></div>
-            </div>
-
-            <div class="cc-team-wrap">
-              <div class="cc-team-hdr">Team Load</div>
-              <div class="cc-team-row" onclick="setCCAssignee('M. Wright')">
-                <div class="cc-team-av" style="background:#A09E9A;color:#fff;">MW</div>
-                <div style="flex:1;min-width:0;"><div class="cc-team-name">M. Wright</div><div style="font-size:10px;color:var(--text-muted);">You</div></div>
-                <div class="cc-team-chips"><div class="cc-tchip apps">3</div><div class="cc-tchip alrt">4</div></div>
-              </div>
-              <div class="cc-team-row" onclick="setCCAssignee('S. Patel')">
-                <div class="cc-team-av" style="background:#5B7A5E;color:#fff;">SP</div>
-                <div style="flex:1;min-width:0;"><div class="cc-team-name">S. Patel</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
-                <div class="cc-team-chips"><div class="cc-tchip apps">2</div><div class="cc-tchip alrt">1</div></div>
-              </div>
-              <div class="cc-team-row" onclick="setCCAssignee('J. Rivera')">
-                <div class="cc-team-av" style="background:#6B839B;color:#fff;">JR</div>
-                <div style="flex:1;min-width:0;"><div class="cc-team-name">J. Rivera</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
-                <div class="cc-team-chips"><div class="cc-tchip apps">3</div><div class="cc-tchip msgs">2</div></div>
-              </div>
-              <div class="cc-team-row" onclick="setCCAssignee('D. Martinez')">
-                <div class="cc-team-av" style="background:#9B6B5B;color:#fff;">DM</div>
-                <div style="flex:1;min-width:0;"><div class="cc-team-name">D. Martinez</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
-                <div class="cc-team-chips"><div class="cc-tchip apps">1</div></div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -34812,19 +34799,33 @@ const ccPipStages = [
 ];
 
 const ccQ = [
-  {id:'wq-001',pri:'now',cat:'application',merchant:'Pacific Coast Retail',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'UW pend overdue — bank statements missing',detail:'First Data waiting 5 days. SLA breach in 4 hours.',act:'Open UW Thread →',fn:"navigateToMerchant('Pacific Coast Retail','underwriting')",age:'5d',sla:true,done:false,snoozed:false},
-  {id:'wq-002',pri:'now',cat:'application',merchant:'Metro Print Shop',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:"DocuSign expires tonight — merchant hasn't opened it",detail:'Sent 2 days ago. No open event. Expiry at midnight.',act:'Resend →',fn:"navigateToMerchant('Metro Print Shop','signature')",age:'2d',sla:true,done:false,snoozed:false},
-  {id:'wq-003',pri:'now',cat:'ticket',merchant:'Harbor Bistro',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Chargeback ratio at 1.8% — threshold approaching',detail:'4 new disputes this week. Response due Friday.',act:'View Ticket →',fn:'goToTicket(0)',age:'4m',sla:false,done:false,snoozed:false},
-  {id:'wq-004',pri:'today',cat:'application',merchant:'Maple Street Bakery',mst:'underwriting',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',title:'2 docs uploaded overnight — AI analysis ready',detail:'Owner ID + Jan bank stmt. 1 pend resolved, 1 partial.',act:'Review →',fn:"navigateToMerchant('Maple Street Bakery','underwriting')",age:'2h',sla:false,done:false,snoozed:false},
-  {id:'wq-005',pri:'today',cat:'message',merchant:'Neon Nightclub LA',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Message from owner — equipment delivery question',detail:'"When does the PAX A920 ship? We open Friday."',act:'Reply →',fn:"navigateToMerchant('Neon Nightclub LA','signature')",age:'1h',sla:false,done:false,snoozed:false},
-  {id:'wq-006',pri:'today',cat:'message',merchant:'Green Valley Market',mst:'active',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',title:'Terminal issue — gateway credentials not loading',detail:'Sara R. (NovaPay): "Terminal arrived but credentials wont load"',act:'Respond →',fn:"navigateToMerchant('Green Valley Market','active')",age:'14m',sla:false,done:false,snoozed:false},
-  {id:'wq-007',pri:'today',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Commission discrepancy — Dan M. / Summit · March',detail:'Standalone task · Rep seeing different numbers vs. agreed terms.',act:'Open Thread →',fn:"navigateToMerchant('TechSupply Pro LLC','active')",age:'41m',sla:false,done:false,snoozed:false},
-  {id:'wq-008',pri:'today',cat:'application',merchant:'TechForge Solutions',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Virtual site inspection today — confirm at 2pm',detail:'Priority Commerce · $2.1M potential. Enhanced due diligence.',act:'Prepare →',fn:"navigateToMerchant('TechForge Solutions','underwriting')",age:'3d',sla:false,done:false,snoozed:false},
-  {id:'wq-009',pri:'week',cat:'application',merchant:'Desert Sun Dispensary',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',title:'High-risk app stalled — UW committee memo pending',detail:'11 days in review. Risk justification needed before committee.',act:'Draft Memo →',fn:"navigateToMerchant('Desert Sun Dispensary','inreview')",age:'11d',sla:false,done:false,snoozed:false},
-  {id:'wq-010',pri:'week',cat:'application',merchant:'Bright Star Solar',mst:'boarding',assignee:'J. Rivera',av:'JR',avc:'#6B839B',title:'Activation overdue — equipment delivered 18 days ago',detail:'Coastal Commerce · No first batch. Equipment confirmed delivered.',act:'Escalate →',fn:"navigateToMerchant('Bright Star Solar','boarding')",age:'18d',sla:false,done:false,snoozed:false},
-  {id:'wq-011',pri:'week',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Review March residuals — Apex Elite $214 shortfall',detail:'Standalone task · Discrepancy vs. processor statement.',act:'Open Residuals →',fn:"showView('residuals',null)",age:'1d',sla:false,done:false,snoozed:false},
-  {id:'wq-012',pri:'week',cat:'message',merchant:'Harborlight Dental',mst:'lead',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Referral from Tara P. (Rivermark) — ~$80K/mo restaurant group',detail:'Warm intro from partner. High-volume opportunity.',act:'View Lead →',fn:"navigateToMerchant('Harborlight Dental','lead')",age:'2h',sla:false,done:false,snoozed:false},
-  {id:'wq-013',pri:'week',cat:'ticket',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Rivermark residual discrepancy — $214 shortfall',detail:'March statement. Needs reconciliation before month-end.',act:'View Ticket →',fn:'goToTicket(4)',age:'3h',sla:false,done:false,snoozed:false},
+  // ── NEEDS YOU NOW ──
+  {id:'wq-001',pri:'now',cat:'application',merchant:'Pacific Coast Retail',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'UW pend overdue — bank statements missing',detail:'First Data waiting 5 days. SLA breach in 4 hours.',act:'Open UW Thread →',fn:"navigateToMerchant('Pacific Coast Retail','underwriting')",age:'5d',sla:true,done:false,snoozed:false},
+  {id:'wq-002',pri:'now',cat:'application',merchant:'Metro Print Shop',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Rivermark',processor:'TSYS',title:"DocuSign expires tonight — merchant hasn't opened it",detail:'Sent 2 days ago. No open event. Expiry at midnight.',act:'Resend →',fn:"navigateToMerchant('Metro Print Shop','signature')",age:'2d',sla:true,done:false,snoozed:false},
+  {id:'wq-003',pri:'now',cat:'ticket',merchant:'Harbor Bistro',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Coastal Commerce',processor:'Fiserv',title:'Chargeback ratio at 1.8% — threshold approaching',detail:'4 new disputes this week. Response due Friday.',act:'View Ticket →',fn:'goToTicket(0)',age:'4m',sla:false,done:false,snoozed:false},
+
+  // ── TODAY ──
+  {id:'wq-004',pri:'today',cat:'application',merchant:'Maple Street Bakery',mst:'underwriting',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'Summit Lending',processor:'First Data Omaha',title:'3 documents uploaded overnight — AI analysis ready',detail:'Owner ID + Jan & Feb bank stmts. 1 pend resolved, 1 partial.',act:'Review →',fn:"navigateToMerchant('Maple Street Bakery','underwriting')",age:'2h',sla:false,done:false,snoozed:false},
+  {id:'wq-014',pri:'today',cat:'application',merchant:'Sunrise Bakery',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Apex Elite',processor:'TSYS',title:'New application submitted — ready for first review',detail:'Café & bakery · $42K/mo stated. Submitted via Apex Elite.',act:'Start Review →',fn:"navigateToMerchant('Sunrise Bakery','inreview')",age:'18m',sla:false,done:false,snoozed:false},
+  {id:'wq-015',pri:'today',cat:'application',merchant:'Urban Salon Collective',mst:'approved',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'Merchant signed — approved, ready to board',detail:'Agreement executed. Initiate boarding + equipment order.',act:'Start Boarding →',fn:"navigateToMerchant('Urban Salon Collective','approved')",age:'1h',sla:false,done:false,snoozed:false},
+  {id:'wq-016',pri:'today',cat:'ticket',merchant:'Coastal Spa & Salon',mst:'underwriting',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Coastal Commerce',processor:'Fiserv',title:'UW ticket opened — additional financials requested',detail:'Underwriter needs YTD P&L + last tax return.',act:'View Ticket →',fn:'goToTicket(1)',age:'3h',sla:false,done:false,snoozed:false},
+  {id:'wq-005',pri:'today',cat:'message',merchant:'Neon Nightclub LA',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'NovaPay',processor:'Elavon',title:'Message from owner — equipment delivery question',detail:'"When does the PAX A920 ship? We open Friday."',act:'Reply →',fn:"navigateToMerchant('Neon Nightclub LA','signature')",age:'1h',sla:false,done:false,snoozed:false},
+  {id:'wq-006',pri:'today',cat:'message',merchant:'Green Valley Market',mst:'active',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'NovaPay',processor:'Elavon',title:'Terminal issue — gateway credentials not loading',detail:'Sara R. (NovaPay): "Terminal arrived but credentials wont load"',act:'Respond →',fn:"navigateToMerchant('Green Valley Market','active')",age:'14m',sla:false,done:false,snoozed:false},
+  {id:'wq-007',pri:'today',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'—',title:'Commission discrepancy — Dan M. / Summit · March',detail:'Standalone task · Rep seeing different numbers vs. agreed terms.',act:'Open Thread →',fn:"navigateToMerchant('TechSupply Pro LLC','active')",age:'41m',sla:false,done:false,snoozed:false},
+  {id:'wq-008',pri:'today',cat:'application',merchant:'TechForge Solutions',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Priority Commerce',processor:'Priority',title:'Virtual site inspection today — confirm at 2pm',detail:'$2.1M potential. Enhanced due diligence inspection.',act:'Prepare →',fn:"navigateToMerchant('TechForge Solutions','underwriting')",age:'3d',sla:false,done:false,snoozed:false},
+
+  // ── THIS WEEK ──
+  {id:'wq-018',pri:'week',cat:'application',merchant:'Pinnacle Fitness',mst:'signature',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Apex Elite',processor:'TSYS',title:'Merchant signature received — submitting to UW',detail:'Signed packet in. Package score 91/100. Auto-submitting.',act:'View →',fn:"navigateToMerchant('Pinnacle Fitness','signature')",age:'6h',sla:false,done:false,snoozed:false},
+  {id:'wq-017',pri:'week',cat:'application',merchant:'Bella Cucina Restaurant',mst:'boarding',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'NovaPay',processor:'Elavon',title:'Documents uploaded — voided check + license received',detail:'Boarding docs complete. Ready to schedule install.',act:'Review →',fn:"navigateToMerchant('Bella Cucina Restaurant','boarding')",age:'1d',sla:false,done:false,snoozed:false},
+  {id:'wq-009',pri:'week',cat:'application',merchant:'Desert Sun Dispensary',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Internal',processor:'—',title:'High-risk app stalled — UW committee memo pending',detail:'11 days in review. Risk justification needed before committee.',act:'Draft Memo →',fn:"navigateToMerchant('Desert Sun Dispensary','inreview')",age:'11d',sla:false,done:false,snoozed:false},
+  {id:'wq-010',pri:'week',cat:'application',merchant:'Bright Star Solar',mst:'boarding',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Coastal Commerce',processor:'Fiserv',title:'Activation overdue — equipment delivered 18 days ago',detail:'No first batch. Equipment confirmed delivered.',act:'Escalate →',fn:"navigateToMerchant('Bright Star Solar','boarding')",age:'18d',sla:false,done:false,snoozed:false},
+  {id:'wq-011',pri:'week',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Apex Elite',processor:'—',title:'Review March residuals — Apex Elite $214 shortfall',detail:'Standalone task · Discrepancy vs. processor statement.',act:'Open Residuals →',fn:"showView('residuals',null)",age:'1d',sla:false,done:false,snoozed:false},
+  {id:'wq-012',pri:'week',cat:'message',merchant:'Harborlight Dental',mst:'lead',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'NovaPay',processor:'Elavon',title:'Referral from Tara P. (Rivermark) — ~$80K/mo restaurant group',detail:'Warm intro from partner. High-volume opportunity.',act:'View Lead →',fn:"navigateToMerchant('Harborlight Dental','lead')",age:'2h',sla:false,done:false,snoozed:false},
+  {id:'wq-013',pri:'week',cat:'ticket',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Rivermark',processor:'TSYS',title:'Rivermark residual discrepancy — $214 shortfall',detail:'March statement. Needs reconciliation before month-end.',act:'View Ticket →',fn:'goToTicket(4)',age:'3h',sla:false,done:false,snoozed:false},
+
+  // ── PRE-SNOOZED (visible under Snoozed tab) ──
+  {id:'wq-019',pri:'week',cat:'message',merchant:'Lakeview Dental',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'Follow up on terminal upgrade quote',detail:'Snoozed — merchant asked to revisit next week.',act:'Open →',fn:"navigateToMerchant('Lakeview Dental','active')",age:'2d',sla:false,done:false,snoozed:true},
+  {id:'wq-020',pri:'week',cat:'task',merchant:null,assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'Summit Lending',processor:'—',title:'Quarterly business review — schedule with Valley Auto',detail:'Snoozed — waiting on owner availability.',act:'Open Thread →',fn:"navigateToMerchant('Valley Auto Repair','active')",age:'4d',sla:false,done:false,snoozed:true},
 ];
 
 const ccPort = [
@@ -34835,7 +34836,20 @@ const ccPort = [
   {id:'pa-005',type:'volume',sev:'low',merchant:'Green Valley Market',partner:'NovaPay',icon:'📉',title:'Volume down 42% WoW',detail:'May be linked to reported terminal credential issue.',act:'View Alert →',fn:"openAlertByMerchant('Green Valley Market')",done:false},
 ];
 
-let ccWorkTab='today', ccAsgn='all', ccPortFilter='all', ccActivePip=null;
+let ccWorkTab='today', ccPortFilter='all', ccActivePip=null;
+const ccFilter = { rep:'all', partner:'all', processor:'all' };
+
+const CC_FILTER_FIELD = { rep:'assignee', partner:'partner', processor:'processor' };
+
+/* Does an item pass the active page filters (rep / partner / processor)? */
+function passesPageFilter(item) {
+  for (const key in ccFilter) {
+    if (ccFilter[key] === 'all') continue;
+    const field = CC_FILTER_FIELD[key];
+    if ((item[field] || '') !== ccFilter[key]) return false;
+  }
+  return true;
+}
 
 const CC_ST_FULL = {lead:'New Lead',inreview:'In Review',underwriting:'Underwriting',signature:'Out for Signature',approved:'Approved',boarding:'Boarding',active:'Active Merchant'};
 
@@ -34864,8 +34878,8 @@ function ccKindChip(item) {
   return '<span class="cc-kind" style="color:' + m.col + ';background:' + m.bg + ';border-color:' + m.bd + ';">' + m.icon + ' ' + m.label + '</span>';
 }
 
-function ccActiveNow()   { return ccQ.filter(i => i.pri==='now'   && !i.done && !i.snoozed); }
-function ccActiveToday() { return ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed); }
+function ccActiveNow()   { return ccQ.filter(i => i.pri==='now'   && !i.done && !i.snoozed && passesPageFilter(i)); }
+function ccActiveToday() { return ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed && passesPageFilter(i)); }
 
 /* ── Briefing ── */
 function renderCCBrief() {
@@ -34954,12 +34968,14 @@ function togglePip(key) {
 
 /* ── Work list (tabbed) ── */
 function workTabFilter(tab) {
+  if (tab === 'all')     return () => true;
   if (tab === 'today')   return i => i.pri === 'today';
   if (tab === 'week')    return i => i.pri === 'week';
   if (tab === 'alert')   return i => i.cat === 'application';
   if (tab === 'message') return i => i.cat === 'message';
   if (tab === 'task')    return i => i.cat === 'task';
   if (tab === 'ticket')  return i => i.cat === 'ticket';
+  if (tab === 'snoozed') return () => true; // handled separately below
   return () => true;
 }
 
@@ -34968,23 +34984,33 @@ function renderCCWork() {
   const list = document.getElementById('ccWorkList');
   if (!list) return;
   const f = workTabFilter(ccWorkTab);
-  const items = ccQ.filter(i => !i.done && !i.snoozed && f(i) && (ccAsgn==='all' || i.assignee===ccAsgn));
-  const doneItems = ccQ.filter(i => i.done && f(i));
+
+  // Snoozed tab: show only snoozed items (with a Resume action)
+  if (ccWorkTab === 'snoozed') {
+    const snz = ccQ.filter(i => i.snoozed && !i.done && passesPageFilter(i));
+    list.innerHTML = snz.length
+      ? snz.map(i => ccWorkRowHTML(i, true)).join('')
+      : '<div class="cc-work-empty"><div class="cc-work-empty-ic">&#x1F4A4;</div>Nothing snoozed.</div>';
+    return;
+  }
+
+  const items = ccQ.filter(i => !i.done && !i.snoozed && f(i) && passesPageFilter(i));
+  const doneItems = ccQ.filter(i => i.done && f(i) && passesPageFilter(i));
 
   let h = '';
   if (!items.length) {
     h = '<div class="cc-work-empty"><div class="cc-work-empty-ic">&#x2728;</div>All clear in this view.</div>';
   } else {
-    h = items.map(ccWorkRowHTML).join('');
+    h = items.map(i => ccWorkRowHTML(i)).join('');
   }
   if (doneItems.length) {
     h += '<div class="cc-done-bar" onclick="var s=this.nextElementSibling;s.style.display=(s.style.display===\'none\'?\'block\':\'none\')">&#x2705; Done today (' + doneItems.length + ') <span style="margin-left:auto;">&#x25BE;</span></div>' +
-      '<div class="cc-done-section" style="display:none;">' + doneItems.map(ccWorkRowHTML).join('') + '</div>';
+      '<div class="cc-done-section" style="display:none;">' + doneItems.map(i => ccWorkRowHTML(i)).join('') + '</div>';
   }
   list.innerHTML = h;
 }
 
-function ccWorkRowHTML(item) {
+function ccWorkRowHTML(item, isSnoozed) {
   const stLbl = CC_ST_LBL[item.mst] || '';
   const stCls = CC_ST_CLS[item.mst] || '';
   const priCls = (item.pri==='now'?' pri-now':(item.pri==='today'?' pri-today':''));
@@ -34996,6 +35022,21 @@ function ccWorkRowHTML(item) {
         '<span class="cc-wrow-desc" style="text-decoration:line-through;">' + item.title + '</span>' +
       '</div></div>' +
       '<span style="font-size:11px;color:var(--green);">&#x2713;</span></div>';
+  }
+  // Snoozed view: dimmed, with a Resume button instead of snooze/done
+  if (isSnoozed) {
+    return '<div class="cc-wrow" style="opacity:.72;" onclick="' + item.fn + '">' +
+      ccKindChip(item) +
+      '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
+        '<span class="cc-wrow-name">' + (item.merchant || 'Internal Task') + '</span>' +
+        (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
+        '<span class="cc-wrow-desc">' + item.title + '</span>' +
+      '</div></div>' +
+      '<div class="cc-wrow-meta">' +
+        '<div class="cc-wrow-av" style="background:' + item.avc + ';color:#fff;" title="' + item.assignee + '">' + item.av + '</div>' +
+        '<button class="cc-wrow-resume" onclick="event.stopPropagation();resumeCC(\'' + item.id + '\')" title="Bring back to queue">&#x21BA; Resume</button>' +
+      '</div>' +
+    '</div>';
   }
   return '<div class="cc-wrow' + priCls + '" data-ccid="' + item.id + '" onclick="' + item.fn + '" title="Open ' + (item.merchant||'task') + '">' +
     ccKindChip(item) +
@@ -35025,14 +35066,16 @@ function ccSnoozeMenu(id) {
 }
 
 function updateWorkTabCounts() {
-  const c = (f) => ccQ.filter(i => !i.done && !i.snoozed && f(i) && (ccAsgn==='all'||i.assignee===ccAsgn)).length;
+  const c = (f) => ccQ.filter(i => !i.done && !i.snoozed && f(i) && passesPageFilter(i)).length;
   const set = (id,n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
+  set('ct-all',     c(() => true));
   set('ct-today',   c(i => i.pri==='today'));
   set('ct-week',    c(i => i.pri==='week'));
   set('ct-alert',   c(i => i.cat==='application'));
   set('ct-message', c(i => i.cat==='message'));
   set('ct-task',    c(i => i.cat==='task'));
   set('ct-ticket',  c(i => i.cat==='ticket'));
+  set('ct-snoozed', ccQ.filter(i => i.snoozed && !i.done && passesPageFilter(i)).length);
 }
 
 function renderAllCC() { renderCCBrief(); renderCCHero(); renderCCWork(); }
@@ -35077,45 +35120,72 @@ function setCCWorkTab(tab, el) {
   if (el) el.classList.add('on');
   renderCCWork();
 }
-function setCCAssignee(name) {
-  ccAsgn = (name === ccAsgn) ? 'all' : name;
-  const el = document.getElementById('ccAsgnLbl');
-  if (el) el.textContent = ccAsgn === 'all' ? 'All Team' : name;
-  renderCCWork();
-}
-function cycleAssignee() {
-  const reps = ['all','M. Wright','S. Patel','J. Rivera','D. Martinez'];
-  ccAsgn = reps[(reps.indexOf(ccAsgn)+1) % reps.length];
-  const el = document.getElementById('ccAsgnLbl');
-  if (el) el.textContent = ccAsgn === 'all' ? 'All Team' : ccAsgn;
-  renderCCWork();
+/* Bring a snoozed item back into the active queue */
+function resumeCC(id) {
+  const item = ccQ.find(i => i.id === id);
+  if (item) item.snoozed = false;
+  renderAllCC();
+  ccToast('&#x21BA; Back in your queue');
 }
 
-/* ── Portfolio ── */
-function renderCCPortfolio() {
-  const list = document.getElementById('ccPortList');
-  if (!list) return;
-  const items = ccPort.filter(i => !i.done && (ccPortFilter==='all' || i.type===ccPortFilter));
-  if (!items.length) { list.innerHTML = '<div class="cc-work-empty">No portfolio alerts in this view.</div>'; return; }
-  list.innerHTML = items.map(i =>
-    '<div class="cc-port-item">' +
-      '<div class="cc-port-sev ' + i.sev + '"></div>' +
-      '<div class="cc-port-body">' +
-        '<span class="cc-port-name" onclick="navigateToMerchant(\'' + i.merchant + '\',\'active\')">' + i.merchant + '</span>' +
-        ' <span style="font-size:10px;color:var(--text-muted);">' + i.partner + '</span>' +
-        '<div class="cc-port-text">' + i.title + '</div>' +
-        '<div class="cc-port-detail">' + i.detail + '</div>' +
-      '</div>' +
-      '<button class="cc-port-act" onclick="' + i.fn + '">' + i.act + '</button>' +
-    '</div>'
-  ).join('');
+/* ── Page filters (rep / partner / processor) ── */
+function buildFBMenus() {
+  const reps = [...new Set(ccQ.map(i => i.assignee).filter(Boolean))].sort();
+  const partners = [...new Set(ccQ.map(i => i.partner).filter(p => p && p !== '—'))].sort();
+  const procs = [...new Set(ccQ.map(i => i.processor).filter(p => p && p !== '—'))].sort();
+  fillFBMenu('rep', 'All reps', reps, 'assignee');
+  fillFBMenu('partner', 'All partners', partners, 'partner');
+  fillFBMenu('processor', 'All processors', procs, 'processor');
 }
-function setCCPortTab(val, el) {
-  ccPortFilter = val;
-  document.querySelectorAll('.cc-port-tab').forEach(t => t.classList.remove('on'));
-  if (el) el.classList.add('on');
-  renderCCPortfolio();
+function fillFBMenu(which, allLabel, values, field) {
+  const menu = document.getElementById('fbm-' + which);
+  if (!menu) return;
+  const cur = ccFilter[which];
+  let h = '<div class="cc-fb-opt' + (cur==='all'?' sel':'') + '" onclick="setFB(\'' + which + '\',\'all\')">' + allLabel + '</div>';
+  values.forEach(v => {
+    const n = ccQ.filter(i => !i.done && (i[field]||'') === v).length;
+    h += '<div class="cc-fb-opt' + (cur===v?' sel':'') + '" onclick="setFB(\'' + which + '\',\'' + v.replace(/'/g,"\\'") + '\')"><span>' + v + '</span><span class="cc-fb-opt-ct">' + n + '</span></div>';
+  });
+  menu.innerHTML = h;
 }
+function toggleFB(which) {
+  const menu = document.getElementById('fbm-' + which);
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.cc-fb-menu.open').forEach(m => m.classList.remove('open'));
+  if (!isOpen) menu.classList.add('open');
+}
+function setFB(which, value) {
+  ccFilter[which] = value;
+  document.querySelectorAll('.cc-fb-menu.open').forEach(m => m.classList.remove('open'));
+  applyFBState();
+  buildFBMenus();
+  renderAllCC();
+}
+function clearFB() {
+  ccFilter.rep = 'all'; ccFilter.partner = 'all'; ccFilter.processor = 'all';
+  applyFBState();
+  buildFBMenus();
+  renderAllCC();
+}
+function applyFBState() {
+  const labels = { rep:'All', partner:'All', processor:'All' };
+  let anyActive = false;
+  ['rep','partner','processor'].forEach(which => {
+    const v = ccFilter[which];
+    const vEl = document.getElementById('fbv-' + which);
+    const ddEl = document.getElementById('fb-' + which);
+    if (vEl) vEl.textContent = v === 'all' ? labels[which] : v;
+    if (ddEl) ddEl.classList.toggle('active', v !== 'all');
+    if (v !== 'all') anyActive = true;
+  });
+  const clr = document.getElementById('fbClear');
+  if (clr) clr.style.display = anyActive ? 'inline-block' : 'none';
+}
+
+/* renderCCPortfolio retained as no-op — portfolio alerts moved off the
+   Command Center; they live on their own Portfolio Alerts page. */
+function renderCCPortfolio() {}
+function setCCPortTab() {}
 
 /* ── Task modal ── */
 function openCCTask() { const o = document.getElementById('ccTaskOverlay'); if (o) o.classList.add('open'); }
@@ -35150,14 +35220,21 @@ function initCC() {
   if (gEl) gEl.textContent = greet + ', Mike';
   const dEl = document.getElementById('ccDate');
   if (dEl) dEl.textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  buildFBMenus();
+  applyFBState();
   renderCCBrief();
   renderCCHero();
   renderCCPipeline();
   renderCCWork();
-  renderCCPortfolio();
 }
 
-document.addEventListener('click', e => { if (!e.target.closest('.cc-isnooze')) closeSnoozeMenus(); });
+// Close snooze menus AND filter dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest || !e.target.closest('.cc-isnooze')) closeSnoozeMenus();
+  if (!e.target.closest || !e.target.closest('.cc-fb-dd')) {
+    document.querySelectorAll('.cc-fb-menu.open').forEach(m => m.classList.remove('open'));
+  }
+});
 
 </script>
 <!-- cache-bust:1773827400 -->
