@@ -2257,6 +2257,25 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-wrow-resume:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
 </style>
 
+<style>
+/* ── Command Center: multi-assignee + row hover actions ── */
+.cc-wrow-reps { display: flex; align-items: center; position: relative; }
+.cc-wrow-av.stacked { border: 1.5px solid var(--bg-surface); }
+.cc-wrow-av.stacked:not(:first-child) { margin-left: -7px; }
+.cc-addrep-wrap { position: relative; display: flex; align-items: center; }
+.cc-addrep { display: none; align-items: center; justify-content: center; width: 18px; height: 18px; margin-left: 3px; border-radius: 50%; border: 1px dashed var(--border-strong); background: var(--bg-elevated); color: var(--text-muted); font-size: 13px; line-height: 1; cursor: pointer; padding: 0; flex-shrink: 0; transition: all .12s; }
+.cc-addrep:hover { border-color: var(--navy); color: var(--navy); border-style: solid; }
+.cc-wrow:hover .cc-addrep { display: flex; }
+.cc-addrep-menu { position: absolute; left: 0; top: calc(100% + 5px); min-width: 184px; background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 8px; box-shadow: 0 6px 22px rgba(0,0,0,.16); z-index: 320; display: none; padding: 5px; }
+.cc-addrep-menu.open { display: block; }
+.cc-addrep-hdr { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 5px 8px 6px; }
+.cc-addrep-opt { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text-secondary); }
+.cc-addrep-opt:hover { background: var(--bg-hover); color: var(--text-primary); }
+.cc-addrep-opt .cc-wrow-av { width: 18px; height: 18px; font-size: 7px; }
+/* slightly wider hover cluster so 3 buttons fit cleanly */
+.cc-wrow-hover { gap: 2px; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -34839,15 +34858,26 @@ const ccPort = [
 let ccWorkTab='today', ccPortFilter='all', ccActivePip=null;
 const ccFilter = { rep:'all', partner:'all', processor:'all' };
 
-const CC_FILTER_FIELD = { rep:'assignee', partner:'partner', processor:'processor' };
+/* Rep roster — used by the assignee filter and the "+ add rep" menu */
+const CC_REPS = [
+  {name:'M. Wright',   av:'MW', avc:'#A09E9A'},
+  {name:'S. Patel',    av:'SP', avc:'#5B7A5E'},
+  {name:'J. Rivera',   av:'JR', avc:'#6B839B'},
+  {name:'D. Martinez', av:'DM', avc:'#9B6B5B'},
+];
+/* All reps on an item = primary assignee + any added via "+" */
+function ccItemReps(item) {
+  const reps = [{name:item.assignee, av:item.av, avc:item.avc}];
+  (item.addl || []).forEach(r => reps.push(r));
+  return reps;
+}
+function ccItemRepNames(item) { return ccItemReps(item).map(r => r.name); }
 
 /* Does an item pass the active page filters (rep / partner / processor)? */
 function passesPageFilter(item) {
-  for (const key in ccFilter) {
-    if (ccFilter[key] === 'all') continue;
-    const field = CC_FILTER_FIELD[key];
-    if ((item[field] || '') !== ccFilter[key]) return false;
-  }
+  if (ccFilter.rep !== 'all' && !ccItemRepNames(item).includes(ccFilter.rep)) return false;
+  if (ccFilter.partner !== 'all' && (item.partner || '') !== ccFilter.partner) return false;
+  if (ccFilter.processor !== 'all' && (item.processor || '') !== ccFilter.processor) return false;
   return true;
 }
 
@@ -35046,10 +35076,11 @@ function ccWorkRowHTML(item, isSnoozed) {
       '<span class="cc-wrow-desc">' + item.title + '</span>' +
     '</div></div>' +
     '<div class="cc-wrow-meta">' +
-      '<div class="cc-wrow-av" style="background:' + item.avc + ';color:#fff;" title="' + item.assignee + '">' + item.av + '</div>' +
+      ccRepStackHTML(item) +
       '<span class="cc-wrow-age">' + item.age + '</span>' +
       '<button class="cc-wrow-act" onclick="event.stopPropagation();' + item.fn + '">' + item.act + '</button>' +
       '<div class="cc-wrow-hover">' +
+        (item.cat !== 'ticket' ? '<button class="cc-whbtn" onclick="event.stopPropagation();createTicketFromTask(\'' + item.id + '\')" title="Create ticket from this">&#x1F3AB;</button>' : '') +
         '<div class="cc-isnooze"><button class="cc-whbtn" onclick="event.stopPropagation();toggleSnooze(this)" title="Snooze">&#x1F4A4;</button>' + ccSnoozeMenu(item.id) + '</div>' +
         '<button class="cc-whbtn done" onclick="event.stopPropagation();doneCC(\'' + item.id + '\')" title="Done">&#x2713;</button>' +
       '</div>' +
@@ -35100,7 +35131,7 @@ function snoozeCC(id, label) {
 
 function toggleSnooze(btn) {
   const wasOpen = btn.parentElement.querySelector('.cc-snooze-menu')?.classList.contains('open');
-  closeSnoozeMenus();
+  closeCCMenus();
   if (!wasOpen) { const m = btn.parentElement.querySelector('.cc-snooze-menu'); if (m) m.classList.add('open'); }
 }
 function closeSnoozeMenus() { document.querySelectorAll('.cc-snooze-menu.open').forEach(m => m.classList.remove('open')); }
@@ -35128,22 +35159,85 @@ function resumeCC(id) {
   ccToast('&#x21BA; Back in your queue');
 }
 
+/* ── Multi-assignee: stacked avatars + "+" add-rep menu ── */
+function ccRepStackHTML(item) {
+  const reps = ccItemReps(item);
+  let h = '<div class="cc-wrow-reps">';
+  reps.forEach(r => {
+    h += '<div class="cc-wrow-av stacked" style="background:' + r.avc + ';color:#fff;" title="' + r.name + '">' + r.av + '</div>';
+  });
+  const avail = CC_REPS.filter(r => !ccItemRepNames(item).includes(r.name));
+  h += '<div class="cc-addrep-wrap">' +
+    '<button class="cc-addrep" onclick="event.stopPropagation();toggleAddRep(this)" title="Assign another rep">+</button>' +
+    '<div class="cc-addrep-menu">';
+  if (avail.length) {
+    h += '<div class="cc-addrep-hdr">Assign another rep</div>';
+    avail.forEach(r => {
+      h += '<div class="cc-addrep-opt" onclick="event.stopPropagation();addRepToTask(\'' + item.id + '\',\'' + r.name + '\')">' +
+        '<div class="cc-wrow-av" style="background:' + r.avc + ';color:#fff;">' + r.av + '</div><span>' + r.name + '</span></div>';
+    });
+  } else {
+    h += '<div class="cc-addrep-hdr">All reps assigned</div>';
+  }
+  h += '</div></div></div>';
+  return h;
+}
+function toggleAddRep(btn) {
+  const menu = btn.parentElement.querySelector('.cc-addrep-menu');
+  const open = menu.classList.contains('open');
+  closeCCMenus();
+  if (!open) menu.classList.add('open');
+}
+function addRepToTask(id, repName) {
+  const item = ccQ.find(i => i.id === id);
+  const rep = CC_REPS.find(r => r.name === repName);
+  if (!item || !rep) return;
+  if (!item.addl) item.addl = [];
+  if (!ccItemRepNames(item).includes(repName)) item.addl.push({name:rep.name, av:rep.av, avc:rep.avc});
+  closeCCMenus();
+  renderAllCC();
+  buildFBMenus();
+  ccToast('&#x1F465; Added ' + repName + ' &mdash; now on their Command Center');
+}
+
+/* ── Create a ticket from a work item ── */
+function createTicketFromTask(id) {
+  const item = ccQ.find(i => i.id === id);
+  if (!item) return;
+  ccQ.unshift({
+    id:'wq-tk-' + (ccQ.length + 1), pri:item.pri, cat:'ticket',
+    merchant:item.merchant, mst:item.mst, assignee:item.assignee, av:item.av, avc:item.avc,
+    partner:item.partner, processor:item.processor,
+    title:'Ticket: ' + item.title, detail:'Created from alert' + (item.merchant ? ' · ' + item.merchant : ''),
+    act:'View Ticket →', fn:item.fn, age:'now', sla:false, done:false, snoozed:false
+  });
+  closeCCMenus();
+  renderAllCC();
+  buildFBMenus();
+  ccToast('&#x1F3AB; Ticket created from ' + (item.merchant || 'task'));
+}
+
+/* Close all CC popovers (snooze, add-rep) */
+function closeCCMenus() {
+  document.querySelectorAll('.cc-snooze-menu.open, .cc-addrep-menu.open').forEach(m => m.classList.remove('open'));
+}
+
 /* ── Page filters (rep / partner / processor) ── */
 function buildFBMenus() {
-  const reps = [...new Set(ccQ.map(i => i.assignee).filter(Boolean))].sort();
+  const reps = CC_REPS.map(r => r.name);
   const partners = [...new Set(ccQ.map(i => i.partner).filter(p => p && p !== '—'))].sort();
   const procs = [...new Set(ccQ.map(i => i.processor).filter(p => p && p !== '—'))].sort();
-  fillFBMenu('rep', 'All reps', reps, 'assignee');
-  fillFBMenu('partner', 'All partners', partners, 'partner');
-  fillFBMenu('processor', 'All processors', procs, 'processor');
+  fillFBMenu('rep', 'All reps', reps, (i,v) => ccItemRepNames(i).includes(v));
+  fillFBMenu('partner', 'All partners', partners, (i,v) => (i.partner||'') === v);
+  fillFBMenu('processor', 'All processors', procs, (i,v) => (i.processor||'') === v);
 }
-function fillFBMenu(which, allLabel, values, field) {
+function fillFBMenu(which, allLabel, values, match) {
   const menu = document.getElementById('fbm-' + which);
   if (!menu) return;
   const cur = ccFilter[which];
   let h = '<div class="cc-fb-opt' + (cur==='all'?' sel':'') + '" onclick="setFB(\'' + which + '\',\'all\')">' + allLabel + '</div>';
   values.forEach(v => {
-    const n = ccQ.filter(i => !i.done && (i[field]||'') === v).length;
+    const n = ccQ.filter(i => !i.done && match(i, v)).length;
     h += '<div class="cc-fb-opt' + (cur===v?' sel':'') + '" onclick="setFB(\'' + which + '\',\'' + v.replace(/'/g,"\\'") + '\')"><span>' + v + '</span><span class="cc-fb-opt-ct">' + n + '</span></div>';
   });
   menu.innerHTML = h;
@@ -35228,9 +35322,11 @@ function initCC() {
   renderCCWork();
 }
 
-// Close snooze menus AND filter dropdowns on outside click
+// Close snooze / add-rep popovers AND filter dropdowns on outside click
 document.addEventListener('click', e => {
-  if (!e.target.closest || !e.target.closest('.cc-isnooze')) closeSnoozeMenus();
+  const inSnooze = e.target.closest && e.target.closest('.cc-isnooze');
+  const inAddRep = e.target.closest && e.target.closest('.cc-addrep-wrap');
+  if (!inSnooze && !inAddRep) closeCCMenus();
   if (!e.target.closest || !e.target.closest('.cc-fb-dd')) {
     document.querySelectorAll('.cc-fb-menu.open').forEach(m => m.classList.remove('open'));
   }
