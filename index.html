@@ -7690,8 +7690,7 @@ function nudgeWithDocs() {
           <div class="ch-hdr">
             <div class="ch-title">💬 Activity</div>
             <div class="ch-acts">
-              <div class="ch-btn">⤢</div>
-              <div class="ch-btn">✕</div>
+              <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
             </div>
           </div>
           <div class="cf">
@@ -11778,8 +11777,7 @@ function nudgeWithDocs() {
           <div class="ch-hdr">
             <div class="ch-title">💬 Activity</div>
             <div class="ch-acts">
-              <div class="ch-btn">⤢</div>
-              <div class="ch-btn">✕</div>
+              <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
             </div>
           </div>
           <div class="cf">
@@ -22285,8 +22283,7 @@ function initResCharts() {
           <div class="ch-hdr">
             <div class="ch-title">💬 Activity</div>
             <div class="ch-acts">
-              <div class="ch-btn">⤢</div>
-              <div class="ch-btn">✕</div>
+              <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
             </div>
           </div>
           <div class="cf">
@@ -25144,8 +25141,7 @@ function initResCharts() {
           <div class="ch-hdr">
             <div class="ch-title">💬 Activity</div>
             <div class="ch-acts">
-              <div class="ch-btn">⤢</div>
-              <div class="ch-btn">✕</div>
+              <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
             </div>
           </div>
           <div class="cf">
@@ -28004,8 +28000,7 @@ function initResCharts() {
           <div class="ch-hdr">
             <div class="ch-title">💬 Activity</div>
             <div class="ch-acts">
-              <div class="ch-btn">⤢</div>
-              <div class="ch-btn">✕</div>
+              <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
             </div>
           </div>
           <div class="cf">
@@ -30863,8 +30858,7 @@ function initResCharts() {
           <div class="ch-hdr">
             <div class="ch-title">💬 Activity</div>
             <div class="ch-acts">
-              <div class="ch-btn">⤢</div>
-              <div class="ch-btn">✕</div>
+              <div class="ch-btn" onclick="expandChat()" title="Expand to full screen">⤢</div>
             </div>
           </div>
           <div class="cf">
@@ -35831,11 +35825,11 @@ document.addEventListener('click', e => {
     </div>
   </div>
   <div class="cc-tf-bottom">
-    <button class="cc-tf-back" onclick="closeFS()">&#x2190; Back to thread</button>
+    <span id="cc-tf-resolve-slot"></span>
     <button class="cc-tf-attach" onclick="fsAttach()">&#x1F4CE; Attach document</button>
     <div style="flex:1;"></div>
     <span class="cc-tf-attach" id="cc-fs-foot-name" style="cursor:default;"></span>
-    <span id="cc-tf-resolve-slot"></span>
+    <button class="cc-tf-back" onclick="closeFS()">&#x2190; Back to thread</button>
   </div>
 </div>
 
