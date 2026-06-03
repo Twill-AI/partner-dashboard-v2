@@ -4807,12 +4807,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         </div>
       </div>
 
-      <!-- LOCKED BANNER — shown when sig-uw overlay is minimized -->
-      <div id="locked-banner" style="display:none;align-items:center;gap:10px;padding:9px 20px;background:rgba(245,158,11,.05);border-bottom:1px solid rgba(245,158,11,.2);flex-shrink:0;">
-        <span style="font-size:14px;">&#x1F512;</span>
-        <div><span id="locked-banner-title" style="font-size:12px;font-weight:600;color:var(--text-primary);">Out for Signature</span><span id="locked-banner-sub" style="font-size:12px;color:var(--text-secondary);"> &#x2014; Application is read-only while awaiting merchant signature</span></div>
-        <div style="margin-left:auto;"><button onclick="expandSigUWChat()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;font-family:var(--font-ui);">&#x1F4AC; Open Chat</button></div>
-      </div>
 
       <!-- SIG / UW FULL-SCREEN CHAT OVERLAY — default view for Out for Signature + Underwriting stages -->
       <div id="sig-uw-overlay">
@@ -6923,8 +6917,7 @@ function nudgeWithDocs() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn">⤢</div>
-            <div class="ch-btn">✕</div>
+            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -6986,7 +6979,7 @@ function nudgeWithDocs() {
           </div>
           <div class="ta-wrap">
             <textarea class="chat-ta" id="chatInput" placeholder="Type your internal note…" rows="3"></textarea>
-            <button class="send-btn" onclick="sendChatMessage('chatInput','chatThread','mInt')">→</button>
+            <button class="send-btn" onclick="sendActivityMessage()">→</button>
           </div>
           <div class="tools-row">
             <div class="tool" title="Attach">📎</div>
@@ -11015,8 +11008,7 @@ function nudgeWithDocs() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn">⤢</div>
-            <div class="ch-btn">✕</div>
+            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -11078,7 +11070,7 @@ function nudgeWithDocs() {
           </div>
           <div class="ta-wrap">
             <textarea class="chat-ta" id="chatInput" placeholder="Type your internal note…" rows="3"></textarea>
-            <button class="send-btn" onclick="sendChatMessage('chatInput','chatThread','mInt')">→</button>
+            <button class="send-btn" onclick="sendActivityMessage()">→</button>
           </div>
           <div class="tools-row">
             <div class="tool" title="Attach">📎</div>
@@ -15708,25 +15700,19 @@ function enterSigUWMode(name, status, options) {
     partnerLine.textContent = '/ Application · ' + (m.partner || '');
   }
 
-  // -- Update locked banner (minimized state) --
-  const bannerTitle = document.getElementById('locked-banner-title');
-  const bannerSub   = document.getElementById('locked-banner-sub');
-  if (bannerTitle) bannerTitle.textContent = isSig ? 'Out for Signature' : 'In Underwriting';
-  if (bannerSub)   bannerSub.innerHTML     = isSig
-    ? ' — Application is read-only while awaiting merchant signature'
-    : ' — Application is read-only while under review';
-
   // -- Update chat input footer name --
   const footerName = document.getElementById('sig-uw-footer-name');
   if (footerName) footerName.textContent = resolvedName;
+
+  // -- Update the docked Activity panel header to match this merchant --
+  const asideTitle = document.querySelector('.chat-aside .ch-title');
+  if (asideTitle) asideTitle.innerHTML = '&#x1F4AC; Activity';
 
   // -- Reset thread so each merchant gets fresh content --
   const thread = document.getElementById('sig-uw-thread');
   if (thread) delete thread.dataset.populated;
 
   view.classList.add('sig-uw-active');
-  const banner = document.getElementById('locked-banner');
-  if (banner) banner.style.display = 'none';
 
   if (!options.liveDemo) {
     populateSigUWThread();
@@ -15737,19 +15723,30 @@ function enterSigUWMode(name, status, options) {
 function minimizeSigUWChat() {
   const view = document.getElementById('view-merchant-detail');
   if (!view) return;
+  // Collapse the full-screen view back to the application page; the same
+  // conversation is already mirrored into the right-side Activity panel.
+  syncActivityFromSig();
   view.classList.remove('sig-uw-active');
-  const banner = document.getElementById('locked-banner');
-  if (banner) banner.style.display = 'flex';
-  // Demo bar stays hidden when minimized; reappears if user re-expands
-  // (it's inside sig-uw-overlay so it's already hidden with the overlay)
 }
 
 function expandSigUWChat() {
   const view = document.getElementById('view-merchant-detail');
   if (!view) return;
+  // Expand the Activity chat to full screen — same single thread, just bigger.
   view.classList.add('sig-uw-active');
-  const banner = document.getElementById('locked-banner');
-  if (banner) banner.style.display = 'none';
+}
+
+/* The full-screen thread (#sig-uw-thread) and the docked Activity panel
+   (#chatThread) are ONE conversation. sig-uw-thread is the source of truth;
+   this mirrors it into the docked Activity panel so both always match. */
+function syncActivityFromSig() {
+  const src = document.getElementById('sig-uw-thread');
+  const dst = document.getElementById('chatThread');
+  if (!src || !dst) return;
+  dst.innerHTML = src.innerHTML;
+  dst.scrollTop = dst.scrollHeight;
+  const ct = document.querySelector('.chat-aside .cfct');
+  if (ct) ct.textContent = src.querySelectorAll('.act,.syse').length + ' events';
 }
 
 /* ── Sig/UW thread helpers (used by live demo + BroadcastChannel handlers) ── */
@@ -15757,6 +15754,7 @@ function _sigUWUpdateCount() {
   const thread = document.getElementById('sig-uw-thread');
   const ct = document.getElementById('sig-uw-event-count');
   if (thread && ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
+  syncActivityFromSig();
 }
 
 function sigUWAddSys(text, color) {
@@ -15913,9 +15911,36 @@ function sendSigUWMessage() {
     '<div class="abub ' + mode + '">' + text + '</div>';
   thread.appendChild(d);
   thread.scrollTop = thread.scrollHeight;
-  // update event count
+  // update event count + mirror into the docked Activity panel
   const ct = document.getElementById('sig-uw-event-count');
   if (ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
+  syncActivityFromSig();
+}
+
+/* Docked Activity panel input. On a sig/UW application the canonical thread
+   is #sig-uw-thread, so route the message there and mirror; otherwise fall
+   back to the normal chatThread send. */
+function sendActivityMessage() {
+  const sig = document.getElementById('sig-uw-thread');
+  const ta = document.getElementById('chatInput');
+  if (sig && sig.dataset.populated && ta && ta.value.trim()) {
+    const text = ta.value.trim();
+    ta.value = '';
+    const isOut = document.getElementById('mOut') && document.getElementById('mOut').className.includes('int-on');
+    const mode = isOut ? 'out' : 'int';
+    const modeLabel = {int:'Internal', out:'→ Merchant'}[mode];
+    const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+    const d = document.createElement('div');
+    d.className = 'act';
+    d.innerHTML = '<div class="ah"><div class="aav" style="background:var(--yellow);color:var(--text-inverse);">MW</div>' +
+      '<span class="aname">M. Wright</span><span class="amode ' + mode + '">' + modeLabel + '</span>' +
+      '<span class="atime">' + time + '</span></div>' +
+      '<div class="abub ' + mode + '">' + text + '</div>';
+    sig.appendChild(d);
+    _sigUWUpdateCount(); // updates count + mirrors into the docked panel
+  } else {
+    sendChatMessage('chatInput', 'chatThread', 'mInt');
+  }
 }
 
 function populateSigUWThread() {
@@ -16055,6 +16080,7 @@ function populateSigUWThread() {
   thread.scrollTop = thread.scrollHeight;
   const ct = document.getElementById('sig-uw-event-count');
   if (ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
+  syncActivityFromSig();
 }
 
 function partnerAddMessage(sender, html, options = {}) {
@@ -21452,8 +21478,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn">⤢</div>
-            <div class="ch-btn">✕</div>
+            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -21515,7 +21540,7 @@ function initResCharts() {
           </div>
           <div class="ta-wrap">
             <textarea class="chat-ta" id="chatInput" placeholder="Type your internal note…" rows="3"></textarea>
-            <button class="send-btn" onclick="sendChatMessage('chatInput','chatThread','mInt')">→</button>
+            <button class="send-btn" onclick="sendActivityMessage()">→</button>
           </div>
           <div class="tools-row">
             <div class="tool" title="Attach">📎</div>
@@ -24312,8 +24337,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn">⤢</div>
-            <div class="ch-btn">✕</div>
+            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -24375,7 +24399,7 @@ function initResCharts() {
           </div>
           <div class="ta-wrap">
             <textarea class="chat-ta" id="chatInput" placeholder="Type your internal note…" rows="3"></textarea>
-            <button class="send-btn" onclick="sendChatMessage('chatInput','chatThread','mInt')">→</button>
+            <button class="send-btn" onclick="sendActivityMessage()">→</button>
           </div>
           <div class="tools-row">
             <div class="tool" title="Attach">📎</div>
@@ -27173,8 +27197,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn">⤢</div>
-            <div class="ch-btn">✕</div>
+            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -27236,7 +27259,7 @@ function initResCharts() {
           </div>
           <div class="ta-wrap">
             <textarea class="chat-ta" id="chatInput" placeholder="Type your internal note…" rows="3"></textarea>
-            <button class="send-btn" onclick="sendChatMessage('chatInput','chatThread','mInt')">→</button>
+            <button class="send-btn" onclick="sendActivityMessage()">→</button>
           </div>
           <div class="tools-row">
             <div class="tool" title="Attach">📎</div>
@@ -30033,8 +30056,7 @@ function initResCharts() {
         <div class="ch-hdr">
           <div class="ch-title">💬 Activity</div>
           <div class="ch-acts">
-            <div class="ch-btn">⤢</div>
-            <div class="ch-btn">✕</div>
+            <div class="ch-btn" onclick="expandSigUWChat()" title="Expand to full screen">⤢</div>
           </div>
         </div>
         <div class="cf">
@@ -30096,7 +30118,7 @@ function initResCharts() {
           </div>
           <div class="ta-wrap">
             <textarea class="chat-ta" id="chatInput" placeholder="Type your internal note…" rows="3"></textarea>
-            <button class="send-btn" onclick="sendChatMessage('chatInput','chatThread','mInt')">→</button>
+            <button class="send-btn" onclick="sendActivityMessage()">→</button>
           </div>
           <div class="tools-row">
             <div class="tool" title="Attach">📎</div>
@@ -35393,6 +35415,17 @@ function findVisibleThread() {
   for (const t of threads) { if (t.offsetParent !== null) return t; }
   return threads[0] || null;
 }
+/* The canonical thread for a merchant: sig-uw-thread is the single source of
+   truth on the application page (mirrored into the docked Activity panel);
+   other views use the visible thread directly. */
+function ccCanonicalThread() {
+  const activeView = document.querySelector('.view.active');
+  if (activeView && activeView.id === 'view-merchant-detail') {
+    const sig = document.getElementById('sig-uw-thread');
+    if (sig) return sig;
+  }
+  return findVisibleThread();
+}
 /* Render a CC work item as a thread card that mirrors the Command Center row */
 function ccItemThreadCardHTML(item, merchantName) {
   const stLbl = CC_ST_LBL[item.mst] || '';
@@ -35436,12 +35469,13 @@ function resolveFromThread(id, btn) {
 /* Reflect every CC item for this merchant (plus assignment notes) into the
    visible merchant thread, using cards that match the Command Center rows. */
 function injectMerchantThread(name) {
-  const thread = findVisibleThread();
+  const thread = ccCanonicalThread();
   if (!thread) return;
-  thread.querySelectorAll('.cc-ti-block, .cc-rep-note').forEach(el => el.remove());
+  // clean from BOTH threads so the docked mirror doesn't keep a stale copy
+  document.querySelectorAll('#sig-uw-thread .cc-ti-block, #chatThread .cc-ti-block, .ch-thread .cc-ti-block, .ch-thread .cc-rep-note').forEach(el => el.remove());
   const items = ccQ.filter(i => i.merchant === name && !i.done && !i.snoozed);
   const notes = ccMerchantNotes[name] || [];
-  if (!items.length && !notes.length) return;
+  if (!items.length && !notes.length) { syncActivityFromSig(); return; }
   const wrap = document.createElement('div');
   wrap.className = 'cc-ti-block';
   let h = '<div class="cc-ti-sep"><span>&#x26A1; Active in Command Center</span></div>';
@@ -35449,6 +35483,8 @@ function injectMerchantThread(name) {
   notes.forEach(noteHTML => { h += '<div class="cc-rep-note">' + noteHTML + '</div>'; });
   wrap.innerHTML = h;
   thread.appendChild(wrap);
+  // keep the docked Activity panel mirrored to the canonical thread
+  if (thread.id === 'sig-uw-thread') syncActivityFromSig();
   setTimeout(() => { thread.scrollTop = thread.scrollHeight; }, 40);
 }
 /* back-compat alias */
