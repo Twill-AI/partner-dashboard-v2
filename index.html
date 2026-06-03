@@ -2301,6 +2301,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-rep-note { margin: 2px 0; }
 </style>
 
+<style>
+.cc-pin { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #C9882A; background: rgba(201,136,42,.1); border: 1px solid rgba(201,136,42,.25); border-radius: 3px; padding: 1px 5px; flex-shrink: 0; white-space: nowrap; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -34947,8 +34951,18 @@ function ccKindChip(item) {
   return '<span class="cc-kind" style="color:' + m.col + ';background:' + m.bg + ';border-color:' + m.bd + ';">' + m.icon + ' ' + m.label + '</span>';
 }
 
-function ccActiveNow()   { return ccQ.filter(i => i.pri==='now'   && !i.done && !i.snoozed && passesPageFilter(i)); }
-function ccActiveToday() { return ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed && passesPageFilter(i)); }
+/* An item is "in Today" if its own priority is today, OR it was pinned to
+   Today for the rep currently being viewed (added reps get items pinned to
+   their Today regardless of the item's base priority). */
+function inTodayView(item) {
+  if (item.pri === 'today') return true;
+  if (item.pinnedToday && item.pinnedToday.length) {
+    return ccFilter.rep === 'all' ? true : item.pinnedToday.includes(ccFilter.rep);
+  }
+  return false;
+}
+function ccActiveNow()   { return ccQ.filter(i => i.pri==='now' && !i.done && !i.snoozed && passesPageFilter(i)); }
+function ccActiveToday() { return ccQ.filter(i => inTodayView(i) && i.pri!=='now' && !i.done && !i.snoozed && passesPageFilter(i)); }
 
 /* ── Briefing ── */
 function renderCCBrief() {
@@ -35038,8 +35052,8 @@ function togglePip(key) {
 /* ── Work list (tabbed) ── */
 function workTabFilter(tab) {
   if (tab === 'all')     return () => true;
-  if (tab === 'today')   return i => i.pri === 'today';
-  if (tab === 'week')    return i => i.pri === 'week';
+  if (tab === 'today')   return i => inTodayView(i);
+  if (tab === 'week')    return i => i.pri === 'week' && !inTodayView(i);
   if (tab === 'alert')   return i => i.cat === 'application';
   if (tab === 'message') return i => i.cat === 'message';
   if (tab === 'task')    return i => i.cat === 'task';
@@ -35112,6 +35126,7 @@ function ccWorkRowHTML(item, isSnoozed) {
     '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
       '<span class="cc-wrow-name">' + (item.merchant || 'Internal Task') + '</span>' +
       (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
+      ((item.pinnedToday && item.pinnedToday.length) ? '<span class="cc-pin" title="Pinned to Today for ' + item.pinnedToday.join(', ') + '">&#x1F4CC; Pinned</span>' : '') +
       '<span class="cc-wrow-desc">' + item.title + '</span>' +
     '</div></div>' +
     '<div class="cc-wrow-meta">' +
@@ -35139,8 +35154,8 @@ function updateWorkTabCounts() {
   const c = (f) => ccQ.filter(i => !i.done && !i.snoozed && f(i) && passesPageFilter(i)).length;
   const set = (id,n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
   set('ct-all',     c(() => true));
-  set('ct-today',   c(i => i.pri==='today'));
-  set('ct-week',    c(i => i.pri==='week'));
+  set('ct-today',   c(i => inTodayView(i)));
+  set('ct-week',    c(i => i.pri==='week' && !inTodayView(i)));
   set('ct-alert',   c(i => i.cat==='application'));
   set('ct-message', c(i => i.cat==='message'));
   set('ct-task',    c(i => i.cat==='task'));
@@ -35234,27 +35249,30 @@ function addRepToTask(id, repName) {
   if (ccItemRepNames(item).includes(repName)) { closeCCMenus(); return; }
   if (!item.addl) item.addl = [];
   item.addl.push({name:rep.name, av:rep.av, avc:rep.avc});
+  // Auto-pin to the added rep's Today (regardless of base priority)
+  if (!item.pinnedToday) item.pinnedToday = [];
+  if (!item.pinnedToday.includes(repName)) item.pinnedToday.push(repName);
 
   const subject = item.merchant || item.title;
   // 1) Send a notification to the assigned rep
   pushNotif({
     icon:'&#x1F465;',
     title:repName + ' assigned to ' + subject,
-    sub:'M. Wright added you &middot; ' + (CC_KIND[ccKindOf(item)]||CC_KIND.activity).label + ' &middot; ' + item.title,
+    sub:'M. Wright added you &middot; pinned to your Today &middot; ' + (CC_KIND[ccKindOf(item)]||CC_KIND.activity).label,
     merchant:item.merchant, mst:item.mst
   });
   // 2) Drop a note into the merchant's thread
   if (item.merchant) {
     if (!ccMerchantNotes[item.merchant]) ccMerchantNotes[item.merchant] = [];
     ccMerchantNotes[item.merchant].push(
-      ccRepNoteHTML('&#x1F465; <strong>' + repName + '</strong> was added to this application by M. Wright.')
+      ccRepNoteHTML('&#x1F465; <strong>' + repName + '</strong> was added to this application by M. Wright &middot; pinned to their Today.')
     );
   }
 
   closeCCMenus();
   renderAllCC();
   buildFBMenus();
-  ccToast('&#x1F514; ' + repName + ' notified &middot; note added to thread');
+  ccToast('&#x1F4CC; Pinned to ' + repName + '&rsquo;s Today &middot; notified');
 }
 
 /* ── Create a ticket from a work item ── */
