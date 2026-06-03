@@ -2488,6 +2488,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-fs-tab.proc.on { border-bottom-color:#8358A8; color:#8358A8; }
 </style>
 
+<style>
+.cc-src-badge { font-size:9px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid; display:inline-flex; align-items:center; gap:3px; white-space:nowrap; flex-shrink:0; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -31076,6 +31080,7 @@ function showView(name, clickedNav) {
   if (name === 'command-center' && typeof initCC === 'function') { setTimeout(initCC, 20); }
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
   if (name === 'merchant-active') { setTimeout(initMaOverviewCharts, 50); }
+  if (name === 'tickets' && typeof initTicketDashboard === 'function') { setTimeout(initTicketDashboard, 30); }
   if (name === 'residuals' && !resChartsReady) { resChartsReady = true; setTimeout(initResCharts, 50); }
   if (name === 'alerts') {
     setTimeout(function() {
@@ -35152,6 +35157,20 @@ function ccKindChip(item) {
   return '<span class="cc-kind" style="color:' + m.col + ';background:' + m.bg + ';border-color:' + m.bd + ';">' + m.icon + ' ' + m.label + '</span>';
 }
 
+/* Source/origin badge — internal / partner / merchant / processor */
+const CC_SRC = {
+  internal:  {label:'Internal',  icon:'&#x1F3E2;', color:'#787774', bg:'rgba(120,119,116,.1)'},
+  partner:   {label:'Partner',   icon:'&#x1F91D;', color:'#6B839B', bg:'rgba(107,131,155,.12)'},
+  merchant:  {label:'Merchant',  icon:'&#x1F3EA;', color:'#5B7A5E', bg:'rgba(91,122,94,.12)'},
+  processor: {label:'Processor', icon:'&#x2699;',  color:'#8358A8', bg:'rgba(131,88,168,.12)'},
+};
+function ccSourceBadge(source) {
+  if (!source) return '';
+  const m = CC_SRC[source.kind] || CC_SRC.internal;
+  const nm = (source.kind==='processor' || source.kind==='partner') ? source.name : m.label;
+  return '<span class="cc-src-badge" style="color:'+m.color+';background:'+m.bg+';border-color:'+m.color+'33;">' + m.icon + ' ' + nm + '</span>';
+}
+
 /* An item is "in Today" if its own priority is today, OR it was pinned to
    Today for the rep currently being viewed (added reps get items pinned to
    their Today regardless of the item's base priority). */
@@ -35201,7 +35220,7 @@ function renderCCHero() {
 function ccHeroHTML(item) {
   const meta = CC_HERO[item.id] || {why:(item.sla?'&#x23F1; SLA at risk':'&#x26A0; Needs attention'), sub:(CC_ST_FULL[item.mst]||'')};
   return '<div class="cc-hero" data-ccid="' + item.id + '"><div class="cc-hero-pad">' +
-      '<div class="cc-hero-why">' + meta.why + '</div>' +
+      '<div class="cc-hero-why">' + meta.why + (item.source ? ' &nbsp; ' + ccSourceBadge(item.source) : '') + '</div>' +
       '<div class="cc-hero-name" onclick="' + item.fn + '">' + (item.merchant || 'Task') + '</div>' +
       '<div class="cc-hero-sub">' + meta.sub + '</div>' +
       '<div class="cc-hero-problem">' + item.detail + '</div>' +
@@ -35327,6 +35346,7 @@ function ccWorkRowHTML(item, isSnoozed) {
     '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
       '<span class="cc-wrow-name">' + (item.merchant || 'Internal Task') + '</span>' +
       (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
+      ccSourceBadge(item.source) +
       ((item.pinnedToday && item.pinnedToday.length) ? '<span class="cc-pin" title="Pinned to Today for ' + item.pinnedToday.join(', ') + '">&#x1F4CC; Pinned</span>' : '') +
       '<span class="cc-wrow-desc">' + item.title + '</span>' +
     '</div></div>' +
@@ -35620,6 +35640,7 @@ function ccItemThreadCardHTML(item, merchantName) {
   return '<div class="cc-tcard ' + priCls + '">' +
     '<div class="cc-tcard-top">' +
       ccKindChip(item) +
+      ccSourceBadge(item.source) +
       (stLbl ? '<span class="cc-wrow-sch ' + stCls + '">' + stLbl + '</span>' : '') +
       (item.sla ? '<span class="cc-wrow-sla">&#x23F1; SLA</span>' : '') +
       ((item.pinnedToday && item.pinnedToday.length) ? '<span class="cc-pin">&#x1F4CC; Pinned</span>' : '') +
@@ -36257,6 +36278,79 @@ function seedProcessorTickets(){
   if (TKT_SEQ < 64) TKT_SEQ = 64;
 }
 seedProcessorTickets();
+
+/* Open a chat ticket from a Command Center row — go to its merchant, then focus it */
+function ccOpenTicket(tid, merchant){
+  if (merchant && typeof navigateToMerchant === 'function') navigateToMerchant(merchant, 'active');
+  setTimeout(() => { if (typeof ensureSeededAnchors === 'function') ensureSeededAnchors(); openTicket(tid); }, 320);
+}
+/* Surface processor (and other seeded) tickets in the Command Center queue */
+function syncTicketsToCC(){
+  if (typeof ccQ === 'undefined') return;
+  const priMap = {urgent:'now', high:'today', normal:'week', low:'week'};
+  Object.values(TKT).forEach(t => {
+    if (!t.seeded || ccQ.some(i => i.tktId === t.id)) return;
+    const m = t.members[0];
+    const srcLbl = t.source ? ((TKT_SOURCE[t.source.kind]||{}).label + (t.source.name && t.source.kind==='processor' ? ' · '+t.source.name : '') + ' · via ' + t.source.via) : '';
+    ccQ.unshift({
+      id:'wq-'+t.id.toLowerCase(), pri:priMap[t.priority]||'today', cat:'ticket',
+      merchant:t.merchant, mst:'active', assignee:m.name, av:m.av, avc:m.avc,
+      partner:'', processor:t.processor||'', source:t.source,
+      title:t.title, detail:srcLbl + ' · SLA ' + t.sla,
+      act:'Open Ticket →', fn:"ccOpenTicket('"+t.id+"','"+t.merchant+"')",
+      age:t.created, sla:(t.priority==='urgent'), done:false, snoozed:false, tktId:t.id
+    });
+  });
+  if (typeof renderAllCC === 'function') renderAllCC();
+  if (typeof updateCCCounts === 'function') updateCCCounts();
+}
+setTimeout(syncTicketsToCC, 300);
+
+/* ── Tickets dashboard: source badges on existing rows + processor rows ── */
+const TKT_DASH_SRC = [
+  {kind:'processor', name:'First Data'},  // 0 — chargeback
+  {kind:'processor', name:'TSYS'},        // 1 — UW hold
+  {kind:'internal'},                       // 2 — app review
+  {kind:'merchant'},                       // 3 — terminal setup
+  {kind:'partner',  name:'Rivermark'},     // 4 — residual
+  {kind:'merchant'},                       // 5
+  {kind:'internal'},                       // 6
+  {kind:'partner',  name:'NovaPay'},       // 7
+];
+function applyTicketDashSources(){
+  const list = document.getElementById('ticket-list');
+  if (!list) return;
+  list.querySelectorAll('.trow[data-idx]').forEach(row => {
+    if (row.querySelector('.cc-src-badge')) return;
+    const src = TKT_DASH_SRC[+row.getAttribute('data-idx')];
+    if (!src) return;
+    const mid = row.querySelector('.trow-mid');
+    if (mid) mid.insertAdjacentHTML('beforeend', ccSourceBadge(src));
+  });
+}
+function prependProcessorTicketRows(){
+  const list = document.getElementById('ticket-list');
+  if (!list || list.querySelector('[data-tkt]')) return;
+  Object.values(TKT).filter(t => t.seeded).forEach(t => {
+    const st = TKT_STATUS[t.status];
+    const row = document.createElement('div');
+    row.className = 'trow';
+    row.setAttribute('data-tkt', t.id);
+    row.setAttribute('onclick', "ccOpenTicket('"+t.id+"','"+t.merchant+"')");
+    row.innerHTML = '<div class="trow-priority pri-'+t.priority+'"></div>' +
+      '<div class="trow-body">' +
+        '<div class="trow-top"><span class="trow-id">#'+t.id+'</span>' +
+          '<span class="p-badge" style="background:'+TKT_PRI_COLOR[t.priority]+'1a;color:'+TKT_PRI_COLOR[t.priority]+';">'+TKT_PRI_LBL[t.priority]+'</span>' +
+          ccSourceBadge(t.source) +
+          '<span class="kb-dept-badge" style="margin-left:auto;text-transform:capitalize;">'+t.dept+'</span></div>' +
+        '<div class="trow-title">'+tEsc(t.title)+'</div>' +
+        '<div class="trow-mid"><span class="trow-merchant">'+t.merchant+'</span><span class="p-badge" style="background:'+st.color+'1a;color:'+st.color+';">'+st.label+'</span></div>' +
+        '<div class="trow-bot"><div class="trow-assign"><div class="assign-av" style="background:'+t.members[0].avc+';color:#fff;">'+t.members[0].av+'</div> '+t.members[0].name+'</div><span class="trow-age">'+t.created+'</span></div>' +
+      '</div>';
+    list.insertBefore(row, list.firstElementChild);
+  });
+}
+function initTicketDashboard(){ applyTicketDashSources(); prependProcessorTicketRows(); }
 
 /* Insert seeded ticket anchors into the active merchant thread (merchant-scoped) */
 function ensureSeededAnchors(){
