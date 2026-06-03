@@ -2130,6 +2130,9 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .cc-pip-flag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
 .cc-pip-flag.attn { background: rgba(239,68,68,.09); color: var(--red); border: 1px solid rgba(239,68,68,.18); }
 .cc-pip-flag.ok { background: rgba(34,197,94,.08); color: var(--green); border: 1px solid rgba(34,197,94,.16); }
+.cc-pip-stage.pip-empty { opacity: .5; }
+.cc-pip-stage.pip-empty .cc-pip-ct { color: var(--text-muted); }
+.cc-pip-empty-row { padding: 14px 16px; font-size: 11.5px; color: var(--text-muted); text-align: center; }
 .cc-pip-row-act { font-size: 11px; font-weight: 600; color: var(--text-secondary); background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: 6px; padding: 4px 10px; cursor: pointer; white-space: nowrap; font-family: var(--font-ui); flex-shrink: 0; transition: all .12s; }
 .cc-pip-row-act:hover { background: var(--yellow); color: #09091A; border-color: var(--yellow); }
 
@@ -2753,7 +2756,16 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         <!-- BRIEFING -->
         <div class="cc-brief" id="ccBrief"></div>
 
-        <!-- PIPELINE (top) -->
+        <!-- PAGE FILTER BAR (filters pipeline + work) -->
+        <div class="cc-filterbar" id="ccFilterBar">
+          <span class="cc-fb-label">Filter</span>
+          <div class="cc-fb-dd" id="fb-rep"><div class="cc-fb-trigger" onclick="toggleFB('rep')"><span class="cc-fb-k">Rep</span><span class="cc-fb-v" id="fbv-rep">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-rep"></div></div>
+          <div class="cc-fb-dd" id="fb-partner"><div class="cc-fb-trigger" onclick="toggleFB('partner')"><span class="cc-fb-k">Partner</span><span class="cc-fb-v" id="fbv-partner">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-partner"></div></div>
+          <div class="cc-fb-dd" id="fb-processor"><div class="cc-fb-trigger" onclick="toggleFB('processor')"><span class="cc-fb-k">Processor</span><span class="cc-fb-v" id="fbv-processor">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-processor"></div></div>
+          <button class="cc-fb-clear" id="fbClear" onclick="clearFB()" style="display:none;">&#x2715; Clear</button>
+        </div>
+
+        <!-- PIPELINE -->
         <div class="cc-section">
           <div class="cc-sec-hdr">
             <span class="cc-sec-ttl">&#x1F4E5; Application pipeline</span>
@@ -2764,15 +2776,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             <div class="cc-pip-track" id="ccPipTrack"></div>
             <div class="cc-pip-acc" id="ccPipAcc"></div>
           </div>
-        </div>
-
-        <!-- PAGE FILTER BAR -->
-        <div class="cc-filterbar" id="ccFilterBar">
-          <span class="cc-fb-label">Filter</span>
-          <div class="cc-fb-dd" id="fb-rep"><div class="cc-fb-trigger" onclick="toggleFB('rep')"><span class="cc-fb-k">Rep</span><span class="cc-fb-v" id="fbv-rep">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-rep"></div></div>
-          <div class="cc-fb-dd" id="fb-partner"><div class="cc-fb-trigger" onclick="toggleFB('partner')"><span class="cc-fb-k">Partner</span><span class="cc-fb-v" id="fbv-partner">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-partner"></div></div>
-          <div class="cc-fb-dd" id="fb-processor"><div class="cc-fb-trigger" onclick="toggleFB('processor')"><span class="cc-fb-k">Processor</span><span class="cc-fb-v" id="fbv-processor">All</span><span class="cc-fb-cv">&#x25BE;</span></div><div class="cc-fb-menu" id="fbm-processor"></div></div>
-          <button class="cc-fb-clear" id="fbClear" onclick="clearFB()" style="display:none;">&#x2715; Clear</button>
         </div>
 
         <!-- WORK (tabbed) -->
@@ -35233,7 +35236,7 @@ function renderCCBrief() {
   if (nowN === 0) {
     txt = 'You\'re caught up on urgent items. <b class="b-amber">' + todayN + '</b> queued for today, and your pipeline has <b>' + pipAttn + '</b> applications flagged.';
   } else {
-    txt = 'You have <b class="b-red">' + nowN + ' item' + (nowN!==1?'s':'') + '</b> that need you now &mdash; <span style="color:var(--red);font-weight:700;">flagged in red below</span>' +
+    txt = 'You have <b class="b-red">' + nowN + ' item' + (nowN!==1?'s':'') + '</b> that ' + (nowN!==1?'need':'needs') + ' you now &mdash; <span style="color:var(--red);font-weight:700;">flagged in red below</span>' +
       (slaN ? ', <b>' + slaN + '</b> SLA-critical' : '') +
       '. <b class="b-amber">' + todayN + ' more</b> queued for today. Pipeline has <b>' + pipAttn + '</b> application' + (pipAttn!==1?'s':'') + ' flagged for attention.';
   }
@@ -35270,35 +35273,76 @@ function ccHeroHTML(item) {
 }
 
 /* ── Pipeline ── */
+/* The page filters (rep / partner / processor) apply to the pipeline too.
+   Processor matching is loose so e.g. 'First Data Omaha' matches 'First Data'. */
+function pipMerchantPasses(m) {
+  if (ccFilter.rep !== 'all' && m.rep !== ccFilter.rep) return false;
+  if (ccFilter.partner !== 'all' && (m.partner || '') !== ccFilter.partner) return false;
+  if (ccFilter.processor !== 'all') {
+    const p = (m.proc || '').toLowerCase(), fv = ccFilter.processor.toLowerCase();
+    if (p === '' || p === '—') return false;
+    if (!(p === fv || fv.indexOf(p) === 0 || p.indexOf(fv) === 0)) return false;
+  }
+  return true;
+}
+function ccParseVal(v) {
+  if (!v) return 0;
+  const m = String(v).replace(/[$,\s]/g,'').match(/^([\d.]+)([KM]?)/i);
+  if (!m) return 0;
+  let n = parseFloat(m[1]);
+  if (/M/i.test(m[2])) n *= 1e6; else if (/K/i.test(m[2])) n *= 1e3;
+  return n;
+}
+function ccFmtVal(n) {
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2).replace(/\.?0+$/,'') + 'M';
+  if (n >= 1e3) return '$' + Math.round(n/1e3) + 'K';
+  return '$' + n;
+}
+/* Stages with the active page filter applied — counts / attn / potential recomputed */
+function ccPipStagesView() {
+  return ccPipStages.map(s => {
+    const merchants = s.merchants.filter(pipMerchantPasses);
+    return { ...s, merchants, count: merchants.length,
+      attn: merchants.filter(m => m.ft === 'attn').length,
+      pot: ccFmtVal(merchants.reduce((a,m) => a + ccParseVal(m.val), 0)) };
+  });
+}
 function renderCCPipeline() {
   const track = document.getElementById('ccPipTrack');
   if (!track) return;
-  track.innerHTML = ccPipStages.map(s => {
+  const stages = ccPipStagesView();
+  track.innerHTML = stages.map(s => {
     const on = ccActivePip === s.key;
-    return '<div class="cc-pip-stage' + (on?' pip-active':'') + (s.attn>0?' has-attn':'') + '" style="--pip-c:' + s.c + ';" onclick="togglePip(\'' + s.key + '\')">' +
+    return '<div class="cc-pip-stage' + (on?' pip-active':'') + (s.attn>0?' has-attn':'') + (s.count===0?' pip-empty':'') + '" style="--pip-c:' + s.c + ';" onclick="togglePip(\'' + s.key + '\')">' +
       '<div class="cc-pip-stage-top"><span class="cc-pip-dot"></span><span class="cc-pip-lbl">' + s.label + '</span></div>' +
       '<div class="cc-pip-ct-row"><span class="cc-pip-ct">' + s.count + '</span><span class="cc-pip-ct-u">app' + (s.count!==1?'s':'') + '</span></div>' +
       '<div class="cc-pip-val">' + s.pot + ' / mo</div>' +
-      (s.attn>0 ? '<div class="cc-pip-attn-txt">' + s.attn + ' flagged</div>' : '<div class="cc-pip-attn-txt is-clear">on track</div>') +
+      (s.attn>0 ? '<div class="cc-pip-attn-txt">' + s.attn + ' flagged</div>' : '<div class="cc-pip-attn-txt is-clear">' + (s.count===0?'—':'on track') + '</div>') +
       '</div>';
   }).join('');
   const sub = document.getElementById('ccPipSub');
   if (sub) {
-    const totalCount = ccPipStages.reduce((a,s)=>a+s.count,0);
-    const totalAttn  = ccPipStages.reduce((a,s)=>a+s.attn,0);
-    sub.innerHTML = '<b>' + totalCount + '</b> in flight &middot; <b>$1.07M</b>/mo potential' +
-      (totalAttn ? ' &middot; <span style="color:var(--red);font-weight:700;">' + totalAttn + ' flagged</span>' : '');
+    const totalCount = stages.reduce((a,s)=>a+s.count,0);
+    const totalAttn  = stages.reduce((a,s)=>a+s.attn,0);
+    const totalPot   = ccFmtVal(stages.reduce((a,s)=>a + s.merchants.reduce((b,m)=>b+ccParseVal(m.val),0), 0));
+    const filtered   = (ccFilter.rep!=='all' || ccFilter.partner!=='all' || ccFilter.processor!=='all');
+    sub.innerHTML = '<b>' + totalCount + '</b> in flight &middot; <b>' + totalPot + '</b>/mo potential' +
+      (totalAttn ? ' &middot; <span style="color:var(--red);font-weight:700;">' + totalAttn + ' flagged</span>' : '') +
+      (filtered ? ' &middot; <span style="color:var(--text-muted);">filtered</span>' : '');
   }
 }
 
-function togglePip(key) {
+function renderPipAccordion() {
   const acc = document.getElementById('ccPipAcc');
-  if (ccActivePip === key) { ccActivePip = null; acc.classList.remove('open'); acc.innerHTML = ''; }
-  else {
-    ccActivePip = key;
-    const s = ccPipStages.find(x => x.key === key);
-    let h = '<div class="cc-pip-acc-hdr"><span class="cc-pip-acc-ttl">' + s.label + ' &mdash; ' + s.count + ' merchant' + (s.count!==1?'s':'') + '</span>' +
-      '<span class="cc-pip-acc-cls" onclick="togglePip(\'' + key + '\')">&#x2715; Close</span></div>';
+  if (!acc) return;
+  if (!ccActivePip) { acc.classList.remove('open'); acc.innerHTML = ''; return; }
+  const s = ccPipStagesView().find(x => x.key === ccActivePip);
+  if (!s) { acc.classList.remove('open'); acc.innerHTML = ''; return; }
+  let h = '<div class="cc-pip-acc-hdr"><span class="cc-pip-acc-ttl">' + s.label + ' &mdash; ' + s.count + ' merchant' + (s.count!==1?'s':'') + '</span>' +
+    '<span class="cc-pip-acc-cls" onclick="togglePip(\'' + s.key + '\')">&#x2715; Close</span></div>';
+  if (!s.merchants.length) {
+    h += '<div class="cc-pip-empty-row">No applications in this stage match the current filter.</div>';
+  } else {
     s.merchants.forEach(m => {
       h += '<div class="cc-pip-row" onclick="navigateToMerchant(\'' + m.name + '\',\'' + m.status + '\')">' +
         '<div class="cc-pip-row-av" style="background:' + (m.avc || s.c) + ';">' + m.name.substring(0,2).toUpperCase() + '</div>' +
@@ -35313,9 +35357,15 @@ function togglePip(key) {
         '<button class="cc-pip-row-act" onclick="event.stopPropagation();navigateToMerchant(\'' + m.name + '\',\'' + m.status + '\')">Open &#x2192;</button>' +
         '</div>';
     });
-    acc.innerHTML = h;
-    acc.classList.add('open');
   }
+  acc.innerHTML = h;
+  acc.classList.add('open');
+}
+
+function togglePip(key) {
+  if (ccActivePip === key) { ccActivePip = null; }
+  else { ccActivePip = key; }
+  renderPipAccordion();
   renderCCPipeline();
 }
 
@@ -35435,7 +35485,7 @@ function updateWorkTabCounts() {
   set('ct-snoozed', ccQ.filter(i => i.snoozed && !i.done && passesPageFilter(i)).length);
 }
 
-function renderAllCC() { renderCCBrief(); renderCCWork(); }
+function renderAllCC() { renderCCBrief(); renderCCPipeline(); renderPipAccordion(); renderCCWork(); }
 
 /* ── Item actions ── */
 function doneCC(id) {
