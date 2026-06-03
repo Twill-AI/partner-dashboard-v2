@@ -2478,6 +2478,16 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .tkt-ai-bub strong { color:var(--text-primary); }
 </style>
 
+<style>
+/* Ticket source attribution + processor messaging */
+.tkt-a-src { font-size:9px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid; display:inline-flex; align-items:center; gap:3px; white-space:nowrap; }
+.cc-tf-src { font-size:10px; font-weight:700; padding:2px 9px; border-radius:5px; border:1px solid; display:inline-flex; align-items:center; gap:4px; margin-left:8px; }
+.amode.proc { background:rgba(131,88,168,.13); color:#8358A8; }
+.abub.proc { background:rgba(131,88,168,.07); border:1px solid rgba(131,88,168,.22); color:var(--text-primary); border-radius:4px 10px 10px 10px; }
+.abub.proc.out-proc { background:rgba(131,88,168,.14); border-radius:10px 4px 10px 10px; }
+.cc-fs-tab.proc.on { border-bottom-color:#8358A8; color:#8358A8; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -35817,6 +35827,7 @@ document.addEventListener('click', e => {
     <div class="cc-fs-tabs">
       <div class="cc-fs-tab on" data-m="int" onclick="fsMode('int',this)">&#x1F512; Internal</div>
       <div class="cc-fs-tab" data-m="out" onclick="fsMode('out',this)">&#x1F4AC; Merchant</div>
+      <div class="cc-fs-tab proc" data-m="proc" onclick="fsMode('proc',this)">&#x2699; Processor</div>
       <div class="cc-fs-tab ai" data-m="ai" onclick="fsMode('ai',this)">&#x2726; Ask AI</div>
     </div>
     <div class="cc-fs-ta-wrap">
@@ -35861,6 +35872,20 @@ const TKT_STATUS = {
 };
 const TKT_STAGES = ['Open','In Progress','Waiting','Resolved'];
 
+/* Where a ticket originated. Processor tickets are ingested via API/email. */
+const TKT_SOURCE = {
+  internal:  {label:'Internal',  icon:'&#x1F3E2;', color:'#787774',  bg:'rgba(120,119,116,.1)'},
+  partner:   {label:'Partner',   icon:'&#x1F91D;', color:'#6B839B',  bg:'rgba(107,131,155,.12)'},
+  merchant:  {label:'Merchant',  icon:'&#x1F3EA;', color:'#5B7A5E',  bg:'rgba(91,122,94,.12)'},
+  processor: {label:'Processor', icon:'&#x2699;',  color:'#8358A8',  bg:'rgba(131,88,168,.12)'},
+};
+/* Known processors (avatar initials + color) */
+const TKT_PROCESSORS = {
+  'First Data': {av:'FD', color:'#8358A8'},
+  'Luqra':      {av:'LQ', color:'#8358A8'},
+  'Maverick':   {av:'MV', color:'#8358A8'},
+};
+
 function tNow() { return new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
 function tEsc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function tStrip(s){ return (s||'').replace(/<[^>]*>/g,' ').replace(/&[a-z]+;/g,' ').replace(/\s+/g,' ').trim(); }
@@ -35873,11 +35898,14 @@ function createTicketFromMsg(srcEl) {
   const text = (bubble ? bubble.textContent : (sysTxt ? sysTxt.textContent : '')).trim();
   const title = text.length > 70 ? text.slice(0,67) + '…' : (text || 'New ticket');
   const id = 'TKT-' + String(TKT_SEQ++).padStart(3,'0');
+  // origin: a ticket made from an incoming merchant message is merchant-sourced; else internal
+  const fromMerchant = bubble && bubble.classList.contains('inc');
+  const source = fromMerchant ? {kind:'merchant', name:merchant, via:'Chat'} : {kind:'internal', name:'Internal', via:'Chat'};
   const t = {
     id, title, merchant, status:'open', priority:'normal', type:'general', dept:'support',
     members:[{name:'M. Wright', av:'MW', avc:'#A09E9A'}],
     sla:'24h left', tags:[], docs:[], thread:[], created:tNow(),
-    sourceText:text
+    sourceText:text, source
   };
   // seed the conversation with the originating message + an opened event
   t.thread.push({kind:'src', text:text, time:t.created});
@@ -35925,6 +35953,18 @@ function tLastEntry(t){
 const TKT_PRI_LBL = {urgent:'Urgent', high:'High', normal:'Normal', low:'Low'};
 const TKT_PRI_COLOR = {urgent:'var(--red)', high:'var(--amber)', normal:'var(--blue)', low:'var(--text-muted)'};
 
+function tSrcName(t){
+  const s = t.source || {kind:'internal', name:'Internal'};
+  if (s.kind==='processor' || s.kind==='partner') return s.name;
+  if (s.kind==='merchant') return 'Merchant';
+  return 'Internal';
+}
+function sourceBadge(t){
+  const s = t.source || {kind:'internal', name:'Internal'};
+  const meta = TKT_SOURCE[s.kind] || TKT_SOURCE.internal;
+  return '<span class="tkt-a-src" style="color:'+meta.color+';background:'+meta.bg+';border-color:'+meta.color+'33;">'+meta.icon+' '+tSrcName(t)+'</span>';
+}
+
 function anchorCls(t){ return 'tkt-anchor ' + (t.status==='resolved' ? 'st-resolved' : ('pri-'+t.priority)) + (fsCur===t.id ? ' tkt-active' : ''); }
 function anchorHTML(t){
   const st = TKT_STATUS[t.status];
@@ -35938,6 +35978,7 @@ function anchorHTML(t){
   const msgCount = t.thread.filter(e=>e.kind==='msg'||e.kind==='ai').length;
   return '<div class="tkt-a-top">' +
       '<span class="tkt-a-id">🎫 ' + t.id + '</span>' +
+      sourceBadge(t) +
       '<span class="tkt-a-pri ' + t.priority + '">' + TKT_PRI_LBL[t.priority] + '</span>' +
       '<span class="tkt-a-status" style="background:'+st.color+'1a;color:'+st.color+';">' + st.label + '</span>' +
       tDots(t) + tags +
@@ -35991,7 +36032,10 @@ function openTicket(id){
   fsCur = id;
   document.getElementById('cc-fs-hi-id').innerHTML = '🎫 ' + t.id;
   document.getElementById('cc-fs-hi-title').textContent = t.title;
-  document.getElementById('cc-fs-hi-sub').textContent = '· ' + t.merchant;
+  const s = t.source || {kind:'internal', name:'Internal', via:'Chat'};
+  const sm = TKT_SOURCE[s.kind] || TKT_SOURCE.internal;
+  document.getElementById('cc-fs-hi-sub').innerHTML = '· ' + t.merchant +
+    '  <span class="cc-tf-src" style="color:'+sm.color+';background:'+sm.bg+';border-color:'+sm.color+'33;">' + sm.icon + ' From ' + tSrcName(t) + (s.via?' · '+s.via:'') + '</span>';
   document.getElementById('cc-fs-foot-name').textContent = t.merchant;
   renderFsStepper(t);
   renderFsControls(t);
@@ -36076,6 +36120,15 @@ function renderFsThread(t){
     } else if (e.kind==='ai') {
       h += '<div class="act"><div class="ah"><div class="aav" style="background:var(--navy);color:#A78BFA;">✦</div><span class="aname">Twill AI</span><span class="amode int">Research</span><span class="atime">'+e.time+'</span></div>' +
         '<div class="tkt-ai-bub">'+e.text+'</div></div>';
+    } else if (e.kind==='procmsg') {
+      // INBOUND message from the processor (ingested)
+      const p = TKT_PROCESSORS[e.from] || {av:(e.from||'PR').slice(0,2).toUpperCase(), color:'#8358A8'};
+      h += '<div class="act"><div class="ah"><div class="aav" style="background:'+p.color+';color:#fff;">'+p.av+'</div><span class="aname">'+tEsc(e.from||'Processor')+'</span><span class="amode proc">⚙ Processor'+(e.via?' · '+e.via:'')+'</span><span class="atime">'+e.time+'</span></div>' +
+        '<div class="abub proc">'+tEsc(e.text)+'</div></div>';
+    } else if (e.mode==='proc') {
+      // OUTBOUND reply to the processor
+      h += '<div class="act"><div class="ah"><div class="aav" style="background:var(--yellow);color:var(--text-inverse);">'+(e.av||'MW')+'</div><span class="aname">'+(e.author||'M. Wright')+'</span><span class="amode proc">→ Processor</span><span class="atime">'+e.time+'</span></div>' +
+        '<div class="abub proc out-proc">'+tEsc(e.text)+'</div></div>';
     } else {
       const mc = e.mode==='out'?'out':'int';
       const ml = e.mode==='out'?'→ Merchant':'Internal';
@@ -36106,7 +36159,12 @@ function fsMode(m, el){
   document.querySelectorAll('.cc-fs-tab').forEach(x=>x.classList.remove('on'));
   if (el) el.classList.add('on');
   const ta = document.getElementById('fsInput');
-  ta.placeholder = m==='ai' ? 'Ask Twill AI to research this ticket…' : (m==='out' ? 'Message the merchant…' : 'Add an internal note to this ticket…');
+  const t = TKT[fsCur];
+  const procName = (t && t.source && t.source.kind==='processor') ? t.source.name : (t ? (t.processor||'the processor') : 'the processor');
+  ta.placeholder = m==='ai' ? 'Ask Twill AI to research this ticket…'
+    : m==='out' ? 'Message the merchant…'
+    : m==='proc' ? ('Reply to ' + procName + '…')
+    : 'Add an internal note to this ticket…';
 }
 function fsSend(){
   const ta = document.getElementById('fsInput');
@@ -36160,7 +36218,65 @@ function injectChatHoverActions(root){
   });
 }
 /* keep injecting as threads update */
-setInterval(() => { injectChatHoverActions(); renderChatTicketBar(); }, 1200);
+/* ── Mock: processor-ingested tickets (API / email) auto-create ── */
+function seedProcessorTickets(){
+  TKT['TKT-061'] = {
+    id:'TKT-061', title:'Retrieval request — Visa dispute $623.00 (AU9788)', merchant:'Harbor Bistro',
+    status:'open', priority:'high', type:'chargeback', dept:'support',
+    members:[{name:'M. Wright', av:'MW', avc:'#A09E9A'}],
+    sla:'10 days', tags:[], docs:['retrieval_request_AU9788.pdf'], created:'9:02 AM',
+    processor:'First Data', source:{kind:'processor', name:'First Data', via:'API'}, seeded:true,
+    thread:[
+      {kind:'sys', text:'⚙ Auto-created from First Data via API', time:'9:02 AM'},
+      {kind:'procmsg', from:'First Data', via:'API', text:'Retrieval request for cardholder dispute. Visa ••••7723 · $623.00 · auth AU9788 (Mar 10). Provide the signed sales draft / receipt within 10 calendar days or the item proceeds to chargeback.', time:'9:02 AM'},
+    ]
+  };
+  TKT['TKT-062'] = {
+    id:'TKT-062', title:'Funding hold — KYC re-verification required', merchant:'Green Valley Market',
+    status:'waiting_merchant', priority:'urgent', type:'underwriting', dept:'underwriting',
+    members:[{name:'M. Wright', av:'MW', avc:'#A09E9A'},{name:'S. Patel', av:'SP', avc:'#5B7A5E'}],
+    sla:'4h left', tags:['escalated'], docs:[], created:'8:15 AM',
+    processor:'Maverick', source:{kind:'processor', name:'Maverick', via:'Email'}, seeded:true,
+    thread:[
+      {kind:'sys', text:'⚙ Auto-created from Maverick via email ingestion', time:'8:15 AM'},
+      {kind:'procmsg', from:'Maverick', via:'Email', text:'Settlement funds are on hold pending KYC re-verification of the beneficial owner. Please submit an updated government ID and a current voided check. Funds release within 24h of receipt.', time:'8:15 AM'},
+      {kind:'msg', mode:'out', author:'M. Wright', av:'MW', text:'Reached out to the merchant for updated docs — will forward to Maverick as soon as they come in.', time:'8:40 AM'},
+    ]
+  };
+  TKT['TKT-063'] = {
+    id:'TKT-063', title:'Compliance review — MCC verification (5812 vs 7011)', merchant:'Riverside MCA Group',
+    status:'inprogress', priority:'normal', type:'underwriting', dept:'operations',
+    members:[{name:'M. Wright', av:'MW', avc:'#A09E9A'}],
+    sla:'48h', tags:[], docs:['site_photos.pdf'], created:'Yesterday',
+    processor:'Luqra', source:{kind:'processor', name:'Luqra', via:'API'}, seeded:true,
+    thread:[
+      {kind:'sys', text:'⚙ Auto-created from Luqra via API', time:'Yesterday 4:20 PM'},
+      {kind:'procmsg', from:'Luqra', via:'API', text:'Routine MCC verification. Coded as 5812 (Restaurants) but recent volume pattern resembles 7011 (Lodging). Please confirm business type and provide supporting documentation.', time:'Yesterday 4:20 PM'},
+    ]
+  };
+  if (TKT_SEQ < 64) TKT_SEQ = 64;
+}
+seedProcessorTickets();
+
+/* Insert seeded ticket anchors into the active merchant thread (merchant-scoped) */
+function ensureSeededAnchors(){
+  const merchant = (typeof ccCurrentMerchantName==='function' && ccCurrentMerchantName());
+  const thread = findVisibleThread();
+  if (!thread || !merchant) return;
+  thread.querySelectorAll('.tkt-anchor[data-seeded="1"]').forEach(el => {
+    const tid = el.id.replace('tkt-anchor-','');
+    if (!TKT[tid] || TKT[tid].merchant !== merchant) el.remove();
+  });
+  Object.values(TKT).forEach(t => {
+    if (t.seeded && t.merchant === merchant && !thread.querySelector('#tkt-anchor-'+t.id)) {
+      insertAnchor(t, thread);
+      const el = thread.querySelector('#tkt-anchor-'+t.id);
+      if (el) el.setAttribute('data-seeded','1');
+    }
+  });
+}
+
+setInterval(() => { injectChatHoverActions(); ensureSeededAnchors(); renderChatTicketBar(); }, 1200);
 setTimeout(() => injectChatHoverActions(), 400);
 
 /* ── Expand button: open the merchant chat full-screen (fixes ⤢) ── */
