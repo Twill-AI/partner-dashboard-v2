@@ -2218,6 +2218,20 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 @keyframes ccpulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
 .cc-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: ccpulse 2s infinite; }
 </style>
+<style>
+/* ── Dashboard overview extras ── */
+.delta-up { color: var(--green); }
+.seg-toggle { display: inline-flex; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.seg-opt { font-size: 11px; font-weight: 600; color: var(--text-muted); padding: 5px 11px; cursor: pointer; transition: all .12s; }
+.seg-opt:hover { color: var(--text-secondary); }
+.seg-opt.active { background: var(--navy); color: #fff; }
+.dash-funnel-row { display: flex; align-items: center; gap: 9px; }
+.dash-funnel-lbl { font-size: 11px; color: var(--text-secondary); width: 102px; flex-shrink: 0; }
+.dash-funnel-bar { flex: 1; height: 8px; background: var(--bg-elevated); border-radius: 4px; overflow: hidden; }
+.dash-funnel-bar > div { height: 100%; border-radius: 4px; }
+.dash-funnel-pct { font-size: 11px; font-weight: 700; font-family: var(--font-mono); color: var(--text-primary); width: 34px; text-align: right; flex-shrink: 0; }
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -2230,11 +2244,16 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
     <div class="sidebar-section">
       <div class="sidebar-label">Overview</div>
-      <div class="nav-item active" onclick="showView('dashboard', this)">
+      <div class="nav-item active" id="nav-dashboard" onclick="showView('dashboard', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h5v5H2V3zm7 0h5v5H9V3zM2 9h5v5H2V9zm7 0h5v5H9V9z" opacity=".8"/></svg>
         Dashboard
       </div>
-      <div class="nav-item" onclick="showView('dashboard', this)">
+      <div class="nav-item" id="nav-command" onclick="showView('command-center', this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.7 4.1.6-3 2.9.7 4.1L8 10.9 4.4 12.8l.7-4.1-3-2.9 4.1-.6L8 1.5z" opacity=".85"/></svg>
+        Command Center
+        <span style="margin-left:auto;background:rgba(239,68,68,.12);color:var(--red);font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;font-family:var(--font-mono);">3</span>
+      </div>
+      <div class="nav-item" id="nav-activity" onclick="showView('dashboard', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zm1 6.5V5.5a.5.5 0 00-1 0V9a.5.5 0 00.5.5h2.5a.5.5 0 000-1H9z" opacity=".8"/></svg>
         Activity Feed
       </div>
@@ -2309,7 +2328,120 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
   <div class="main">
 
     <!-- ── VIEW: DASHBOARD ──────────────────────────── -->
+    <!-- ── VIEW: DASHBOARD (Portfolio Overview) ─────────── -->
     <div class="view active" id="view-dashboard">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div>
+            <div class="page-title">Portfolio Overview</div>
+            <div class="page-sub">All partners &middot; <span id="dashDate"></span></div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="seg-toggle" id="dashRange">
+            <span class="seg-opt active" onclick="setDashRange('30d',this)">30D</span>
+            <span class="seg-opt" onclick="setDashRange('90d',this)">90D</span>
+            <span class="seg-opt" onclick="setDashRange('ytd',this)">YTD</span>
+          </div>
+          <button class="btn btn-ghost">Export</button>
+        </div>
+      </div>
+
+      <div class="content" style="overflow-y:auto;">
+        <!-- KPI STRIP -->
+        <div class="kpi-strip">
+          <div class="kpi"><div class="kpi-label">MTD Volume</div><div class="kpi-value">$4.2M</div><div class="kpi-delta delta-up">&#x2191; 11% vs last month</div></div>
+          <div class="kpi"><div class="kpi-label">MTD Residuals</div><div class="kpi-value">$38.4K</div><div class="kpi-delta delta-up">&#x2191; 8.3% MoM</div></div>
+          <div class="kpi"><div class="kpi-label">Active Merchants</div><div class="kpi-value">612</div><div class="kpi-delta delta-up">&#x2191; 38 this month</div></div>
+          <div class="kpi"><div class="kpi-label">Pipeline Value</div><div class="kpi-value">$2.9M</div><div class="kpi-delta delta-flat">13 apps in flight</div></div>
+          <div class="kpi"><div class="kpi-label">Approval Rate</div><div class="kpi-value">86%</div><div class="kpi-delta delta-up">&#x2191; 3pts vs Q1</div></div>
+          <div class="kpi"><div class="kpi-label">Avg Cycle Time</div><div class="kpi-value">6.2<span style="font-size:15px;color:var(--text-muted);"> d</span></div><div class="kpi-delta delta-down">&#x2193; 1.1d faster</div></div>
+        </div>
+
+        <!-- ROW 1: Volume trend (wide) + Merchant status donut -->
+        <div class="charts-row" style="grid-template-columns:1.6fr 1fr;">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Processing Volume</div><div class="card-sub">All partners combined &middot; <span id="volRangeLbl">last 30 days</span></div></div>
+              <div style="text-align:right;"><div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--navy);">$4.2M</div><div style="font-size:11px;color:var(--green);">&#x2191; 11%</div></div>
+            </div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="dashVolume"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Merchant Status</div><div class="card-sub">847 total across all partners</div></div></div>
+            <div class="card-body">
+              <div class="chart-wrap" style="min-height:150px;"><canvas id="dashStatus"></canvas></div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center;">
+                <span style="font-size:12px;color:var(--text-secondary);"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#5B7A5E;margin-right:5px;"></span>Active 612</span>
+                <span style="font-size:12px;color:var(--text-secondary);"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#A67C5B;margin-right:5px;"></span>Pending 23</span>
+                <span style="font-size:12px;color:var(--text-secondary);"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#A09E9A;margin-right:5px;"></span>Inactive 189</span>
+                <span style="font-size:12px;color:var(--text-secondary);"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9B6B5B;margin-right:5px;"></span>Suspended 23</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: Pipeline funnel + Residual trend + Conversion -->
+        <div class="charts-row" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Application Pipeline</div><div class="card-sub">13 in flight &middot; $2.9M potential</div></div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="showView('command-center', document.getElementById('nav-command'))">Work it &#x2192;</button></div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="dashPipeline"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Residual Earnings</div><div class="card-sub">Net to you &middot; trailing 6 mo</div></div></div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="dashResiduals"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Pipeline Health</div><div class="card-sub">Conversion by stage</div></div></div>
+            <div class="card-body" style="padding:14px 16px;display:flex;flex-direction:column;gap:11px;justify-content:center;">
+              <div class="dash-funnel-row"><span class="dash-funnel-lbl">Lead &#x2192; Review</span><div class="dash-funnel-bar"><div style="width:78%;background:#6B839B;"></div></div><span class="dash-funnel-pct">78%</span></div>
+              <div class="dash-funnel-row"><span class="dash-funnel-lbl">Review &#x2192; UW</span><div class="dash-funnel-bar"><div style="width:71%;background:#818CF8;"></div></div><span class="dash-funnel-pct">71%</span></div>
+              <div class="dash-funnel-row"><span class="dash-funnel-lbl">UW &#x2192; Approved</span><div class="dash-funnel-bar"><div style="width:86%;background:#A67C5B;"></div></div><span class="dash-funnel-pct">86%</span></div>
+              <div class="dash-funnel-row"><span class="dash-funnel-lbl">Approved &#x2192; Live</span><div class="dash-funnel-bar"><div style="width:94%;background:#5B7A5E;"></div></div><span class="dash-funnel-pct">94%</span></div>
+              <div style="margin-top:4px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:var(--text-secondary);">Overall lead&#x2192;live</span>
+                <span style="font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--green);">45%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: Top merchants + Partner performance -->
+        <div class="charts-row" style="grid-template-columns:1fr 1.6fr;">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Top Merchants</div><div class="card-sub">By MTD volume</div></div></div>
+            <div class="card-body" style="padding:4px 0;">
+              <div class="partner-row"><div class="p-avatar" style="background:#6B5FA5;">HB</div><div style="flex:1;min-width:0;"><div class="p-name">Harbor Bistro</div><div style="font-size:12px;color:var(--text-muted);">Coastal Commerce</div></div><span class="p-vol">$218K</span></div>
+              <div class="partner-row"><div class="p-avatar" style="background:#6B839B;">LD</div><div style="flex:1;min-width:0;"><div class="p-name">Lakeview Dental</div><div style="font-size:12px;color:var(--text-muted);">Summit Lending</div></div><span class="p-vol">$194K</span></div>
+              <div class="partner-row"><div class="p-avatar" style="background:#5B7A5E;">GV</div><div style="flex:1;min-width:0;"><div class="p-name">Green Valley Market</div><div style="font-size:12px;color:var(--text-muted);">NovaPay</div></div><span class="p-vol">$176K</span></div>
+              <div class="partner-row"><div class="p-avatar" style="background:#A67C5B;">PA</div><div style="flex:1;min-width:0;"><div class="p-name">Pines Auto Group</div><div style="font-size:12px;color:var(--text-muted);">Apex Elite</div></div><span class="p-vol">$163K</span></div>
+              <div class="partner-row"><div class="p-avatar" style="background:#9B6B5B;">MP</div><div style="flex:1;min-width:0;"><div class="p-name">Metro Print Shop</div><div style="font-size:12px;color:var(--text-muted);">Rivermark</div></div><span class="p-vol">$141K</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Partner Performance</div><div class="card-sub">Volume, merchants &amp; effective rate</div></div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="showView('partners', document.getElementById('nav-partners'))">All partners &#x2192;</button></div>
+            <div class="card-body" style="padding:0;">
+              <table style="width:100%;border-collapse:collapse;">
+                <thead><tr style="border-bottom:1px solid var(--border);">
+                  <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;padding:9px 16px;">Partner</th>
+                  <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:9px 8px;">Merch</th>
+                  <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:9px 8px;">MTD Vol</th>
+                  <th style="text-align:right;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:9px 8px;">Residual</th>
+                  <th style="text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:9px 16px;">Trend</th>
+                </tr></thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="showView('partners',document.getElementById('nav-partners'))"><td style="padding:11px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#6B839B;width:22px;height:22px;font-size:9px;">AE</div><span style="font-size:12px;font-weight:500;">Apex Elite</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);padding:11px 8px;">218</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:11px 8px;">$921K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);padding:11px 8px;">$9.2K</td><td style="text-align:center;padding:11px 16px;"><span style="color:var(--green);font-size:12px;">&#x2197; 6%</span></td></tr><tr style="border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="showView('partners',document.getElementById('nav-partners'))"><td style="padding:11px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#5B7A5E;width:22px;height:22px;font-size:9px;">SL</div><span style="font-size:12px;font-weight:500;">Summit Lending</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);padding:11px 8px;">184</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:11px 8px;">$784K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);padding:11px 8px;">$7.8K</td><td style="text-align:center;padding:11px 16px;"><span style="color:var(--green);font-size:12px;">&#x2197; 4%</span></td></tr><tr style="border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="showView('partners',document.getElementById('nav-partners'))"><td style="padding:11px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#A67C5B;width:22px;height:22px;font-size:9px;">NP</div><span style="font-size:12px;font-weight:500;">NovaPay</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);padding:11px 8px;">146</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:11px 8px;">$612K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);padding:11px 8px;">$6.1K</td><td style="text-align:center;padding:11px 16px;"><span style="color:var(--green);font-size:12px;">&#x2197; 9%</span></td></tr><tr style="border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="showView('partners',document.getElementById('nav-partners'))"><td style="padding:11px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#9B6B5B;width:22px;height:22px;font-size:9px;">CC</div><span style="font-size:12px;font-weight:500;">Coastal Commerce</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);padding:11px 8px;">121</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:11px 8px;">$498K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);padding:11px 8px;">$5.0K</td><td style="text-align:center;padding:11px 16px;"><span style="color:var(--red);font-size:12px;">&#x2198; 2%</span></td></tr><tr style="border-bottom:1px solid rgba(0,0,0,0.04);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="showView('partners',document.getElementById('nav-partners'))"><td style="padding:11px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#6B5FA5;width:22px;height:22px;font-size:9px;">RM</div><span style="font-size:12px;font-weight:500;">Rivermark</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);padding:11px 8px;">98</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:11px 8px;">$387K</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;color:var(--green);padding:11px 8px;">$3.9K</td><td style="text-align:center;padding:11px 16px;"><span style="color:var(--green);font-size:12px;">&#x2197; 3%</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-dashboard -->
+
+    <div class="view" id="view-command-center">
       <div class="topbar">
         <div class="topbar-left">
           <div>
@@ -2419,7 +2551,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         </div>
 
       </div>
-    </div><!-- /view-dashboard -->
+    </div><!-- /view-command-center -->
 
 
     <!-- ── VIEW: PARTNERS ────────────────────────────── -->
@@ -14930,26 +15062,58 @@ Chart.defaults.color = C.muted;
 Chart.defaults.font.family = "'Inter',sans-serif";
 Chart.defaults.font.size = 11;
 
-(function() {
-  const cv = document.getElementById('volumeTrend');
-  if (!cv) return; // dashboard charts removed in Command Center redesign
-  const labels = [];
-  const d = new Date(); d.setDate(d.getDate()-29);
-  for(let i=0;i<30;i++){ labels.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'})); d.setDate(d.getDate()+1); }
-  const seed = [110,98,125,134,119,144,160,152,148,162,178,155,190,204,196,211,225,218,230,245,238,252,261,248,270,285,278,290,304,312];
-  const ctx = cv.getContext('2d');
-  const gradient = ctx.createLinearGradient(0,0,0,180);
-  gradient.addColorStop(0,'rgba(34,46,72,0.15)');
-  gradient.addColorStop(1,'rgba(34,46,72,0)');
-  new Chart(ctx,{type:'line',data:{labels,datasets:[{data:seed,borderColor:C.yellow,borderWidth:1.5,backgroundColor:gradient,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:C.yellow,tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'#FFFFFF',borderColor:C.border,borderWidth:1,titleColor:C.muted,bodyColor:'#37352F',callbacks:{label:ctx=>` $${ctx.parsed.y}K`}}},scales:{x:{grid:{color:C.border,drawBorder:false},border:{display:false},ticks:{maxTicksLimit:6,color:C.muted}},y:{grid:{color:C.border,drawBorder:false},border:{display:false},ticks:{color:C.muted,callback:v=>`$${v}K`}}}}});
-})();
+/* ── Dashboard (Portfolio Overview) charts ── */
+let _dashCharts = {};
+function initDashCharts() {
+  if (typeof Chart === 'undefined') return;
+  const TT = {backgroundColor:'#FFFFFF',borderColor:C.border,borderWidth:1,titleColor:C.muted,bodyColor:'#37352F',padding:9,cornerRadius:6};
 
-(function() {
-  const cv = document.getElementById('statusDonut');
-  if (!cv) return; // dashboard charts removed in Command Center redesign
-  const ctx = cv.getContext('2d');
-  new Chart(ctx,{type:'doughnut',data:{labels:['Active','Pending','Inactive','Suspended'],datasets:[{data:[612,23,189,23],backgroundColor:[C.green,C.amber,'#A09E9A',C.red],borderColor:'#FFFFFF',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#FFFFFF',borderColor:C.border,borderWidth:1,bodyColor:'#37352F'}}}});
-})();
+  // Volume — area line, 30 days
+  (function(){
+    const cv = document.getElementById('dashVolume'); if (!cv) return;
+    if (_dashCharts.vol) { _dashCharts.vol.resize(); return; }
+    const labels = [];
+    const d = new Date(); d.setDate(d.getDate()-29);
+    for(let i=0;i<30;i++){ labels.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'})); d.setDate(d.getDate()+1); }
+    const seed = [110,98,125,134,119,144,160,152,148,162,178,155,190,204,196,211,225,218,230,245,238,252,261,248,270,285,278,290,304,312];
+    const ctx = cv.getContext('2d');
+    const g = ctx.createLinearGradient(0,0,0,200);
+    g.addColorStop(0,'rgba(34,46,72,0.16)'); g.addColorStop(1,'rgba(34,46,72,0)');
+    _dashCharts.vol = new Chart(ctx,{type:'line',data:{labels,datasets:[{data:seed,borderColor:C.yellow,borderWidth:2,backgroundColor:g,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:C.yellow,tension:0.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>' $'+c.parsed.y+'K'}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{maxTicksLimit:6,color:C.muted,font:{size:10}}},y:{grid:{color:C.border},border:{display:false},ticks:{color:C.muted,font:{size:10},callback:v=>'$'+v+'K'}}}}});
+  })();
+
+  // Status donut
+  (function(){
+    const cv = document.getElementById('dashStatus'); if (!cv) return;
+    if (_dashCharts.status) { _dashCharts.status.resize(); return; }
+    _dashCharts.status = new Chart(cv.getContext('2d'),{type:'doughnut',data:{labels:['Active','Pending','Inactive','Suspended'],datasets:[{data:[612,23,189,23],backgroundColor:['#5B7A5E','#A67C5B','#A09E9A','#9B6B5B'],borderColor:'#FFFFFF',borderWidth:3,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false},tooltip:TT}}});
+  })();
+
+  // Pipeline funnel — horizontal bar by stage
+  (function(){
+    const cv = document.getElementById('dashPipeline'); if (!cv) return;
+    if (_dashCharts.pipe) { _dashCharts.pipe.resize(); return; }
+    _dashCharts.pipe = new Chart(cv.getContext('2d'),{type:'bar',data:{labels:['Lead','Review','Underwriting','Signature','Approved','Boarding'],datasets:[{data:[3,2,3,2,1,2],backgroundColor:['#6B839B','#818CF8','#A67C5B','#A78BFA','#5B7A5E','#222E48'],borderRadius:5,barThickness:16}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>' '+c.parsed.x+' merchants'}}},scales:{x:{grid:{color:C.border},border:{display:false},ticks:{color:C.muted,font:{size:10},stepSize:1}},y:{grid:{display:false},border:{display:false},ticks:{color:C.text,font:{size:10}}}}}});
+  })();
+
+  // Residual earnings — trailing 6 months bars
+  (function(){
+    const cv = document.getElementById('dashResiduals'); if (!cv) return;
+    if (_dashCharts.res) { _dashCharts.res.resize(); return; }
+    _dashCharts.res = new Chart(cv.getContext('2d'),{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{data:[28.1,30.4,31.9,33.2,35.5,38.4],backgroundColor:C.green,borderRadius:5,barThickness:22}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>' $'+c.parsed.y+'K'}}},scales:{x:{grid:{display:false},border:{display:false},ticks:{color:C.muted,font:{size:10}}},y:{grid:{color:C.border},border:{display:false},ticks:{color:C.muted,font:{size:10},callback:v=>'$'+v+'K'}}}}});
+  })();
+
+  // Date stamp
+  const de = document.getElementById('dashDate');
+  if (de && !de.textContent) de.textContent = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+}
+function setDashRange(r, el) {
+  if (el) { el.parentElement.querySelectorAll('.seg-opt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
+  const lbl = document.getElementById('volRangeLbl');
+  if (lbl) lbl.textContent = {'30d':'last 30 days','90d':'last 90 days','ytd':'year to date'}[r] || r;
+}
+// Render dashboard charts on initial load (dashboard is the default view)
+document.addEventListener('DOMContentLoaded', () => { setTimeout(initDashCharts, 60); });
 
 /* ── Analytics tab switch ──────────────────────── */
 function switchAtab(el, id) {
@@ -30661,6 +30825,8 @@ function showView(name, clickedNav) {
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (clickedNav) clickedNav.classList.add('active');
+  if (name === 'dashboard') { setTimeout(initDashCharts, 30); }
+  if (name === 'command-center' && typeof initCC === 'function') { setTimeout(initCC, 20); }
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
   if (name === 'merchant-active') { setTimeout(initMaChart, 50); }
   if (name === 'residuals' && !resChartsReady) { resChartsReady = true; setTimeout(initResCharts, 50); }
