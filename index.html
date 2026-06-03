@@ -1776,6 +1776,171 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .assign-dd-opt { display:flex; align-items:center; gap:8px; padding:7px 12px; cursor:pointer; transition:background .1s; font-size:12px; }
 .assign-dd-opt:hover { background:var(--bg-hover); }
 </style>
+<style>
+/* ═══ COMMAND CENTER V3 ═══════════════════════════════════════════ */
+.cc-content{display:flex;flex-direction:column;gap:16px;padding:18px 20px;overflow-y:auto;}
+.cc-stat-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.cc-stat{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all .15s;white-space:nowrap;}
+.cc-stat:hover{opacity:.82;}
+.cc-stat.now{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red);}
+.cc-stat.today{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.22);color:var(--amber);}
+.cc-stat.sla{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.18);color:var(--red);}
+.cc-stat.tasks{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.22);color:var(--blue);}
+.cc-stat.msgs{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.2);color:var(--green);}
+.cc-stat-ct{font-size:18px;font-family:var(--font-mono);line-height:1;}
+/* Pipeline */
+.cc-pipeline{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:visible;}
+.cc-pip-track{display:flex;align-items:stretch;overflow-x:auto;min-height:62px;border-radius:10px 10px 0 0;}
+.cc-pip-stage{flex:1;min-width:88px;display:flex;flex-direction:column;align-items:center;padding:11px 6px 10px;cursor:pointer;border-right:1px solid var(--border);transition:background .12s;position:relative;user-select:none;}
+.cc-pip-stage:last-child{border-right:none;}
+.cc-pip-stage:hover{background:var(--bg-hover);}
+.cc-pip-stage.pip-active{background:rgba(255,222,0,.04);border-bottom:2px solid var(--yellow);}
+.cc-pip-lbl{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;white-space:nowrap;}
+.cc-pip-ct{font-size:22px;font-weight:800;font-family:var(--font-mono);color:var(--text-primary);line-height:1;}
+.cc-pip-attn{position:absolute;top:7px;right:6px;font-size:9px;font-weight:700;color:var(--red);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:3px;padding:1px 4px;}
+.cc-pip-arrow{display:flex;align-items:center;color:var(--border-strong);font-size:16px;padding:0 1px;flex-shrink:0;padding-bottom:2px;}
+.cc-pip-acc{border-top:1px solid var(--border);display:none;}
+.cc-pip-acc.open{display:block;}
+.cc-pip-acc-hdr{display:flex;align-items:center;padding:8px 16px;background:var(--bg-elevated);border-bottom:1px solid var(--border);}
+.cc-pip-acc-ttl{font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;}
+.cc-pip-acc-cls{margin-left:auto;font-size:11px;color:var(--text-muted);cursor:pointer;padding:2px 8px;border-radius:4px;}
+.cc-pip-acc-cls:hover{background:var(--bg-hover);}
+.cc-pip-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;transition:background .1s;}
+.cc-pip-row:last-child{border-bottom:none;}
+.cc-pip-row:hover{background:var(--bg-hover);}
+.cc-pip-row-av{width:26px;height:26px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-secondary);flex-shrink:0;}
+.cc-pip-row-name{font-size:12px;font-weight:600;color:var(--text-primary);flex:1;min-width:0;}
+.cc-pip-row-partner{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+.cc-pip-row-age{font-size:10px;font-family:var(--font-mono);color:var(--text-muted);white-space:nowrap;}
+.cc-pip-flag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;}
+.cc-pip-flag.attn{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.cc-pip-flag.ok{background:rgba(34,197,94,.08);color:var(--green);border:1px solid rgba(34,197,94,.18);}
+.cc-pip-row-act{font-size:11px;font-weight:600;color:var(--text-secondary);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:4px 10px;cursor:pointer;white-space:nowrap;font-family:var(--font-ui);}
+.cc-pip-row-act:hover{background:var(--yellow);color:#09091A;border-color:var(--yellow);}
+/* Main layout */
+.cc-main{display:flex;gap:16px;align-items:flex-start;}
+.cc-queue-wrap{flex:1;min-width:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.cc-team-wrap{width:242px;flex-shrink:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+/* Queue filters */
+.cc-queue-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-elevated);flex-wrap:wrap;}
+.cc-queue-ttl{font-size:12px;font-weight:700;color:var(--text-primary);}
+.cc-asgn-sel{font-size:11px;font-weight:600;color:var(--text-secondary);background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;padding:4px 9px;cursor:pointer;display:flex;align-items:center;gap:4px;user-select:none;}
+.cc-asgn-sel:hover{background:var(--bg-hover);}
+.cc-ptabs{display:flex;gap:1px;margin-left:auto;}
+.cc-ptab{font-size:11px;font-weight:600;padding:4px 9px;border-radius:5px;cursor:pointer;color:var(--text-muted);transition:all .1s;border:1px solid transparent;}
+.cc-ptab:hover{color:var(--text-primary);}
+.cc-ptab.on{background:var(--bg-elevated);color:var(--text-primary);border-color:var(--border-strong);}
+.cc-cat-pills{display:flex;gap:5px;padding:7px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.cc-cpill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--text-muted);background:transparent;transition:all .1s;text-transform:uppercase;letter-spacing:.04em;}
+.cc-cpill:hover{border-color:var(--border-strong);color:var(--text-secondary);}
+.cc-cpill.on{background:var(--bg-elevated);color:var(--text-primary);border-color:var(--border-strong);}
+/* Queue tiers */
+.cc-tier-hdr{display:flex;align-items:center;gap:8px;padding:8px 14px 5px;border-top:1px solid var(--border);}
+.cc-tier-hdr:first-child{border-top:none;}
+.cc-tier-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cc-tier-dot.now{background:var(--red);}
+.cc-tier-dot.today{background:var(--amber);}
+.cc-tier-dot.week{background:var(--blue);}
+.cc-tier-lbl{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;}
+.cc-tier-lbl.now{color:var(--red);}
+.cc-tier-lbl.today{color:var(--amber);}
+.cc-tier-lbl.week{color:var(--blue);}
+.cc-tier-ct{font-size:10px;color:var(--text-muted);}
+/* Queue items */
+.cc-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-top:1px solid rgba(0,0,0,.04);transition:background .1s;}
+.cc-item:hover{background:rgba(0,0,0,.013);}
+.cc-item.cc-gone{opacity:0;transform:translateX(18px);transition:all .22s ease;}
+.cc-ileft{display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:2px;flex-shrink:0;}
+.cc-ipri{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cc-ipri.now{background:var(--red);box-shadow:0 0 5px rgba(239,68,68,.35);}
+.cc-ipri.today{background:var(--amber);}
+.cc-ipri.week{background:var(--blue);}
+.cc-icat{font-size:13px;line-height:1;}
+.cc-ibody{flex:1;min-width:0;}
+.cc-imerchant{font-size:12px;font-weight:700;color:var(--text-primary);cursor:pointer;display:inline;}
+.cc-imerchant:hover{color:var(--yellow);text-decoration:underline;}
+.cc-istatus{display:inline;font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;margin-left:5px;}
+.cc-ititle{font-size:12px;color:var(--text-secondary);margin-top:2px;line-height:1.4;}
+.cc-idetail{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+.cc-imeta{display:flex;align-items:center;gap:7px;margin-top:6px;}
+.cc-iav{width:16px;height:16px;border-radius:50%;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cc-iassignee{font-size:10px;color:var(--text-muted);}
+.cc-iage{font-size:10px;font-family:var(--font-mono);color:var(--text-muted);}
+.cc-isla{font-size:9px;font-weight:700;color:var(--red);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:3px;padding:1px 5px;}
+.cc-iactions{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:auto;margin-top:1px;}
+.cc-iact{font-size:11px;font-weight:600;padding:5px 11px;border-radius:5px;cursor:pointer;font-family:var(--font-ui);border:1px solid var(--border-strong);background:var(--bg-elevated);color:var(--text-primary);white-space:nowrap;transition:all .12s;}
+.cc-iact:hover{background:var(--yellow);color:#09091A;border-color:var(--yellow);}
+.cc-isnooze{position:relative;}
+.cc-isnooze-btn{font-size:11px;padding:5px 7px;border-radius:5px;cursor:pointer;font-family:var(--font-ui);border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .12s;}
+.cc-isnooze-btn:hover{background:var(--bg-elevated);color:var(--text-secondary);}
+.cc-idone-btn{font-size:14px;padding:3px 7px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .12s;}
+.cc-idone-btn:hover{background:rgba(34,197,94,.1);color:var(--green);border-color:rgba(34,197,94,.3);}
+.cc-snooze-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:7px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:200;overflow:hidden;min-width:150px;display:none;}
+.cc-snooze-menu.open{display:block;}
+.cc-snooze-opt{padding:8px 14px;font-size:11px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:background .1s;}
+.cc-snooze-opt:hover{background:var(--bg-hover);color:var(--text-primary);}
+.cc-done-bar{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;color:var(--text-muted);cursor:pointer;background:rgba(34,197,94,.025);border-top:1px solid rgba(34,197,94,.1);}
+.cc-done-bar:hover{background:rgba(34,197,94,.05);}
+.cc-done-section{display:none;}
+.cc-done-section.open .cc-item{opacity:.4;}
+/* Team sidebar */
+.cc-team-hdr{padding:10px 14px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;background:var(--bg-elevated);}
+.cc-team-row{display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;transition:background .1s;}
+.cc-team-row:last-of-type{border-bottom:none;}
+.cc-team-row:hover{background:var(--bg-hover);}
+.cc-team-av{width:26px;height:26px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cc-team-name{font-size:12px;font-weight:600;color:var(--text-primary);flex:1;}
+.cc-team-chips{display:flex;gap:3px;flex-wrap:wrap;}
+.cc-tchip{font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;}
+.cc-tchip.apps{background:rgba(99,102,241,.1);color:var(--blue);}
+.cc-tchip.alrt{background:rgba(239,68,68,.1);color:var(--red);}
+.cc-tchip.msgs{background:rgba(34,197,94,.08);color:var(--green);}
+/* Portfolio alerts */
+.cc-port-wrap{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.cc-port-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg-elevated);flex-wrap:wrap;}
+.cc-port-ttl{font-size:12px;font-weight:700;color:var(--text-primary);}
+.cc-port-sub{font-size:11px;color:var(--text-muted);}
+.cc-port-tabs{display:flex;gap:2px;margin-left:auto;}
+.cc-port-tab{font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;cursor:pointer;color:var(--text-muted);border:1px solid transparent;}
+.cc-port-tab:hover{color:var(--text-primary);}
+.cc-port-tab.on{background:var(--bg-elevated);border-color:var(--border-strong);color:var(--text-primary);}
+.cc-port-item{display:flex;align-items:center;gap:11px;padding:11px 14px;border-top:1px solid rgba(0,0,0,.04);transition:background .1s;}
+.cc-port-item:hover{background:rgba(0,0,0,.012);}
+.cc-port-sev{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;}
+.cc-port-sev.high{background:var(--red);}
+.cc-port-sev.med{background:var(--amber);}
+.cc-port-sev.low{background:var(--blue);}
+.cc-port-icon{font-size:16px;flex-shrink:0;}
+.cc-port-body{flex:1;min-width:0;}
+.cc-port-name{font-size:12px;font-weight:700;color:var(--text-primary);cursor:pointer;display:inline;}
+.cc-port-name:hover{color:var(--yellow);}
+.cc-port-text{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+.cc-port-detail{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.cc-port-acts{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+/* Status badge colours */
+.st-lead{background:rgba(107,131,155,.1);color:#6B839B;}
+.st-inreview{background:rgba(129,140,248,.1);color:#818CF8;}
+.st-underwriting{background:rgba(166,124,91,.1);color:#A67C5B;}
+.st-signature{background:rgba(167,139,250,.1);color:#a78bfa;}
+.st-approved{background:rgba(74,222,128,.1);color:#4ADE80;}
+.st-boarding{background:rgba(34,46,72,.12);color:#8899BB;}
+.st-active{background:rgba(91,122,94,.1);color:#5B7A5E;}
+/* Task modal */
+.cc-task-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;}
+.cc-task-overlay.open{display:flex;}
+.cc-task-modal{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:12px;box-shadow:0 12px 48px rgba(0,0,0,.25);width:420px;max-width:95vw;}
+.cc-task-mhdr{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);}
+.cc-task-mttl{font-size:14px;font-weight:700;color:var(--text-primary);flex:1;}
+.cc-task-mcls{font-size:18px;color:var(--text-muted);cursor:pointer;background:none;border:none;line-height:1;padding:2px;}
+.cc-task-mcls:hover{color:var(--text-primary);}
+.cc-task-mbody{padding:18px;display:flex;flex-direction:column;gap:12px;}
+.cc-tf label{display:block;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.cc-tf input,.cc-tf textarea,.cc-tf select{width:100%;padding:8px 10px;background:var(--bg-base);border:1px solid var(--border-strong);border-radius:6px;font-size:12px;color:var(--text-primary);font-family:var(--font-ui);outline:none;resize:none;box-sizing:border-box;}
+.cc-tf input:focus,.cc-tf textarea:focus,.cc-tf select:focus{border-color:var(--yellow);}
+.cc-task-mftr{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border);justify-content:flex-end;}
+@keyframes ccpulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.cc-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:ccpulse 2s infinite;}
+</style>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     if (typeof Chart !== "undefined") {
@@ -1896,157 +2061,124 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="topbar">
         <div class="topbar-left">
           <div>
-            <div class="page-title">Partner Dashboard</div>
-            <div class="page-sub">All partners · Last updated just now</div>
+            <div class="page-title">Command Center</div>
+            <div class="page-sub">Good morning, M. Wright &mdash; <span id="ccDate"></span></div>
           </div>
         </div>
         <div class="topbar-right">
-          <button class="btn btn-ghost">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
-            Filter
-          </button>
-          <button class="btn btn-ghost">Export</button>
-          <button class="btn btn-primary" onclick="openAddPartnerDrawer()">+ Add Partner</button>
+          <button class="btn btn-ghost" id="ccOverviewBtn" onclick="toggleCCOverview(this)">&#x1F4CA; Overview</button>
+          <button class="btn btn-primary" onclick="openCCTask()">+ Task</button>
         </div>
       </div>
 
-      <div class="content">
-        <!-- KPI STRIP -->
-        <div class="kpi-strip">
-          <div class="kpi"><div class="kpi-label">Active Partners</div><div class="kpi-value">14</div><div class="kpi-delta delta-up">↑ 2 this month</div></div>
-          <div class="kpi"><div class="kpi-label">Total Merchants</div><div class="kpi-value">847</div><div class="kpi-delta delta-up">↑ 38 this month</div></div>
-          <div class="kpi"><div class="kpi-label">MTD Volume</div><div class="kpi-value">$4.2M</div><div class="kpi-delta delta-up">↑ 11% vs last month</div></div>
-          <div class="kpi"><div class="kpi-label">MTD Residuals</div><div class="kpi-value">$38.4K</div><div class="kpi-delta delta-up">↑ 8.3% vs last month</div></div>
-          <div class="kpi"><div class="kpi-label">Pending Apps</div><div class="kpi-value" style="color:var(--amber)">23</div><div class="kpi-delta delta-flat">Avg 3.2 days in queue</div></div>
-          <div class="kpi"><div class="kpi-label">Auth Rate</div><div class="kpi-value">97.2%</div><div class="kpi-delta delta-down">↓ 0.4% vs last week</div></div>
+      <div class="cc-content">
+
+        <!-- STAT BAR -->
+        <div class="cc-stat-bar">
+          <div class="cc-stat now" onclick="setCCPri('now')">
+            <span class="cc-stat-ct" id="ccCtNow">3</span>
+            <span>&#x26A0; Need attention now</span>
+          </div>
+          <div class="cc-stat today" onclick="setCCPri('today')">
+            <span class="cc-stat-ct" id="ccCtToday">5</span>
+            <span>Today</span>
+          </div>
+          <div class="cc-stat sla">
+            <span class="cc-stat-ct">2</span>
+            <span>&#x23F1; SLA at risk</span>
+          </div>
+          <div class="cc-stat tasks" onclick="setCCCat('task')">
+            <span class="cc-stat-ct">4</span>
+            <span>Tasks due</span>
+          </div>
+          <div class="cc-stat msgs" onclick="setCCCat('message')">
+            <span class="cc-stat-ct">12</span>
+            <span>Unread</span>
+          </div>
+          <div style="flex:1;"></div>
+          <span style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;"><span class="cc-live-dot"></span> Live</span>
         </div>
 
-        <!-- CHARTS ROW -->
-        <div class="charts-row">
-          <div class="card">
-            <div class="card-header">
-              <div><div class="card-title">Processing Volume — 30 Days</div><div class="card-sub">All partners combined</div></div>
-              <div style="display:flex;gap:2px;align-items:center;"><span style="font-size:11px;color:var(--text-muted);padding:3px 8px;border-radius:4px;cursor:pointer;">30d</span><span style="font-size:11px;color:var(--text-primary);font-weight:600;padding:3px 8px;border-radius:4px;background:rgba(0,0,0,0.06);cursor:pointer;">90d</span></div>
-            </div>
-            <div class="card-body"><div class="chart-wrap"><canvas id="volumeTrend"></canvas></div></div>
-          </div>
+        <!-- APPLICATION PIPELINE -->
+        <div class="cc-pipeline">
+          <div class="cc-pip-track" id="ccPipTrack"></div>
+          <div class="cc-pip-acc" id="ccPipAcc"></div>
+        </div>
 
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Merchant Status</div><div class="card-sub">Across all partners</div></div></div>
-            <div class="card-body">
-              <div class="chart-wrap" style="flex:1;"><canvas id="statusDonut"></canvas></div>
-              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-                <span style="font-size:12px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;"></span>Active 612</span>
-                <span style="font-size:12px;color:var(--amber);"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:4px;"></span>Pending 23</span>
-                <span style="font-size:12px;color:var(--text-secondary);"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text-muted);margin-right:4px;"></span>Inactive 189</span>
-                <span style="font-size:12px;color:var(--red);"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:4px;"></span>Suspended 23</span>
+        <!-- QUEUE + TEAM -->
+        <div class="cc-main">
+          <div class="cc-queue-wrap">
+            <div class="cc-queue-bar">
+              <span class="cc-queue-ttl">Your Queue</span>
+              <div class="cc-asgn-sel" onclick="cycleAssignee()">
+                <span id="ccAsgnLbl">All Team</span><span>&#x25BE;</span>
+              </div>
+              <div class="cc-ptabs">
+                <div class="cc-ptab on" data-p="all" onclick="setCCPri('all',this)">All</div>
+                <div class="cc-ptab" data-p="now" onclick="setCCPri('now',this)">Now</div>
+                <div class="cc-ptab" data-p="today" onclick="setCCPri('today',this)">Today</div>
+                <div class="cc-ptab" data-p="week" onclick="setCCPri('week',this)">This Week</div>
+                <div class="cc-ptab" data-p="done" onclick="setCCPri('done',this)">Done</div>
               </div>
             </div>
+            <div class="cc-cat-pills">
+              <div class="cc-cpill on" data-c="all" onclick="setCCCat('all',this)">All</div>
+              <div class="cc-cpill" data-c="application" onclick="setCCCat('application',this)">&#x1F4CB; Apps</div>
+              <div class="cc-cpill" data-c="portfolio" onclick="setCCCat('portfolio',this)">&#x1F4B3; Portfolio</div>
+              <div class="cc-cpill" data-c="message" onclick="setCCCat('message',this)">&#x1F4AC; Messages</div>
+              <div class="cc-cpill" data-c="task" onclick="setCCCat('task',this)">&#x2713; Tasks</div>
+              <div class="cc-cpill" data-c="ticket" onclick="setCCCat('ticket',this)">&#x1F3AB; Tickets</div>
+            </div>
+            <div id="ccQueueList"></div>
           </div>
 
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Top Merchants — MTD Volume</div><div class="card-sub">Across all partners</div></div></div>
-            <div class="card-body" style="padding:4px 0;">
-              <div class="partner-row"><div class="p-avatar" style="background:#6B5FA5;">HB</div><div style="flex:1;min-width:0;"><div class="p-name">Harbor Bistro</div><div style="font-size:13px;color:var(--text-secondary);">Coastal Commerce</div></div><span class="p-vol">$218K</span></div>
-              <div class="partner-row"><div class="p-avatar" style="background:#6B839B;">LD</div><div style="flex:1;min-width:0;"><div class="p-name">Lakeview Dental</div><div style="font-size:13px;color:var(--text-secondary);">Summit Lending</div></div><span class="p-vol">$194K</span></div>
-              <div class="partner-row"><div class="p-avatar" style="background:#5B7A5E;">GV</div><div style="flex:1;min-width:0;"><div class="p-name">Green Valley Market</div><div style="font-size:13px;color:var(--text-secondary);">NovaPay</div></div><span class="p-vol">$176K</span></div>
-              <div class="partner-row"><div class="p-avatar" style="background:#A67C5B;">PA</div><div style="flex:1;min-width:0;"><div class="p-name">Pines Auto Group</div><div style="font-size:13px;color:var(--text-secondary);">Apex Elite</div></div><span class="p-vol">$163K</span></div>
-              <div class="partner-row"><div class="p-avatar" style="background:#9B6B5B;">MP</div><div style="flex:1;min-width:0;"><div class="p-name">Metro Print Shop</div><div style="font-size:13px;color:var(--text-secondary);">Rivermark</div></div><span class="p-vol">$141K</span></div>
+          <div class="cc-team-wrap">
+            <div class="cc-team-hdr">Team</div>
+            <div class="cc-team-row" onclick="setCCAssignee('M. Wright')">
+              <div class="cc-team-av" style="background:#A09E9A;color:#fff;">MW</div>
+              <div style="flex:1;min-width:0;"><div class="cc-team-name">M. Wright</div><div style="font-size:10px;color:var(--text-muted);">You</div></div>
+              <div class="cc-team-chips"><div class="cc-tchip apps">3 apps</div><div class="cc-tchip alrt">4</div></div>
+            </div>
+            <div class="cc-team-row" onclick="setCCAssignee('S. Patel')">
+              <div class="cc-team-av" style="background:#5B7A5E;color:#fff;">SP</div>
+              <div style="flex:1;min-width:0;"><div class="cc-team-name">S. Patel</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
+              <div class="cc-team-chips"><div class="cc-tchip apps">2 apps</div><div class="cc-tchip alrt">1</div></div>
+            </div>
+            <div class="cc-team-row" onclick="setCCAssignee('J. Rivera')">
+              <div class="cc-team-av" style="background:#6B839B;color:#fff;">JR</div>
+              <div style="flex:1;min-width:0;"><div class="cc-team-name">J. Rivera</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
+              <div class="cc-team-chips"><div class="cc-tchip apps">3 apps</div><div class="cc-tchip msgs">2</div></div>
+            </div>
+            <div class="cc-team-row" onclick="setCCAssignee('D. Martinez')">
+              <div class="cc-team-av" style="background:#9B6B5B;color:#fff;">DM</div>
+              <div style="flex:1;min-width:0;"><div class="cc-team-name">D. Martinez</div><div style="font-size:10px;color:var(--text-muted);">Account Exec</div></div>
+              <div class="cc-team-chips"><div class="cc-tchip apps">1 app</div></div>
+            </div>
+            <div style="padding:10px 14px;border-top:1px solid var(--border);">
+              <button class="btn btn-ghost" style="width:100%;font-size:11px;" onclick="showView('users',null)">&#x1F465; Manage Team</button>
             </div>
           </div>
         </div>
 
-        <!-- TILES ROW — 3 columns: Tickets | Messaging | Alerts -->
-        <div class="tiles-row">
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Tickets</div><div class="card-sub">12 open · 3 urgent</div></div><button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="showView('tickets', document.getElementById('nav-tickets'))">View All</button></div>
-            <div class="card-body scroll">
-              <div class="ticket-item mine" onclick="goToTicket(0)"><div class="ticket-dot" style="background:#9B6B5B;"></div><div class="ticket-meta"><div class="ticket-title">Chargeback spike — Coastal Commerce</div><div class="ticket-desc">CB ratio 1.8% · Harbor Bistro</div><div class="ticket-footer"><span class="ticket-mine-badge">Assigned to you</span><span class="ticket-assignee">Master Admin</span></div></div><div class="ticket-time">4m</div></div>
-              <div class="ticket-item" onclick="goToTicket(1)"><div class="ticket-dot" style="background:#9B6B5B;"></div><div class="ticket-meta"><div class="ticket-title">Underwriting hold — NovaPay</div><div class="ticket-desc">Documents expired, re-submission needed</div><div class="ticket-footer"><span class="ticket-assignee">Assigned to: Sara R.</span></div></div><div class="ticket-time">18m</div></div>
-              <div class="ticket-item mine" onclick="goToTicket(2)"><div class="ticket-dot" style="background:#A67C5B;"></div><div class="ticket-meta"><div class="ticket-title">Application review — Apex Elite</div><div class="ticket-desc">High-risk merchant flagged</div><div class="ticket-footer"><span class="ticket-mine-badge">Assigned to you</span></div></div><div class="ticket-time">1h</div></div>
-              <div class="ticket-item" onclick="goToTicket(3)"><div class="ticket-dot" style="background:#6B839B;"></div><div class="ticket-meta"><div class="ticket-title">Terminal setup — Summit Lending</div><div class="ticket-desc">PAX A920 provisioning pending</div><div class="ticket-footer"><span class="ticket-assignee">Assigned to: Dan M.</span></div></div><div class="ticket-time">2h</div></div>
-              <div class="ticket-item mine" onclick="goToTicket(4)"><div class="ticket-dot" style="background:#6B839B;"></div><div class="ticket-meta"><div class="ticket-title">Residual discrepancy — Rivermark</div><div class="ticket-desc">$214 shortfall vs processor</div><div class="ticket-footer"><span class="ticket-mine-badge">Assigned to you</span></div></div><div class="ticket-time">3h</div></div>
-              <div class="ticket-item" onclick="goToTicket(5)"><div class="ticket-dot" style="background:#6B839B;"></div><div class="ticket-meta"><div class="ticket-title">Gateway credential refresh</div><div class="ticket-desc">NovaPay — 3 Stripe gateways expiring</div><div class="ticket-footer"><span class="ticket-assignee">Unassigned</span></div></div><div class="ticket-time">7h</div></div>
+        <!-- PORTFOLIO ALERTS -->
+        <div class="cc-port-wrap">
+          <div class="cc-port-hdr">
+            <span class="cc-port-ttl">&#x1F4B3; Portfolio Alerts</span>
+            <span class="cc-port-sub">Active merchants requiring attention</span>
+            <div class="cc-port-tabs" style="margin-left:auto;">
+              <div class="cc-port-tab on" onclick="setCCPortTab('all',this)">All</div>
+              <div class="cc-port-tab" onclick="setCCPortTab('chargeback',this)">Chargebacks</div>
+              <div class="cc-port-tab" onclick="setCCPortTab('churn',this)">Churn</div>
+              <div class="cc-port-tab" onclick="setCCPortTab('nobatch',this)">No Batch</div>
+              <div class="cc-port-tab" onclick="setCCPortTab('volume',this)">Volume</div>
+              <div class="cc-port-tab" onclick="setCCPortTab('dormant',this)">Dormant</div>
             </div>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-left:8px;" onclick="showView('portfolio-alerts',null)">View All</button>
           </div>
-
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Messaging</div><div class="card-sub">5 unread · 3 threads</div></div><button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">Open Inbox</button></div>
-            <div class="card-body scroll">
-              <div class="msg-item" onclick="navigateToMerchant('Harbor Bistro', 'active')"><div class="msg-avatar" style="background:#6B839B;">JC</div><div class="msg-body"><div class="msg-header"><span class="msg-sender">James C. · Apex Elite</span><span class="msg-time">2m</span></div><div class="msg-context">Re: Harbor Bistro onboarding</div><div class="msg-preview">Merchant asking why they haven't received the DocuSign yet...</div></div><div class="msg-unread"></div></div>
-              <div class="msg-item" onclick="navigateToMerchant('Green Valley Market', 'active')"><div class="msg-avatar" style="background:#5B7A5E;">SR</div><div class="msg-body"><div class="msg-header"><span class="msg-sender">Sara R. · NovaPay</span><span class="msg-time">14m</span></div><div class="msg-context">Green Valley Market</div><div class="msg-preview">Terminal arrived but can't get gateway credentials to load...</div></div><div class="msg-unread"></div></div>
-              <div class="msg-item" onclick="navigateToMerchant('TechSupply Pro LLC', 'active')"><div class="msg-avatar" style="background:#8C7A5E;">DM</div><div class="msg-body"><div class="msg-header"><span class="msg-sender">Dan M. · Summit</span><span class="msg-time">41m</span></div><div class="msg-context">Commission question</div><div class="msg-preview">Seeing different numbers for March vs what we agreed...</div></div><div class="msg-unread"></div></div>
-              <div class="msg-item" onclick="navigateToMerchant('Harborlight Dental', 'lead')"><div class="msg-avatar" style="background:#A67C5B;">TP</div><div class="msg-body"><div class="msg-header"><span class="msg-sender">Tara P. · Rivermark</span><span class="msg-time">2h</span></div><div class="msg-context">New merchant referral</div><div class="msg-preview">High volume restaurant group, ~$80K/mo...</div></div></div>
-              <div class="msg-item" onclick="navigateToMerchant('Harbor Bistro', 'active')"><div class="msg-avatar" style="background:#9B6B5B;">BC</div><div class="msg-body"><div class="msg-header"><span class="msg-sender">Blake C. · Coastal</span><span class="msg-time">3h</span></div><div class="msg-context">Chargeback — Harbor Bistro</div><div class="msg-preview">4 chargebacks this week, situation escalating...</div></div><div class="msg-unread"></div></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Merchant Activity</div><div class="card-sub">All partners · Live</div></div></div>
-            <div class="card-body scroll">
-              <div class="activity-row" onclick="navigateToMerchant('Green Valley Market', 'active')"><div class="activity-icon" style="background:var(--green-dim);">✅</div><div class="activity-body"><div class="activity-text"><strong>Merchant approved</strong> — Green Valley Market (NovaPay)</div><div class="activity-time">just now</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Sunrise Bakery', 'inreview')"><div class="activity-icon" style="background:var(--blue-dim);">📋</div><div class="activity-body"><div class="activity-text"><strong>Application submitted</strong> — Sunrise Bakery via Apex Elite</div><div class="activity-time">3 min ago</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Harbor Bistro', 'active')"><div class="activity-icon" style="background:var(--red-dim);">⚠️</div><div class="activity-body"><div class="activity-text"><strong>Chargeback threshold</strong> — Harbor Bistro · CB ratio 1.8%</div><div class="activity-time">4 min ago</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Lakeview Dental', 'active')"><div class="activity-icon" style="background:var(--purple-dim);">💳</div><div class="activity-body"><div class="activity-text"><strong>First batch processed</strong> — Lakeview Dental · $4,280</div><div class="activity-time">12 min ago</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Metro Print Shop', 'signature')"><div class="activity-icon" style="background:var(--blue-dim);">📤</div><div class="activity-body"><div class="activity-text"><strong>DocuSign sent</strong> — Metro Print Shop · Rivermark</div><div class="activity-time">34 min ago</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Pacific Coast Retail', 'underwriting')"><div class="activity-icon" style="background:var(--amber-dim);">📁</div><div class="activity-body"><div class="activity-text"><strong>Document uploaded</strong> — Pacific Coast Retail · Bank statements</div><div class="activity-time">47 min ago</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Neon Nightclub LA', 'signature')"><div class="activity-icon" style="background:var(--green-dim);">✍️</div><div class="activity-body"><div class="activity-text"><strong>Contract signed</strong> — Neon Nightclub LA · NovaPay</div><div class="activity-time">1h ago</div></div></div>
-              <div class="activity-row" onclick="navigateToMerchant('Desert Sun Dispensary', 'inreview')"><div class="activity-icon" style="background:var(--purple-dim);">📝</div><div class="activity-body"><div class="activity-text"><strong>Application filled</strong> — Desert Sun Dispensary · High-risk review</div><div class="activity-time">2h ago</div></div></div>
-            </div>
-          </div>
+          <div id="ccPortList"></div>
         </div>
 
-        <!-- BOTTOM ROW -->
-        <div class="bottom-row">
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Partner Overview</div><div class="card-sub">Commission · Users · Funnel cycle</div></div></div>
-            <div class="card-body" style="padding:0;">
-              <table style="width:100%;border-collapse:collapse;">
-                <thead><tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
-                  <th style="text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;padding:8px 16px;">Partner</th>
-                  <th style="text-align:right;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:8px 8px;">Merchants</th>
-                  <th style="text-align:right;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:8px 8px;">MTD Vol</th>
-                  <th style="text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:8px 8px;">Commission</th>
-                  <th style="text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;padding:8px 16px;">Status</th>
-                </tr></thead>
-                <tbody>
-                  <tr style="border-bottom:1px solid rgba(0,0,0,0.05);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''"><td style="padding:12px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#6B839B;width:22px;height:22px;font-size:9px;">AE</div><span style="font-size:12px;font-weight:500;">Apex Elite</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);padding:12px 10px;">218</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:12px 10px;">$921K</td><td style="text-align:center;padding:12px 10px;"><span class="p-badge badge-green">1.2%</span></td><td style="text-align:center;padding:12px 16px;"><div class="dot dot-green" style="margin:0 auto;"></div></td></tr>
-                  <tr style="border-bottom:1px solid rgba(0,0,0,0.05);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''"><td style="padding:12px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#5B7A5E;width:22px;height:22px;font-size:9px;">SL</div><span style="font-size:12px;font-weight:500;">Summit Lending</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);padding:12px 10px;">184</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:12px 10px;">$784K</td><td style="text-align:center;padding:12px 10px;"><span class="p-badge badge-green">1.1%</span></td><td style="text-align:center;padding:12px 16px;"><div class="dot dot-green" style="margin:0 auto;"></div></td></tr>
-                  <tr style="border-bottom:1px solid rgba(0,0,0,0.05);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''"><td style="padding:12px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#8C7A5E;width:22px;height:22px;font-size:9px;">NV</div><span style="font-size:12px;font-weight:500;">NovaPay</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);padding:12px 10px;">157</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:12px 10px;">$641K</td><td style="text-align:center;padding:12px 10px;"><span class="p-badge badge-amber">1.5%</span></td><td style="text-align:center;padding:12px 16px;"><div class="dot dot-green" style="margin:0 auto;"></div></td></tr>
-                  <tr style="border-bottom:1px solid rgba(0,0,0,0.05);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''"><td style="padding:12px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#A67C5B;width:22px;height:22px;font-size:9px;">RM</div><span style="font-size:12px;font-weight:500;">Rivermark</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);padding:12px 10px;">132</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:12px 10px;">$512K</td><td style="text-align:center;padding:12px 10px;"><span class="p-badge badge-green">0.9%</span></td><td style="text-align:center;padding:12px 16px;"><div class="dot dot-green" style="margin:0 auto;"></div></td></tr>
-                  <tr style="border-bottom:1px solid rgba(0,0,0,0.05);cursor:pointer;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''"><td style="padding:12px 16px;"><div style="display:flex;align-items:center;gap:8px;"><div class="p-avatar" style="background:#9B6B5B;width:22px;height:22px;font-size:9px;">CC</div><span style="font-size:12px;font-weight:500;">Coastal Commerce</span></div></td><td style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);padding:12px 10px;">94</td><td style="text-align:right;font-family:var(--font-mono);font-size:12px;padding:12px 10px;">$487K</td><td style="text-align:center;padding:12px 10px;"><span class="p-badge badge-amber">1.4%</span></td><td style="text-align:center;padding:12px 16px;"><div class="dot dot-amber" style="margin:0 auto;"></div></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header"><div class="card-title">Application Funnel</div></div>
-            <div class="card-body">
-              <div class="funnel-item"><span class="funnel-label">Submitted</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:var(--blue);"></div></div><span class="funnel-count">86</span></div>
-              <div class="funnel-item"><span class="funnel-label">In Review</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:78%;background:var(--purple);"></div></div><span class="funnel-count">67</span></div>
-              <div class="funnel-item"><span class="funnel-label">Approved</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:61%;background:var(--green);"></div></div><span class="funnel-count">53</span></div>
-              <div class="funnel-item"><span class="funnel-label">Activating</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:32%;background:var(--amber);"></div></div><span class="funnel-count">28</span></div>
-              <div class="funnel-item"><span class="funnel-label">Processing</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:24%;background:var(--yellow);"></div></div><span class="funnel-count">21</span></div>
-              <div class="funnel-item"><span class="funnel-label">Declined</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:13%;background:var(--red);"></div></div><span class="funnel-count">11</span></div>
-              <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);"><div class="section-title">Avg time to approval</div><div style="font-family:var(--font-mono);font-size:20px;font-weight:500;">3.2 <span style="font-size:13px;color:var(--text-muted);">days</span></div><div style="font-size:11px;color:var(--green);margin-top:2px;">↓ 0.8d faster than last month</div></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Portfolio Alerts</div><div class="card-sub">9 merchants with active alerts</div></div><button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;" onclick="showView('alerts', document.getElementById('nav-alerts'))">View All</button></div>
-            <div class="card-body scroll" style="max-height:320px;">
-              <div class="alert-item" onclick="openAlertByMerchant('Harbor Bistro')"><div class="alert-icon chargeback">⚠️</div><div class="alert-meta"><div class="alert-merchant">Harbor Bistro <span class="p-badge badge-warn">Chargeback</span></div><div class="alert-desc">CB ratio 1.8% · Coastal</div></div><div class="alert-time">4m ago</div></div>
-              <div class="alert-item" onclick="openAlertByMerchant('Pines Auto Group')"><div class="alert-icon batch">🕐</div><div class="alert-meta"><div class="alert-merchant">Pines Auto Group <span class="p-badge badge-amber">No Batch</span></div><div class="alert-desc">No batch in 3 days · Apex Elite</div></div><div class="alert-time">18m ago</div></div>
-              <div class="alert-item" onclick="openAlertByMerchant('Green Valley Market')"><div class="alert-icon volume">📉</div><div class="alert-meta"><div class="alert-merchant">Green Valley Market <span class="p-badge badge-purple">Vol Drop</span></div><div class="alert-desc">Volume down 42% WoW · NovaPay</div></div><div class="alert-time">1h ago</div></div>
-              <div class="alert-item" onclick="openAlertByMerchant('Lakeview Dental')"><div class="alert-icon auth">🔵</div><div class="alert-meta"><div class="alert-merchant">Lakeview Dental <span class="p-badge badge-blue">Auth Rate</span></div><div class="alert-desc">Auth rate dropped to 88% · Summit</div></div><div class="alert-time">2h ago</div></div>
-              <div class="alert-item" onclick="openAlertByMerchant('Metro Print Shop')"><div class="alert-icon chargeback">⚠️</div><div class="alert-meta"><div class="alert-merchant">Metro Print Shop <span class="p-badge badge-warn">Chargeback</span></div><div class="alert-desc">2 new chargebacks today · Rivermark</div></div><div class="alert-time">3h ago</div></div>
-              <div class="alert-item" onclick="openAlertByMerchant('Sunrise Cafe')"><div class="alert-icon batch">🕐</div><div class="alert-meta"><div class="alert-merchant">Sunrise Cafe <span class="p-badge badge-amber">No Batch</span></div><div class="alert-desc">No batch in 5 days · Apex Elite</div></div><div class="alert-time">4h ago</div></div>
-              <div class="alert-item" onclick="openAlertByMerchant('Coastal Spa & Salon')"><div class="alert-icon volume">📉</div><div class="alert-meta"><div class="alert-merchant">Coastal Spa &amp; Salon <span class="p-badge badge-purple">Vol Drop</span></div><div class="alert-desc">Volume down 61% WoW · Coastal</div></div><div class="alert-time">5h ago</div></div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /content -->
+      </div>
     </div><!-- /view-dashboard -->
 
 
@@ -12983,6 +13115,8 @@ function navigateToMerchant(name, status) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('ccQueueList')) initCC();
+
   renderMerchantTabs();
   renderMerchantTable();
 
@@ -34239,7 +34373,341 @@ function escapeHtmlPartner(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+
+/* ═══ COMMAND CENTER V3 ═══════════════════════════════════════════ */
+const CC_CAT_ICONS = {application:'📋',portfolio:'💳',message:'💬',task:'✓',ticket:'🎫'};
+const CC_ST_CLS = {lead:'st-lead',inreview:'st-inreview',underwriting:'st-underwriting',signature:'st-signature',approved:'st-approved',boarding:'st-boarding',active:'st-active'};
+const CC_ST_LBL = {lead:'Lead',inreview:'Review',underwriting:'UW',signature:'Sig',approved:'Approved',boarding:'Boarding',active:'Active'};
+
+const ccPipStages = [
+  {key:'lead',label:'Lead',count:3,attn:0,merchants:[
+    {name:'Fresh Brew Coffee Co.',partner:'Internal',age:'1h',flag:'New',ft:'ok',status:'lead'},
+    {name:'Harborlight Dental',partner:'NovaPay',age:'6h',flag:'Follow up',ft:'attn',status:'lead'},
+    {name:'Sunrise Bakery',partner:'Apex Elite',age:'3m',flag:'Just submitted',ft:'ok',status:'inreview'}]},
+  {key:'inreview',label:'In Review',count:2,attn:1,merchants:[
+    {name:'Desert Sun Dispensary',partner:'Internal',age:'11d',flag:'⚠ Risk memo needed',ft:'attn',status:'inreview'},
+    {name:'Sunrise Bakery',partner:'Apex Elite',age:'3m',flag:'New',ft:'ok',status:'inreview'}]},
+  {key:'underwriting',label:'Underwriting',count:3,attn:2,merchants:[
+    {name:'Pacific Coast Retail',partner:'Summit Lending',age:'8d',flag:'⚠ Bank stmts overdue',ft:'attn',status:'underwriting'},
+    {name:'Maple Street Bakery',partner:'Summit Lending',age:'4d',flag:'⚠ 2 pends open',ft:'attn',status:'underwriting'},
+    {name:'TechForge Solutions',partner:'Priority Commerce',age:'3d',flag:'Site inspection today',ft:'ok',status:'underwriting'}]},
+  {key:'signature',label:'Signature',count:2,attn:1,merchants:[
+    {name:'Metro Print Shop',partner:'Rivermark',age:'2d',flag:'⚠ Expiring tonight',ft:'attn',status:'signature'},
+    {name:'Neon Nightclub LA',partner:'NovaPay',age:'1d',flag:'Awaiting sig',ft:'ok',status:'signature'}]},
+  {key:'approved',label:'Approved',count:1,attn:0,merchants:[
+    {name:'Urban Salon Collective',partner:'Summit Lending',age:'2d',flag:'Ready to board',ft:'ok',status:'approved'}]},
+  {key:'boarding',label:'Boarding',count:2,attn:1,merchants:[
+    {name:'Bright Star Solar',partner:'Coastal Commerce',age:'18d',flag:'⚠ Activation overdue',ft:'attn',status:'boarding'},
+    {name:'Bella Cucina Restaurant',partner:'NovaPay',age:'5d',flag:'On track',ft:'ok',status:'boarding'}]},
+];
+
+const ccQ = [
+  {id:'wq-001',pri:'now',cat:'application',merchant:'Pacific Coast Retail',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'UW pend overdue — bank statements missing',detail:'First Data waiting 5 days. SLA breach in 4 hours.',act:'Open UW Thread →',fn:"navigateToMerchant('Pacific Coast Retail','underwriting')",age:'5d',sla:true,done:false,snoozed:false},
+  {id:'wq-002',pri:'now',cat:'application',merchant:'Metro Print Shop',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:"DocuSign expires tonight — merchant hasn't opened it",detail:'Sent 2 days ago. No open event. Expiry at midnight.',act:'Resend →',fn:"navigateToMerchant('Metro Print Shop','signature')",age:'2d',sla:true,done:false,snoozed:false},
+  {id:'wq-003',pri:'now',cat:'ticket',merchant:'Harbor Bistro',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Chargeback ratio at 1.8% — threshold approaching',detail:'4 new disputes this week. Response due Friday.',act:'View Ticket →',fn:'goToTicket(0)',age:'4m',sla:false,done:false,snoozed:false},
+  {id:'wq-004',pri:'today',cat:'application',merchant:'Maple Street Bakery',mst:'underwriting',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',title:'2 docs uploaded overnight — AI analysis ready',detail:'Owner ID + Jan bank stmt. 1 pend resolved, 1 partial.',act:'Review →',fn:"navigateToMerchant('Maple Street Bakery','underwriting')",age:'2h',sla:false,done:false,snoozed:false},
+  {id:'wq-005',pri:'today',cat:'message',merchant:'Neon Nightclub LA',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Message from owner — equipment delivery question',detail:'"When does the PAX A920 ship? We open Friday."',act:'Reply →',fn:"navigateToMerchant('Neon Nightclub LA','signature')",age:'1h',sla:false,done:false,snoozed:false},
+  {id:'wq-006',pri:'today',cat:'message',merchant:'Green Valley Market',mst:'active',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',title:'Terminal issue — gateway credentials not loading',detail:'Sara R. (NovaPay): "Terminal arrived but credentials wont load"',act:'Respond →',fn:"navigateToMerchant('Green Valley Market','active')",age:'14m',sla:false,done:false,snoozed:false},
+  {id:'wq-007',pri:'today',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Commission discrepancy — Dan M. / Summit · March',detail:'Standalone task · Rep seeing different numbers vs. agreed terms.',act:'Open Thread →',fn:"navigateToMerchant('TechSupply Pro LLC','active')",age:'41m',sla:false,done:false,snoozed:false},
+  {id:'wq-008',pri:'today',cat:'application',merchant:'TechForge Solutions',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Virtual site inspection today — confirm at 2pm',detail:'Priority Commerce · $2.1M potential. Enhanced due diligence.',act:'Prepare →',fn:"navigateToMerchant('TechForge Solutions','underwriting')",age:'3d',sla:false,done:false,snoozed:false},
+  {id:'wq-009',pri:'week',cat:'application',merchant:'Desert Sun Dispensary',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',title:'High-risk app stalled — UW committee memo pending',detail:'11 days in review. Risk justification needed before committee.',act:'Draft Memo →',fn:"navigateToMerchant('Desert Sun Dispensary','inreview')",age:'11d',sla:false,done:false,snoozed:false},
+  {id:'wq-010',pri:'week',cat:'application',merchant:'Bright Star Solar',mst:'boarding',assignee:'J. Rivera',av:'JR',avc:'#6B839B',title:'Activation overdue — equipment delivered 18 days ago',detail:'Coastal Commerce · No first batch. Equipment confirmed delivered.',act:'Escalate →',fn:"navigateToMerchant('Bright Star Solar','boarding')",age:'18d',sla:false,done:false,snoozed:false},
+  {id:'wq-011',pri:'week',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Review March residuals — Apex Elite $214 shortfall',detail:'Standalone task · Discrepancy vs. processor statement.',act:'Open Residuals →',fn:"showView('residuals',null)",age:'1d',sla:false,done:false,snoozed:false},
+  {id:'wq-012',pri:'week',cat:'message',merchant:'Harborlight Dental',mst:'lead',assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Referral from Tara P. (Rivermark) — ~$80K/mo restaurant group',detail:'Warm intro from partner. High-volume opportunity.',act:'View Lead →',fn:"navigateToMerchant('Harborlight Dental','lead')",age:'2h',sla:false,done:false,snoozed:false},
+  {id:'wq-013',pri:'week',cat:'ticket',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',title:'Rivermark residual discrepancy — $214 shortfall',detail:'March statement. Needs reconciliation before month-end.',act:'View Ticket →',fn:'goToTicket(4)',age:'3h',sla:false,done:false,snoozed:false},
+];
+
+const ccPort = [
+  {id:'pa-001',type:'chargeback',sev:'high',merchant:'Harbor Bistro',partner:'Coastal Commerce',icon:'⚠️',title:'CB ratio 1.8% — 4 disputes this week',detail:'Ratio up from 0.4%. Processor threshold: 2%. Response due Fri.',act:'View Ticket →',fn:'goToTicket(0)',done:false},
+  {id:'pa-002',type:'churn',sev:'high',merchant:'Riverside MCA Group',partner:'Apex Elite',icon:'📉',title:'Volume down 30% MoM — churn risk',detail:'$28.9K vs. $41.2K last month. Retention call recommended.',act:'Schedule Call →',fn:"navigateToMerchant('Riverside MCA Group','active')",done:false},
+  {id:'pa-003',type:'dormant',sev:'med',merchant:'CloudTech Services',partner:'Coastal Commerce',icon:'🚫',title:'Dormant 48 days — no transactions',detail:'Last batch Jan 14. Zero volume. Win-back opportunity.',act:'Send Outreach →',fn:"navigateToMerchant('CloudTech Services','cancelled')",done:false},
+  {id:'pa-004',type:'nobatch',sev:'med',merchant:'Pines Auto Group',partner:'Apex Elite',icon:'🕐',title:'No batch in 3 days',detail:'Typically batches daily. Unusual gap since Monday.',act:'Check In →',fn:"openAlertByMerchant('Pines Auto Group')",done:false},
+  {id:'pa-005',type:'volume',sev:'low',merchant:'Green Valley Market',partner:'NovaPay',icon:'📉',title:'Volume down 42% WoW',detail:'May be linked to reported terminal credential issue.',act:'View Alert →',fn:"openAlertByMerchant('Green Valley Market')",done:false},
+];
+
+let ccPriFilter='all', ccCatFilter='all', ccAsgn='all', ccPortFilter='all', ccActivePip=null;
+
+function renderCCPipeline() {
+  const track = document.getElementById('ccPipTrack');
+  if (!track) return;
+  let h = '';
+  ccPipStages.forEach((s,i) => {
+    const on = ccActivePip === s.key;
+    h += '<div class="cc-pip-stage'+(on?' pip-active':'')+'" onclick="togglePip(\''+s.key+'\')">' +
+      '<div class="cc-pip-lbl">'+s.label+'</div>' +
+      '<div class="cc-pip-ct">'+s.count+'</div>' +
+      (s.attn > 0 ? '<div class="cc-pip-attn">&#x26A0; '+s.attn+'</div>' : '') +
+      '</div>';
+    if (i < ccPipStages.length-1) h += '<div class="cc-pip-arrow">›</div>';
+  });
+  track.innerHTML = h;
+}
+
+function togglePip(key) {
+  const acc = document.getElementById('ccPipAcc');
+  if (ccActivePip === key) { ccActivePip = null; acc.classList.remove('open'); acc.innerHTML = ''; }
+  else {
+    ccActivePip = key;
+    const s = ccPipStages.find(x => x.key === key);
+    let h = '<div class="cc-pip-acc-hdr"><span class="cc-pip-acc-ttl">'+s.label+' — '+s.count+' merchants</span>' +
+      '<span class="cc-pip-acc-cls" onclick="togglePip(\''+key+'\')">&#x2715; Close</span></div>';
+    s.merchants.forEach(m => {
+      const sn = m.name.replace(/'/g,"\\'");
+      h += '<div class="cc-pip-row" onclick="navigateToMerchant(\''+sn+'\',\''+m.status+'\')">' +
+        '<div class="cc-pip-row-av">'+m.name.substring(0,2).toUpperCase()+'</div>' +
+        '<div class="cc-pip-row-name">'+m.name+'</div>' +
+        '<div class="cc-pip-row-partner">'+m.partner+'</div>' +
+        '<div class="cc-pip-row-age">'+m.age+'</div>' +
+        '<span class="cc-pip-flag '+m.ft+'">'+m.flag+'</span>' +
+        '<button class="cc-pip-row-act" onclick="event.stopPropagation();navigateToMerchant(\''+sn+'\',\''+m.status+'\')">Open &#x2192;</button>' +
+        '</div>';
+    });
+    acc.innerHTML = h;
+    acc.classList.add('open');
+  }
+  renderCCPipeline();
+}
+
+function renderCCQueue() {
+  const list = document.getElementById('ccQueueList');
+  if (!list) return;
+  const showDone = ccPriFilter === 'done';
+  const visible = ccQ.filter(i => {
+    if (showDone) return i.done;
+    if (i.done || i.snoozed) return false;
+    if (ccPriFilter !== 'all' && i.pri !== ccPriFilter) return false;
+    if (ccCatFilter !== 'all' && i.cat !== ccCatFilter) return false;
+    if (ccAsgn !== 'all' && i.assignee !== ccAsgn) return false;
+    return true;
+  });
+  const doneItems = ccQ.filter(i => i.done && !showDone);
+
+  if (visible.length === 0 && doneItems.length === 0) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px;">✅ Queue is clear — all caught up</div>';
+    updateCCCounts(); return;
+  }
+
+  const tiers = showDone ? [] : ['now','today','week'];
+  const tierLbls = {now:'NOW',today:'TODAY',week:'THIS WEEK'};
+  let h = '';
+
+  tiers.forEach(tier => {
+    const items = visible.filter(i => i.pri === tier);
+    if (!items.length) return;
+    h += '<div class="cc-tier-hdr"><div class="cc-tier-dot '+tier+'"></div><div class="cc-tier-lbl '+tier+'">'+tierLbls[tier]+'</div><div class="cc-tier-ct">— '+items.length+' item'+(items.length!==1?'s':'')+'</div></div>';
+    items.forEach(i => { h += ccItemHTML(i); });
+  });
+
+  if (showDone) {
+    visible.forEach(i => { h += ccItemHTML(i, true); });
+  }
+
+  if (doneItems.length > 0) {
+    h += '<div class="cc-done-bar" onclick="this.nextElementSibling.classList.toggle(\'open\')">&#x2705; Done today ('+doneItems.length+') <span style="margin-left:auto;">&#x25BE;</span></div>' +
+      '<div class="cc-done-section">';
+    doneItems.forEach(i => { h += ccItemHTML(i, true); });
+    h += '</div>';
+  }
+
+  list.innerHTML = h;
+  updateCCCounts();
+}
+
+function ccItemHTML(item, isDoneView) {
+  const stCls = CC_ST_CLS[item.mst] || '';
+  const stLbl = CC_ST_LBL[item.mst] || '';
+  const icon = CC_CAT_ICONS[item.cat] || '';
+  const opacity = isDoneView ? 'opacity:.45;' : '';
+  const mn = item.merchant ? item.merchant.replace(/'/g,"\\'") : '';
+  const ms = item.mst || 'lead';
+  const merchantSpan = item.merchant
+    ? '<span class="cc-imerchant" onclick="navigateToMerchant(\'' + mn + '\',\'' + ms + '\')">' + item.merchant + '</span>'
+    : '<span style="font-size:12px;font-weight:600;color:var(--text-secondary);">Standalone</span>';
+  const actionBtns = isDoneView ? '' :
+    '<div class="cc-iactions">' +
+      '<button class="cc-iact" onclick="' + item.fn + '">' + item.act + '</button>' +
+      '<div class="cc-isnooze">' +
+        '<button class="cc-isnooze-btn" onclick="toggleSnooze(\'' + item.id + '\')">&#x1F4A4;</button>' +
+        '<div class="cc-snooze-menu" id="sm-' + item.id + '">' +
+          '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'2h\')">2 hours</div>' +
+          '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'tomorrow\')">Tomorrow morning</div>' +
+          '<div class="cc-snooze-opt" onclick="snoozeCC(\'' + item.id + '\',\'monday\')">Next Monday</div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="cc-idone-btn" onclick="doneCC(\'' + item.id + '\')" title="Done">&#x2713;</button>' +
+    '</div>';
+  return '<div class="cc-item" id="cqi-' + item.id + '" style="' + opacity + '">' +
+    '<div class="cc-ileft"><div class="cc-ipri ' + item.pri + '"></div><div class="cc-icat">' + icon + '</div></div>' +
+    '<div class="cc-ibody">' +
+      '<div>' + merchantSpan +
+        (stLbl ? '<span class="cc-istatus ' + stCls + '">' + stLbl + '</span>' : '') +
+        (item.sla ? '<span class="cc-isla">&#x23F1; SLA</span>' : '') +
+      '</div>' +
+      '<div class="cc-ititle">' + item.title + '</div>' +
+      '<div class="cc-idetail">' + item.detail + '</div>' +
+      '<div class="cc-imeta">' +
+        '<div class="cc-iav" style="background:' + item.avc + ';color:#fff;">' + item.av + '</div>' +
+        '<span class="cc-iassignee">' + item.assignee + '</span>' +
+        '<span style="color:var(--border-strong);">&middot;</span>' +
+        '<span class="cc-iage">' + item.age + ' ago</span>' +
+      '</div>' +
+    '</div>' + actionBtns +
+  '</div>';
+}
+
+function doneCC(id) {
+  const item = ccQ.find(i => i.id === id);
+  if (!item) return;
+  const el = document.getElementById('cqi-'+id);
+  if (el) { el.classList.add('cc-gone'); setTimeout(() => { item.done=true; renderCCQueue(); }, 220); }
+  else { item.done=true; renderCCQueue(); }
+}
+
+function snoozeCC(id, dur) {
+  const item = ccQ.find(i => i.id === id);
+  if (item) { item.snoozed = true; }
+  closeSnoozeMenus();
+  renderCCQueue();
+  const lbl = {'2h':'2 hours',tomorrow:'tomorrow morning',monday:'next Monday'};
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:8px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text-primary);z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.15);';
+  t.textContent = '💤 Snoozed until ' + (lbl[dur]||dur);
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+function toggleSnooze(id) { closeSnoozeMenus(); const m = document.getElementById('sm-'+id); if (m) m.classList.toggle('open'); }
+function closeSnoozeMenus() { document.querySelectorAll('.cc-snooze-menu.open').forEach(m => m.classList.remove('open')); }
+
+function setCCPri(val, el) {
+  ccPriFilter = val;
+  document.querySelectorAll('.cc-ptab').forEach(t => t.classList.remove('on'));
+  const tab = el || document.querySelector('.cc-ptab[data-p="'+val+'"]');
+  if (tab) tab.classList.add('on');
+  renderCCQueue();
+}
+function setCCCat(val, el) {
+  ccCatFilter = val;
+  document.querySelectorAll('.cc-cpill').forEach(p => p.classList.remove('on'));
+  const pill = el || document.querySelector('.cc-cpill[data-c="'+val+'"]');
+  if (pill) pill.classList.add('on');
+  renderCCQueue();
+}
+function setCCAssignee(name) {
+  ccAsgn = name === ccAsgn ? 'all' : name;
+  const el = document.getElementById('ccAsgnLbl');
+  if (el) el.textContent = ccAsgn === 'all' ? 'All Team' : name;
+  renderCCQueue();
+}
+function cycleAssignee() {
+  const reps = ['all','M. Wright','S. Patel','J. Rivera','D. Martinez'];
+  const idx = reps.indexOf(ccAsgn);
+  ccAsgn = reps[(idx+1) % reps.length];
+  const el = document.getElementById('ccAsgnLbl');
+  if (el) el.textContent = ccAsgn === 'all' ? 'All Team' : ccAsgn;
+  renderCCQueue();
+}
+function updateCCCounts() {
+  const nowCt = document.getElementById('ccCtNow');
+  const todayCt = document.getElementById('ccCtToday');
+  if (nowCt) nowCt.textContent = ccQ.filter(i => i.pri==='now' && !i.done && !i.snoozed).length;
+  if (todayCt) todayCt.textContent = ccQ.filter(i => i.pri==='today' && !i.done && !i.snoozed).length;
+}
+
+function renderCCPortfolio() {
+  const list = document.getElementById('ccPortList');
+  if (!list) return;
+  const items = ccPort.filter(i => !i.done && (ccPortFilter==='all' || i.type===ccPortFilter));
+  if (!items.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:12px;">No portfolio alerts</div>'; return; }
+  list.innerHTML = items.map(i =>
+    '<div class="cc-port-item">' +
+    '<div class="cc-port-sev '+i.sev+'"></div>' +
+    '<div class="cc-port-icon">'+i.icon+'</div>' +
+    '<div class="cc-port-body">' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<span class="cc-port-name" onclick="navigateToMerchant(\''+i.merchant.replace(/'/g,"\\'")+ '\',\'active\')">'+i.merchant+'</span>' +
+        '<span style="font-size:10px;color:var(--text-muted);">'+i.partner+'</span>' +
+      '</div>' +
+      '<div class="cc-port-text">'+i.title+'</div>' +
+      '<div class="cc-port-detail">'+i.detail+'</div>' +
+    '</div>' +
+    '<div class="cc-port-acts">' +
+      '<button class="cc-iact" onclick="'+i.fn+'">'+i.act+'</button>' +
+      '<button class="cc-idone-btn" onclick="donePort(\''+i.id+'\')" title="Dismiss">✕</button>' +
+    '</div></div>'
+  ).join('');
+}
+function donePort(id) { const i = ccPort.find(x => x.id===id); if(i){ i.done=true; renderCCPortfolio(); } }
+function setCCPortTab(val, el) {
+  ccPortFilter = val;
+  document.querySelectorAll('.cc-port-tab').forEach(t => t.classList.remove('on'));
+  if (el) el.classList.add('on');
+  renderCCPortfolio();
+}
+
+function openCCTask() { const o = document.getElementById('ccTaskOverlay'); if(o) o.classList.add('open'); }
+function closeCCTask() { const o = document.getElementById('ccTaskOverlay'); if(o) o.classList.remove('open'); }
+function submitCCTask() {
+  const title = document.getElementById('ccTaskTitle')?.value.trim();
+  if (!title) return;
+  const asgn = document.getElementById('ccTaskAsgn')?.value || 'M. Wright';
+  const avMap = {'M. Wright':{av:'MW',c:'#A09E9A'},'S. Patel':{av:'SP',c:'#5B7A5E'},'J. Rivera':{av:'JR',c:'#6B839B'},'D. Martinez':{av:'DM',c:'#9B6B5B'}};
+  const {av,c} = avMap[asgn]||{av:'MW',c:'#A09E9A'};
+  const merchant = document.getElementById('ccTaskMerchant')?.value.trim()||null;
+  ccQ.unshift({id:'wq-t-'+Date.now(),pri:'today',cat:'task',merchant,mst:null,assignee:asgn,av,avc:c,title,detail:'Created just now'+(merchant?' · '+merchant:''),act:'View →',fn:'openCCTask()',age:'just now',sla:false,done:false,snoozed:false});
+  closeCCTask();
+  ['ccTaskTitle','ccTaskMerchant'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderCCQueue();
+}
+
+function toggleCCOverview(btn) {
+  btn.textContent = btn.textContent.includes('Overview') ? '🎯 Work Mode' : '📊 Overview';
+  const t = document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:8px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text-primary);z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.15);';
+  t.textContent = btn.textContent.includes('Work') ? '📊 Overview mode coming soon' : '🎯 Back to work mode';
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2000);
+}
+
+function initCC() {
+  const d = new Date();
+  const el = document.getElementById('ccDate');
+  if (el) el.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  renderCCPipeline();
+  renderCCQueue();
+  renderCCPortfolio();
+}
+
+document.addEventListener('click', e => { if (!e.target.closest('.cc-isnooze')) closeSnoozeMenus(); });
+
 </script>
 <!-- cache-bust:1773827400 -->
+
+<!-- Command Center Task Modal -->
+<div class="cc-task-overlay" id="ccTaskOverlay" onclick="if(event.target===this)closeCCTask()">
+  <div class="cc-task-modal">
+    <div class="cc-task-mhdr">
+      <span class="cc-task-mttl">&#x2795; New Task</span>
+      <button class="cc-task-mcls" onclick="closeCCTask()">&#x2715;</button>
+    </div>
+    <div class="cc-task-mbody">
+      <div class="cc-tf"><label>Task</label><input id="ccTaskTitle" type="text" placeholder="What needs to be done?" /></div>
+      <div class="cc-tf"><label>Linked Merchant (optional)</label><input id="ccTaskMerchant" type="text" placeholder="e.g. Harbor Bistro" /></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="cc-tf"><label>Assign To</label>
+          <select id="ccTaskAsgn">
+            <option>M. Wright</option><option>S. Patel</option><option>J. Rivera</option><option>D. Martinez</option>
+          </select>
+        </div>
+        <div class="cc-tf"><label>Due Date</label><input id="ccTaskDue" type="date" /></div>
+      </div>
+      <div class="cc-tf"><label>Notes (optional)</label><textarea id="ccTaskNotes" rows="2" placeholder="Any context..."></textarea></div>
+    </div>
+    <div class="cc-task-mftr">
+      <button class="btn btn-ghost" onclick="closeCCTask()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCCTask()">Create Task</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
