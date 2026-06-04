@@ -31647,17 +31647,20 @@ function renderAlertDetail(idx) {
       <div class="tdetail-id" style="color:#B45309;">${a.id} · ${a.type} · Triggered ${a.age}</div>
       <div class="tdetail-title-row">
         <div class="tdetail-title">${a.title}</div>
+        <div class="tdetail-actions">
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Reassign</button>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:#D97706;border-color:rgba(245,158,11,0.3);" onclick="askAIAnalyst(this)">⚡ Ask AI</button>
+          <button class="btn btn-success" style="font-size:11px;padding:5px 10px;" onclick="tktResolve(this)">✓ Resolve</button>
+        </div>
       </div>
-      <div class="tdetail-actions" style="display:flex;gap:6px;margin-top:8px;">
-        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;">Reassign</button>
-        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:#D97706;border-color:rgba(245,158,11,0.3);" onclick="askAIAnalyst(this)">⚡ Ask AI</button>
-        <button class="btn btn-success" style="font-size:11px;padding:5px 10px;" onclick="tktResolve(this)">✓ Resolve</button>
-      </div>
-      <div class="tdetail-meta-row" style="margin-top:10px;">
+      <div class="tdetail-meta-row">
         <div class="meta-pill" onclick="tktMetaClick(this,'status')"><span class="meta-label">Status</span><span class="meta-sep">·</span><span class="meta-pill-val"><span class="p-badge ${a.statusClass}">${a.status}</span></span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'priority')"><span class="meta-label">Priority</span><span class="meta-sep">·</span><span data-meta-val="1" style="color:${a.priColor};font-size:11px;font-weight:600;">● ${a.priority}</span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'type')"><span class="meta-label">Type</span><span class="meta-sep">·</span><span class="meta-type-val">${a.type}</span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'assigned')"><span class="meta-label">Assigned</span><span class="meta-sep">·</span><span class="meta-assigned-val"><div class="assign-av" style="background:var(--yellow);color:var(--text-inverse);width:16px;height:16px;font-size:8px;">MA</div> <strong style="color:var(--yellow);">You</strong></span></div>
+        <div class="meta-pill"><span class="meta-label">Partner</span><span class="meta-sep">·</span> ${a.partner}</div>
+        <div class="meta-pill"><span class="meta-label">Merchant</span><span class="meta-sep">·</span> ${a.merchantId}</div>
+        <div class="meta-pill"><span class="meta-label">Detected by</span><span class="meta-sep">·</span> <span style="color:#B45309;font-weight:600;">⚡ AI Monitor</span></div>
       </div>
     </div>
 
