@@ -31654,7 +31654,7 @@ function renderAlertDetail(idx) {
         <div class="meta-pill" onclick="tktMetaClick(this,'status')"><span class="meta-label">Status</span><span class="meta-sep">·</span><span class="meta-pill-val"><span class="p-badge ${a.statusClass}">${a.status}</span></span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'priority')"><span class="meta-label">Priority</span><span class="meta-sep">·</span><span data-meta-val="1" style="color:${a.priColor};font-size:11px;font-weight:600;">● ${a.priority}</span></div>
         <div class="meta-pill" onclick="tktMetaClick(this,'type')"><span class="meta-label">Type</span><span class="meta-sep">·</span><span class="meta-type-val">${a.type}</span></div>
-        <div class="meta-pill" onclick="tktMetaClick(this,'assigned')"><span class="meta-label">Assigned</span><span class="meta-sep">·</span><span class="meta-assigned-val"><div class="assign-av" style="background:var(--yellow);color:var(--text-inverse);width:16px;height:16px;font-size:8px;">MA</div> <strong style="color:var(--yellow);">You</strong></span></div>
+        <div class="meta-pill alert-assign-pill" style="position:relative;cursor:default;"><span class="meta-label">Assigned</span><span class="meta-sep">·</span><span class="alert-asgn-val" id="alert-asgn-val"></span><span class="alert-asgn-add" onclick="event.stopPropagation();toggleAlertAssignMenu(event)" title="Add assignee">+</span><div class="alert-assign-menu" id="alert-assign-menu"></div></div>
         <div class="meta-pill"><span class="meta-label">Partner</span><span class="meta-sep">·</span> ${a.partner}</div>
         <div class="meta-pill"><span class="meta-label">Merchant</span><span class="meta-sep">·</span> ${a.merchantId}</div>
         <div class="meta-pill"><span class="meta-label">Detected by</span><span class="meta-sep">·</span> <span style="color:#B45309;font-weight:600;">⚡ AI Monitor</span></div>
@@ -31718,12 +31718,79 @@ function renderAlertDetail(idx) {
       </div>
     </div>`;
 
+  renderAlertAssignees(a.id);
+
   // scroll msgs to bottom
   setTimeout(() => {
     const msgs = document.getElementById('alert-thread-msgs');
     if (msgs) msgs.scrollTop = msgs.scrollHeight;
   }, 50);
 }
+
+/* ── Alerts: multiple assignees (add / remove) ── */
+const ALERT_REPS = [
+  {name:'You',         av:'MA', avc:'var(--yellow)', fg:'var(--text-inverse)'},
+  {name:'S. Patel',    av:'SP', avc:'#5B7A5E', fg:'#fff'},
+  {name:'J. Rivera',   av:'JR', avc:'#6B839B', fg:'#fff'},
+  {name:'D. Martinez', av:'DM', avc:'#9B6B5B', fg:'#fff'},
+  {name:'Blake C.',    av:'BC', avc:'#8C7A5E', fg:'#fff'},
+  {name:'Sara R.',     av:'SR', avc:'#A67C5B', fg:'#fff'},
+];
+const alertAssignees = {};
+function getAlertAssignees(id) {
+  if (!alertAssignees[id]) alertAssignees[id] = ['You'];
+  return alertAssignees[id];
+}
+function alertRep(name) {
+  return ALERT_REPS.find(r => r.name === name) || {name, av:name.slice(0,2).toUpperCase(), avc:'#888', fg:'#fff'};
+}
+function alertAsgnAvHTML(r, size) {
+  const s = size || 16;
+  return '<span class="assign-av" style="background:' + r.avc + ';color:' + r.fg + ';width:' + s + 'px;height:' + s + 'px;font-size:8px;">' + r.av + '</span>';
+}
+function renderAlertAssignees(id) {
+  const val = document.getElementById('alert-asgn-val');
+  if (!val) return;
+  const names = getAlertAssignees(id);
+  val.innerHTML = names.length
+    ? names.map(n => {
+        const r = alertRep(n);
+        const nameStyle = n === 'You' ? ' style="color:var(--yellow);font-weight:600;"' : '';
+        return '<span class="alert-asgn-chip">' + alertAsgnAvHTML(r) +
+          '<span class="alert-asgn-nm"' + nameStyle + '>' + n + '</span>' +
+          '<span class="alert-asgn-x" onclick="event.stopPropagation();removeAlertAssignee(\'' + id + '\',\'' + n.replace(/'/g,"\\'") + '\')" title="Remove ' + n + '">&times;</span></span>';
+      }).join('')
+    : '<span class="alert-asgn-none">Unassigned</span>';
+  const menu = document.getElementById('alert-assign-menu');
+  if (menu) {
+    const avail = ALERT_REPS.filter(r => !names.includes(r.name));
+    menu.innerHTML = avail.length
+      ? avail.map(r => '<div class="alert-assign-opt" onclick="event.stopPropagation();addAlertAssignee(\'' + id + '\',\'' + r.name.replace(/'/g,"\\'") + '\')">' + alertAsgnAvHTML(r, 18) + ' ' + r.name + '</div>').join('')
+      : '<div class="alert-assign-empty">Everyone is assigned</div>';
+  }
+}
+function addAlertAssignee(id, name) {
+  const arr = getAlertAssignees(id);
+  if (!arr.includes(name)) arr.push(name);
+  closeAlertAssignMenu();
+  renderAlertAssignees(id);
+}
+function removeAlertAssignee(id, name) {
+  alertAssignees[id] = getAlertAssignees(id).filter(n => n !== name);
+  renderAlertAssignees(id);
+}
+function toggleAlertAssignMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('alert-assign-menu');
+  if (menu) menu.classList.toggle('open');
+}
+function closeAlertAssignMenu() {
+  const menu = document.getElementById('alert-assign-menu');
+  if (menu) menu.classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.alert-assign-pill')) closeAlertAssignMenu();
+});
 
 /* Reply tab switch for alerts */
 let _alertReplyMode = 'ai';
@@ -34618,6 +34685,22 @@ function assignToast(msg) {
 <style id="alerts-css">
 /* ── Alerts view: amber accent header ─── */
 .alerts-accent-bar { height:2px; background:linear-gradient(90deg,#F59E0B 0%,rgba(245,158,11,0.30) 50%,transparent 100%); flex-shrink:0; }
+/* Multiple assignees on the alert detail */
+.alert-assign-pill { gap:5px; }
+.alert-asgn-val { display:inline-flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.alert-asgn-chip { display:inline-flex; align-items:center; gap:4px; background:var(--bg-base); border:1px solid var(--border); border-radius:5px; padding:1px 4px 1px 2px; }
+.alert-asgn-nm { font-size:11px; color:var(--text-secondary); white-space:nowrap; }
+.alert-asgn-x { cursor:pointer; color:var(--text-muted); font-size:13px; line-height:1; display:none; }
+.alert-asgn-chip:hover .alert-asgn-x { display:inline; }
+.alert-asgn-x:hover { color:var(--red); }
+.alert-asgn-none { font-size:11px; color:var(--text-muted); }
+.alert-asgn-add { width:17px; height:17px; border-radius:50%; border:1px dashed var(--border-strong); color:var(--text-muted); font-size:12px; line-height:1; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .12s; }
+.alert-asgn-add:hover { border-color:#F59E0B; color:#B45309; background:rgba(245,158,11,0.08); }
+.alert-assign-menu { position:absolute; top:calc(100% + 6px); left:0; min-width:180px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.35); z-index:500; padding:4px; display:none; }
+.alert-assign-menu.open { display:block; }
+.alert-assign-opt { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; font-size:12px; color:var(--text-secondary); cursor:pointer; }
+.alert-assign-opt:hover { background:var(--bg-hover); color:var(--text-primary); }
+.alert-assign-empty { padding:8px; font-size:11px; color:var(--text-muted); text-align:center; }
 /* Alerts reuse the Tickets .trow component — recolored amber so the section reads distinct */
 #view-alerts .trow.alert-row.active { background: rgba(245,158,11,0.08); }
 #view-alerts .trow-id { color: #B45309; }
