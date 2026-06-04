@@ -34621,9 +34621,6 @@ function assignToast(msg) {
 <style id="alerts-css">
 /* ── Alerts view: amber accent header ─── */
 .alerts-accent-bar { height:2px; background:linear-gradient(90deg,#F59E0B 0%,rgba(245,158,11,0.30) 50%,transparent 100%); flex-shrink:0; }
-#view-alerts .tdetail-header {
-  border-left: 3px solid rgba(245,158,11,0.55);
-}
 /* Alerts reuse the Tickets .trow component — recolored amber so the section reads distinct */
 #view-alerts .trow.alert-row.active { background: rgba(245,158,11,0.08); }
 #view-alerts .trow-id { color: #B45309; }
@@ -34701,32 +34698,9 @@ function assignToast(msg) {
 /* Alerts merchant rail — full-height sibling column (not nested in detail body) */
 .tsidebar-alerts { width:340px; border-left:1px solid rgba(245,158,11,0.15); background:var(--bg-surface); }
 
-/* ── Alerts detail panel — readability pass (scoped to #view-alerts only) ── */
-#view-alerts .tdetail-header { padding:20px 24px 16px; }
-#view-alerts .tdetail-id { font-size:12px; letter-spacing:0.04em; margin-bottom:8px; }
-#view-alerts .tdetail-title { font-size:18px; line-height:1.35; letter-spacing:-0.005em; font-weight:600; }
-#view-alerts .tdetail-title-row { margin-bottom:0; }
-#view-alerts .tdetail-actions { gap:8px; margin-top:14px !important; }
-#view-alerts .tdetail-actions .btn { font-size:12.5px !important; padding:7px 14px !important; }
-#view-alerts .tdetail-meta-row { margin-top:14px !important; gap:10px; }
-#view-alerts .meta-pill { font-size:12px; padding:5px 10px; border-radius:7px; }
-#view-alerts .meta-label { font-size:11px; }
-/* Message thread — more breathing room, larger AI body type */
-#view-alerts .tthread-msgs { padding:20px 24px; gap:18px; }
-#view-alerts .tmsg { gap:6px; }
-#view-alerts .tmsg-header { margin-bottom:4px; gap:8px; }
-#view-alerts .tmsg-sender { font-size:12px; font-weight:600; }
-#view-alerts .tmsg-time   { font-size:11px; }
-#view-alerts .tmsg-badge  { font-size:10px; padding:2px 6px; }
-#view-alerts .tmsg-ai .tmsg-bubble { font-size:14px; line-height:1.6; padding:14px 16px 14px 18px; border-radius:10px; max-width:none; background:var(--bg-surface); border:1px solid var(--border); border-left:3px solid rgba(245,158,11,0.55); color:var(--text-primary); }
-#view-alerts .tmsg-event .tmsg-bubble { font-size:12px; padding:6px 0; }
-/* Reply box — slightly roomier */
-#view-alerts .treply-box { padding:14px 20px; }
-#view-alerts .treply-tabs { margin-bottom:10px; }
-#view-alerts .rtab { font-size:12px; padding:7px 12px; }
-#view-alerts .treply-textarea { font-size:13px; padding:12px 14px; min-height:80px; line-height:1.55; }
-#view-alerts .treply-actions { padding-top:10px; }
-#view-alerts .treply-actions .btn { font-size:12px !important; padding:6px 12px !important; }
+/* Alerts detail uses the exact same sizing as the Tickets detail panel —
+   no scaled-up overrides. Only the amber AI-bubble left accent is kept. */
+#view-alerts .tmsg-ai .tmsg-bubble { border-left:3px solid rgba(245,158,11,0.55); }
 </style>
 
 <style id="tkt-scroll-fix">
