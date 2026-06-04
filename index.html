@@ -4284,10 +4284,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             </div>
 
           </div>
-        </div><!-- /tdetail-panel -->
-
-        <!-- MERCHANT RAIL — full-height sibling column, populated by renderAlertDetail -->
-        <div class="tsidebar tsidebar-alerts" id="alert-sidebar"></div>
+        </div><!-- /tdetail-panel — merchant sidebar now lives INSIDE the detail body (like Tickets) -->
 
       </div><!-- /alerts-split -->
 
@@ -31693,34 +31690,31 @@ function renderAlertDetail(idx) {
           </div>
         </div>
       </div>
-
-    </div>`;
-
-  // Sidebar lives in its own full-height column (sibling of the detail panel)
-  var sb = document.getElementById('alert-sidebar');
-  if (sb) sb.innerHTML = `
-    <div class="tsb-section">
-      <div class="tsb-title">Merchant</div>
-      <div class="tsb-merchant-card">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="p-avatar" style="background:${m.color};width:30px;height:30px;font-size:11px;">${m.initials}</div>
-          <div><div class="tsb-merchant-name">${a.merchant}</div><div class="tsb-merchant-sub">${a.partner} · ${a.merchantId}</div></div>
+      <div class="tsidebar">
+        <div class="tsb-section">
+          <div class="tsb-title">Merchant</div>
+          <div class="tsb-merchant-card">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="p-avatar" style="background:${m.color};width:30px;height:30px;font-size:11px;">${m.initials}</div>
+              <div><div class="tsb-merchant-name">${a.merchant}</div><div class="tsb-merchant-sub">${a.partner} · ${a.merchantId}</div></div>
+            </div>
+          </div>
+          <div class="tsb-stat-grid">
+            <div class="tsb-stat"><div class="tsb-stat-label">MTD Vol</div><div class="tsb-stat-val">${m.vol}</div></div>
+            <div class="tsb-stat"><div class="tsb-stat-label">Auth Rate</div><div class="tsb-stat-val" style="color:${m.authColor};">${m.auth}</div></div>
+            <div class="tsb-stat"><div class="tsb-stat-label">Last Batch</div><div class="tsb-stat-val" style="font-size:11px;">${m.lastBatch}</div></div>
+            <div class="tsb-stat"><div class="tsb-stat-label">CB Ratio</div><div class="tsb-stat-val" style="color:${m.cbColor};">${m.cb}</div></div>
+          </div>
         </div>
-      </div>
-      <div class="tsb-stat-grid">
-        <div class="tsb-stat"><div class="tsb-stat-label">MTD Vol</div><div class="tsb-stat-val">${m.vol}</div></div>
-        <div class="tsb-stat"><div class="tsb-stat-label">Auth Rate</div><div class="tsb-stat-val" style="color:${m.authColor};">${m.auth}</div></div>
-        <div class="tsb-stat"><div class="tsb-stat-label">Last Batch</div><div class="tsb-stat-val" style="font-size:11px;">${m.lastBatch}</div></div>
-        <div class="tsb-stat"><div class="tsb-stat-label">CB Ratio</div><div class="tsb-stat-val" style="color:${m.cbColor};">${m.cb}</div></div>
-      </div>
-    </div>
-    <div class="tsb-section">
-      <div class="tsb-title">Quick Actions</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📋 View merchant profile</button>
-        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📊 Pull transaction log</button>
-        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📤 Escalate to partner</button>
-        <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">🎫 Convert to ticket</button>
+        <div class="tsb-section">
+          <div class="tsb-title">Quick Actions</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📋 View merchant profile</button>
+            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📊 Pull transaction log</button>
+            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">📤 Escalate to partner</button>
+            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;">🎫 Convert to ticket</button>
+          </div>
+        </div>
       </div>
     </div>`;
 
