@@ -38967,5 +38967,527 @@ function _agentDecorateRail(){
 }
 /* ===== /AGENT DESK ===== */
 </script>
+
+<style>
+/* ===== AGENT DESK ===== */
+/* B3: deployment session decision flows */
+.agdk-chip.agdk-spent{opacity:.5;cursor:default;pointer-events:none;}
+.agdk-pick{margin-top:8px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg-surface);padding:10px 12px;font-size:12px;}
+.agdk-pick.agdk-frozen{opacity:.72;}
+.agdk-pick-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
+.agdk-serial{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 12px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg-elevated);cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-primary);transition:all .15s;}
+.agdk-serial:hover{border-color:rgba(91,122,94,.4);background:var(--green-dim);}
+.agdk-serial span{font-family:var(--font-ui);font-size:9px;font-weight:500;color:var(--text-muted);}
+.agdk-track{margin-top:8px;border:1px solid rgba(91,122,94,.3);border-radius:8px;background:var(--bg-surface);padding:10px 12px;font-size:11px;display:flex;flex-direction:column;gap:6px;}
+.agdk-track-code{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--text-primary);letter-spacing:.03em;}
+.agdk-track-steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10px;color:var(--text-secondary);}
+/* ===== /AGENT DESK ===== */
+</style>
+
+<script>
+/* ===== AGENT DESK ===== */
+/* B3: deployment session — serial assignment (in-stock chips), payment method
+   (payment gates shipping), shipment + tracking card, install-call booking, and
+   the Bright Star overdue escalation. Every ops action drafts a partner
+   notification through B2's draft-card machinery. Overrides via re-declaration /
+   wrapping only — no B1/B2 lines edited. */
+
+/* ── demo inventory + payment routes ── */
+const AGENT_SERIAL_STOCK = [
+  { sn:'PAX-4823-0651', note:'Warehouse NJ · in stock' },
+  { sn:'PAX-4823-0688', note:'Warehouse NJ · in stock' },
+  { sn:'PAX-4901-0102', note:'Warehouse AZ · in stock' },
+];
+const AGENT_PAY_OPTS = [
+  { label:'Bill merchant (card on file)', icon:'💳',
+    done:'Charged merchant card on file — payment cleared',
+    payNote:'Billed merchant card on file · paid just now',
+    partnerLine:'The merchant’s card on file was charged for the equipment — nothing needed on your side.' },
+  { label:'Invoice partner', icon:'🧾',
+    done:'Invoice sent to partner — approved for ship',
+    payNote:'Invoiced partner · approved for ship',
+    partnerLine:'The invoice is headed to your AP inbox — net-15 terms, and the equipment ships without waiting on payment.' },
+  { label:'Deduct from partner payout', icon:'📉',
+    done:'Deduction scheduled against next payout',
+    payNote:'Deducting from next partner payout',
+    partnerLine:'The equipment cost nets against your next payout statement — line-itemed so it’s easy to reconcile.' },
+];
+const AGENT_INSTALL_SLOTS = ['Today · 3:30 PM ET', 'Tomorrow · 10:00 AM ET'];
+
+/* ── tiny helpers ── */
+function _agentDeploy(sess){ return (sess && sess.dr && sess.dr.deploy) || null; }
+function _agentOwner(sess){
+  const b = (sess.dr && sess.dr.synopsis && sess.dr.synopsis.business) || {};
+  return (b.owner || 'the owner').replace(/\s*\(.*$/, '').split('·')[0].trim();
+}
+function _agentDrActivity(sess, color, text){
+  if (!sess.dr) return;
+  sess.dr.activity = sess.dr.activity || [];
+  sess.dr.activity.push({ type:'sys', time:_agdkToday(), color, text });
+}
+
+/* pick card: one live decision widget per beat, frozen once used (transcript-safe) */
+function _agentPickCard(sess, innerHtml){
+  const seq = sess._seq = (sess._seq||0) + 1;
+  const id = 'agdk-pick-'+_agdkSlug(sess.merchant)+'-'+seq;
+  sess._pickId = id;
+  return '<div class="agdk-pick" id="'+id+'">'+innerHtml+'</div>';
+}
+function _agentPickFreeze(sess, footHtml){
+  const box = sess._pickId && document.getElementById(sess._pickId);
+  if (box) {
+    box.classList.add('agdk-frozen');
+    box.querySelectorAll('button').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); });
+    if (footHtml) box.insertAdjacentHTML('beforeend', '<div style="margin-top:9px;">'+footHtml+'</div>');
+  }
+  _agentSnapshotActive();
+}
+
+/* spend the current NBA row and issue a fresh one reflecting new deploy state */
+function _agentRefreshDeployNBA(sess){
+  if (!sess || sess.kind !== 'deploy') return;
+  const old = document.getElementById('agdk-nba-'+_agdkSlug(sess.merchant));
+  if (old) {
+    old.removeAttribute('id');
+    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); });
+  }
+  _agentSnapshotActive();
+  _agentAddDeployNBA(sess);
+}
+
+/* ── deploy NBA chips (re-declaration of B1's: state-aware, done-aware) ── */
+function _agentAddDeployNBA(sess){
+  const n = _agdkEsc(sess.merchant);
+  const d = _agentDeploy(sess) || {};
+  const eq = d.equipment || [];
+  const needsSerial = eq.some(e => !e.serial);
+  const needsPay = eq.some(e => e.pay === 'due');
+  const shipped = eq.length > 0 && eq.every(e => e.ship);
+  let chips = '';
+  if (d.overdue) {
+    const acts = d.overdue.doneActs || {};
+    chips += (acts[0] || d._installBooked)
+      ? '<button class="agdk-chip agdk-spent" disabled>✓ Install call booked</button>'
+      : '<button class="agdk-chip pend" data-hook="agent-nba-install" onclick="agentNBA(\'install\',\''+n+'\')">📞 Book install call</button>';
+    chips += acts[1]
+      ? '<button class="agdk-chip agdk-spent" disabled>✓ Escalated</button>'
+      : '<button class="agdk-chip" data-hook="agent-nba-escalate" onclick="agentNBA(\'escalate\',\''+n+'\')">⚠ Escalate</button>';
+  } else {
+    if (needsSerial) chips += '<button class="agdk-chip approve" data-hook="agent-nba-serial" onclick="agentNBA(\'serial\',\''+n+'\')">🔢 Assign serial</button>';
+    if (needsPay) chips += '<button class="agdk-chip pend" data-hook="agent-nba-pay" onclick="agentNBA(\'pay\',\''+n+'\')">💳 Payment method</button>';
+    chips += shipped
+      ? '<button class="agdk-chip agdk-spent" disabled>📦 Shipped ✓</button>'
+      : '<button class="agdk-chip'+(needsPay?' locked':'')+'" data-hook="agent-nba-ship"'+(needsPay?' title="Payment gates shipping — choose a payment method first"':'')+' onclick="agentNBA(\'ship\',\''+n+'\')">📦 Create shipment</button>';
+    if (d._installBooked) chips += '<button class="agdk-chip agdk-spent" disabled>✓ Install call booked</button>';
+    else if (shipped) chips += '<button class="agdk-chip" data-hook="agent-nba-install" onclick="agentNBA(\'install\',\''+n+'\')">📞 Book install call</button>';
+  }
+  chips += '<button class="agdk-chip" data-hook="agent-nba-message" onclick="agentNBA(\'message\',\''+n+'\')">✉ Message partner</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\''+n+'\')">📄 View documents</button>';
+  _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-'+_agdkSlug(sess.merchant)+'">'+chips+'</div></div>');
+}
+
+/* ── NBA dispatcher (re-declaration: all branches live) ── */
+function agentNBA(action, name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  switch(action){
+    case 'docs':     _agentShowDocs(sess); return;
+    case 'approve':  agentFlowApprove(sess); return;
+    case 'pend':     agentFlowPend(sess); return;
+    case 'message':  agentFlowMessage(sess); return;
+    case 'team':     agentFlowTeam(sess); return;
+    case 'serial':   agentFlowSerial(sess); return;
+    case 'pay':      agentFlowPay(sess); return;
+    case 'ship':     agentFlowShip(sess); return;
+    case 'install':  agentFlowInstall(sess); return;
+    case 'escalate': agentFlowEscalate(sess); return;
+  }
+}
+
+/* ══════════════════ SERIAL ASSIGNMENT ══════════════════ */
+function agentFlowSerial(sess){
+  const d = _agentDeploy(sess); if (!d) return;
+  const idx = (d.equipment||[]).findIndex(e => !e.serial);
+  if (idx < 0) {
+    agentAddSys(sess, 'Serial already assigned — S/N '+((d.equipment[0]||{}).serial||'—'), 'var(--green)');
+    return;
+  }
+  if (sess._serialOpen) return;
+  sess._serialOpen = true;
+  agentAddUserMsg(sess, '🔢 Assign a serial.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const e = d.equipment[idx];
+    const esc = _agdkEsc(sess.merchant);
+    const chips = AGENT_SERIAL_STOCK.map((s,i) =>
+      '<button class="agdk-serial" onclick="agentSerialPick(\''+esc+'\','+idx+','+i+')">'+s.sn+'<span>'+s.note+'</span></button>').join('');
+    agentAddMsg(sess, e.qty+'× <b>'+e.device+'</b> to assign. Three units in stock — pick one and I’ll pull it from inventory:' +
+      _agentPickCard(sess, '<div class="agdk-pick-row">'+chips+
+      '<button class="agdk-chip" onclick="agentSerialCancel(\''+esc+'\')">Cancel</button></div>'));
+  }, 650);
+}
+function agentSerialCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  _agentPickFreeze(sess, '<span class="agdk-cancelled">Cancelled — no serial assigned</span>');
+  sess._serialOpen = false;
+  agentAddSys(sess, 'Serial assignment cancelled', 'var(--text-muted)');
+}
+function agentSerialPick(name, eqIdx, stockIdx){
+  const sess = AGENT_DESK.sessions[name];
+  const d = _agentDeploy(sess);
+  const e = d && d.equipment && d.equipment[eqIdx];
+  const s = AGENT_SERIAL_STOCK[stockIdx];
+  if (!sess || !e || !s || e.serial) return;
+  _agentPickFreeze(sess, '<span class="agdk-ck-done">✓ S/N '+s.sn+' · pulled from inventory</span>');
+  sess._serialOpen = false;
+  e.serial = s.sn;
+  e.serialNote = '✓ pulled from inventory';
+  _agentDrActivity(sess, 'var(--green)', '🔢 Serial '+s.sn+' assigned via AI agent session');
+  agentAddSys(sess, '🔢 S/N '+s.sn+' assigned — '+s.note, 'var(--green)');
+  agentRenderRail();
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const r = _agentRep(sess);
+    const payDue = e.pay === 'due';
+    const body = 'Hi '+r.first+',\n\nQuick equipment update on '+sess.merchant+': terminal assigned.\n\n  • '+e.qty+'× '+e.device+' — S/N '+s.sn+'\n  • Ships to: '+e.shipTo+
+      '\n\n'+(payDue
+        ? 'One thing before it ships: the equipment payment method still needs to be set — shipping is gated on it. We’ll handle that next and send tracking the moment the label is created.'
+        : 'Payment is settled — tracking follows as soon as the label is created.')+
+      '\n\nThanks,\nTwill AI · on behalf of '+(sess.m.assignee||'Twill Ops');
+    _agentDraftCard(sess, {
+      kind:'ops', channel:'partner', after:'deploy-nba',
+      to: r.rep + ' · ' + (sess.m.partner||'Partner'), email: r.email,
+      subject: sess.merchant + ' — terminal assigned (S/N '+s.sn+')',
+      body,
+      intro: 'Partner notification drafted — edit inline, then approve to send.',
+    });
+  }, 700);
+}
+
+/* ══════════════════ PAYMENT METHOD (gates shipping) ══════════════════ */
+function agentFlowPay(sess){
+  const d = _agentDeploy(sess); if (!d) return;
+  const idx = (d.equipment||[]).findIndex(e => e.pay === 'due');
+  if (idx < 0) {
+    agentAddSys(sess, 'Equipment payment already settled — '+((d.equipment[0]||{}).payNote||'paid'), 'var(--green)');
+    return;
+  }
+  if (sess._payOpen) return;
+  sess._payOpen = true;
+  agentAddUserMsg(sess, '💳 Set the payment method.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const e = d.equipment[idx];
+    const esc = _agdkEsc(sess.merchant);
+    const chips = AGENT_PAY_OPTS.map((o,i) =>
+      '<button class="agdk-chip pend" onclick="agentPayPick(\''+esc+'\','+idx+','+i+')">'+o.icon+' '+o.label+'</button>').join('');
+    agentAddMsg(sess, 'Equipment payment for '+e.qty+'× <b>'+e.device+'</b>. Shipping stays locked until this is set — pick the route:' +
+      _agentPickCard(sess, '<div class="agdk-pick-row">'+chips+
+      '<button class="agdk-chip" onclick="agentPayCancel(\''+esc+'\')">Cancel</button></div>'));
+  }, 650);
+}
+function agentPayCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  _agentPickFreeze(sess, '<span class="agdk-cancelled">Cancelled — payment method not set, shipping stays locked</span>');
+  sess._payOpen = false;
+  agentAddSys(sess, 'Payment method not set — shipping stays locked', 'var(--text-muted)');
+}
+function agentPayPick(name, eqIdx, optIdx){
+  const sess = AGENT_DESK.sessions[name];
+  const d = _agentDeploy(sess);
+  const e = d && d.equipment && d.equipment[eqIdx];
+  const o = AGENT_PAY_OPTS[optIdx];
+  if (!sess || !e || !o || e.pay !== 'due') return;
+  _agentPickFreeze(sess, '<span class="agdk-ck-done">✓ '+o.label+'</span>');
+  sess._payOpen = false;
+  if (typeof drdSetPay === 'function') drdSetPay(name, eqIdx, o.label);   // canonical payChoice mutation
+  e.pay = 'paid';
+  e.payNote = o.payNote;
+  _agentDrActivity(sess, 'var(--green)', '💳 '+o.done+' — via AI agent session');
+  agentAddSys(sess, '💳 '+o.done+' — shipping unlocked', 'var(--green)');
+  agentRenderRail();
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const r = _agentRep(sess);
+    const body = 'Hi '+r.first+',\n\nEquipment payment for '+sess.merchant+' is set: '+o.label+'.\n\n'+o.partnerLine+
+      '\n\nShipping is now unlocked — tracking follows as soon as the shipment is created.\n\nThanks,\nTwill AI · on behalf of '+(sess.m.assignee||'Twill Ops');
+    _agentDraftCard(sess, {
+      kind:'ops', channel:'partner', after:'deploy-nba',
+      to: r.rep + ' · ' + (sess.m.partner||'Partner'), email: r.email,
+      subject: sess.merchant + ' — equipment payment set',
+      body,
+      intro: 'Partner notification drafted — edit inline, then approve to send.',
+    });
+  }, 700);
+}
+
+/* ══════════════════ CREATE SHIPMENT (payment-gated) ══════════════════ */
+function agentFlowShip(sess){
+  const d = _agentDeploy(sess); if (!d) return;
+  const idx = (d.equipment||[]).findIndex(e => !e.ship);
+  if (idx < 0) {
+    const e0 = (d.equipment||[])[0];
+    agentAddSys(sess, 'Already shipped — '+(e0 && e0.ship ? e0.ship.carrier+' '+e0.ship.code : ''), 'var(--green)');
+    return;
+  }
+  const e = d.equipment[idx];
+  agentAddUserMsg(sess, '📦 Create the shipment.');
+  if (e.pay === 'due') {
+    agentAddTyping(sess);
+    setTimeout(() => {
+      agentRemoveTyping();
+      agentAddMsg(sess, 'Can’t ship yet — <b>payment gates shipping</b>. Set the equipment payment method first and this unlocks.');
+    }, 600);
+    return;
+  }
+  if (!e.serial) {
+    agentAddTyping(sess);
+    setTimeout(() => {
+      agentRemoveTyping();
+      agentAddMsg(sess, 'Almost — the shipment needs a unit attached. <b>Assign a serial</b> first and I’ll cut the label right after.');
+    }, 600);
+    return;
+  }
+  if (sess._shipOpen) return;
+  sess._shipOpen = true;
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const esc = _agdkEsc(sess.merchant);
+    agentAddMsg(sess, 'Ready to cut the label:' +
+      _agentPickCard(sess,
+        '<div style="font-size:12px;"><b>'+e.qty+'× '+e.device+'</b> · S/N <span style="font-family:var(--font-mono);">'+e.serial+'</span>' +
+        '<div style="color:var(--text-muted);font-size:11px;margin-top:3px;">FedEx 2-Day → '+e.shipTo+'</div>' +
+        '<div style="color:var(--text-muted);font-size:11px;margin-top:2px;">'+(e.payNote||'Payment settled')+'</div></div>' +
+        '<div class="agdk-pick-row" style="margin-top:9px;">' +
+        '<button class="agdk-chip approve" onclick="agentShipConfirm(\''+esc+'\','+idx+')">✓ Create shipment</button>' +
+        '<button class="agdk-chip" onclick="agentShipCancel(\''+esc+'\')">Cancel</button></div>'));
+  }, 700);
+}
+function agentShipCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  _agentPickFreeze(sess, '<span class="agdk-cancelled">Cancelled — no label created</span>');
+  sess._shipOpen = false;
+  agentAddSys(sess, 'Shipment cancelled — nothing created', 'var(--text-muted)');
+}
+function agentShipConfirm(name, eqIdx){
+  const sess = AGENT_DESK.sessions[name];
+  const d = _agentDeploy(sess);
+  const e = d && d.equipment && d.equipment[eqIdx];
+  if (!sess || !e || e.ship) return;
+  const code = '7749 4' + String(Math.floor(100+Math.random()*900)) + ' ' + String(Math.floor(1000+Math.random()*9000));
+  _agentPickFreeze(sess, '<span class="agdk-ck-done">✓ Label created · FedEx '+code+'</span>');
+  sess._shipOpen = false;
+  e.ship = { carrier:'FedEx', code, eta:'Est. 2 business days',
+    steps:[ {label:'Label created',done:true}, {label:'Picked up',done:false}, {label:'In transit',done:false}, {label:'Delivered',done:false} ] };
+  /* deal-room coherence: welcome kit rides along with tracking; stepper advances */
+  const wk = (d.rail||[]).find(nd => /welcome/i.test(nd.label||''));
+  if (wk && wk.state !== 'done') { wk.state = 'done'; wk.val = 'Email sent — FedEx tracking included'; wk.time = 'Just now'; }
+  if (sess.dr) {
+    sess.dr.currentStep = Math.max(sess.dr.currentStep||0, 6);
+    if (sess.dr.stepDates) sess.dr.stepDates[6] = 'Today';
+    if (sess.dr.stepDetails) sess.dr.stepDetails.equip = 'Shipped via AI agent session — FedEx '+code+'.';
+  }
+  if (sess.m) sess.m.actionItem = 'Equipment shipped — awaiting delivery + install call';
+  _agentDrActivity(sess, 'var(--green)', '📦 Equipment shipped — FedEx '+code+' (AI agent session)');
+  sess.decision = { type:'shipped', time:_agdkTime(), code, shipTo:e.shipTo };
+  agentAddSys(sess, '📦 Shipment created — FedEx '+code+' · welcome kit sent with tracking', 'var(--green)');
+  _agentFinal(sess, '<div class="act"><div class="agdk-track" style="margin-left:26px;">' +
+    '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">📦</span><b>FedEx</b>' +
+    '<span class="agdk-track-code">'+code+'</span><span style="margin-left:auto;font-size:10px;color:var(--text-muted);">'+e.ship.eta+'</span></div>' +
+    '<div class="agdk-track-steps">'+e.ship.steps.map(s =>
+      '<span>'+(s.done?'<span style="color:var(--green);">●</span>':'<span style="color:var(--border-strong);">○</span>')+' '+s.label+'</span>').join('<span style="color:var(--text-muted);">→</span>')+'</div>' +
+    '<div style="font-size:10px;color:var(--text-muted);">'+e.qty+'× '+e.device+' · S/N '+e.serial+' → '+e.shipTo+'</div></div></div>');
+  agentToast('📦', 'Shipment created — <strong>'+sess.merchant+'</strong> · FedEx '+code);
+  agentRenderRail();
+  agentRenderQueue();
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(err) {}
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const r = _agentRep(sess);
+    const body = 'Hi '+r.first+',\n\n'+sess.merchant+'’s equipment is on the way.\n\n  • '+e.qty+'× '+e.device+' — S/N '+e.serial+'\n  • FedEx '+code+' · est. 2 business days\n  • Ship to: '+e.shipTo+
+      '\n\nTrack it any time with the number above. Next step after delivery is a 20-minute install call — we’ll book it from this session.\n\nThanks,\nTwill AI · on behalf of '+(sess.m.assignee||'Twill Ops');
+    _agentDraftCard(sess, {
+      kind:'ops', channel:'partner', after:'deploy-nba',
+      to: r.rep + ' · ' + (sess.m.partner||'Partner'), email: r.email,
+      subject: sess.merchant + ' — shipped · FedEx '+code,
+      body,
+      intro: 'Shipping notification drafted with live tracking — edit inline, then approve to send.',
+    });
+  }, 800);
+}
+
+/* ══════════════════ BOOK INSTALL CALL (Urban post-ship + Bright Star overdue) ══════════════════ */
+function agentFlowInstall(sess){
+  const d = _agentDeploy(sess); if (!d) return;
+  if (d._installBooked) {
+    agentAddSys(sess, 'Install call already booked — '+d._installBooked, 'var(--green)');
+    return;
+  }
+  if (sess._installOpen) return;
+  sess._installOpen = true;
+  agentAddUserMsg(sess, '📞 Book the install call.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const esc = _agdkEsc(sess.merchant);
+    const owner = _agentOwner(sess);
+    const chips = AGENT_INSTALL_SLOTS.map((s,i) =>
+      '<button class="agdk-chip pend" onclick="agentInstallPick(\''+esc+'\','+i+')">🗓 '+s+'</button>').join('');
+    agentAddMsg(sess, (d.overdue
+        ? 'Best move here — the terminal is already on site, so a 20-minute remote install with <b>'+owner+'</b> gets them live today. I have two slots on the install team’s calendar:'
+        : '20-minute remote install with <b>'+owner+'</b> — I have two slots on the install team’s calendar:') +
+      _agentPickCard(sess, '<div class="agdk-pick-row">'+chips+
+      '<button class="agdk-chip" onclick="agentInstallCancel(\''+esc+'\')">Cancel</button></div>'));
+  }, 650);
+}
+function agentInstallCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  _agentPickFreeze(sess, '<span class="agdk-cancelled">Cancelled — no call booked</span>');
+  sess._installOpen = false;
+  agentAddSys(sess, 'Install booking cancelled', 'var(--text-muted)');
+}
+function agentInstallPick(name, slotIdx){
+  const sess = AGENT_DESK.sessions[name];
+  const d = _agentDeploy(sess);
+  const slot = AGENT_INSTALL_SLOTS[slotIdx];
+  if (!sess || !d || !slot || d._installBooked) return;
+  _agentPickFreeze(sess, '<span class="agdk-ck-done">✓ Booked — '+slot+'</span>');
+  sess._installOpen = false;
+  const owner = _agentOwner(sess);
+  d._installBooked = slot;
+  if (d.activation) d.activation.install = 'Remote install — booked '+slot+' with '+owner;
+  if (d.overdue && typeof drdOverdueAct === 'function') drdOverdueAct(name, 0, null);   // persists doneActs + deal-room activity
+  else _agentDrActivity(sess, 'var(--green)', '📞 Remote install booked — '+slot+' (AI agent session)');
+  if (sess.m) sess.m.actionItem = 'Install call booked — '+slot;
+  sess.decision = { type:'install-booked', time:_agdkTime(), slot };
+  agentAddSys(sess, '📞 Remote install booked — '+slot+' · 20 min · '+owner, 'var(--green)');
+  agentToast('📞', 'Install call booked — <strong>'+sess.merchant+'</strong> · '+slot);
+  agentRenderRail();
+  agentRenderQueue();
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const r = _agentRep(sess);
+    const e = (d.equipment||[])[0] || {};
+    const onSite = !!(e.ship && /delivered/i.test(e.ship.eta||''));
+    const body = 'Hi '+r.first+',\n\nInstall call is booked for '+sess.merchant+': '+slot+' — a 20-minute remote session with '+owner+'.\n\nThe terminal'+(e.serial ? ' (S/N '+e.serial+')' : '')+' is '+(onSite ? 'already on site' : 'arriving shortly')+'. We’ll run tap / chip / swipe tests on the call, and the account auto-activates on the first settled batch — no manual flip needed.\n\nA quick heads-up to the merchant that the call is coming would help it stick.\n\nThanks,\nTwill AI · on behalf of '+(sess.m.assignee||'Twill Ops');
+    _agentDraftCard(sess, {
+      kind:'ops', channel:'partner', after:'deploy-nba',
+      to: r.rep + ' · ' + (sess.m.partner||'Partner'), email: r.email,
+      subject: sess.merchant + ' — install call booked ('+slot+')',
+      body,
+      intro: 'Partner notification drafted — edit inline, then approve to send.',
+    });
+  }, 700);
+}
+
+/* ══════════════════ ESCALATE (Bright Star — activation overdue) ══════════════════ */
+function agentFlowEscalate(sess){
+  const d = _agentDeploy(sess); if (!d) return;
+  if (d.overdue && d.overdue.doneActs && d.overdue.doneActs[1]) {
+    agentAddSys(sess, 'Already escalated — deployment queue notified', 'var(--red)');
+    return;
+  }
+  agentAddUserMsg(sess, '⚠ Escalate this.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const owner = _agentOwner(sess);
+    const e = (d.equipment||[])[0] || {};
+    const days = (sess.dr && (sess.dr.stalledDays || sess.dr.daysInStage)) || '—';
+    const body = '@deployment-ops — '+sess.merchant+' ('+(sess.m.partner||'—')+' · '+((sess.dr && sess.dr.synopsis && sess.dr.synopsis.business && sess.dr.synopsis.business.monthlyVol) || sess.m.potVol || '—')+'/mo):\n\nEquipment delivered '+days+' days ago — no install call completed, no first transaction, and the merchant went quiet after delivery. 3 outreach attempts so far.'+(e.serial ? ' Terminal S/N '+e.serial+' is on site.' : '')+
+      '\n\nNeeds an owner: direct call to '+owner+' today, offer the 20-minute remote install. Session transcript attached; everything is logged.';
+    _agentDraftCard(sess, {
+      kind:'depesc', channel:'team', after:'deploy-nba',
+      to:'#deployment-ops', email:'deploy-ops@twillpayments.com',
+      subject:'Activation overdue — '+sess.merchant+' ('+days+' days, no first batch)',
+      body,
+      intro:'Escalation drafted for the deployment queue — edit if needed, then post.',
+    });
+  }, 700);
+}
+function _agentDepEscCommit(sess, d, bodyText){
+  sess.comms.push({ time:_agdkTime(), kind:'team', label:'Escalation → #deployment-ops', preview:_agdkStrip(bodyText).slice(0,110) });
+  sess.decision = { type:'dep-escalated', time:_agdkTime() };
+  const dep = _agentDeploy(sess);
+  if (dep && dep.overdue && typeof drdOverdueAct === 'function') drdOverdueAct(sess.merchant, 1, null);   // persists doneActs + activity
+  if (sess.m) sess.m.actionItem = 'Escalated to deployment queue — awaiting owner';
+  agentAddSys(sess, '⚠ Posted to #deployment-ops — deployment queue notified, owner assignment pending', 'var(--red)');
+  agentToast('⚠', 'Escalated — <strong>'+sess.merchant+'</strong> → deployment queue');
+  agentRenderRail();
+  agentRenderQueue();
+}
+
+/* ── draft send/cancel (re-declaration: adds 'depesc' kind + post-send NBA refresh) ── */
+function agentDraftSend(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || !sess._draft) return;
+  const d = sess._draft;
+  const bodyEl = document.getElementById(sess._draftId+'-body');
+  const bodyText = bodyEl ? bodyEl.innerText : d.body;
+  _agentFreezeDraft(sess, '<span class="agdk-sent">✓ '+(d.channel==='team'?'Posted':'Sent')+' · '+_agdkTime()+'</span>');
+  sess._draft = null;
+  if (d.kind === 'pend')        _agentPendCommit(sess, d, bodyText);
+  else if (d.kind === 'team')   _agentTeamCommit(sess, d, bodyText);
+  else if (d.kind === 'depesc') _agentDepEscCommit(sess, d, bodyText);
+  else                          _agentMsgCommit(sess, d, bodyText);
+  if (d.after === 'deploy-nba') _agentRefreshDeployNBA(sess);
+}
+(function(){
+  const _cancel = agentDraftCancel;
+  agentDraftCancel = function(name){
+    const sess = AGENT_DESK.sessions[name];
+    const after = sess && sess._draft && sess._draft.after;
+    _cancel(name);
+    if (after === 'deploy-nba') _agentRefreshDeployNBA(sess);   // the ops action itself stood — chips must reflect it
+  };
+})();
+
+/* ── queue-card states for deploy outcomes (wraps B2's) ── */
+(function(){
+  const _ds = _agdkDecisionState;
+  _agdkDecisionState = function(sess){
+    const d = sess.decision;
+    if (d) {
+      if (d.type === 'shipped')        return { t:'Shipped — tracking sent', c:'var(--green)' };
+      if (d.type === 'install-booked') return { t:'Install call booked', c:'var(--green)' };
+      if (d.type === 'dep-escalated')  return { t:'Escalated — deployment queue', c:'var(--red)' };
+    }
+    return _ds(sess);
+  };
+})();
+
+/* ── Deployment Record decision text for B3 outcomes (wraps B2's report builder) ── */
+(function(){
+  const _rep = _agentBuildReport;
+  _agentBuildReport = function(sess){
+    let html = _rep(sess);
+    const d = sess.decision;
+    if (d && (d.type === 'shipped' || d.type === 'install-booked' || d.type === 'dep-escalated')) {
+      let txt;
+      if (d.type === 'shipped') {
+        txt = '<b style="color:var(--green);">EQUIPMENT SHIPPED</b> at '+d.time+' — FedEx <b>'+d.code+'</b>, est. 2 business days to '+(d.shipTo||'the merchant')+'. Serial and payment were resolved in-session; the partner was notified with live tracking.';
+      } else if (d.type === 'install-booked') {
+        txt = '<b style="color:var(--green);">INSTALL CALL BOOKED</b> — '+d.slot+' (20-minute remote session). The activation watcher stays armed until the first settled batch; the account auto-activates on it.';
+      } else {
+        txt = '<b style="color:var(--red);">ESCALATED</b> to #deployment-ops at '+d.time+' — activation overdue with no first transaction. Deployment queue notified; owner assignment pending a direct call to the merchant.';
+      }
+      html = html.replace('No final decision this session — file remains in the deployment queue.', txt);
+    }
+    return html;
+  };
+})();
+/* ===== /AGENT DESK ===== */
+</script>
 </body>
 </html>
