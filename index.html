@@ -39815,5 +39815,293 @@ function _agentNextInQueue(exclude){
 initAgentDesk();
 /* ===== /AGENT DESK ===== */
 </script>
+
+<style>
+/* ===== AGENT DESK ===== */
+/* AI wiring: subtle "live" marker on timestamps of replies that came from the real model */
+.agdk-live{color:var(--green);font-weight:700;opacity:.85;}
+/* ===== /AGENT DESK ===== */
+</style>
+
+<script>
+/* ===== AGENT DESK ===== */
+/* ─────────────────────────────────────────────────────────────────────────────
+   AI WIRING — live free-text chat via the Pages Function at /api/agent/chat
+   (source: functions/api/agent/chat.js).
+
+   Contract:  POST /api/agent/chat
+              { token?, sessionType:'uw'|'deployment', merchant, board,
+                transcript:[{role,text}], message }  →  200 {text}
+              Anything else (404 on the static server, 4xx/5xx, timeout,
+              network error) → the client falls back to a canned deflection +
+              re-offered NBA chips. The demo never shows an error.
+
+   Local setup for LIVE replies:
+     1. echo 'ANTHROPIC_API_KEY=sk-ant-…' > .dev.vars        (git-ignored)
+     2. npx wrangler pages dev .                              (functions run)
+     Optional: DEMO_CHAT_TOKEN=… in .dev.vars locks the endpoint; mirror it
+     client-side with  window.AGENT_CHAT_TOKEN = '…'  in the console.
+   Under plain `python -m http.server` the POST 404s and every free-text turn
+   takes the deflection path — that is the expected static-demo mode.
+
+   Routing rule (scripted beats ALWAYS win):
+     composer text → _agentMatchScripted() → scripted flow if an intent matches
+     (pend / approve / message / team / serial / pay / ship / install /
+      escalate / docs / start / end / @team-note), gated to states where the
+     flow is actually on the table; otherwise → API attempt (8s abort) →
+     on 200 render as a normal agent message with a "· live" timestamp marker,
+     on any failure render a rotating deflection + current NBA chips.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── "· live" timestamp marker: injected into the message HTML string itself so
+   it persists in sess.threadHTML across session switches ── */
+(function(){
+  const _orig = _agentMsgHtml;
+  _agentMsgHtml = function(role, html){
+    let out = _orig(role, html);
+    if (window._agdkLiveMark && role === 'ai') {
+      out = out.replace(/<span class="atime">([^<]*)<\/span>/,
+        '<span class="atime">$1 <span class="agdk-live">· live</span></span>');
+    }
+    return out;
+  };
+})();
+
+/* ── intent matcher: decides scripted vs API. Substring/stem keywords, but each
+   decision intent is gated to the state where its flow is actually offered —
+   e.g. "approve" pre-verdict is NOT a beat (the flow isn't on the table yet),
+   so it routes to the API/deflection instead of firing a nonsensical flow. ── */
+function _agentMatchScripted(sess, val){
+  if (/^@team/i.test(val)) return 'teamnote';                    // legacy composer beat
+  const t = ' ' + val.toLowerCase() + ' ';
+  const uw = sess.kind === 'uw';
+  if (sess.ended) return null;                                    // wrapped file → free text only
+  if (!sess.goStarted && /\b(start|run|kick( it)? off|begin|go ahead|let'?s go)\b/.test(t)) return 'go';
+  if (uw && sess.verdict && !sess.decision) {
+    if (/pend/.test(t)) return 'pend';
+    if (/approv/.test(t)) return 'approve';
+  }
+  if (!uw && sess.goStarted) {
+    if (/serial/.test(t)) return 'serial';
+    if (/\bpay(ment)?\b|billing|invoice/.test(t)) return 'pay';
+    if (/\bship|\blabel\b|tracking/.test(t)) return 'ship';
+    if (/install/.test(t)) return 'install';
+    if (/escalat/.test(t)) return 'escalate';
+  }
+  if (uw && /escalat/.test(t)) return 'team';                     // UW escalation lives in Ask-the-team
+  if (/\bmessage\b|\bemail\b|\bnotify\b/.test(t)) return 'message';
+  if (/\bteam\b/.test(t)) return 'team';
+  if (/\bdocs\b|document/.test(t)) return 'docs';
+  if (/end (the |this )?session|wrap (it|this) up/.test(t)) return 'end';
+  return null;
+}
+
+/* run a scripted flow but suppress its canonical first user-echo — the composer
+   already rendered the user's actual words, so the flow shouldn't add a second
+   "⏸ Pend this file."-style bubble */
+function _agentSuppressEcho(run){
+  const orig = agentAddUserMsg;
+  let used = false;
+  agentAddUserMsg = function(s, h){ if (!used) { used = true; return; } orig(s, h); };
+  try { run(); } finally { agentAddUserMsg = orig; }
+}
+
+function _agentRunScripted(sess, intent){
+  if (intent === 'end') { agentEndSession(); return; }
+  if (intent === 'go') {
+    const go = sess.kind === 'uw' ? agentUWGo : agentDeployGo;
+    _agentSuppressEcho(function(){ go(sess.merchant); });
+    return;
+  }
+  const map = { pend:agentFlowPend, approve:agentFlowApprove, message:agentFlowMessage,
+    team:agentFlowTeam, serial:agentFlowSerial, pay:agentFlowPay, ship:agentFlowShip,
+    install:agentFlowInstall, escalate:agentFlowEscalate, docs:_agentShowDocs };
+  const fn = map[intent];
+  if (fn) _agentSuppressEcho(function(){ fn(sess); });
+}
+
+/* ── API payload builders: current session context, exactly what the function
+   grounds the model in ── */
+function _agentChatMerchant(sess){
+  const s = (sess.dr && sess.dr.synopsis) || {};
+  return {
+    name: sess.merchant,
+    partner: sess.m.partner || null,
+    status: sess.m.status || null,
+    risk: sess.m.risk || null,
+    mid: sess.m.mid || null,
+    monthlyVol: (s.business && s.business.monthlyVol) || sess.m.potVol || null,
+    business: s.business || null,
+    solution: s.solution || null,
+    solutionLabel: (sess.dr && sess.dr.solutionLabel) || null,
+    riskTier: sess.kind === 'uw' && sess.uwb ? (sess.uwb.riskTier || null) : null,
+  };
+}
+
+function _agentChatBoard(sess){
+  const b = { stage: sess.stage, verdict: sess.verdict || null,
+    decision: sess.decision || null, ended: !!sess.ended };
+  if (sess.kind === 'uw') {
+    /* pre-verdict, only send what has actually streamed back — no future leaks */
+    b.checks = sess.verdict ? ((sess.uwb && sess.uwb.checks) || []) : (sess.checkResults || []);
+    b.concurrence = (sess.uwb && sess.uwb.concurrence) || null;
+  } else {
+    const d = (sess.dr && sess.dr.deploy) || {};
+    b.steps = d.rail || [];
+    b.equipment = d.equipment || [];
+    b.overdue = d.overdue || null;
+  }
+  b.pends = (sess.dr && sess.dr.pends) || [];
+  b.comms = sess.comms || [];
+  b.docs = (sess.docs || []).map(d => d.name + ' (' + d.type + ')');
+  return b;
+}
+
+function _agentChatTranscript(sess){
+  return (sess.log || []).slice(-20).map(l => ({
+    role: l.who === 'Master Admin' ? 'user' : 'agent',
+    text: (l.who === 'System' ? '[system] ' : '') + l.text,
+  }));
+}
+
+/* ── deflection library: what plays when the API can't answer (static server,
+   5xx, timeout). Rotates per state bucket so back-to-back fallbacks never
+   repeat verbatim; buckets marked ● also re-offer the current NBA chips. ── */
+const _AGDK_DEFLECT = {
+  uwPre: [
+    'Noted — logged to the session. Most of that gets answered by the run itself: kick off the verification package and the six sources do the talking.',
+    'On the record. I’d rather ground that in real data — start the check run and I’ll have specifics instead of guesses.',
+  ],
+  uwRun: [
+    'Logged — the verification stream is still coming back. Give it a beat; the verdict will cover this.',
+    'Noted. Sources are mid-flight — I’ll fold that into the verdict in a moment.',
+  ],
+  uw: [        /* ● verdict on the table */
+    'Noted — logged to the session record. Here’s where I can take this file:',
+    'Good flag — it’s in the log. The moves on the table:',
+    'On the record. When you’re ready, the file’s next best actions:',
+    'Logged for the report. Your options from here:',
+  ],
+  uwDecided: [ /* ● decision already recorded */
+    'Noted — it’s in the session log, and the decision is already on the record. Still open to you:',
+    'Logged. This file is decided for the session — the follow-through moves:',
+  ],
+  deployPre: [
+    'Noted — logged to the session. Kick off the boarding-rail sync and most of that answers itself.',
+    'On the record. Start the rail sync and I’ll have live boarding data to work from.',
+  ],
+  deploy: [    /* ● rail synced */
+    'Noted — logged to the session. Here’s what moves this deployment forward:',
+    'Got it — in the record. The open moves on the fulfillment side:',
+    'Logged. These keep the boarding rail moving:',
+  ],
+  ended: [
+    'Noted — though this session is wrapped. The saved report has the full trail; reopen from the queue if the file needs another pass.',
+    'Logged. This file is closed out for the session — everything lives in the report on the merchant record.',
+  ],
+};
+
+/* spend the live NBA row (if any) and issue a fresh, state-appropriate one */
+function _agentReofferNBA(sess){
+  const old = document.getElementById('agdk-nba-' + _agdkSlug(sess.merchant));
+  if (old) {
+    old.removeAttribute('id');
+    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); });
+  }
+  _agentSnapshotActive();
+  if (sess.kind === 'deploy') { _agentAddDeployNBA(sess); return; }
+  const n = _agdkEsc(sess.merchant);
+  if (sess.decision) {
+    _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-' + _agdkSlug(sess.merchant) + '">' +
+      '<button class="agdk-chip" onclick="agentNBA(\'message\',\'' + n + '\')">✉ Message partner</button>' +
+      '<button class="agdk-chip" onclick="agentNBA(\'docs\',\'' + n + '\')">📄 View documents</button></div></div>');
+    return;
+  }
+  const locked = ((sess.uwb && sess.uwb.checks) || []).some(c => c.state === 'fail');
+  _agentAddNBA(sess, locked);
+}
+
+function _agentDeflect(sess){
+  let bucket, chips = false;
+  if (sess.ended) bucket = 'ended';
+  else if (sess.kind === 'uw') {
+    if (sess.decision)      { bucket = 'uwDecided'; chips = true; }
+    else if (sess.verdict)  { bucket = 'uw';        chips = true; }
+    else if (sess.goStarted)  bucket = 'uwRun';
+    else                      bucket = 'uwPre';
+  } else {
+    if (sess.goStarted)     { bucket = 'deploy';    chips = true; }
+    else                      bucket = 'deployPre';
+  }
+  const arr = _AGDK_DEFLECT[bucket];
+  sess._defIdx = sess._defIdx || {};
+  const i = sess._defIdx[bucket] || 0;
+  sess._defIdx[bucket] = i + 1;
+  agentAddMsg(sess, arr[i % arr.length]);
+  if (chips) _agentReofferNBA(sess);
+}
+
+/* ── the free-text turn: try the API, fall back seamlessly ── */
+async function _agentFreeText(sess, val){
+  const t0 = Date.now();
+  let reply = null;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(function(){ ctrl.abort(); }, 8000);
+    const res = await fetch('/api/agent/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        token: window.AGENT_CHAT_TOKEN,
+        sessionType: sess.kind === 'deploy' ? 'deployment' : 'uw',
+        merchant: _agentChatMerchant(sess),
+        board: _agentChatBoard(sess),
+        transcript: _agentChatTranscript(sess),
+        message: val,
+      }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data.text === 'string' && data.text.trim()) reply = data.text.trim();
+    }
+  } catch (e) { /* 404 / network / abort — deflection path */ }
+  /* minimum typing dwell so an instant local 404 still reads as the agent thinking */
+  const dwell = 850 - (Date.now() - t0);
+  if (dwell > 0) await _agdkWait(dwell);
+  if (_agentLive(sess)) agentRemoveTyping();
+  if (reply != null) {
+    window._agdkLiveMark = true;
+    agentAddMsg(sess, _agdkEscHtml(reply).replace(/\n/g, '<br>'));
+    window._agdkLiveMark = false;
+  } else {
+    _agentDeflect(sess);
+  }
+}
+
+/* ── composer (final re-declaration): scripted beats first, then the API ── */
+agentComposerSend = function(){
+  const ta = document.getElementById('agent-composer-input');
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!ta || !sess) return;
+  const val = (ta.value || '').trim();
+  if (!val) return;
+  ta.value = '';
+  const intent = _agentMatchScripted(sess, val);
+  agentAddUserMsg(sess, _agdkEscHtml(val));
+  if (intent === 'teamnote') {
+    agentAddSys(sess, '👥 Posted to the team thread — logged to session', 'var(--blue)');
+    sess.comms.push({ time:_agdkTime(), kind:'team', label:'Team note',
+      preview:_agdkStrip(val.replace(/^@team\s*/i, '')).slice(0, 110) });
+    agentRenderRail();
+    return;
+  }
+  if (intent) { _agentRunScripted(sess, intent); return; }
+  agentAddTyping(sess);
+  _agentFreeText(sess, val);
+};
+/* ===== /AGENT DESK ===== */
+</script>
 </body>
 </html>
