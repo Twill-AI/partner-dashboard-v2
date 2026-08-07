@@ -13352,8 +13352,19 @@ function navigateToMerchant(name, status) {
     if (hasCCContent) setTimeout(() => injectMerchantThread(name), 180);
   }
 
-  // Sig / UW — full-screen chat overlay (takes priority over deal room)
-  if (status === 'signature' || status === 'underwriting') {
+  // AGENT DESK — signature stage: the full-screen Signature session is the DEFAULT surface.
+  // The legacy sig overlay never mounts for signature merchants anymore; teardown first so
+  // its classes can't leak onto the record. agentBackToMerchant sets _agdkSuppressSigSession
+  // so "← Merchant record" lands on the record (Deal Room / read-only app) instead of looping.
+  if (status === 'signature' && !window._agdkSuppressSigSession) {
+    document.getElementById('view-merchant-detail')?.classList.remove('sig-uw-active','uw-bench-active');
+    document.getElementById('sig-uw-mode-toggle')?.classList.remove('visible');
+    agentOpenSession(name, 'sig');
+    return;
+  }
+
+  // UW — full-screen chat overlay (takes priority over deal room)
+  if (status === 'underwriting') {
     _currentSBMerchant = name;
     document.getElementById('md-merchant-name').textContent = name;
     showView('merchant-detail', null);
@@ -14331,6 +14342,11 @@ const merchantData = [
     notes:[], actionItem:'No action needed — healthy account', potVol:'$35K', volMTD:'$22,340', residual:'$559', lastBatch:{amt:'$1,180',date:'Mar 2'}, mca:null, created:'Dec 3, 2025', lastAct:'3d ago', recent24h:false },
   { name:'Neon Nightclub LA',     mid:'Pending',        status:'signature',    risk:'High',   tags:[],                    partner:'NovaPay',          assignee:'M. Wright', avColor:'#A09E9A', av:'MW',
     notes:[{icon:'💬',cls:'ni-msg',tip:'Message: "Contract sent to owner for e-signature"'}], actionItem:'Follow up on e-signature — sent 2 days ago', potVol:'$200K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Mar 1, 2026', lastAct:'1d ago', recent24h:false },
+  /* AGENT DESK — signature-stage demo merchants (Command Center wq-002 / wq-018 + pipeline strip already reference both) */
+  { name:'Metro Print Shop',      mid:'Pending',        status:'signature',    risk:'Medium', tags:['Action Required'],   partner:'Rivermark',        assignee:'M. Wright', avColor:'#A09E9A', av:'MW',
+    notes:[{icon:'💬',cls:'ni-msg',tip:'Signature package expiring — merchant has not opened it'}], actionItem:'Envelope expires tonight — re-send the signature package', potVol:'$24K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Mar 6, 2026', lastAct:'2d ago', recent24h:false },
+  { name:'Pinnacle Fitness',      mid:'Pending',        status:'signature',    risk:'Low',    tags:[],                    partner:'Apex Elite',       assignee:'J. Rivera',  avColor:'#6B839B', av:'JR',
+    notes:[{icon:'💬',cls:'ni-msg',tip:'Signed packet received — document QC outstanding'}], actionItem:'Package executed — verify documents, then submit to UW', potVol:'$52K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Mar 4, 2026', lastAct:'6h ago', recent24h:true },
   { name:'Fresh Brew Coffee Co.', mid:'Pending',        status:'lead',         risk:'Low',    tags:[],                    partner:'Internal',         assignee:'J. Rivera',  avColor:'#6B839B', av:'JR',
     notes:[{icon:'💬',cls:'ni-msg',tip:'New inbound lead — owner inquired through website'}], actionItem:'Schedule discovery call — new inbound lead', potVol:'$40K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Mar 10, 2026', lastAct:'1h ago', recent24h:true },
   { name:'Harborlight Dental',    mid:'Pending',        status:'lead',         risk:'Low',    tags:[],                    partner:'NovaPay',          assignee:'M. Wright', avColor:'#A09E9A', av:'MW',
@@ -16273,7 +16289,7 @@ async function runFreshBrewLiveDemo() {
   sigUWRemoveTyping();
   sigUWAddMessage('ai',
     '&#x1F4E8; <strong>Signature packet sent to Sarah Chen</strong> via DocuSign at sarah@freshbrewcoffee.com<br><br>' +
-    'Package contains: Merchant Processing Agreement, First Data IC+ Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
+    'Package contains: Merchant Processing Agreement, IC+ Program Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
     'I\'ll surface all activity here in real-time as she reviews and signs.');
 
   await pwait(2000);
@@ -16321,7 +16337,7 @@ function setSUMode(mode) {
     if (ta) ta.placeholder = 'Message to ' + (mNameEl ? mNameEl.textContent.trim() : 'merchant') + '…';
   } else if (mode === 'uw') {
     const el = document.getElementById('suUW'); if (el) el.className = 'mbtn int-on';
-    if (ta) ta.placeholder = 'Message to First Data UW team (uw@firstdataomaha.com)…';
+    if (ta) ta.placeholder = 'Message to the underwriting team…';
   }
 }
 
@@ -16421,7 +16437,7 @@ function populateSigUWThread() {
     sys('Application submitted · 8 of 8 documents complete · package score 94/100', '2:24 PM', 'var(--green)');
     msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
       '📨 <strong>Signature packet sent to Sarah Chen</strong> via DocuSign at sarah@freshbrewcoffee.com<br><br>' +
-      'Package contains: Merchant Processing Agreement, First Data IC+ Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
+      'Package contains: Merchant Processing Agreement, IC+ Program Pricing Schedule, and Equipment Order (PAX A920 Pro). ' +
       'I\'ll surface all activity here in real-time as she reviews and signs.',
       '2:28 PM');
     sys('Sarah Chen opened the signature request', '2:31 PM', 'var(--blue)');
@@ -16441,11 +16457,11 @@ function populateSigUWThread() {
       '📊 Package score: <strong style="color:var(--green);">94 / 100</strong> — Strong. No UW red flags detected. Approval likelihood: <strong style="color:var(--green);">High</strong>.', '2:41 PM');
     sys('🎉 Sarah Chen signed! Full execution complete.', '2:47 PM', 'var(--green)');
     msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-      '✅ <strong>Merchant signed.</strong> Submitting complete package to First Data Omaha underwriting…<br><br>' +
+      '✅ <strong>Merchant signed.</strong> Submitting complete package to underwriting…<br><br>' +
       'Submission includes all 8 documents, AI analysis summary, IC+ pricing schedule, and equipment order.', '2:48 PM');
-    sys('Submitted to First Data Omaha UW · Case #FD-2026-04891 created', '2:48 PM', 'var(--blue)');
+    sys('Submitted to underwriting · Case #UW-2026-04891 created', '2:48 PM', 'var(--blue)');
     msg(AI_AV, AI_BG, AI_C, 'Twill AI', 'Internal', 'int',
-      '📬 <strong>UW submission confirmed.</strong> Case <strong>#FD-2026-04891</strong> assigned to First Data Omaha.<br><br>' +
+      '📬 <strong>UW submission confirmed.</strong> Case <strong>#UW-2026-04891</strong> assigned to the underwriting queue.<br><br>' +
       'Estimated decision: <strong>24–48 hours.</strong> Current queue position: 3 of 18. ' +
       'I\'ll monitor for any UW questions, pends, or decisions and surface them here automatically.', '2:49 PM');
 
@@ -16595,7 +16611,7 @@ async function startPartnerSharedThread() {
   await pwait(500);
 
   // AI message: signature sent
-  partnerAddMessage('ai', '📨 <strong>Signature request sent</strong> to Sarah Chen (sarah@pacificcoastretail.com)<br><br>The merchant processing agreement for First Data Omaha has been delivered via DocuSign. You\'ll see their activity here in real-time.');
+  partnerAddMessage('ai', '📨 <strong>Signature request sent</strong> to Sarah Chen (sarah@pacificcoastretail.com)<br><br>The merchant processing agreement has been delivered via DocuSign. You\'ll see their activity here in real-time.');
 
   await pwait(1000);
   partnerAddNotification('<span class="pn-icon">👀</span> <span>Sarah Chen opened the signature request</span>');
@@ -17476,8 +17492,8 @@ const DEMO_EVENTS = [
   // ─── SIGNATURE STAGE ───
   { type:'status', status:'signature', label:'Sent for Signature', delay:0 },
   { type:'sys', color:'var(--green)', text:'Application package sent to sarah@freshbrewcoffee.com for e-signature', delay:800 },
-  { type:'sys', color:'var(--blue)', text:'Solution: First Data Omaha + PAX A920 Pro · IC+ 0.25% + $0.10 · NMI Gateway', delay:600 },
-  { type:'ai', text:'Hi Sarah! Your merchant processing agreement for Fresh Brew Coffee Co. is ready for review and signature.\n\nI\'ve attached the full application with:\n• <strong>First Data Omaha</strong> processing — IC+ pricing at 0.25% + $0.10\n• <strong>PAX A920 Pro</strong> terminal with built-in tipping\n• <strong>NMI Gateway</strong> for your WooCommerce online orders\n\nPlease review everything and sign when ready. I\'m here if you have any questions!', mode:'out', delay:1200 },
+  { type:'sys', color:'var(--blue)', text:'Solution: IC+ Program — PAX A920 Pro · IC+ 0.25% + $0.10 · NMI Gateway', delay:600 },
+  { type:'ai', text:'Hi Sarah! Your merchant processing agreement for Fresh Brew Coffee Co. is ready for review and signature.\n\nI\'ve attached the full application with:\n• <strong>IC+ pricing program</strong> — 0.25% + $0.10\n• <strong>PAX A920 Pro</strong> terminal with built-in tipping\n• <strong>NMI Gateway</strong> for your WooCommerce online orders\n\nPlease review everything and sign when ready. I\'m here if you have any questions!', mode:'out', delay:1200 },
   { type:'sys', color:'var(--text-muted)', text:'Follow-up sequence scheduled: Day 1, 2, 3, 5, 7', delay:500 },
   { type:'ai', text:'Application sent. Follow-up automation is active — I\'ll nudge Sarah if she hasn\'t signed within 24 hours. Estimated time to signature: 1-2 days based on similar QSR merchants.', mode:'int', delay:1000 },
 
@@ -17502,7 +17518,7 @@ const DEMO_EVENTS = [
   { type:'merchant', sender:'Sarah Chen', text:'Here you go! I have the statements from my Chase business account and a voided check.', delay:2500 },
   { type:'merchant-doc', sender:'Sarah Chen', docs:['FreshBrew_BankStmt_Jan2026.pdf','FreshBrew_BankStmt_Feb2026.pdf','FreshBrew_BankStmt_Mar2026.pdf','VoidedCheck_Chase.pdf'], delay:800 },
   { type:'ai-thinking', text:'4 documents received. Analyzing bank statements and voided check...', delay:1200 },
-  { type:'ai', text:'Documents analyzed:\n\n<strong>Bank Statements (3 months):</strong>\n✅ Account holder matches: Fresh Brew Coffee Co.\n✅ Average monthly deposits: $38,200 — consistent with $40K stated volume\n✅ No NSF/overdraft flags\n✅ Consistent daily deposits suggest card processing revenue\n\n<strong>Voided Check:</strong>\n✅ Chase Business Checking confirmed\n✅ Routing/Account numbers captured\n\n📋 <strong>Application is now 100% complete.</strong> Submitting to First Data Omaha underwriting.', mode:'int', delay:1500 },
+  { type:'ai', text:'Documents analyzed:\n\n<strong>Bank Statements (3 months):</strong>\n✅ Account holder matches: Fresh Brew Coffee Co.\n✅ Average monthly deposits: $38,200 — consistent with $40K stated volume\n✅ No NSF/overdraft flags\n✅ Consistent daily deposits suggest card processing revenue\n\n<strong>Voided Check:</strong>\n✅ Chase Business Checking confirmed\n✅ Routing/Account numbers captured\n\n📋 <strong>Application is now 100% complete.</strong> Submitting to underwriting.', mode:'int', delay:1500 },
   { type:'ai', text:'Perfect, Sarah! Everything looks great. I\'ve submitted your complete application package to underwriting.', mode:'out', delay:800 },
 
   // ─── EQUIPMENT CHANGE SCENARIO ───
@@ -17516,11 +17532,11 @@ const DEMO_EVENTS = [
 
   // ─── UNDERWRITING STAGE ───
   { type:'status', status:'underwriting', label:'In Underwriting', delay:1500 },
-  { type:'sys', color:'var(--purple)', text:'Application submitted to First Data Omaha underwriting · Ref #FD-2026-78234', delay:800 },
+  { type:'sys', color:'var(--purple)', text:'Application submitted to underwriting · Ref #UW-2026-78234', delay:800 },
   { type:'divider', label:'Next Day · Mar 13', delay:1500 },
 
   // UW pend comes in
-  { type:'processor', sender:'First Data UW', text:'<strong>Underwriting Pend Notice — Ref #FD-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\nMCC: 5812\n\nThe following items are required before approval:\n\n1. <strong>Business License</strong> — Please provide current city/county business license.\n2. <strong>Ownership Clarification</strong> — Application lists Sarah Chen at 100% ownership, however the Secretary of State filing shows Fresh Brew Coffee LLC with two members listed. Please clarify ownership structure and provide any amendments if applicable.\n\nPlease respond within 5 business days.\n\n— First Data Underwriting Team', delay:2000 },
+  { type:'processor', sender:'Underwriting', text:'<strong>Underwriting Pend Notice — Ref #UW-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\nMCC: 5812\n\nThe following items are required before approval:\n\n1. <strong>Business License</strong> — Please provide current city/county business license.\n2. <strong>Ownership Clarification</strong> — Application lists Sarah Chen at 100% ownership, however the Secretary of State filing shows Fresh Brew Coffee LLC with two members listed. Please clarify ownership structure and provide any amendments if applicable.\n\nPlease respond within 5 business days.\n\n— Underwriting Team', delay:2000 },
   { type:'ai-thinking', text:'UW pend received. Analyzing requirements against available data...\n\n1. Business License — not in our files, need from merchant.\n2. Ownership — UW found a discrepancy. Let me check the SOS filing...', delay:1500 },
   { type:'ai', text:'<strong>🔍 UW Pend Analysis:</strong>\n\n<strong>1. Business License</strong> — We don\'t have this on file. Need to request from Sarah.\n\n<strong>2. Ownership Discrepancy</strong> — This is interesting. The SOS filing shows Fresh Brew Coffee LLC was formed with two members. The application lists Sarah Chen at 100%. Possible scenarios:\n• Second member may have been bought out\n• Could be an operating agreement vs. formation docs difference\n• May need an amendment or letter of explanation\n\n<strong>Recommended action:</strong> Ask Sarah to clarify the ownership structure and provide the business license. If the second member was bought out, a simple amendment or letter will satisfy this.\n\n<em>This is a routine pend — not a red flag. Typical resolution: 1-2 days.</em>', mode:'int', delay:1800 },
   { type:'ai', text:'Hi Sarah! Good news — underwriting is reviewing your application and just needs two quick items:\n\n1. 📄 <strong>Your current business license</strong> (city or county)\n2. 📋 <strong>Ownership clarification</strong> — the state filing shows Fresh Brew Coffee LLC was originally formed with two members, but your application lists you as 100% owner. Can you confirm? If there was a change in ownership, a brief letter explaining it will work.\n\nYou can upload the docs right here or snap a photo — whatever\'s easiest!', mode:'out', delay:1500 },
@@ -17532,17 +17548,17 @@ const DEMO_EVENTS = [
   { type:'ai', text:'<strong>✅ UW Pend Resolution:</strong>\n\n<strong>1. Business License:</strong>\n✅ City of Portland Business License — current through Dec 2026\n✅ Business name matches: Fresh Brew Coffee LLC\n\n<strong>2. Ownership Amendment:</strong>\n✅ LLC Amendment filed June 2024 with Oregon Secretary of State\n✅ Transfer of 30% membership interest from Linda Chen to Sarah Chen\n✅ Sarah Chen confirmed as 100% sole member effective June 15, 2024\n✅ Amendment is notarized and state-filed — this fully satisfies the UW pend\n\n<strong>All underwriting requirements satisfied.</strong> Sending response to processor now.', mode:'int', delay:1500 },
 
   // Send to processor
-  { type:'processor-out', sender:'Twill AI', text:'<strong>Re: Pend Response — Ref #FD-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\n\nPlease find attached documentation addressing both pend items:\n\n1. <strong>Business License</strong> — City of Portland Business License, current through December 2026. (attached)\n\n2. <strong>Ownership Clarification</strong> — The LLC was originally formed with two members (Sarah Chen 70%, Linda Chen 30%). Ownership was fully transferred to Sarah Chen via LLC Amendment filed with the Oregon Secretary of State on June 15, 2024. Sarah Chen is the sole member at 100%. Amendment document attached.\n\nAll items have been verified. Please proceed with underwriting review.\n\nBest regards,\nTwill Processing Team', delay:1500 },
-  { type:'sys', color:'var(--green)', text:'✅ UW pend response sent to First Data with 2 supporting documents', delay:600 },
+  { type:'processor-out', sender:'Twill AI', text:'<strong>Re: Pend Response — Ref #UW-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\n\nPlease find attached documentation addressing both pend items:\n\n1. <strong>Business License</strong> — City of Portland Business License, current through December 2026. (attached)\n\n2. <strong>Ownership Clarification</strong> — The LLC was originally formed with two members (Sarah Chen 70%, Linda Chen 30%). Ownership was fully transferred to Sarah Chen via LLC Amendment filed with the Oregon Secretary of State on June 15, 2024. Sarah Chen is the sole member at 100%. Amendment document attached.\n\nAll items have been verified. Please proceed with underwriting review.\n\nBest regards,\nTwill Processing Team', delay:1500 },
+  { type:'sys', color:'var(--green)', text:'✅ UW pend response sent to underwriting with 2 supporting documents', delay:600 },
   { type:'ai', text:'Great news Sarah! I\'ve reviewed your documents and sent everything to underwriting. Your business license and the ownership amendment fully address their questions. You should hear back within 24 hours. I\'ll let you know the moment we have a decision! 🎉', mode:'out', delay:1200 },
-  { type:'ai', text:'All UW pends resolved and response sent to First Data. Documents verified — ownership chain is clean. Expecting approval decision within 24 hours. No further action needed from merchant.', mode:'int', delay:1000 },
+  { type:'ai', text:'All UW pends resolved and response sent to underwriting. Documents verified — ownership chain is clean. Expecting approval decision within 24 hours. No further action needed from merchant.', mode:'int', delay:1000 },
 
   // ─── APPROVAL ───
   { type:'divider', label:'Next Day · Mar 14', delay:2000 },
-  { type:'processor', sender:'First Data UW', text:'<strong>APPROVAL NOTICE — Ref #FD-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\nMID: 4812-7823-0034\nStatus: <strong style="color:#22C55E;">APPROVED</strong>\n\nTerminal deployment authorized.\nGateway credentials will be emailed within 24 hours.\n\nPlease proceed with equipment deployment.\n\n— First Data Underwriting Team', delay:2000 },
+  { type:'processor', sender:'Underwriting', text:'<strong>APPROVAL NOTICE — Ref #UW-2026-78234</strong>\n\nMerchant: Fresh Brew Coffee Co.\nMID: 4812-7823-0034\nStatus: <strong style="color:#22C55E;">APPROVED</strong>\n\nTerminal deployment authorized.\nGateway credentials will be emailed within 24 hours.\n\nPlease proceed with equipment deployment.\n\n— Underwriting Team', delay:2000 },
   { type:'status', status:'approved', label:'Approved!', delay:500 },
   { type:'sys', color:'var(--green)', text:'🎉 APPLICATION APPROVED — MID: 4812-7823-0034 assigned', delay:800 },
-  { type:'ai', text:'<strong>🎉 Fresh Brew Coffee Co. is APPROVED!</strong>\n\nMID: 4812-7823-0034\nProcessor: First Data Omaha\n\nStarting deployment sequence:\n1. ✅ MID assigned\n2. 📱 PAX A920 Pro (counter) — ordering now, ships in 2-3 days\n3. 📲 PAX A77 (mobile) — ordering now, ships in 2-3 days\n4. 🔌 NMI gateway credentials — will be emailed within 24 hours\n5. 📅 Scheduling activation support\n\nNotifying merchant now.', mode:'int', delay:1500 },
+  { type:'ai', text:'<strong>🎉 Fresh Brew Coffee Co. is APPROVED!</strong>\n\nMID: 4812-7823-0034\nProgram: IC+ Program\n\nStarting deployment sequence:\n1. ✅ MID assigned\n2. 📱 PAX A920 Pro (counter) — ordering now, ships in 2-3 days\n3. 📲 PAX A77 (mobile) — ordering now, ships in 2-3 days\n4. 🔌 NMI gateway credentials — will be emailed within 24 hours\n5. 📅 Scheduling activation support\n\nNotifying merchant now.', mode:'int', delay:1500 },
   { type:'ai', text:'Sarah, amazing news — <strong>you\'re approved!</strong> 🎉\n\nHere\'s what happens next:\n\n📦 Your equipment is being shipped to:\n2847 NW Thurman St, Portland, OR 97210\n\n📱 <strong>PAX A920 Pro</strong> (for your counter)\n📲 <strong>PAX A77</strong> (for farmers markets & catering)\nExpected delivery: 2-3 business days\n\n🔑 Your <strong>NMI gateway login</strong> for online order payments will be emailed within 24 hours.\n\nOnce your terminals arrive, I\'ll walk you through the 10-minute setup for each — it\'s really easy. You\'ll be processing your first transaction before your next coffee roast! ☕\n\nCongratulations!', mode:'out', delay:1500 },
 
   { type:'end', delay:1000 },
@@ -17581,7 +17597,7 @@ function buildDemoView() {
         <div style="cursor:pointer;font-size:14px;color:var(--text-muted);" onclick="resetDemo()">←</div>
         <div style="font-size:15px;font-weight:700;letter-spacing:-.2px;">Fresh Brew Coffee Co.</div>
         <div id="demo-status-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(167,139,250,.12);color:#A78BFA;text-transform:uppercase;letter-spacing:.05em;">Sent for Signature</div>
-        <div style="font-size:11px;color:var(--text-muted);">Sarah Chen · MCC 5812 · First Data Omaha</div>
+        <div style="font-size:11px;color:var(--text-muted);">Sarah Chen · MCC 5812 · IC+ Program</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="demo-auto-indicator" style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);font-size:10px;font-weight:600;color:#22C55E;">
@@ -17609,7 +17625,7 @@ function buildDemoView() {
         </div>
         <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:6px;">Solution</div>
-          <div style="font-size:11px;font-weight:600;margin-bottom:2px;">First Data Omaha</div>
+          <div style="font-size:11px;font-weight:600;margin-bottom:2px;">IC+ Program</div>
           <div style="font-size:10px;color:var(--text-secondary);">IC+ 0.25% + $0.10 · NMI Gateway</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">Est. savings vs Square: $3,800/yr</div>
         </div>
@@ -18110,7 +18126,7 @@ function buildEquipmentEditorHTML() {
       <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Equipment Configuration</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Fresh Brew Coffee Co. · First Data Omaha</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Fresh Brew Coffee Co. · IC+ Program</div>
         </div>
         <button onclick="closeEquipmentEditor()" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--border-strong);background:transparent;color:var(--text-muted);font-size:14px;cursor:pointer;">✕</button>
       </div>
@@ -35268,18 +35284,18 @@ async function handleMerchantSigned() {
     await pwait(900);
     sigUWRemoveTyping();
     sigUWAddMessage('ai',
-      '&#x2705; <strong>Merchant signed.</strong> Submitting complete package to First Data Omaha underwriting&hellip;<br><br>' +
+      '&#x2705; <strong>Merchant signed.</strong> Submitting complete package to underwriting&hellip;<br><br>' +
       'Submission includes all 8 documents, AI analysis summary, IC+ pricing schedule, and equipment order.');
 
     await pwait(1500);
-    sigUWAddSys('Submitted to First Data Omaha UW &middot; Case #FD-2026-04891 created', 'var(--blue)');
+    sigUWAddSys('Submitted to underwriting &middot; Case #UW-2026-04891 created', 'var(--blue)');
 
     await pwait(800);
     sigUWAddTyping();
     await pwait(1100);
     sigUWRemoveTyping();
     sigUWAddMessage('ai',
-      '&#x1F4EC; <strong>UW submission confirmed.</strong> Case <strong>#FD-2026-04891</strong> assigned to First Data Omaha.<br><br>' +
+      '&#x1F4EC; <strong>UW submission confirmed.</strong> Case <strong>#UW-2026-04891</strong> assigned to the underwriting queue.<br><br>' +
       'Estimated decision: <strong>24&ndash;48 hours.</strong> Current queue position: 3 of 18. ' +
       'I\'ll monitor for any UW questions, pends, or decisions and surface them here automatically.');
 
@@ -35295,7 +35311,7 @@ async function handleMerchantSigned() {
     if (uwCheck) {
       uwCheck.style.opacity = '1';
       uwCheck.innerHTML = '<div class="sig-uw-check-icon" style="background:rgba(245,158,11,.12);color:var(--amber);">&#x23F3;</div>' +
-        '<div><div style="color:var(--text-primary);font-weight:500;">Submitted to UW</div><div style="font-size:10px;color:var(--text-muted);">Case #FD-2026-04891</div></div>';
+        '<div><div style="color:var(--text-primary);font-weight:500;">Submitted to UW</div><div style="font-size:10px;color:var(--text-muted);">Case #UW-2026-04891</div></div>';
     }
   } else {
     // ── Original expanded-chat flow ───────────────────────────────
@@ -35348,12 +35364,12 @@ async function handleQuestionnaireDone() {
   if (inSigUW) {
     sigUWAddSys('&#x2705; All questionnaires completed &mdash; ready for UW review', 'var(--green)');
     await pwait(600);
-    sigUWAddMessage('ai', '&#x1F4CB; All merchant questionnaires are complete. The First Data Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
+    sigUWAddMessage('ai', '&#x1F4CB; All merchant questionnaires are complete. The Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
       '<strong>Application status:</strong> Ready for UW review');
   } else {
     partnerAddNotification('<span class="pn-icon">&#x2705;</span> <strong>All questionnaires completed</strong> &mdash; application is ready for underwriting review');
     await pwait(600);
-    partnerAddMessage('ai', '&#x1F4CB; All merchant questionnaires are complete. The First Data Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
+    partnerAddMessage('ai', '&#x1F4CB; All merchant questionnaires are complete. The Retail Questionnaire and E-commerce Addendum have been auto-filled based on Sarah\'s responses.<br><br>' +
       '<strong>Application status:</strong> Ready for UW review<br>' +
       '<span style="font-size:11px;color:var(--text-muted);">Use the buttons below to simulate underwriting actions.</span>');
   }
@@ -37310,7 +37326,11 @@ function _agentSeedDocs(name, dr){
 
 function _agentCreateSession(name){
   const m = merchantData.find(x => x.name === name) || { name, partner:'—', risk:'—', tags:[] };
-  const kind = (m.status==='approved' || m.status==='boarding') ? 'deploy' : 'uw';
+  /* 'sig' = signature & documents session (default for signature-stage merchants).
+     A merchant the scripted Neon beat has moved into the UW queue (extraQueue) opens as UW. */
+  const kind = AGENT_DESK._pendingKind ||
+    ((m.status==='approved' || m.status==='boarding') ? 'deploy'
+      : (m.status==='signature' && !AGENT_DESK.extraQueue.includes(name)) ? 'sig' : 'uw');
   const dr = (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name]) || null;
   const uwb = kind==='uw' ? ((typeof UW_WORKBENCH_DATA !== 'undefined' && UW_WORKBENCH_DATA[name]) || _uwbDefaultData(name)) : null;
   const sess = {
@@ -37323,6 +37343,7 @@ function _agentCreateSession(name){
     comms: [],               // partner comms log: {time, to, label, preview}
     docs: _agentSeedDocs(name, dr),
   };
+  if (kind === 'sig' && typeof _agentSigInit === 'function') _agentSigInit(sess);
   AGENT_DESK.sessions[name] = sess;
   return sess;
 }
@@ -37389,9 +37410,11 @@ function agentOpenSession(name){
   AGENT_DESK.active = name;
   const title = document.getElementById('agent-session-title');
   const sub = document.getElementById('agent-session-sub');
-  if (title) title.textContent = (sess.kind==='uw' ? 'UW Session — ' : 'Deployment Session — ') + name;
+  if (title) title.textContent = (sess.kind==='uw' ? 'UW Session — ' : sess.kind==='sig' ? 'Signature Session — ' : 'Deployment Session — ') + name;
   if (sub) sub.textContent = sess.kind==='uw'
     ? (sess.m.partner||'—') + ' · ' + (sess.uwb.riskTier||'') + ' · queued ' + (sess.uwb.queuedOn||'—')
+    : sess.kind==='sig'
+    ? (sess.m.partner||'—') + ' · ' + (sess.sig ? sess.sig.p.program : '') + ' · ' + (sess.sig ? sess.sig.statusLabel() : '')
     : (sess.m.partner||'—') + ' · ' + (sess.dr ? sess.dr.solutionLabel : '');
   const thread = document.getElementById('agent-thread');
   if (thread) { thread.innerHTML = sess.threadHTML; }
@@ -37425,6 +37448,18 @@ function _agentIntroHtml(sess){
       kv('Solution', sess.dr ? sess.dr.solutionLabel : sol.name) + kv('Risk tier', sess.uwb.riskTier) +
       '</div><div style="margin-top:8px;">Six checks are staged — MATCH, OFAC, TIN, GIACT bank, credit, KYB. Ready when you are.</div>';
   }
+  if (sess.kind === 'sig') {
+    const p = sess.sig.p, pb = p.business || {};
+    return '<b>'+sess.merchant+'</b> is at the signature &amp; documents stage. The shape of the deal:' +
+      '<div style="margin-top:7px;">' +
+      kv('Partner', sess.m.partner) + kv('Business', b.type || pb.type) + kv('Location', b.location || pb.location) +
+      kv('Monthly volume', b.monthlyVol || pb.monthlyVol || sess.m.potVol) + kv('Owner', b.owner || pb.owner) +
+      kv('Prior provider', b.prevProcessor || pb.prevProcessor) +
+      kv('Program', p.program) + kv('Pricing', p.pricing) +
+      '</div>' +
+      (p.stateNote ? '<div style="margin-top:8px;color:'+(p.state==='executed' ? 'var(--green)' : 'var(--amber)')+';font-weight:600;">'+p.stateNote+'</div>' : '') +
+      '<div style="margin-top:8px;">Running the readiness pre-flight — required fields, docs to collect, and which program addenda this deal shape needs.</div>';
+  }
   const rail = (sess.dr && sess.dr.deploy && sess.dr.deploy.rail) || [];
   const mid = rail.length && rail[0].state==='done' ? rail[0].val : sess.m.mid;
   const overdue = sess.dr && sess.dr.deploy && sess.dr.deploy.overdue;
@@ -37439,20 +37474,25 @@ function _agentIntroHtml(sess){
 
 function _agentAddGo(sess){
   const id = 'agdk-go-' + _agdkSlug(sess.merchant);
-  const fn = sess.kind==='uw' ? 'agentUWGo' : 'agentDeployGo';
-  const hint = sess.kind==='uw' ? 'Runs the 6-check verification package' : 'Syncs the boarding rail, then walks the decisions';
+  const fn = sess.kind==='uw' ? 'agentUWGo' : sess.kind==='sig' ? 'agentSigGo' : 'agentDeployGo';
+  const sigExec = sess.kind==='sig' && sess.sig && sess.sig.executed;
+  const label = sess.kind==='sig' ? (sigExec ? 'Pick up the executed package ▶' : 'Assemble &amp; send ▶') : 'Let’s start this ▶';
+  const hint = sess.kind==='uw' ? 'Runs the 6-check verification package'
+    : sess.kind==='sig' ? (sigExec ? 'Files the signed package, extracts fields, QCs the documents' : 'Assembles the package, routes ordered signers, watches the envelope')
+    : 'Syncs the boarding rail, then walks the decisions';
   _agentFinal(sess, '<div class="act" id="'+id+'"><div style="margin-left:26px;display:flex;align-items:center;gap:10px;padding:4px 0 6px;">' +
-    '<button class="btn btn-primary" style="font-size:13px;padding:9px 18px;" onclick="'+fn+'(\''+_agdkEsc(sess.merchant)+'\')">Let’s start this ▶</button>' +
+    '<button class="btn btn-primary" style="font-size:13px;padding:9px 18px;" onclick="'+fn+'(\''+_agdkEsc(sess.merchant)+'\')">'+label+'</button>' +
     '<span style="font-size:11px;color:var(--text-muted);">'+hint+'</span></div></div>');
 }
 
 async function _agentIntro(sess){
-  agentAddSys(sess, 'Session opened — ' + (sess.kind==='uw' ? 'underwriting queue' : 'deployment queue'), 'var(--blue)');
+  agentAddSys(sess, 'Session opened — ' + (sess.kind==='uw' ? 'underwriting queue' : sess.kind==='sig' ? 'signature & documents queue' : 'deployment queue'), 'var(--blue)');
   agentAddTyping(sess);
   await _agdkWait(850);
   agentRemoveTyping();
   agentAddMsg(sess, _agentIntroHtml(sess));
   sess.stage = 'intro';
+  if (sess.kind === 'sig' && typeof _agentSigPreflight === 'function') await _agentSigPreflight(sess);
   await _agdkWait(150);
   _agentAddGo(sess);
   agentRenderQueue();
@@ -37839,6 +37879,7 @@ function agentRenderRail(){
   if (!host) return;
   const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
   if (!sess) { host.innerHTML = ''; return; }
+  if (sess.kind === 'sig' && typeof _agentSigRailHtml === 'function') { host.innerHTML = _agentSigRailHtml(sess); return; }
   const s = (sess.dr && sess.dr.synopsis) || {};
   const b = s.business || {}, sol = s.solution || {};
   const kv = (k,v) => v ? '<div class="agdk-kv"><span>'+k+'</span><b>'+v+'</b></div>' : '';
@@ -38007,6 +38048,8 @@ const AGENT_PARTNER_REPS = {
   'Priority Commerce': { rep:'Dana Whitfield', email:'ops@prioritycommerce.com' },
   'NovaPay':           { rep:'Marcus Cole',    email:'ops@novapay.com' },
   'Coastal Commerce':  { rep:'Jenna Ortiz',    email:'boarding@coastalcommerce.com' },
+  'Rivermark':         { rep:'Priya Shah',     email:'ops@rivermark.com' },
+  'Apex Elite':        { rep:'James Harmon',   email:'jharmon@apexelite.com' },
 };
 const AGENT_PROCESSORS = {
   'Pacific Coast Retail':'First Data Omaha', 'Maple Street Bakery':'First Data Omaha',
@@ -38093,6 +38136,7 @@ function _agdkDecisionState(sess){
     if (d.type === 'approved')  return { t:'Approved ✓', c:'var(--green)' };
     if (d.type === 'pended')    return { t:'Pended — awaiting partner', c:'var(--amber)' };
     if (d.type === 'escalated') return { t:'Escalated to risk team', c:'var(--red)' };
+    if (d.type === 'sig-submitted') return { t:'Submitted to UW ✓', c:'var(--green)' };
   }
   if (sess.ended) return { t:'Session ended — report available', c:'var(--text-muted)' };
   return null;
@@ -38276,7 +38320,9 @@ function _agentDraftCard(sess, draft){
   const id = 'agdk-draft-'+sl+'-'+seq;
   sess._draftId = id;
   const isTeam = draft.channel === 'team';
-  const chip = isTeam ? '<span class="amode int">→ Team</span>' : '<span class="amode out">→ Partner</span>';
+  const chip = isTeam ? '<span class="amode int">→ Team</span>'
+    : draft.channel === 'merchant' ? '<span class="amode out">→ Merchant</span>'
+    : '<span class="amode out">→ Partner</span>';
   agentAddMsg(sess, (draft.intro||'Draft ready — edit anything inline, then approve to send.') +
     '<div class="agdk-draft'+(isTeam?' team':'')+'" id="'+id+'">' +
     '<div class="agdk-draft-hd">'+chip+'<b>'+draft.to+'</b><span class="agdk-draft-em">'+draft.email+'</span></div>' +
@@ -39005,6 +39051,16 @@ function _agentAddDeployNBA(sess){
 function agentNBA(action, name){
   const sess = AGENT_DESK.sessions[name];
   if (!sess) return;
+  if (sess.kind === 'sig') {
+    switch(action){
+      case 'docs':    _agentShowDocs(sess); return;
+      case 'nudge':   agentSigFlowNudge(sess); return;
+      case 'docreq':  agentSigFlowDocReq(sess); return;
+      case 'analyze': agentSigAnalyzeNext(sess); return;
+      case 'subuw':   agentSigSubmitUW(sess); return;
+    }
+    return;
+  }
   switch(action){
     case 'docs':     _agentShowDocs(sess); return;
     case 'approve':  agentFlowApprove(sess); return;
@@ -39497,6 +39553,10 @@ function _agentQueueEntries(){
     const m = merchantData.find(x => x.name === n);
     if (m && m.status !== 'underwriting') push(m, 'uw', true);
   });
+  /* Signature & documents sessions — a merchant the Neon beat already moved into the
+     UW queue (extraQueue) has signed and left the signature stage */
+  merchantData.filter(m => m.status === 'signature' && !AGENT_DESK.extraQueue.includes(m.name))
+    .forEach(m => push(m, 'sig', false));
   merchantData.filter(m => (m.status==='approved' || m.status==='boarding') &&
     typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[m.name] && DEAL_ROOM_DATA[m.name].deploy)
     .forEach(m => push(m, 'deploy', false));
@@ -39504,6 +39564,21 @@ function _agentQueueEntries(){
 }
 
 function _agqReason(e){
+  if (e.kind === 'sig') {
+    const g = e.sess && e.sess.sig;
+    if (g) {
+      if (g.submitted) return 'submitted to underwriting — awaiting queue pickup';
+      if (g.executed) {
+        const req = (g.requests||[]).find(r => r.required && r.status !== 'received');
+        return req ? 'package executed — waiting on ' + req.doc.toLowerCase()
+                   : 'package executed — ready to submit to underwriting';
+      }
+      if (e.sess.goStarted) return 'envelope in flight — watcher streaming status';
+    }
+    const sd = (typeof AGENT_SIG_DATA !== 'undefined') && AGENT_SIG_DATA[e.name];
+    if (sd && sd.queueReason) return sd.queueReason;
+    return 'package out — awaiting signatures';
+  }
   if (e.isNew) {
     const mins = AGENT_DESK.notifTime ? Math.max(1, Math.round((Date.now() - AGENT_DESK.notifTime)/60000)) : 1;
     return 'signed ' + (mins < 2 ? 'just now' : mins + 'm ago') + ' — entered UW queue';
@@ -39537,8 +39612,9 @@ function _agentRenderPill(entries){
   const dot = document.getElementById('agent-queue-dot');
   if (!counts || !dot) return;
   const uw = entries.filter(e => e.kind === 'uw').length;
-  const dep = entries.length - uw;
-  counts.textContent = 'UW ' + uw + ' · Deploy ' + dep;
+  const sig = entries.filter(e => e.kind === 'sig').length;
+  const dep = entries.length - uw - sig;
+  counts.textContent = 'UW ' + uw + ' · Sig ' + sig + ' · Deploy ' + dep;
   const maxWait = entries.reduce((mx, e) => Math.max(mx, e.waitMins), 0);
   dot.className = 'agq-dot' + (maxWait >= 1440 ? ' red' : maxWait >= 120 ? ' amber' : '');
   dot.title = maxWait >= 1440 ? 'Oldest item waiting more than a day' : maxWait >= 120 ? 'Oldest item waiting more than 2 hours' : 'Queue fresh';
@@ -39547,7 +39623,7 @@ function _agentRenderPill(entries){
 function _agqRow(e){
   const esc = _agdkEsc(e.name);
   const stageColor = e.kind==='uw' ? mStatusConfig.underwriting.color : (mStatusConfig[e.m.status]||{}).color || '#7C849A';
-  const stageLabel = e.kind==='uw' ? 'Underwriting' : (e.m.status==='approved' ? 'Approved' : 'Boarding');
+  const stageLabel = e.kind==='uw' ? 'Underwriting' : e.kind==='sig' ? 'Signature' : (e.m.status==='approved' ? 'Approved' : 'Boarding');
   const waitCls = e.waitMins >= 1440 ? ' red' : e.waitMins >= 120 ? ' amber' : '';
   const st = e.sess
     ? (_agdkDecisionState(e.sess)
@@ -39580,10 +39656,13 @@ function _agentRenderFlyout(entries){
   const sub = document.getElementById('agent-queue-sub');
   if (!list) return;
   const uw = entries.filter(e => e.kind === 'uw');
+  const sig = entries.filter(e => e.kind === 'sig');
   const dep = entries.filter(e => e.kind === 'deploy');
   list.innerHTML =
     '<div class="agq-group">Underwriting <span class="agdk-count">'+uw.length+'</span></div>' +
     (uw.map(_agqRow).join('') || '<div class="agq-empty">Queue clear.</div>') +
+    '<div class="agq-group">Signature <span class="agdk-count">'+sig.length+'</span></div>' +
+    (sig.map(_agqRow).join('') || '<div class="agq-empty">Queue clear.</div>') +
     '<div class="agq-group">Deployment <span class="agdk-count">'+dep.length+'</span></div>' +
     (dep.map(_agqRow).join('') || '<div class="agq-empty">Queue clear.</div>');
   if (sub) sub.textContent = entries.length + ' sessions waiting · human in the loop';
@@ -39617,7 +39696,13 @@ function agentBackToMerchant(){
   const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
   if (sess) _agentSnapshot(sess);
   AGENT_DESK.active = null;
-  if (sess && sess.m) navigateToMerchant(sess.merchant, sess.m.status);   // m.status is live — routes to app view / Deal Room by current stage
+  if (sess && sess.m) {
+    /* signature merchants default INTO the session — suppress that for the explicit
+       "← Merchant record" hop so it lands on the record instead of looping back */
+    window._agdkSuppressSigSession = true;
+    try { navigateToMerchant(sess.merchant, sess.m.status); }   // m.status is live — routes to app view / Deal Room by current stage
+    finally { window._agdkSuppressSigSession = false; }
+  }
   else switchMerchantMode('merchants', document.getElementById('nav-merchants'));
 }
 /* legacy name → merchant record (there is no desk anymore) */
@@ -39640,7 +39725,7 @@ function _agentSessionCrumb(){
     '<span class="agq-crumb-sep">→</span>' +
     '<span class="agq-crumb-link" onclick="agentBackToMerchant()" title="Open the merchant record">'+_agdkEscHtml(sess.merchant)+'</span>' +
     '<span class="agq-crumb-sep">→</span>' +
-    '<span class="agq-crumb-cur">'+(sess.kind==='uw' ? 'UW Session' : 'Deployment Session')+'</span>' +
+    '<span class="agq-crumb-cur">'+(sess.kind==='uw' ? 'UW Session' : sess.kind==='sig' ? 'Signature Session' : 'Deployment Session')+'</span>' +
     '</span>';
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const nav = document.getElementById('nav-merchants');
@@ -39665,7 +39750,7 @@ function _agentSessionCrumb(){
 /* "Open agent session" button on the merchant record (md-topbar + Deal Room topbar) */
 function _agentSyncOpenBtn(name){
   const m = merchantData.find(x => x.name === name);
-  const eligible = !!m && (m.status === 'underwriting' || m.status === 'approved' || m.status === 'boarding' ||
+  const eligible = !!m && (m.status === 'underwriting' || m.status === 'signature' || m.status === 'approved' || m.status === 'boarding' ||
     AGENT_DESK.extraQueue.includes(name));
   window._agdkRecordName = name;
   ['agent-open-session-btn-md','agent-open-session-btn-dr'].forEach(id => {
@@ -39724,7 +39809,7 @@ function _agentNextInQueue(exclude){
       agentAddMsg(sess, 'That wraps <b>'+_agdkEscHtml(sess.merchant)+'</b>. Next in queue: <b>'+_agdkEscHtml(nxt.name)+'</b> — waiting '+nxt.waitLabel+'.' +
         '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentOpenSession(\''+_agdkEsc(nxt.name)+'\')">▶ Start — '+_agdkEscHtml(nxt.name)+'</button>' +
-        '<span style="font-size:11px;color:var(--text-muted);">'+(nxt.kind==='uw' ? 'UW session' : 'Deployment session')+' · '+_agdkEscHtml(_agqReason(nxt))+'</span></div>');
+        '<span style="font-size:11px;color:var(--text-muted);">'+(nxt.kind==='uw' ? 'UW session' : nxt.kind==='sig' ? 'Signature session' : 'Deployment session')+' · '+_agdkEscHtml(_agqReason(nxt))+'</span></div>');
     } else {
       agentAddMsg(sess, 'That wraps <b>'+_agdkEscHtml(sess.merchant)+'</b> — and the queue is clear. Nothing else waiting on a human right now.');
     }
@@ -39797,6 +39882,16 @@ function _agentMatchScripted(sess, val){
   const uw = sess.kind === 'uw';
   if (sess.ended) return null;                                    // wrapped file → free text only
   if (!sess.goStarted && /\b(start|run|kick( it)? off|begin|go ahead|let'?s go)\b/.test(t)) return 'go';
+  if (sess.kind === 'sig') {
+    /* signature sessions: only the flows actually on the table are beats */
+    const g = sess.sig || {};
+    if (sess.goStarted && !g.executed && /nudge|remind/.test(t)) return 'nudge';
+    if (sess.goStarted && /request.{0,12}doc|doc.{0,12}request|need .*(license|check|statement)/.test(t)) return 'docreq';
+    if (sess.goStarted && /submit/.test(t)) return 'subuw';
+    if (/\bdocs\b|document/.test(t)) return 'docs';
+    if (/end (the |this )?session|wrap (it|this) up/.test(t)) return 'end';
+    return null;
+  }
   if (uw && sess.verdict && !sess.decision) {
     if (/pend/.test(t)) return 'pend';
     if (/approv/.test(t)) return 'approve';
@@ -39829,13 +39924,14 @@ function _agentSuppressEcho(run){
 function _agentRunScripted(sess, intent){
   if (intent === 'end') { agentEndSession(); return; }
   if (intent === 'go') {
-    const go = sess.kind === 'uw' ? agentUWGo : agentDeployGo;
+    const go = sess.kind === 'uw' ? agentUWGo : sess.kind === 'sig' ? agentSigGo : agentDeployGo;
     _agentSuppressEcho(function(){ go(sess.merchant); });
     return;
   }
   const map = { pend:agentFlowPend, approve:agentFlowApprove, message:agentFlowMessage,
     team:agentFlowTeam, serial:agentFlowSerial, pay:agentFlowPay, ship:agentFlowShip,
-    install:agentFlowInstall, escalate:agentFlowEscalate, docs:_agentShowDocs };
+    install:agentFlowInstall, escalate:agentFlowEscalate, docs:_agentShowDocs,
+    nudge:agentSigFlowNudge, docreq:agentSigFlowDocReq, subuw:agentSigSubmitUW };
   const fn = map[intent];
   if (fn) _agentSuppressEcho(function(){ fn(sess); });
 }
@@ -39865,6 +39961,13 @@ function _agentChatBoard(sess){
     /* pre-verdict, only send what has actually streamed back — no future leaks */
     b.checks = sess.verdict ? ((sess.uwb && sess.uwb.checks) || []) : (sess.checkResults || []);
     b.concurrence = (sess.uwb && sess.uwb.concurrence) || null;
+  } else if (sess.kind === 'sig') {
+    const g = sess.sig || {};
+    b.envelope = { id: g.envId || null, status: g.envStatus || 'none',
+      signers: (g.signers || []).map(s => ({ role:s.role, name:s.name, org:s.org, state:s.state })) };
+    b.docRequests = (g.requests || []).map(r => ({ doc:r.doc, status:r.status, required:!!r.required }));
+    b.program = g.p ? { program:g.p.program, pricing:g.p.pricing, addenda:g.p.addenda } : null;
+    b.fieldsComplete = g.p && g.p.fields ? g.p.fields.complete + '/' + g.p.fields.total : null;
   } else {
     const d = (sess.dr && sess.dr.deploy) || {};
     b.steps = d.rail || [];
@@ -39906,6 +40009,19 @@ const _AGDK_DEFLECT = {
     'Noted — it’s in the session log, and the decision is already on the record. Still open to you:',
     'Logged. This file is decided for the session — the follow-through moves:',
   ],
+  sigPre: [
+    'Noted — logged to the session. Kick off the package flow and the envelope watcher answers most of that in real time.',
+    'On the record. Assemble & send and I’ll have live envelope data to work from.',
+  ],
+  sigRun: [
+    'Logged — the envelope watcher is still streaming. Give it a beat; the next status will cover this.',
+    'Noted. Signer events are mid-flight — I’ll fold that in as they land.',
+  ],
+  sig: [      /* ● executed / NBA on the table */
+    'Noted — logged to the session record. Here’s where I can take this file:',
+    'Good flag — it’s in the log. The moves on the table:',
+    'Logged for the report. Your options from here:',
+  ],
   deployPre: [
     'Noted — logged to the session. Kick off the boarding-rail sync and most of that answers itself.',
     'On the record. Start the rail sync and I’ll have live boarding data to work from.',
@@ -39929,6 +40045,7 @@ function _agentReofferNBA(sess){
     old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); b.title = 'Already handled — see the latest card below'; });
   }
   _agentSnapshotActive();
+  if (sess.kind === 'sig') { _agentAddSigNBA(sess); return; }
   if (sess.kind === 'deploy') { _agentAddDeployNBA(sess); return; }
   const n = _agdkEsc(sess.merchant);
   if (sess.decision) {
@@ -39949,6 +40066,10 @@ function _agentDeflect(sess){
     else if (sess.verdict)  { bucket = 'uw';        chips = true; }
     else if (sess.goStarted)  bucket = 'uwRun';
     else                      bucket = 'uwPre';
+  } else if (sess.kind === 'sig') {
+    if (sess.stage === 'verdict' || (sess.sig && sess.sig.executed)) { bucket = 'sig'; chips = true; }
+    else if (sess.goStarted)  bucket = 'sigRun';
+    else                      bucket = 'sigPre';
   } else {
     if (sess.goStarted)     { bucket = 'deploy';    chips = true; }
     else                      bucket = 'deployPre';
@@ -39973,7 +40094,7 @@ async function _agentFreeText(sess, val){
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         token: window.AGENT_CHAT_TOKEN,
-        sessionType: sess.kind === 'deploy' ? 'deployment' : 'uw',
+        sessionType: sess.kind === 'deploy' ? 'deployment' : sess.kind === 'sig' ? 'signature' : 'uw',
         merchant: _agentChatMerchant(sess),
         board: _agentChatBoard(sess),
         transcript: _agentChatTranscript(sess),
@@ -40021,6 +40142,830 @@ agentComposerSend = function(){
   agentAddTyping(sess);
   _agentFreeText(sess, val);
 };
+/* ===== /AGENT DESK ===== */
+</script>
+
+<script>
+/* ===== AGENT DESK ===== */
+/* SIGNATURE & DOCUMENTS SESSION (kind 'sig') — the third session kind, default surface
+   for signature-stage merchants. Same UX kit as UW + Deployment: intro → pre-flight tool
+   cards → GO → streamed tool stream (assemble / addenda / send_esign / envelope watcher)
+   → executed package auto-files → extract_document_fields → verify_documents QC → NBA
+   human loop (nudge signer / request document / analyze / submit to UW) → Intake &
+   Signature Report via the shared doc system. RAIL LAW: everything mirrors to the board.
+   HARD RULE: no processor or acquiring-bank names anywhere in this session — programs
+   and solutions only. */
+
+/* ── demo data: signature-stage profiles (solution-based names ONLY) ── */
+const AGENT_SIG_DATA = {
+  'Metro Print Shop': {
+    state:'out', pause:'unopened', pages:24,
+    program:'Dual Pricing Program — Verifone VX520 + Gateway',
+    pricing:'Dual pricing · 3.99% guest rate',
+    business:{ type:'Commercial print & copy retail', location:'Portland, OR', owner:'Dana Whitcomb (100%)', monthlyVol:'$24K/mo', prevProcessor:'Square' },
+    fields:{ complete:31, total:34, missing:['Ownership attestation date','Avg ticket','DDA confirmation'] },
+    addenda:['Dual Pricing Program Addendum','Card-Present Retail Questionnaire'],
+    docsNeeded:['Voided check (on file)','Owner driver’s license'],
+    signers:[
+      { role:'Partner certification', name:'Priya Shah', org:'Rivermark', email:'ops@rivermark.com', state:'pending' },
+      { role:'Merchant owner', name:'Dana Whitcomb', org:'Metro Print Shop', email:'dana@metroprintshop.com', state:'pending' },
+    ],
+    stateNote:'⚠ A prior envelope went out 2 days ago — the merchant never opened it, and it expires at midnight. Assemble & send voids it and re-issues fresh.',
+    reissueNote:'Supersedes the expiring envelope',
+    expiryNote:'at midnight',
+    qcDocs:[
+      { name:'VoidedCheck_Chase4417.png', type:'Banking', state:'pass', detail:'Routing/DDA match the application · account holder matches the legal entity' },
+      { name:'Drivers_License_DWhitcomb.jpg', type:'Owner ID', state:'pass', detail:'Identity fields legible + consistent with the application · expiry >6 months out' },
+    ],
+    seedDocs:[
+      { name:'Merchant application', type:'Application', date:'Mar 6' },
+      { name:'VoidedCheck_Chase4417.png', type:'Banking', date:'Mar 7' },
+    ],
+    priorTimeline:[ { t:'2 days ago', label:'Prior envelope sent — no open event since' } ],
+    queueReason:'package out 2d — merchant hasn’t opened · envelope expires tonight',
+  },
+  'Pinnacle Fitness': {
+    state:'executed', pages:28, envId:'ENV-8412', score:91, executedAgo:'6h ago',
+    program:'Recurring Billing Program — PAX A920 Pro + Gateway',
+    pricing:'IC+ 0.30% + $0.12 · recurring billing',
+    business:{ type:'Fitness studio — memberships', location:'Austin, TX', owner:'Marcus Lee (60%) · Tara Nguyen (40%)', monthlyVol:'$52K/mo', prevProcessor:'In-house ACH' },
+    fields:{ complete:36, total:36, missing:[] },
+    addenda:['Recurring Billing Program Addendum','ACH Authorization Addendum'],
+    docsNeeded:['Bank statement (on file)','Owner IDs — both owners'],
+    signers:[
+      { role:'Partner certification', name:'James Harmon', org:'Apex Elite', email:'jharmon@apexelite.com', state:'signed', at:'Yesterday · 4:12 PM' },
+      { role:'Merchant owner (60%)', name:'Marcus Lee', org:'Pinnacle Fitness', email:'marcus@pinnaclefit.com', state:'signed', at:'6h ago' },
+      { role:'Merchant owner (40%)', name:'Tara Nguyen', org:'Pinnacle Fitness', email:'tara@pinnaclefit.com', state:'signed', at:'6h ago' },
+    ],
+    stateNote:'✅ Signed packet is in — envelope executed 6h ago, package score 91/100. What’s left is document QC and the underwriting handoff.',
+    qcDocs:[
+      { name:'BankStmt_Feb2026.pdf', type:'Bank stmt', state:'pass', detail:'Deposits consistent with stated $52K/mo · account holder matches the legal entity · 0 NSFs' },
+      { name:'Drivers_License_MLee.jpg', type:'Owner ID', state:'warn', detail:'Image blurry — glare across DOB and expiry; identity fields unreadable for the application match', request:'Driver’s license (retake) — Marcus Lee', retakeName:'Drivers_License_MLee_retake.jpg' },
+    ],
+    seedDocs:[
+      { name:'Merchant application', type:'Application', date:'Mar 4' },
+      { name:'BankStmt_Feb2026.pdf', type:'Bank stmt', date:'Mar 5' },
+      { name:'VoidedCheck_Frost1120.png', type:'Banking', date:'Mar 5' },
+    ],
+    priorTimeline:[
+      { t:'2 days ago', label:'Envelope ENV-8412 sent — 3 ordered signers' },
+      { t:'Yesterday · 4:12 PM', label:'Partner certified — James Harmon (Apex Elite)' },
+      { t:'6h ago', label:'Envelope executed — all signers complete' },
+    ],
+    queueReason:'signed 6h ago — package executed · doc QC outstanding',
+  },
+  'Neon Nightclub LA': {
+    state:'out', pause:'viewed', pages:26, envId:'ENV-7268',
+    program:'IC+ Program — 3× PAX A920 Pro + Gateway',
+    pricing:'IC+ 0.35% + $0.15',
+    business:{ type:'Entertainment / Nightclub', location:'Los Angeles, CA', owner:'Jason Park (100%)', monthlyVol:'$180K avg', prevProcessor:'Stripe' },
+    fields:{ complete:33, total:36, missing:['Ownership attestation date','Seasonal volume note','DDA confirmation'] },
+    addenda:['High-Volume Hospitality Addendum','Card-Present Nightlife Questionnaire'],
+    docsNeeded:['Liquor license','Owner driver’s license'],
+    signers:[
+      { role:'Partner certification', name:'Marcus Cole', org:'NovaPay', email:'ops@novapay.com', state:'signed', at:'Mar 10 · 3:20 PM' },
+      { role:'Merchant owner', name:'Jason Park', org:'Neon Nightclub LA', email:'jason@neonla.com', state:'viewed' },
+    ],
+    stateNote:'⚠ A package is already out — sent Mar 10 to Jason Park (100% owner). He opened it and stopped at the personal guarantee. Assemble & send voids it and issues a fresh envelope.',
+    reissueNote:'Supersedes the stalled envelope',
+    expiryNote:null,
+    qcDocs:[
+      { name:'LiquorLicense_LA_2026.pdf', type:'Compliance', state:'pass', detail:'Active through Dec 2026 · licensee matches the legal entity' },
+      { name:'Drivers_License_JPark.jpg', type:'Owner ID', state:'pass', detail:'Identity fields legible + consistent with the application · expiry >6 months out' },
+    ],
+    seedDocs:[
+      { name:'Merchant application', type:'Application', date:'Mar 1' },
+      { name:'VoidedCheck_Chase.png', type:'Banking', date:'Mar 2' },
+    ],
+    priorTimeline:[
+      { t:'Mar 10 · 3:00 PM', label:'Prior envelope sent to Jason Park' },
+      { t:'1d ago', label:'Merchant opened — did not sign' },
+    ],
+    queueReason:'package out 1d — merchant viewed, not signed',
+  },
+};
+
+function _agentSigDefaultProfile(sess){
+  const s = (sess.dr && sess.dr.synopsis) || {};
+  const b = s.business || {}, sol = s.solution || {};
+  const rep = AGENT_PARTNER_REPS[sess.m.partner] || { rep:'Partner Ops', email:'ops@partner.com' };
+  const owner = (b.owner || 'The Owner').replace(/\s*\(.*$/, '');
+  return {
+    state:'fresh', pause:'viewed', pages:22,
+    program: (sess.dr && sess.dr.solutionLabel) || sol.name || 'Configured solution program',
+    pricing: sol.pricing || 'as configured',
+    business: { type:b.type, location:b.location, owner:b.owner, monthlyVol:b.monthlyVol || sess.m.potVol, prevProcessor:b.prevProcessor },
+    fields: { complete:32, total:34, missing:['Avg ticket confirmation','DDA confirmation'] },
+    addenda: ['Program Pricing Addendum'],
+    docsNeeded: ['Voided check','Owner driver’s license'],
+    signers: [
+      { role:'Partner certification', name:rep.rep, org:sess.m.partner || 'Partner', email:rep.email, state:'pending' },
+      { role:'Merchant owner', name:owner, org:sess.merchant, email:'owner@' + _agdkSlug(sess.merchant).replace(/-/g,'') + '.com', state:'pending' },
+    ],
+    qcDocs: [ { name:'VoidedCheck.png', type:'Banking', state:'pass', detail:'Routing/DDA match the application · account holder matches the legal entity' } ],
+    queueReason:'package out — awaiting signatures',
+  };
+}
+
+/* ── session state init (called from _agentCreateSession for kind 'sig') ── */
+function _agentSigInit(sess){
+  const prof = AGENT_SIG_DATA[sess.merchant] || _agentSigDefaultProfile(sess);
+  const p = JSON.parse(JSON.stringify(prof));
+  const g = sess.sig = {
+    p,
+    envId: p.envId || null,
+    envStatus: p.state === 'executed' ? 'executed' : p.state === 'out' ? 'out' : 'none',
+    signers: (p.signers || []).map(s => Object.assign({}, s)),
+    requests: [],
+    executed: p.state === 'executed',
+    submitted: false,
+    paused: false,
+    timeline: (p.priorTimeline || []).slice(),
+  };
+  g.statusLabel = function(){
+    return g.submitted ? 'submitted to UW'
+      : g.executed ? 'package executed'
+      : (g.envStatus === 'sent' || g.envStatus === 'viewed' || g.envStatus === 'delivered') ? 'envelope out'
+      : g.envStatus === 'out' ? 'envelope out — stalled'
+      : 'pre-send';
+  };
+  if (p.seedDocs) sess.docs = p.seedDocs.map(d => Object.assign({}, d));
+}
+
+/* ── readiness pre-flight (streamed inside the intro, before GO) ── */
+async function _agentSigPreflight(sess){
+  const p = sess.sig.p;
+  _agentRunningCard(sess, 'pf1', '🧾 Checking required application fields', 'get_required_fields');
+  await _agdkWait(800);
+  _agentClearRunning(sess, 'pf1');
+  const f = p.fields || { complete:0, total:0, missing:[] };
+  const fState = f.complete >= f.total ? 'pass' : 'warn';
+  _agentFinal(sess, _agentToolCardHtml({ icon:'🧾', name:'Application fields', state:fState,
+    val: f.complete + ' of ' + f.total + ' required fields complete' + (fState==='warn'
+      ? ' — missing: ' + f.missing.join(', ') + ' (collected in-envelope during signing)'
+      : ' — application is signature-ready'),
+    meta:'get_required_fields · application record · ' + f.total + ' fields checked' }));
+  agentRenderRail();
+  _agentRunningCard(sess, 'pf2', '🧮 Computing signature readiness', 'check_readiness');
+  await _agdkWait(850);
+  _agentClearRunning(sess, 'pf2');
+  _agentFinal(sess, _agentToolCardHtml({ icon:'🧮', name:'Readiness — what this deal shape requires', state:'pass',
+    val:'Program addenda: ' + p.addenda.join(' · ') + '. Docs to collect: ' + p.docsNeeded.join(', ') + '.',
+    meta:'check_readiness · program rules engine · ' + p.addenda.length + ' addenda matched to the deal shape' }));
+  agentRenderRail();
+}
+
+/* ── GO: assemble → route ordered signers → envelope watcher ── */
+async function agentSigGo(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.kind !== 'sig' || sess.goStarted) return;
+  const g = sess.sig, p = g.p;
+  sess.goStarted = true; sess.stage = 'running';
+  _agentConsumeGo(sess);
+  agentAddUserMsg(sess, g.executed ? 'Pick up the executed package.' : 'Assemble & send.');
+  agentRenderQueue();
+  if (g.executed) { await _agentSigPickupFlow(sess); return; }
+  agentAddSys(sess, 'Signature package flow started — assemble → route signers → watch the envelope', 'var(--blue)');
+  /* 1 · generate_signature_package */
+  _agentRunningCard(sess, 'sp1', '📦 Assembling the signature package', 'generate_signature_package');
+  await _agdkWait(950);
+  _agentClearRunning(sess, 'sp1');
+  _agentFinal(sess, _agentToolCardHtml({ icon:'📦', name:'Signature package assembled', state:'pass',
+    val: p.pages + ' pages — Merchant Agreement + Personal Guarantee + pricing schedule (' + p.pricing + ')' + (p.reissueNote ? '. ' + p.reissueNote + '.' : ''),
+    meta:'generate_signature_package · solutions engine · ' + p.program }));
+  g.timeline.push({ t:_agdkTime(), label:'Package assembled — ' + p.pages + ' pages' });
+  agentRenderRail();
+  /* 2 · select_addenda */
+  _agentRunningCard(sess, 'sp2', '📎 Selecting program addenda', 'select_addenda');
+  await _agdkWait(800);
+  _agentClearRunning(sess, 'sp2');
+  _agentFinal(sess, _agentToolCardHtml({ icon:'📎', name:'Addenda attached — required by the deal shape', state:'pass',
+    val: p.addenda.join(' · '),
+    meta:'select_addenda · program rules · ' + p.addenda.length + ' attached' }));
+  g.timeline.push({ t:_agdkTime(), label:'Addenda attached — ' + p.addenda.join(', ') });
+  agentRenderRail();
+  /* 3 · send_esign — ordered signers, partner certifies first */
+  _agentRunningCard(sess, 'sp3', '✉️ Creating the envelope — ordered signing', 'send_esign');
+  await _agdkWait(900);
+  _agentClearRunning(sess, 'sp3');
+  g.envId = 'ENV-' + (7100 + Math.floor(Math.random() * 800));
+  g.envStatus = 'sent';
+  g.signers.forEach(s => { s.state = 'pending'; delete s.at; });
+  const order = g.signers.map((s, i) => (i + 1) + ') ' + s.name + ' — ' + s.role).join('  →  ');
+  _agentFinal(sess, _agentToolCardHtml({ icon:'✉️', name:'Envelope sent — ordered signing', state:'pass',
+    val: order,
+    meta:'send_esign · envelope ' + g.envId + ' · ' + g.signers.length + ' signers · partner certifies before the merchant can sign' }));
+  g.timeline.push({ t:_agdkTime(), label:'Envelope ' + g.envId + ' sent — ' + g.signers.length + ' ordered signers' });
+  agentRenderRail();
+  agentAddSys(sess, '👁 Envelope watcher armed — streaming get_envelope_status', 'var(--blue)');
+  /* watcher beats */
+  await _agdkWait(1700);
+  agentAddSys(sess, '✉ get_envelope_status — delivered · awaiting partner certification', 'var(--blue)');
+  await _agdkWait(1800);
+  const cert = g.signers[0];
+  cert.state = 'signed'; cert.at = _agdkTime();
+  g.timeline.push({ t:cert.at, label:'Partner certified — ' + cert.name + ' (' + cert.org + ')' });
+  agentAddSys(sess, '✔ get_envelope_status — partner certified · ' + cert.name + ' (' + cert.org + ') · 1 of ' + g.signers.length, 'var(--green)');
+  agentRenderRail();
+  await _agdkWait(1800);
+  if (p.pause === 'viewed') {
+    g.signers.slice(1).forEach(s => { s.state = 'viewed'; });
+    g.envStatus = 'viewed';
+    g.timeline.push({ t:_agdkTime(), label:'Merchant opened the package — did not sign' });
+    agentAddSys(sess, '👁 get_envelope_status — merchant opened the package · viewing, not signing', 'var(--amber)');
+  } else {
+    g.envStatus = 'delivered';
+    g.timeline.push({ t:_agdkTime(), label:'No merchant open event' + (p.expiryNote ? ' — link expires ' + p.expiryNote : '') });
+    agentAddSys(sess, '⚠ get_envelope_status — merchant hasn’t opened the package' + (p.expiryNote ? ' · link expires ' + p.expiryNote : ''), 'var(--amber)');
+  }
+  g.paused = true;
+  agentRenderRail(); agentRenderQueue();
+  agentAddTyping(sess);
+  await _agdkWait(900);
+  agentRemoveTyping();
+  const holdout = g.signers[1] ? g.signers[1].name : 'the owner';
+  agentAddMsg(sess, 'Envelope <b>' + g.envId + '</b> is out and the partner side is certified — the merchant signature is the holdout. ' +
+    (p.pause === 'viewed'
+      ? '<b>' + holdout + ' opened it but hasn’t signed.</b>'
+      : '<b>No open event from ' + holdout + ' yet' + (p.expiryNote ? ', and the link expires ' + p.expiryNote : '') + '.</b>') +
+    ' A nudge from this desk usually closes it — I’ll draft it, you approve the send. The watcher stays armed either way.');
+  sess.stage = 'verdict';
+  _agentAddSigNBA(sess);
+  agentRenderQueue();
+}
+
+/* executed-before-session merchants (Pinnacle): pull the record, then straight to filing + QC */
+async function _agentSigPickupFlow(sess){
+  const g = sess.sig, p = g.p;
+  _agentRunningCard(sess, 'sp0', '✉️ Pulling the envelope record', 'get_envelope_status');
+  await _agdkWait(950);
+  _agentClearRunning(sess, 'sp0');
+  _agentFinal(sess, _agentToolCardHtml({ icon:'✉️', name:'Envelope ' + (g.envId || '—') + ' — EXECUTED', state:'pass',
+    val: g.signers.map(s => s.name + ' (' + s.role + ') ✓' + (s.at ? ' ' + s.at : '')).join(' · ') + (p.score ? ' · package score ' + p.score + '/100' : ''),
+    meta:'get_envelope_status · executed ' + (p.executedAgo || 'earlier today') + ' · all signers complete' }));
+  agentRenderRail();
+  await _agentSigAfterExecute(sess);
+}
+
+/* resume after a nudge lands — merchant completes fields, envelope executes */
+async function _agentSigResume(sess){
+  const g = sess.sig, p = g.p;
+  if (g.executed || sess.ended) return;
+  agentAddSys(sess, '👁 get_envelope_status — merchant opened the package (reminder landed)', 'var(--blue)');
+  g.signers.slice(1).forEach(s => { if (s.state !== 'signed') s.state = 'viewed'; });
+  g.envStatus = 'viewed';
+  agentRenderRail();
+  await _agdkWait(2000);
+  if (p.fields && p.fields.total > p.fields.complete) {
+    const n = p.fields.total - p.fields.complete;
+    agentAddSys(sess, '✍ get_envelope_status — merchant completing ' + n + ' missing fields in-envelope — ' + p.fields.missing.join(', '), 'var(--blue)');
+    g.timeline.push({ t:_agdkTime(), label:'Merchant completed ' + n + ' missing fields in-envelope' });
+    p.fields.complete = p.fields.total;
+    agentRenderRail();
+    await _agdkWait(2100);
+  }
+  g.signers.forEach(s => { s.state = 'signed'; s.at = s.at || _agdkTime(); });
+  g.envStatus = 'executed';
+  g.executed = true;
+  g.timeline.push({ t:_agdkTime(), label:'Envelope executed — all signers complete' });
+  agentAddSys(sess, '✅ get_envelope_status — EXECUTED · all ' + g.signers.length + ' signatures complete', 'var(--green)');
+  agentRenderRail(); agentRenderQueue();
+  await _agentSigAfterExecute(sess);
+}
+
+/* executed → auto-file the package, extract fields, QC every collected doc */
+async function _agentSigAfterExecute(sess){
+  const g = sess.sig, p = g.p;
+  await _agdkWait(700);
+  const pkg = { name:'Agreement package — executed (' + g.signers.map(s => s.name).join(', ') + ')', type:'Agreement', date:'Just now', badge:'Executed' };
+  if (!sess.docs.some(d => d.name === pkg.name)) sess.docs.push(pkg);
+  _agentFinal(sess, _agentToolCardHtml({ icon:'🗂', name:'Executed package filed to the record', state:'pass',
+    val:'Signed PDF + completion certificate stored — visible under Documents on the Session Board →',
+    meta:'get_envelope_document · auto-filed · ' + p.pages + ' pages' }));
+  g.timeline.push({ t:_agdkTime(), label:'Executed package auto-filed to the merchant record' });
+  agentRenderRail();
+  /* extract_document_fields → application autofill */
+  _agentRunningCard(sess, 'sx1', '🔍 Extracting fields from the executed package', 'extract_document_fields');
+  await _agdkWait(1050);
+  _agentClearRunning(sess, 'sx1');
+  _agentFinal(sess, _agentToolCardHtml({ icon:'🔍', name:'Fields extracted → application autofilled', state:'pass',
+    val:'12 fields written back — ownership %, DDA + routing, avg ticket, signature dates · 0 conflicts with the application',
+    meta:'extract_document_fields · 12 fields · write-back complete' }));
+  g.timeline.push({ t:_agdkTime(), label:'Fields extracted + application autofilled' });
+  agentRenderRail();
+  /* verify_documents — per-doc QC */
+  const qcs = p.qcDocs || [];
+  for (let i = 0; i < qcs.length; i++){
+    const qd = qcs[i];
+    if (!sess.docs.some(d => d.name === qd.name)) sess.docs.push({ name:qd.name, type:qd.type || 'Document', date:'Just now', badge:'From envelope' });
+    agentRenderRail();
+    _agentRunningCard(sess, 'sq' + i, '🪪 QC — ' + qd.name, 'verify_documents');
+    await _agdkWait(900);
+    _agentClearRunning(sess, 'sq' + i);
+    _agentFinal(sess, _agentToolCardHtml({ icon: qd.state === 'pass' ? '✅' : '⚠️', name:'QC — ' + qd.name, state: qd.state,
+      val: qd.detail,
+      meta:'verify_documents · legibility + field match vs application' }));
+    if (qd.state !== 'pass' && qd.request) {
+      const req = { doc: qd.request, docType: qd.type || 'Owner ID', status:'needed', required:true,
+        time:_agdkTime(), reason: qd.detail, newDocName: qd.retakeName || 'Replacement_doc.jpg' };
+      g.requests.push(req);
+      g.timeline.push({ t:req.time, label:'Doc request created — ' + qd.request });
+      agentAddSys(sess, '📎 Doc request created — ' + qd.request + ' · submit to underwriting stays gated until it lands', 'var(--amber)');
+    }
+    agentRenderRail();
+  }
+  /* wrap + NBA */
+  agentAddTyping(sess);
+  await _agdkWait(900);
+  agentRemoveTyping();
+  const openReq = g.requests.filter(r => r.required && r.status !== 'received');
+  agentAddMsg(sess, openReq.length
+    ? 'Package is executed and filed and the fields are written back — <b>one thing blocks underwriting:</b> ' + openReq.map(r => '<b>' + r.doc + '</b>').join(', ') + '. Hit <b>📎 Request document</b> and I’ll draft the ask — you approve the send, and I track it on the board until it lands.'
+    : 'Package is executed, fields are written back, and every collected document QCs clean. <b>This file is ready for underwriting</b> — submit when you’re ready.');
+  sess.stage = 'verdict';
+  _agentAddSigNBA(sess);
+  agentRenderRail(); agentRenderQueue();
+}
+
+/* ── NBA chips — the sig human loop ── */
+function _agentAddSigNBA(sess){
+  const g = sess.sig;
+  const n = _agdkEsc(sess.merchant);
+  const openReq = (g.requests || []).filter(r => r.required && r.status !== 'received');
+  const canSubmit = g.executed && !openReq.length && !g.submitted;
+  let chips = '';
+  if (!g.executed) chips += '<button class="agdk-chip pend" data-hook="agent-nba-nudge" onclick="agentNBA(\'nudge\',\'' + n + '\')">⏰ Nudge signer</button>';
+  chips += '<button class="agdk-chip" data-hook="agent-nba-docreq" onclick="agentNBA(\'docreq\',\'' + n + '\')">📎 Request document</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-analyze" onclick="agentNBA(\'analyze\',\'' + n + '\')">✦ Analyze docs</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\'' + n + '\')">📄 View documents</button>';
+  if (g.submitted) {
+    chips += '<button class="agdk-chip agdk-spent" disabled>✓ Submitted to UW</button>';
+  } else {
+    const lockTitle = !g.executed ? 'Needs the executed signature package — the envelope is not complete yet'
+      : openReq.length ? 'Waiting on: ' + openReq.map(r => r.doc).join(', ') : '';
+    chips += '<button class="agdk-chip approve' + (canSubmit ? '' : ' locked') + '"' + (lockTitle ? ' title="' + lockTitle + '"' : '') +
+      ' data-hook="agent-nba-subuw" onclick="agentNBA(\'subuw\',\'' + n + '\')">→ Submit to underwriting</button>';
+  }
+  _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-' + _agdkSlug(sess.merchant) + '">' + chips + '</div></div>');
+}
+
+function _agentSigRefreshNBA(sess){
+  const old = document.getElementById('agdk-nba-' + _agdkSlug(sess.merchant));
+  if (old) {
+    old.removeAttribute('id');
+    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); b.title = 'Superseded — see the latest card below'; });
+  }
+  _agentSnapshotActive();
+  _agentAddSigNBA(sess);
+}
+
+/* ── ⏰ NUDGE SIGNER — draft reminder, approve-to-send, logged to the comms rail ── */
+function agentSigFlowNudge(sess){
+  const g = sess.sig;
+  if (g.executed) { agentAddSys(sess, 'Envelope is executed — no signer left to nudge', 'var(--text-muted)'); return; }
+  if (sess._nudgeOpen || sess._draft) return;
+  sess._nudgeOpen = true;
+  agentAddUserMsg(sess, '⏰ Nudge the signer.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const p = g.p;
+    const pending = (g.signers || []).find(x => x.state !== 'signed') || g.signers[g.signers.length - 1];
+    const missing = p.fields && p.fields.total > p.fields.complete ? (p.fields.total - p.fields.complete) : 0;
+    const expiry = p.expiryNote ? '\n\nHeads up: the signing link expires ' + p.expiryNote + ' — after that we have to re-issue the whole package.' : '';
+    const body = 'Hi ' + pending.name.split(' ')[0] + ',\n\nQuick reminder on the ' + sess.merchant + ' agreement package — your signature is the last one outstanding. The link in the original email is still live and takes about 3 minutes' +
+      (missing ? ' (it will also ask you to confirm ' + missing + ' short fields)' : '') + '.' + expiry +
+      '\n\nReply here if anything in the package looks off and we’ll sort it before you sign.\n\nThanks,\nTwill AI · on behalf of ' + (sess.m.assignee || 'Twill Ops');
+    _agentDraftCard(sess, { kind:'signudge', channel:'merchant',
+      to: pending.name + ' · ' + pending.org, email: pending.email || 'owner@merchant.com',
+      subject: 'Reminder — ' + sess.merchant + ' agreement is ready for your signature',
+      body,
+      intro: 'Reminder drafted for the outstanding signer — edit inline, then approve to send. It logs to the comms rail, and the envelope watcher stays armed.' });
+  }, 700);
+}
+function _agentSigNudgeCommit(sess, d, bodyText){
+  const g = sess.sig;
+  sess._nudgeOpen = false;
+  const pending = (g.signers || []).find(x => x.state !== 'signed');
+  const who = pending ? pending.name : 'the signer';
+  agentLogComm(sess.merchant, { time:_agdkTime(), kind:'merchant', label:'Signature reminder → ' + who, preview:_agdkStrip(bodyText).slice(0, 110) });
+  g.timeline.push({ t:_agdkTime(), label:'Signature reminder sent to ' + who });
+  agentAddSys(sess, '⏰ Reminder sent to ' + who + ' — logged to the comms rail · watcher armed', 'var(--amber)');
+  agentToast('⏰', 'Reminder sent — <strong>' + sess.merchant + '</strong>');
+  agentRenderRail();
+  if (g.paused && !g.executed) {
+    g.paused = false;
+    setTimeout(() => { _agentSigResume(sess); }, 2600);
+  }
+}
+
+/* ── 📎 REQUEST DOCUMENT — pick type → templated draft → approve-to-send → tracked ── */
+function agentSigFlowDocReq(sess){
+  const g = sess.sig;
+  if (sess._reqOpen || sess._draft) return;
+  sess._reqOpen = true;
+  agentAddUserMsg(sess, '📎 Request a document.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const esc = _agdkEsc(sess.merchant);
+    const needed = (g.requests || []).filter(r => r.status === 'needed');
+    const std = ['Voided check', 'Bank statement (latest month)', 'Business license', 'Owner driver’s license'];
+    let chips = needed.map(r => '<button class="agdk-chip pend" onclick="agentSigReqPick(\'' + esc + '\',\'' + _agdkEsc(r.doc) + '\')">⚠ ' + r.doc + '</button>').join('');
+    chips += std.filter(t => !needed.some(r => r.doc === t)).map(t => '<button class="agdk-chip" onclick="agentSigReqPick(\'' + esc + '\',\'' + _agdkEsc(t) + '\')">' + t + '</button>').join('');
+    agentAddMsg(sess, 'Which document are we asking for?' + (needed.length ? ' The flagged one is pre-staged — QC already wrote the reason into the draft.' : '') +
+      _agentPickCard(sess, '<div class="agdk-pick-row">' + chips +
+      '<button class="agdk-chip" onclick="agentSigReqCancel(\'' + esc + '\')">Cancel</button></div>'));
+  }, 650);
+}
+function agentSigReqCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  _agentPickFreeze(sess, '<span class="agdk-cancelled">Cancelled — nothing requested</span>');
+  sess._reqOpen = false;
+  agentAddSys(sess, 'Document request cancelled', 'var(--text-muted)');
+}
+function agentSigReqPick(name, docLabel){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.kind !== 'sig') return;
+  const g = sess.sig;
+  _agentPickFreeze(sess, '<span class="agdk-ck-done">✓ ' + docLabel + '</span>');
+  sess._reqOpen = false;
+  let req = g.requests.find(r => r.doc === docLabel && r.status !== 'received');
+  if (!req) {
+    req = { doc:docLabel, docType:'Document', status:'needed', required:false, time:_agdkTime(),
+      newDocName: docLabel.replace(/[^a-z0-9]+/gi, '_') + '.pdf' };
+    g.requests.push(req);
+    agentRenderRail();
+  }
+  sess._reqActive = req;
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const signerM = (g.signers || []).find(s => /owner|merchant/i.test(s.role)) || g.signers[g.signers.length - 1] || { name:'the owner', email:'owner@merchant.com', org:sess.merchant };
+    const rep = _agentRep(sess);
+    const why = req.reason
+      ? 'The copy that came back with the signing package didn’t pass our document check — ' + req.reason.toLowerCase() + '.'
+      : 'Underwriting will ask for this one — collecting it now keeps the file moving without a pend later.';
+    const body = 'Hi ' + signerM.name.split(' ')[0] + ',\n\nOne document to wrap up ' + sess.merchant + '’s file: ' + req.doc + '.\n\n' + why +
+      '\n\nA phone photo is fine — flat surface, no flash, all four corners in frame. Reply to this message with the file and it lands straight in your file here.\n\n(cc ' + rep.rep + ' · ' + (sess.m.partner || 'partner') + ')\n\nThanks,\nTwill AI · on behalf of ' + (sess.m.assignee || 'Twill Ops');
+    _agentDraftCard(sess, { kind:'sigdocreq', channel:'merchant',
+      to: signerM.name + ' · ' + sess.merchant, email: signerM.email || 'owner@merchant.com',
+      subject: sess.merchant + ' — one document needed: ' + req.doc,
+      body,
+      intro: 'Templated request drafted' + (req.required ? ' from the QC finding' : '') + ' — edit inline, then approve to send. It tracks as awaiting on the Session Board.' });
+  }, 700);
+}
+function _agentSigDocReqCommit(sess, d, bodyText){
+  const g = sess.sig;
+  const req = sess._reqActive;
+  sess._reqActive = null;
+  if (req) { req.status = 'awaiting'; req.askedAt = _agdkTime(); }
+  const label = req ? req.doc : 'document';
+  agentLogComm(sess.merchant, { time:_agdkTime(), kind:'merchant', label:'Doc request → ' + label, preview:_agdkStrip(bodyText).slice(0, 110) });
+  g.timeline.push({ t:_agdkTime(), label:'Doc request sent — ' + label });
+  agentAddSys(sess, '📎 Doc request sent — ' + label + ' · tracked as awaiting on the Session Board', 'var(--amber)');
+  agentToast('📎', 'Doc request sent — <strong>' + sess.merchant + '</strong>');
+  agentRenderRail(); agentRenderQueue();
+  if (req && req.required) _agentSigDocArrival(sess, req);
+}
+/* scripted arrival beat for the QC-flagged doc (~6s after the ask goes out) */
+function _agentSigDocArrival(sess, req){
+  setTimeout(() => {
+    if (!req || req.status === 'received' || sess.sig.submitted) return;
+    const g = sess.sig;
+    req.status = 'received'; req.receivedAt = _agdkTime();
+    const dn = req.newDocName || 'Replacement document';
+    if (!sess.docs.some(d => d.name === dn)) sess.docs.push({ name:dn, type:req.docType || 'Owner ID', date:'Just now', badge:'Re-collected' });
+    g.timeline.push({ t:_agdkTime(), label:'Document received — ' + dn });
+    agentAddSys(sess, '📥 Document received — ' + dn + ' · doc request satisfied', 'var(--green)');
+    _agentFinal(sess, _agentToolCardHtml({ icon:'🪪', name:'Re-verify — ' + dn, state:'pass',
+      val:'Retake is legible — identity fields match the application. QC clear.',
+      meta:'verify_documents · re-run on arrival · 1 doc' }));
+    agentRenderRail(); agentRenderQueue();
+    agentAddTyping(sess);
+    setTimeout(() => {
+      agentRemoveTyping();
+      agentAddMsg(sess, 'That clears the last blocker — <b>required documents are on file and the package is executed</b>. Submit to underwriting is unlocked.');
+      _agentSigRefreshNBA(sess);
+      agentRenderQueue();
+    }, 800);
+  }, 6000);
+}
+
+/* ── ✦ Analyze docs — next unanalyzed doc through the existing agentAnalyzeDoc ── */
+function agentSigAnalyzeNext(sess){
+  const idx = sess.docs.findIndex(d => !d.analyzed);
+  if (idx < 0) { agentAddSys(sess, '✦ Every document on file is analyzed — results are on the Session Board', 'var(--green)'); return; }
+  agentAnalyzeDoc(sess.merchant, idx);
+}
+
+/* ── → SUBMIT TO UNDERWRITING — gated on executed package + required docs on file ── */
+function agentSigSubmitUW(sess){
+  const g = sess.sig;
+  if (g.submitted) { agentAddSys(sess, 'Already submitted to underwriting — this file is wrap-ready', 'var(--green)'); return; }
+  agentAddUserMsg(sess, '→ Submit to underwriting.');
+  if (!g.executed) {
+    agentAddTyping(sess);
+    setTimeout(() => { agentRemoveTyping();
+      agentAddMsg(sess, '<b>Submit is locked.</b> The envelope isn’t executed yet — ' + (g.signers.filter(s => s.state !== 'signed').map(s => s.name).join(' and ') || 'a signer') + ' still needs to sign. <b>⏰ Nudge signer</b> is the fastest unlock.');
+    }, 650);
+    return;
+  }
+  const openReq = (g.requests || []).filter(r => r.required && r.status !== 'received');
+  if (openReq.length) {
+    agentAddTyping(sess);
+    setTimeout(() => { agentRemoveTyping();
+      agentAddMsg(sess, '<b>Submit is locked.</b> Waiting on: ' + openReq.map(r => '<b>' + r.doc + '</b>').join(', ') + '. The moment it lands and passes QC, submit unlocks.');
+    }, 650);
+    return;
+  }
+  if (sess._subOpen) return;
+  sess._subOpen = true;
+  const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    agentAddMsg(sess, '<div class="agdk-confirm" id="agdk-sub-' + sl + '">' +
+      'Submit <b>' + sess.merchant + '</b> to underwriting? The executed package + ' + sess.docs.length + ' documents file to the UW queue, the application locks for review, and the queue regroups.' +
+      '<div class="agdk-confirm-foot" id="agdk-sub-foot-' + sl + '">' +
+      '<button class="agdk-chip approve" onclick="agentSigSubmitConfirm(\'' + esc + '\')">→ Confirm submit</button>' +
+      '<button class="agdk-chip" onclick="agentSigSubmitCancel(\'' + esc + '\')">Cancel</button></div></div>');
+  }, 650);
+}
+function agentSigSubmitCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  const foot = document.getElementById('agdk-sub-foot-' + _agdkSlug(name));
+  if (foot) foot.innerHTML = '<span class="agdk-cancelled">Cancelled — file stays at signature stage</span>';
+  if (sess) sess._subOpen = false;
+  _agentSnapshotActive();
+  if (sess) agentAddSys(sess, 'Submit cancelled', 'var(--text-muted)');
+}
+function agentSigSubmitConfirm(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.kind !== 'sig' || sess.sig.submitted) return;
+  const g = sess.sig;
+  const foot = document.getElementById('agdk-sub-foot-' + _agdkSlug(name));
+  if (foot) foot.innerHTML = '<span class="agdk-ck-done">✓ Confirmed by Master Admin · ' + _agdkTime() + '</span>';
+  _agentSnapshotActive();
+  sess._subOpen = false;
+  _agentFinal(sess, _agentToolCardHtml({ icon:'📤', name:'Filed to the underwriting queue', state:'pass',
+    val:'Executed package + ' + sess.docs.length + ' documents attached · application locked for review',
+    meta:'submit_to_underwriting · queue position assigned · verification package staged' }));
+  /* state flips — queue regroups */
+  g.submitted = true;
+  g.timeline.push({ t:_agdkTime(), label:'Submitted to underwriting by Master Admin' });
+  sess.decision = { type:'sig-submitted', time:_agdkTime() };
+  if (sess.m) {
+    sess.m.status = 'underwriting';
+    sess.m.tags = (sess.m.tags || []).filter(t => t !== 'Action Required');
+    sess.m.actionItem = 'In underwriting — verification package ready to run';
+    sess.m.lastAct = 'Just now';
+  }
+  if (typeof ccQ !== 'undefined') ccQ.filter(i => i.merchant === name && !i.done && i.cat === 'application').forEach(i => i.done = true);
+  if (sess.dr) {
+    sess.dr.activity = sess.dr.activity || [];
+    sess.dr.activity.push({ type:'sys', time:_agdkToday(), color:'var(--green)', text:'📤 Submitted to underwriting via AI signature session — executed package + documents attached' });
+  }
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  agentAddSys(sess, '📤 Submitted to underwriting — status flipped · queue regrouped', 'var(--green)');
+  agentToast('📤', '<strong>' + name + '</strong> submitted to underwriting — UW session queued');
+  agentRenderRail(); agentRenderQueue();
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const esc = _agdkEsc(name);
+    agentAddMsg(sess, 'Handoff clean. <b>' + name + '</b> is in the underwriting queue with the executed package and every collected document attached — the UW session will pick it up with the full paper trail.' +
+      '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;">' +
+      '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentSigHandoffUW(\'' + esc + '\')">Open UW session now ▶</button>' +
+      '<span style="font-size:11px;color:var(--text-muted);">or find it later in the Queue</span></div>');
+    _agentSigRefreshNBA(sess);
+    agentRenderQueue();
+  }, 800);
+}
+
+/* chain into the UW session — archive the sig transcript, carry the documents over */
+function agentSigHandoffUW(name){
+  const old = AGENT_DESK.sessions[name];
+  if (old && old.kind === 'sig') {
+    _agentSnapshot(old);
+    (AGENT_DESK.archived = AGENT_DESK.archived || {})[name + '::sig'] = old;
+    delete AGENT_DESK.sessions[name];
+  }
+  if (AGENT_DESK.active === name) AGENT_DESK.active = null;
+  agentOpenSession(name);
+  const s2 = AGENT_DESK.sessions[name];
+  if (s2 && s2 !== old) {
+    if (old) old.docs.forEach(d => { if (!s2.docs.some(x => x.name === d.name)) s2.docs.push(d); });
+    (AGENT_INTERNAL_DOCS[name] || []).forEach(d => { if (!s2.docs.some(x => x.name === d.name)) s2.docs.push(d); });
+    agentRenderRail();
+  }
+}
+
+/* ── Session Board rail for sig sessions (rendered by the B1 agentRenderRail branch) ── */
+function _agentSigRailHtml(sess){
+  const g = sess.sig, p = g.p;
+  const s = (sess.dr && sess.dr.synopsis) || {};
+  const b = s.business || {};
+  const pb = p.business || {};
+  const kv = (k, v) => v ? '<div class="agdk-kv"><span>' + k + '</span><b>' + v + '</b></div>' : '';
+  let html = '<div class="agdk-rail-sec" style="background:var(--bg-elevated);">' +
+    '<div class="agdk-rail-title" style="margin-bottom:4px;">✦ Session Board</div>' +
+    '<div style="font-size:12px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);">' + sess.merchant + '</div>' +
+    '<div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">Signature &amp; documents session</div></div>';
+  /* application summary */
+  html += '<div class="agdk-rail-sec"><div class="agdk-rail-title">📋 Application summary</div>' +
+    kv('Partner', sess.m.partner) + kv('Business', b.type || pb.type) + kv('Location', b.location || pb.location) +
+    kv('Monthly volume', b.monthlyVol || pb.monthlyVol || sess.m.potVol) + kv('Owner', b.owner || pb.owner) +
+    kv('Prior provider', b.prevProcessor || pb.prevProcessor) + kv('Program', p.program) + kv('Pricing', p.pricing) +
+    (p.fields ? kv('Fields complete', p.fields.complete + ' / ' + p.fields.total) : '') + '</div>';
+  /* envelope status — per-signer state */
+  const stChip = g.submitted ? '<span class="uwb-chip pass" style="margin-left:auto;">✓ Submitted to UW</span>'
+    : g.executed ? '<span class="uwb-chip pass" style="margin-left:auto;">✓ Executed</span>'
+    : g.envStatus === 'none' ? '<span class="uwb-chip" style="margin-left:auto;background:var(--bg-hover);color:var(--text-muted);">○ Not sent</span>'
+    : '<span class="uwb-chip warn" style="margin-left:auto;">⏳ ' + (g.envStatus === 'viewed' ? 'Viewed — unsigned' : g.envStatus === 'out' ? 'Out — stalled' : 'Awaiting signatures') + '</span>';
+  const signerRows = (g.signers || []).map((sg, i) => {
+    const done = sg.state === 'signed', viewed = sg.state === 'viewed';
+    const bg = done ? 'rgba(34,197,94,.12)' : viewed ? 'rgba(245,158,11,.14)' : 'var(--bg-elevated)';
+    const fg = done ? 'var(--green)' : viewed ? 'var(--amber)' : 'var(--text-muted)';
+    const glyph = done ? '✓' : viewed ? '👁' : (i + 1);
+    const sub = sg.role + ' · ' + sg.org + (done ? (sg.at ? ' · signed ' + sg.at : ' · signed') : viewed ? ' · opened, not signed' : ' · pending');
+    return '<div class="agdk-vrow"><div class="agdk-vicon" style="background:' + bg + ';color:' + fg + ';">' + glyph + '</div>' +
+      '<div style="flex:1;min-width:0;"><div style="font-weight:600;color:var(--text-primary);">' + sg.name + '</div>' +
+      '<div style="color:var(--text-muted);font-size:10px;line-height:1.4;margin-top:1px;">' + sub + '</div></div></div>';
+  }).join('');
+  html += '<div class="agdk-rail-sec" id="agent-rail-envelope"><div class="agdk-rail-title">✉️ Envelope' + stChip + '</div>' +
+    (g.envId
+      ? '<div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);padding:2px 0 4px;">' + g.envId + ' · ordered signing — partner certifies first</div>'
+      : '<div style="font-size:10px;color:var(--text-muted);padding:2px 0 4px;">No envelope yet — run Assemble &amp; send</div>') +
+    signerRows + '</div>';
+  /* documents (analyzed chips) */
+  const docRows = sess.docs.length ? sess.docs.map(d =>
+    '<div class="agdk-doc-row"><span style="font-size:12px;">📄</span>' +
+    '<div style="flex:1;min-width:0;"><div style="font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + d.name + '</div>' +
+    '<div style="color:var(--text-muted);font-size:9px;font-family:var(--font-mono);">' + d.type + ' · ' + d.date + '</div></div>' +
+    (d.badge ? '<span class="p-badge" style="background:var(--yellow-dim);color:var(--yellow);flex-shrink:0;font-size:9px;">' + d.badge + '</span>' : '') +
+    (d.analyzed ? '<span class="p-badge" style="background:rgba(91,122,94,.14);color:var(--green);flex-shrink:0;font-size:9px;">✦ Analyzed</span>' : '') +
+    '</div>').join('') : '<div class="agdk-empty">No documents yet.</div>';
+  html += '<div class="agdk-rail-sec" id="agent-rail-docs"><div class="agdk-rail-title">🗂 Documents' +
+    '<span style="margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:0;">' + sess.docs.length + '</span></div>' + docRows + '</div>';
+  /* doc requests */
+  const reqRows = g.requests.length ? g.requests.map(r => {
+    const st = r.status === 'received' ? '<span class="uwb-chip pass">✓ Received</span>'
+      : r.status === 'awaiting' ? '<span class="uwb-chip warn">⏳ Awaiting</span>'
+      : '<span class="uwb-chip warn">⚠ To request</span>';
+    return '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+      '<div style="display:flex;align-items:center;gap:7px;"><b style="color:var(--text-primary);flex:1;min-width:0;">' + r.doc + '</b>' + st + '</div>' +
+      '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">' +
+      (r.status === 'received' ? 'Landed ' + (r.receivedAt || 'just now')
+        : r.status === 'awaiting' ? 'Asked ' + (r.askedAt || r.time) + (r.required ? ' · gates UW submit' : '')
+        : 'QC flagged — send the request') + '</div></div>';
+  }).join('') : '<div class="agdk-empty">No open document requests.</div>';
+  html += '<div class="agdk-rail-sec" id="agent-rail-requests"><div class="agdk-rail-title">📎 Doc requests' +
+    '<span style="margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:0;">' + g.requests.filter(r => r.status !== 'received').length + ' open</span></div>' + reqRows + '</div>';
+  /* comms — merchant / partner / team */
+  const commRows = sess.comms.length ? sess.comms.map(cm =>
+    '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+    '<div style="display:flex;align-items:center;gap:6px;"><span class="amode ' + (cm.kind === 'team' ? 'int' : 'out') + '" style="flex-shrink:0;">' +
+    (cm.kind === 'team' ? '→ Team' : cm.kind === 'merchant' ? '→ Merchant' : '→ Partner') + '</span>' +
+    '<b style="color:var(--text-primary);flex:1;min-width:0;">' + cm.label + '</b>' +
+    '<span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">' + cm.time + '</span></div>' +
+    (cm.preview ? '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;line-height:1.4;">' + cm.preview + '</div>' : '') +
+    '</div>').join('') : '<div class="agdk-empty">No messages this session.</div>';
+  html += '<div class="agdk-rail-sec" id="agent-rail-comms"><div class="agdk-rail-title">✉ Partner comms</div>' + commRows + '</div>';
+  return html;
+}
+
+/* ── Intake & Signature Report (End session → shared doc system) ── */
+function _agentBuildSigReport(sess){
+  const g = sess.sig, p = g.p;
+  const s = (sess.dr && sess.dr.synopsis) || {};
+  const b = s.business || p.business || {};
+  let outcome;
+  if (g.submitted) outcome = '<b style="color:var(--green);">SUBMITTED TO UNDERWRITING</b> at ' + (sess.decision ? sess.decision.time : '—') + '. Envelope ' + (g.envId || '—') + ' executed by all ' + g.signers.length + ' signers; required documents on file and QC-clean.';
+  else if (g.executed) outcome = '<b style="color:var(--green);">PACKAGE EXECUTED</b> — envelope ' + (g.envId || '—') + ' complete. ' + ((g.requests || []).filter(r => r.required && r.status !== 'received').length ? 'Underwriting submit still gated on an outstanding document request.' : 'Ready to submit to underwriting.');
+  else outcome = '<b style="color:var(--amber);">ENVELOPE IN FLIGHT</b> — ' + (g.envId ? g.envId + ' out, ' : '') + 'signatures outstanding. File remains in the signature queue.';
+  const tl = g.timeline || [];
+  const tlRows = tl.length
+    ? '<table><tr><th>Time</th><th>Envelope event</th></tr>' + tl.map(e => '<tr><td style="font-family:var(--font-mono);white-space:nowrap;">' + e.t + '</td><td>' + e.label + '</td></tr>').join('') + '</table>'
+    : '<div class="agdk-rep-p" style="color:var(--text-muted);">No envelope events this session.</div>';
+  const sgRows = '<table><tr><th>Signer</th><th>Role</th><th>Status</th></tr>' + (g.signers || []).map(sg =>
+    '<tr><td style="font-weight:600;">' + sg.name + '</td><td>' + sg.role + ' · ' + sg.org + '</td><td style="white-space:nowrap;">' +
+    (sg.state === 'signed' ? '<span class="uwb-chip pass">✓ Signed' + (sg.at ? ' · ' + sg.at : '') + '</span>'
+      : sg.state === 'viewed' ? '<span class="uwb-chip warn">👁 Viewed — unsigned</span>'
+      : '<span class="uwb-chip">○ Pending</span>') + '</td></tr>').join('') + '</table>';
+  const docRows = sess.docs.length
+    ? '<table><tr><th>Document</th><th>Type</th><th>Date</th><th>Notes</th></tr>' + sess.docs.map(d =>
+        '<tr><td style="font-weight:600;">' + d.name + '</td><td>' + d.type + '</td><td style="font-family:var(--font-mono);white-space:nowrap;">' + d.date + '</td><td>' +
+        ([d.badge || '', d.analyzed ? 'AI-analyzed' : ''].filter(Boolean).join(' · ') || '—') + '</td></tr>').join('') + '</table>'
+    : '<div class="agdk-rep-p" style="color:var(--text-muted);">No documents on file.</div>';
+  const reqRows = g.requests.length
+    ? '<table><tr><th>Request</th><th>Status</th><th>Notes</th></tr>' + g.requests.map(r =>
+        '<tr><td style="font-weight:600;">' + r.doc + '</td><td style="white-space:nowrap;">' +
+        (r.status === 'received' ? '<span class="uwb-chip pass">✓ Received</span>' : r.status === 'awaiting' ? '<span class="uwb-chip warn">⏳ Awaiting</span>' : '<span class="uwb-chip warn">⚠ To request</span>') +
+        '</td><td>' + (r.required ? 'Required — gated UW submit' : 'Optional') + (r.reason ? ' · ' + r.reason : '') + '</td></tr>').join('') + '</table>'
+    : '<div class="agdk-rep-p" style="color:var(--text-muted);">No document requests this session.</div>';
+  const comms = sess.comms || [];
+  const commRows = comms.length
+    ? '<table><tr><th>Time</th><th>Channel</th><th>Message</th></tr>' + comms.map(c =>
+        '<tr><td style="font-family:var(--font-mono);white-space:nowrap;">' + c.time + '</td><td style="white-space:nowrap;">' +
+        (c.kind === 'team' ? '<span class="amode int">→ Team</span>' : c.kind === 'merchant' ? '<span class="amode out">→ Merchant</span>' : '<span class="amode out">→ Partner</span>') +
+        '</td><td><b>' + c.label + '</b>' + (c.preview ? '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">' + c.preview + '</div>' : '') + '</td></tr>').join('') + '</table>'
+    : '<div class="agdk-rep-p" style="color:var(--text-muted);">No merchant, partner, or team messages this session.</div>';
+  const log = sess.log || [];
+  const logRows = log.length
+    ? log.map(l => '<div style="padding:2px 0;"><span class="lt">' + l.t + '</span><span class="lw">' + l.who + '</span> ' + _agdkEscHtml(l.text) + '</div>').join('')
+    : '<div style="color:var(--text-muted);">Empty.</div>';
+  const vol = b.monthlyVol || sess.m.potVol || '—';
+  return '<div class="agdk-rep">' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">Deal</div><div class="agdk-rep-p">' +
+      '<b>' + sess.merchant + '</b> · ' + (b.type || '—') + ' · ' + (b.location || '—') + ' · ' + vol + (/\/mo|avg/.test(vol) ? '' : '/mo') + ' · Partner: ' + (sess.m.partner || '—') + ' · ' + p.program + '</div></div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">1 · Outcome &amp; envelope timeline</div><div class="agdk-rep-p">' + outcome + '</div>' + tlRows + '<div style="margin-top:8px;"></div>' + sgRows + '</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">2 · Documents collected</div>' + docRows + '</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">3 · Document requests</div>' + reqRows + '</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">4 · Communications</div>' + commRows + '</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">5 · Full session log</div><div class="agdk-rep-log">' + logRows + '</div></div>' +
+    '<div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:8px;">Generated by Twill AI · signature session · ' + _agdkToday() + ' · human decisions by Master Admin</div>' +
+    '</div>';
+}
+
+/* ── wrappers over the shared kit (assignment-style — no earlier lines edited) ── */
+(function(){
+  /* draft send: route the two sig draft kinds to their commits, everything else unchanged */
+  const _send = agentDraftSend;
+  agentDraftSend = function(name){
+    const sess = AGENT_DESK.sessions[name];
+    const d = sess && sess._draft;
+    if (d && (d.kind === 'signudge' || d.kind === 'sigdocreq')) {
+      const bodyEl = document.getElementById(sess._draftId + '-body');
+      const bodyText = bodyEl ? bodyEl.innerText : d.body;
+      _agentFreezeDraft(sess, '<span class="agdk-sent">✓ Sent · ' + _agdkTime() + '</span>');
+      sess._draft = null;
+      if (d.kind === 'signudge') _agentSigNudgeCommit(sess, d, bodyText);
+      else _agentSigDocReqCommit(sess, d, bodyText);
+      return;
+    }
+    _send(name);
+  };
+  /* draft cancel: also release the sig flow locks */
+  const _cancel = agentDraftCancel;
+  agentDraftCancel = function(name){
+    const sess = AGENT_DESK.sessions[name];
+    _cancel(name);
+    if (sess) { sess._nudgeOpen = false; sess._reqOpen = false; sess._reqActive = null; }
+  };
+  /* open: optional kind param (agentOpenSession(name,'sig')) + sig→UW handoff on reopen */
+  const _open = agentOpenSession;
+  agentOpenSession = function(name, kind){
+    const sess = AGENT_DESK.sessions[name];
+    const m = merchantData.find(x => x.name === name);
+    if (sess && sess.kind === 'sig' && m && (
+          (sess.sig && sess.sig.submitted && m.status === 'underwriting') ||
+          (AGENT_DESK.extraQueue.includes(name) && !(sess.sig && sess.sig.submitted)))) {
+      /* file left the signature stage (submitted here, or signed via the scripted beat) —
+         reopening hands off to a fresh UW session with the documents carried over */
+      agentSigHandoffUW(name);
+      return;
+    }
+    if (kind === 'sig' && AGENT_DESK.extraQueue.includes(name)) kind = null;   // signed via the beat → derive UW
+    if (kind) AGENT_DESK._pendingKind = kind;
+    try { _open(name); } finally { AGENT_DESK._pendingKind = null; }
+  };
+  /* end session: sig sessions produce the Intake & Signature Report through the shared
+     doc system, then offer the next deal in queue (same chaining as UW/Deploy) */
+  const _end = agentEndSession;
+  agentEndSession = function(){
+    const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+    if (!sess || sess.kind !== 'sig') return _end();
+    const docName = 'Intake & Signature Report — ' + sess.merchant;
+    if (!sess.ended) {
+      sess.ended = true;
+      agentAddSys(sess, '■ Session ended by Master Admin — generating Intake & Signature Report', 'var(--text-muted)');
+    }
+    const existing = (AGENT_INTERNAL_DOCS[sess.merchant] || []).find(x => x.name === docName);
+    const doc = existing || sess._reportDoc || { name:docName, type:'Signature Report', badge:'AI session', saved:false };
+    doc.reportHTML = _agentBuildSigReport(sess);
+    doc.date = _agdkToday();
+    sess._reportDoc = doc;
+    agentRenderQueue();
+    _agentOpenDocModal(doc, sess.merchant);
+    if (!sess._chainOffered) {
+      sess._chainOffered = true;
+      const nxt = _agentNextInQueue(sess.merchant);
+      if (nxt) {
+        agentAddMsg(sess, 'That wraps <b>' + _agdkEscHtml(sess.merchant) + '</b>. Next in queue: <b>' + _agdkEscHtml(nxt.name) + '</b> — waiting ' + nxt.waitLabel + '.' +
+          '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+          '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentOpenSession(\'' + _agdkEsc(nxt.name) + '\')">▶ Start — ' + _agdkEscHtml(nxt.name) + '</button>' +
+          '<span style="font-size:11px;color:var(--text-muted);">' + (nxt.kind === 'uw' ? 'UW session' : nxt.kind === 'sig' ? 'Signature session' : 'Deployment session') + ' · ' + _agdkEscHtml(_agqReason(nxt)) + '</span></div>');
+      } else {
+        agentAddMsg(sess, 'That wraps <b>' + _agdkEscHtml(sess.merchant) + '</b> — and the queue is clear. Nothing else waiting on a human right now.');
+      }
+    }
+  };
+})();
+
+/* pill/flyout re-render now that the signature group + demo merchants exist */
+agentRenderQueue();
 /* ===== /AGENT DESK ===== */
 </script>
 

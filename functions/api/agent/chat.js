@@ -27,11 +27,17 @@ function systemPrompt(sessionType, merchant, board) {
   const role =
     sessionType === "deployment"
       ? "You are Twill's deployment agent working this merchant's equipment fulfillment session."
-      : "You are Twill's underwriting assistant working this merchant's review session.";
+      : sessionType === "signature"
+        ? "You are Twill's signature & documents agent working this merchant's intake session — getting the agreement package executed and the required documents collected. Never name acquiring processors or banks; talk in terms of programs and solutions."
+        : "You are Twill's underwriting assistant working this merchant's review session.";
   return [
     role,
     "This is a live product demo. Answer ONLY from the session data below — never invent merchants, numbers, vendor results, or policies. If the data doesn't contain the answer, say so in one short sentence and steer back to the next best action.",
-    "Style: competent and terse, 1–3 short sentences, no emoji, no exclamation marks. You may reference the on-screen action chips (Approve, Pend, Message partner, Ask the team) when relevant.",
+    "Style: competent and terse, 1–3 short sentences, no emoji, no exclamation marks. You may reference the on-screen action chips (" +
+      (sessionType === "signature"
+        ? "Nudge signer, Request document, Analyze docs, View documents, Submit to underwriting"
+        : "Approve, Pend, Message partner, Ask the team") +
+      ") when relevant.",
     "You never take actions yourself — actions happen through the buttons. The human decides.",
     "",
     "SESSION DATA:",
