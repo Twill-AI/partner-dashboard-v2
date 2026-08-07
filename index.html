@@ -2628,13 +2628,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         Applications
         <span style="margin-left:auto;background:var(--border-strong);color:var(--text-secondary);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;font-family:var(--font-mono);">5</span>
       </div>
-      <!-- ===== AGENT DESK ===== -->
-      <div class="nav-item" id="nav-agent-desk" onclick="showView('agent-desk', this)">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5a5.5 5.5 0 00-5.5 5.5c0 1.23.4 2.36 1.08 3.28L2.5 13.5l3.35-.94A5.5 5.5 0 108 1.5zm0 2.9l.72 1.83 1.83.72-1.83.72L8 9.5l-.72-1.83-1.83-.72 1.83-.72L8 4.4z" opacity=".85"/></svg>
-        Agent Desk
-        <span id="nav-agent-desk-badge" style="margin-left:auto;background:var(--yellow-dim);color:var(--yellow);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;font-family:var(--font-mono);">6</span>
-      </div>
-      <!-- ===== /AGENT DESK ===== -->
       <div class="nav-item" id="nav-merchants" onclick="switchMerchantMode('merchants', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 3h10a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1zm5 3a2 2 0 100 4 2 2 0 000-4z" opacity=".8"/></svg>
         Merchants
@@ -2693,29 +2686,31 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
   <div class="main">
 
     <!-- ===== AGENT DESK ===== -->
-    <!-- View: session queue / inbox -->
-    <div class="view" id="view-agent-desk">
-      <div class="topbar">
-        <div class="topbar-left">
-          <div>
-            <div class="page-title">Agent Desk</div>
-            <div class="page-sub">AI ops sessions · human in the loop · <span id="agdk-queue-count">—</span></div>
-          </div>
-        </div>
-        <div class="topbar-right">
-          <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;" onclick="agentRenderQueue()">⟳ Refresh queue</button>
-        </div>
-      </div>
-      <div class="agdk-desk-body">
-        <div class="agdk-desk-inner" id="agent-desk-queue"></div>
-      </div>
+    <!-- Global queue pill — fixed portal chrome, visible on every view (topbars are per-view) -->
+    <div id="agent-queue-pill" onclick="agentQueueToggle()" title="AI session queue — click to review">
+      <span class="agq-dot" id="agent-queue-dot"></span>
+      <span class="agq-label">Queue</span>
+      <span class="agq-counts" id="agent-queue-counts">—</span>
     </div>
 
-    <!-- View: full-screen agent session (chat + Session Board rail) -->
+    <!-- Slide-over queue flyout (overlay — never navigation) -->
+    <div id="agent-queue-scrim" onclick="agentQueueClose()"></div>
+    <aside id="agent-queue-flyout" aria-hidden="true">
+      <div class="agq-hd">
+        <div>
+          <div class="agq-title">✦ Session queue</div>
+          <div class="agq-sub" id="agent-queue-sub">—</div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;flex-shrink:0;" onclick="agentQueueClose()">✕ Close</button>
+      </div>
+      <div class="agq-list" id="agent-queue-list"></div>
+    </aside>
+
+    <!-- View: full-screen agent session (chat + Session Board rail) — mounts on the merchant record -->
     <div class="view" id="view-agent-session">
       <div class="topbar">
         <div class="topbar-left">
-          <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;" onclick="agentBackToDesk()">← Agent Desk</button>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;" onclick="agentBackToMerchant()">← Merchant record</button>
           <div>
             <div class="page-title" id="agent-session-title">Session</div>
             <div class="page-sub" id="agent-session-sub"></div>
@@ -5092,6 +5087,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <span style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;" id="md-assign-bar"><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'partner','md')"><span style="width:18px;height:18px;border-radius:50%;background:#8C7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SL</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Partner</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Summit Lending</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><span style="display:inline-block;width:1px;height:16px;background:var(--border-strong);margin:0 4px;vertical-align:middle;"></span><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'rep','md')"><span style="width:18px;height:18px;border-radius:50%;background:#5B7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SR</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Rep</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Sara Reyes</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><button style="display:inline-flex;align-items:center;gap:4px;background:none;border:1px dashed var(--border-strong);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;" onclick="assignAddRep(this,'md')">+ Rep</button></span>
         </div>
         <div class="topbar-right">
+          <!-- ===== AGENT DESK ===== open the AI session from the merchant record -->
+          <button class="btn btn-primary" id="agent-open-session-btn-md" style="display:none;font-size:11px;padding:5px 12px;background:var(--navy);" onclick="agentOpenFromRecord()">✦ Open agent session</button>
           <label class="btn btn-ghost" style="font-size:11px;padding:5px 10px;cursor:pointer;" title="Upload a fillable PDF — the merchant fills it via chat">
             <input type="file" accept="application/pdf" style="display:none;" onchange="partnerSendFormToMerchant(this)">
             📎 Send form
@@ -7394,6 +7391,8 @@ function nudgeWithDocs() {
         <span class="p-badge" id="dr-status-badge" style="font-size:11px;">Underwriting</span>
         <div class="dr-days warn" id="dr-days">⏱ 5 days in stage</div>
         <div class="dr-topbar-actions">
+          <!-- ===== AGENT DESK ===== open the AI session from the merchant record -->
+          <button class="btn btn-primary" id="agent-open-session-btn-dr" style="display:none;font-size:11px;background:var(--navy);" onclick="agentOpenFromRecord()">✦ Open agent session</button>
           <button class="btn btn-ghost" id="dr-app-btn" onclick="drViewApplication()" style="font-size:11px;">📄 View Application</button>
           <button class="btn btn-amber" onclick="nudgeMerchant()" style="font-size:11px;">📣 Nudge Merchant</button>
         </div>
@@ -31770,7 +31769,6 @@ function showView(name, clickedNav) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (clickedNav) clickedNav.classList.add('active');
   if (name === 'dashboard') { setTimeout(initDashCharts, 30); }
-  if (name === 'agent-desk' && typeof initAgentDesk === 'function') { setTimeout(initAgentDesk, 30); } /* ===== AGENT DESK ===== */
   if (name === 'command-center' && typeof initCC === 'function') { setTimeout(initCC, 20); }
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
   if (name === 'merchant-active') { setTimeout(initMaOverviewCharts, 50); }
@@ -35947,25 +35945,25 @@ const ccPipStages = [
 
 const ccQ = [
   // ── NEEDS YOU NOW ──
-  {id:'wq-001',pri:'now',cat:'application',merchant:'Pacific Coast Retail',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'UW pend overdue — bank statements missing',detail:'First Data waiting 5 days. SLA breach in 4 hours.',act:'Open UW Thread →',fn:"navigateToMerchant('Pacific Coast Retail','underwriting')",age:'5d',sla:true,done:false,snoozed:false},
+  {id:'wq-001',pri:'now',cat:'application',merchant:'Pacific Coast Retail',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'UW pend overdue — bank statements missing',detail:'First Data waiting 5 days. SLA breach in 4 hours.',act:'Open agent session →',fn:"agentOpenSession('Pacific Coast Retail')",age:'5d',sla:true,done:false,snoozed:false},
   {id:'wq-002',pri:'now',cat:'application',merchant:'Metro Print Shop',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Rivermark',processor:'TSYS',title:"DocuSign expires tonight — merchant hasn't opened it",detail:'Sent 2 days ago. No open event. Expiry at midnight.',act:'Resend →',fn:"navigateToMerchant('Metro Print Shop','signature')",age:'2d',sla:true,done:false,snoozed:false},
   {id:'wq-003',pri:'now',cat:'ticket',merchant:'Harbor Bistro',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Coastal Commerce',processor:'Fiserv',title:'Chargeback ratio at 1.8% — threshold approaching',detail:'4 new disputes this week. Response due Friday.',act:'View Ticket →',fn:'goToTicket(0)',age:'4m',sla:false,done:false,snoozed:false},
 
   // ── TODAY ──
-  {id:'wq-004',pri:'today',cat:'application',merchant:'Maple Street Bakery',mst:'underwriting',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'Summit Lending',processor:'First Data Omaha',title:'3 documents uploaded overnight — AI analysis ready',detail:'Owner ID + Jan & Feb bank stmts. 1 pend resolved, 1 partial.',act:'Review →',fn:"navigateToMerchant('Maple Street Bakery','underwriting')",age:'2h',sla:false,done:false,snoozed:false},
+  {id:'wq-004',pri:'today',cat:'application',merchant:'Maple Street Bakery',mst:'underwriting',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'Summit Lending',processor:'First Data Omaha',title:'3 documents uploaded overnight — AI analysis ready',detail:'Owner ID + Jan & Feb bank stmts. 1 pend resolved, 1 partial.',act:'Open agent session →',fn:"agentOpenSession('Maple Street Bakery')",age:'2h',sla:false,done:false,snoozed:false},
   {id:'wq-014',pri:'today',cat:'application',merchant:'Sunrise Bakery',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Apex Elite',processor:'TSYS',title:'New application submitted — ready for first review',detail:'Café & bakery · $42K/mo stated. Submitted via Apex Elite.',act:'Start Review →',fn:"navigateToMerchant('Sunrise Bakery','inreview')",age:'18m',sla:false,done:false,snoozed:false},
-  {id:'wq-015',pri:'today',cat:'application',merchant:'Urban Salon Collective',mst:'approved',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'Merchant signed — approved, ready to board',detail:'Agreement executed. Initiate boarding + equipment order.',act:'Start Boarding →',fn:"navigateToMerchant('Urban Salon Collective','approved')",age:'1h',sla:false,done:false,snoozed:false},
+  {id:'wq-015',pri:'today',cat:'application',merchant:'Urban Salon Collective',mst:'approved',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'Merchant signed — approved, ready to board',detail:'Agreement executed. Initiate boarding + equipment order.',act:'Open agent session →',fn:"agentOpenSession('Urban Salon Collective')",age:'1h',sla:false,done:false,snoozed:false},
   {id:'wq-016',pri:'today',cat:'ticket',merchant:'Coastal Spa & Salon',mst:'underwriting',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Coastal Commerce',processor:'Fiserv',title:'UW ticket opened — additional financials requested',detail:'Underwriter needs YTD P&L + last tax return.',act:'View Ticket →',fn:'goToTicket(1)',age:'3h',sla:false,done:false,snoozed:false},
   {id:'wq-005',pri:'today',cat:'message',merchant:'Neon Nightclub LA',mst:'signature',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'NovaPay',processor:'Elavon',title:'Message from owner — equipment delivery question',detail:'"When does the PAX A920 ship? We open Friday."',act:'Reply →',fn:"navigateToMerchant('Neon Nightclub LA','signature')",age:'1h',sla:false,done:false,snoozed:false},
   {id:'wq-006',pri:'today',cat:'message',merchant:'Green Valley Market',mst:'active',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'NovaPay',processor:'Elavon',title:'Terminal issue — gateway credentials not loading',detail:'Sara R. (NovaPay): "Terminal arrived but credentials wont load"',act:'Respond →',fn:"navigateToMerchant('Green Valley Market','active')",age:'14m',sla:false,done:false,snoozed:false},
   {id:'wq-007',pri:'today',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'—',title:'Commission discrepancy — Dan M. / Summit · March',detail:'Standalone task · Rep seeing different numbers vs. agreed terms.',act:'Open Thread →',fn:"navigateToMerchant('TechSupply Pro LLC','active')",age:'41m',sla:false,done:false,snoozed:false},
-  {id:'wq-008',pri:'today',cat:'application',merchant:'TechForge Solutions',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Priority Commerce',processor:'Priority',title:'Virtual site inspection today — confirm at 2pm',detail:'$2.1M potential. Enhanced due diligence inspection.',act:'Prepare →',fn:"navigateToMerchant('TechForge Solutions','underwriting')",age:'3d',sla:false,done:false,snoozed:false},
+  {id:'wq-008',pri:'today',cat:'application',merchant:'TechForge Solutions',mst:'underwriting',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Priority Commerce',processor:'Priority',title:'Virtual site inspection today — confirm at 2pm',detail:'$2.1M potential. Enhanced due diligence inspection.',act:'Open agent session →',fn:"agentOpenSession('TechForge Solutions')",age:'3d',sla:false,done:false,snoozed:false},
 
   // ── THIS WEEK ──
   {id:'wq-018',pri:'week',cat:'application',merchant:'Pinnacle Fitness',mst:'signature',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Apex Elite',processor:'TSYS',title:'Merchant signature received — submitting to UW',detail:'Signed packet in. Package score 91/100. Auto-submitting.',act:'View →',fn:"navigateToMerchant('Pinnacle Fitness','signature')",age:'6h',sla:false,done:false,snoozed:false},
-  {id:'wq-017',pri:'week',cat:'application',merchant:'Bella Cucina Restaurant',mst:'boarding',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'NovaPay',processor:'Elavon',title:'Documents uploaded — voided check + license received',detail:'Boarding docs complete. Ready to schedule install.',act:'Review →',fn:"navigateToMerchant('Bella Cucina Restaurant','boarding')",age:'1d',sla:false,done:false,snoozed:false},
+  {id:'wq-017',pri:'week',cat:'application',merchant:'Bella Cucina Restaurant',mst:'boarding',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'NovaPay',processor:'Elavon',title:'Documents uploaded — voided check + license received',detail:'Boarding docs complete. Ready to schedule install.',act:'Open agent session →',fn:"agentOpenSession('Bella Cucina Restaurant')",age:'1d',sla:false,done:false,snoozed:false},
   {id:'wq-009',pri:'week',cat:'application',merchant:'Desert Sun Dispensary',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Internal',processor:'—',title:'High-risk app stalled — UW committee memo pending',detail:'11 days in review. Risk justification needed before committee.',act:'Draft Memo →',fn:"navigateToMerchant('Desert Sun Dispensary','inreview')",age:'11d',sla:false,done:false,snoozed:false},
-  {id:'wq-010',pri:'week',cat:'application',merchant:'Bright Star Solar',mst:'boarding',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Coastal Commerce',processor:'Fiserv',title:'Activation overdue — equipment delivered 18 days ago',detail:'No first batch. Equipment confirmed delivered.',act:'Escalate →',fn:"navigateToMerchant('Bright Star Solar','boarding')",age:'18d',sla:false,done:false,snoozed:false},
+  {id:'wq-010',pri:'week',cat:'application',merchant:'Bright Star Solar',mst:'boarding',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Coastal Commerce',processor:'Fiserv',title:'Activation overdue — equipment delivered 18 days ago',detail:'No first batch. Equipment confirmed delivered.',act:'Open agent session →',fn:"agentOpenSession('Bright Star Solar')",age:'18d',sla:false,done:false,snoozed:false},
   {id:'wq-011',pri:'week',cat:'task',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Apex Elite',processor:'—',title:'Review March residuals — Apex Elite $214 shortfall',detail:'Standalone task · Discrepancy vs. processor statement.',act:'Open Residuals →',fn:"showView('residuals',null)",age:'1d',sla:false,done:false,snoozed:false},
   {id:'wq-012',pri:'week',cat:'message',merchant:'Harborlight Dental',mst:'lead',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'NovaPay',processor:'Elavon',title:'Referral from Tara P. (Rivermark) — ~$80K/mo restaurant group',detail:'Warm intro from partner. High-volume opportunity.',act:'View Lead →',fn:"navigateToMerchant('Harborlight Dental','lead')",age:'2h',sla:false,done:false,snoozed:false},
   {id:'wq-013',pri:'week',cat:'ticket',merchant:null,assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Rivermark',processor:'TSYS',title:'Rivermark residual discrepancy — $214 shortfall',detail:'March statement. Needs reconciliation before month-end.',act:'View Ticket →',fn:'goToTicket(4)',age:'3h',sla:false,done:false,snoozed:false},
@@ -37766,17 +37764,19 @@ function agentOpenSession(name){
     : (sess.m.partner||'—') + ' · ' + (sess.dr ? sess.dr.solutionLabel : '');
   const thread = document.getElementById('agent-thread');
   if (thread) { thread.innerHTML = sess.threadHTML; }
-  showView('agent-session', document.getElementById('nav-agent-desk'));
+  showView('agent-session', null);   // B4: no nav tab — breadcrumb wrapper highlights Merchants
   agentRenderRail();
   if (thread) thread.scrollTop = thread.scrollHeight;
   if (fresh) _agentIntro(sess);
 }
 
 function agentBackToDesk(){
+  /* B4 redesign: there is no desk view — reassigned to agentBackToMerchant in the
+     final AGENT DESK script block (kept here only so early references resolve). */
   const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
   if (sess) _agentSnapshot(sess);
   AGENT_DESK.active = null;
-  showView('agent-desk', document.getElementById('nav-agent-desk'));
+  switchMerchantMode('merchants', document.getElementById('nav-merchants'));
 }
 
 /* ── intro + GO ── */
@@ -38680,7 +38680,7 @@ function agentApproveConfirm(name){
     agentAddMsg(sess, 'That’s a clean approval. <b>'+name+'</b> is on the books — MID <b>'+(sess.m.mid||'pending')+'</b>, auto-boarding is running, and the partner sees the status flip in their portal.' +
       '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;">' +
       '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentHandoffDeploy(\''+esc+'\')">Deployment session created — open it now ▶</button>' +
-      '<span style="font-size:11px;color:var(--text-muted);">or find it later in the Agent Desk queue</span></div>');
+      '<span style="font-size:11px;color:var(--text-muted);">or find it later in the Queue</span></div>');
     agentToast('✅', '<strong>'+name+'</strong> approved — deployment session queued');
     agentRenderRail();
     agentRenderQueue();
@@ -39487,6 +39487,332 @@ function agentDraftSend(name){
     return html;
   };
 })();
+/* ===== /AGENT DESK ===== */
+</script>
+
+<style>
+/* ===== AGENT DESK ===== */
+/* B4 redesign: no nav tab — a global queue pill + slide-over flyout replace the desk,
+   and sessions mount on the merchant record. */
+/* Queue pill (fixed portal chrome, bottom-right — clear of every per-view topbar) */
+#agent-queue-pill{position:fixed;bottom:22px;right:24px;z-index:900;display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:999px;padding:9px 16px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.14);font-family:var(--font-ui);user-select:none;transition:box-shadow .15s ease, transform .15s ease;}
+#agent-queue-pill:hover{box-shadow:0 8px 26px rgba(0,0,0,.2);transform:translateY(-1px);}
+#agent-queue-pill.agq-pulse{animation:agqPulse .7s ease 2;}
+@keyframes agqPulse{0%,100%{transform:scale(1);}45%{transform:scale(1.07);}}
+.agq-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.agq-dot.amber{background:#B45309;}
+.agq-dot.red{background:#DC2626;}
+.agq-label{font-size:12px;font-weight:700;color:var(--text-primary);}
+.agq-counts{font-size:10px;font-family:var(--font-mono);font-weight:600;color:var(--text-secondary);}
+/* Slide-over flyout */
+#agent-queue-scrim{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:940;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+#agent-queue-scrim.open{opacity:1;pointer-events:auto;}
+#agent-queue-flyout{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--bg-base);border-left:1px solid var(--border-strong);box-shadow:-12px 0 40px rgba(0,0,0,.18);z-index:950;transform:translateX(103%);transition:transform .26s cubic-bezier(.2,.8,.3,1);display:flex;flex-direction:column;}
+#agent-queue-flyout.open{transform:none;}
+.agq-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border-strong);background:var(--bg-surface);flex-shrink:0;}
+.agq-title{font-size:14px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);letter-spacing:-.01em;}
+.agq-sub{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;}
+.agq-list{flex:1;overflow-y:auto;padding:10px 14px 22px;}
+.agq-group{font-size:9px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:12px 4px 7px;display:flex;align-items:center;gap:7px;}
+.agq-row{display:flex;flex-direction:column;gap:5px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg-surface);margin-bottom:7px;cursor:pointer;transition:border-color .12s ease, background .12s ease;}
+.agq-row:hover{border-color:rgba(0,0,0,.16);background:var(--bg-hover);}
+.agq-row.agdk-new{animation:agdkSlideIn .45s cubic-bezier(.2,.8,.3,1);}
+.agq-row-top{display:flex;align-items:center;gap:8px;min-width:0;}
+.agq-name{font-size:12px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.agq-wait{margin-left:auto;font-size:10px;font-family:var(--font-mono);font-weight:600;color:var(--text-muted);flex-shrink:0;}
+.agq-wait.amber{color:#B45309;}
+.agq-wait.red{color:#DC2626;}
+.agq-reason{font-size:11px;color:var(--text-secondary);line-height:1.4;}
+.agq-chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.agq-empty{font-size:11px;color:var(--text-muted);padding:6px 4px;}
+/* Breadcrumb in the session topbar */
+.agq-crumb{display:flex;align-items:center;gap:7px;font-family:var(--font-ui);}
+.agq-crumb-link{font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;}
+.agq-crumb-link:hover{color:var(--text-primary);text-decoration:underline;}
+.agq-crumb-sep{font-size:11px;color:var(--text-muted);opacity:.6;}
+.agq-crumb-cur{font-size:13px;font-weight:700;color:var(--text-primary);}
+/* ===== /AGENT DESK ===== */
+</style>
+
+<script>
+/* ===== AGENT DESK ===== */
+/* B4 REDESIGN — queue flyout + merchant-record mounting + chaining.
+   Mike's call: power users don't want a separate tab or a bell — the queue comes to
+   them (global pill + slide-over on every view) and all session work lives on the
+   merchant record (breadcrumb + back → navigateToMerchant, "Open agent session"
+   button on the record). All overrides are reassignments/wraps — no earlier
+   Agent Desk lines were edited except the removed nav/desk markup + showView hook. */
+
+AGENT_DESK.queueOpen = false;
+AGENT_DESK.notifTime = null;   // when the Neon beat fired (drives "signed Xm ago")
+
+/* ── queue model ── */
+function _agqMins(s){
+  if (!s) return 0;
+  const m = String(s).match(/(\d+)\s*([mhd])/i);
+  if (!m) return 0;
+  const u = m[2].toLowerCase();
+  return (+m[1]) * (u==='d' ? 1440 : u==='h' ? 60 : 1);
+}
+function _agqSort(a, b){ return (b.urg - a.urg) || (b.waitMins - a.waitMins); }
+
+function _agentQueueEntries(){
+  const out = [];
+  const push = (m, kind, isNew) => {
+    const sess = AGENT_DESK.sessions[m.name] || null;
+    const overdue = (m.tags||[]).includes('Activation Overdue');
+    let waitMins, waitLabel;
+    if (isNew) {
+      waitMins = AGENT_DESK.notifTime ? Math.max(1, Math.round((Date.now() - AGENT_DESK.notifTime)/60000)) : 1;
+      waitLabel = waitMins < 2 ? 'just now' : waitMins + 'm';
+    } else {
+      waitMins = _agqMins(m.lastAct);
+      waitLabel = (m.lastAct || '—').replace(/\s*ago\s*$/,'');
+    }
+    out.push({ name:m.name, m, kind, sess, isNew:!!isNew, overdue, waitMins, waitLabel,
+      urg: overdue ? 3 : isNew ? 2 : 0 });
+  };
+  merchantData.filter(m => m.status === 'underwriting').forEach(m => push(m, 'uw', false));
+  AGENT_DESK.extraQueue.forEach(n => {
+    const m = merchantData.find(x => x.name === n);
+    if (m && m.status !== 'underwriting') push(m, 'uw', true);
+  });
+  merchantData.filter(m => (m.status==='approved' || m.status==='boarding') &&
+    typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[m.name] && DEAL_ROOM_DATA[m.name].deploy)
+    .forEach(m => push(m, 'deploy', false));
+  return out.sort(_agqSort);
+}
+
+function _agqReason(e){
+  if (e.isNew) {
+    const mins = AGENT_DESK.notifTime ? Math.max(1, Math.round((Date.now() - AGENT_DESK.notifTime)/60000)) : 1;
+    return 'signed ' + (mins < 2 ? 'just now' : mins + 'm ago') + ' — entered UW queue';
+  }
+  const d = e.sess && e.sess.decision;
+  if (d) {
+    if (d.type === 'pended')         return 'pended — awaiting partner reply by ' + (d.replyBy || 'EOW');
+    if (d.type === 'escalated')      return 'escalated to risk team — approve locked';
+    if (d.type === 'shipped')        return 'shipped — awaiting install + first batch';
+    if (d.type === 'install-booked') return 'install call booked — watcher armed for first batch';
+    if (d.type === 'dep-escalated')  return 'escalated — deployment queue notified';
+  }
+  if (e.overdue) return 'activation overdue — equipment delivered, no first transaction';
+  if (e.kind === 'deploy') {
+    const dr = (e.sess && e.sess.dr) || (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[e.name]) || null;
+    const eq = dr && dr.deploy && dr.deploy.equipment && dr.deploy.equipment[0];
+    if (eq && eq.pay === 'due') return 'payment pending — gates equipment shipping';
+    return e.m.status === 'approved' ? 'approved — boarding rail running' : 'boarding — equipment + activation in flight';
+  }
+  if (typeof ccQ !== 'undefined') {
+    const it = ccQ.find(i => i.merchant === e.name && !i.done && !i.snoozed && i.cat === 'application');
+    if (it) return it.title;
+  }
+  return 'in underwriting — verification package ready to run';
+}
+
+/* ── pill + flyout rendering (agentRenderQueue keeps its name so every
+   existing call site — flows, approvals, notif beat — still refreshes it) ── */
+function _agentRenderPill(entries){
+  const counts = document.getElementById('agent-queue-counts');
+  const dot = document.getElementById('agent-queue-dot');
+  if (!counts || !dot) return;
+  const uw = entries.filter(e => e.kind === 'uw').length;
+  const dep = entries.length - uw;
+  counts.textContent = 'UW ' + uw + ' · Deploy ' + dep;
+  const maxWait = entries.reduce((mx, e) => Math.max(mx, e.waitMins), 0);
+  dot.className = 'agq-dot' + (maxWait >= 1440 ? ' red' : maxWait >= 120 ? ' amber' : '');
+  dot.title = maxWait >= 1440 ? 'Oldest item waiting more than a day' : maxWait >= 120 ? 'Oldest item waiting more than 2 hours' : 'Queue fresh';
+}
+
+function _agqRow(e){
+  const esc = _agdkEsc(e.name);
+  const stageColor = e.kind==='uw' ? mStatusConfig.underwriting.color : (mStatusConfig[e.m.status]||{}).color || '#7C849A';
+  const stageLabel = e.kind==='uw' ? 'Underwriting' : (e.m.status==='approved' ? 'Approved' : 'Boarding');
+  const waitCls = e.waitMins >= 1440 ? ' red' : e.waitMins >= 120 ? ' amber' : '';
+  const st = e.sess
+    ? (_agdkDecisionState(e.sess)
+      || (e.sess.stage==='verdict' ? {t:'Verdict ready', c:'var(--amber)'}
+        : e.sess.goStarted ? {t:'In progress', c:'var(--amber)'}
+        : {t:'Opened', c:'var(--blue)'}))
+    : null;
+  const chips = [];
+  if (e.isNew) chips.push('<span class="p-badge" style="background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(255,222,0,.3);">● just arrived</span>');
+  if (st) chips.push('<span class="p-badge" style="background:var(--bg-elevated);color:'+st.c+';border:1px solid var(--border-strong);">'+st.t+'</span>');
+  if (e.overdue) chips.push('<span class="p-badge" style="background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);">Activation overdue</span>');
+  if (e.sess && e.sess.comms && e.sess.comms.length) {
+    const last = e.sess.comms[e.sess.comms.length - 1];
+    chips.push('<span class="p-badge" style="background:var(--green-dim);color:var(--green);border:1px solid rgba(91,122,94,.25);">✉ ' +
+      (last.kind === 'team' ? 'messaged the team' : 'emailed ' + _agdkEscHtml((e.m.partner||'partner'))) + '</span>');
+  }
+  return '<div class="agq-row'+(AGENT_DESK.justAdded===e.name ? ' agdk-new' : '')+'" onclick="agentOpenSession(\''+esc+'\')" title="Open session">' +
+    '<div class="agq-row-top">' +
+      '<span class="p-badge" style="flex-shrink:0;background:'+stageColor+'22;color:'+stageColor+';border:1px solid '+stageColor+'40;">'+stageLabel+'</span>' +
+      '<span class="agq-name">'+_agdkEscHtml(e.name)+'</span>' +
+      '<span class="agq-wait'+waitCls+'">⏱ '+e.waitLabel+'</span>' +
+    '</div>' +
+    '<div class="agq-reason">'+_agqReason(e)+'</div>' +
+    (chips.length ? '<div class="agq-chips">'+chips.join('')+'</div>' : '') +
+    '</div>';
+}
+
+function _agentRenderFlyout(entries){
+  const list = document.getElementById('agent-queue-list');
+  const sub = document.getElementById('agent-queue-sub');
+  if (!list) return;
+  const uw = entries.filter(e => e.kind === 'uw');
+  const dep = entries.filter(e => e.kind === 'deploy');
+  list.innerHTML =
+    '<div class="agq-group">Underwriting <span class="agdk-count">'+uw.length+'</span></div>' +
+    (uw.map(_agqRow).join('') || '<div class="agq-empty">Queue clear.</div>') +
+    '<div class="agq-group">Deployment <span class="agdk-count">'+dep.length+'</span></div>' +
+    (dep.map(_agqRow).join('') || '<div class="agq-empty">Queue clear.</div>');
+  if (sub) sub.textContent = entries.length + ' sessions waiting · human in the loop';
+}
+
+agentRenderQueue = function(){
+  const entries = _agentQueueEntries();
+  _agentRenderPill(entries);
+  _agentRenderFlyout(entries);
+};
+
+/* ── flyout open/close (overlay — works on any view, incl. mid-session) ── */
+function agentQueueOpen(){
+  agentRenderQueue();
+  AGENT_DESK.queueOpen = true;
+  document.getElementById('agent-queue-flyout').classList.add('open');
+  document.getElementById('agent-queue-flyout').setAttribute('aria-hidden','false');
+  document.getElementById('agent-queue-scrim').classList.add('open');
+}
+function agentQueueClose(){
+  AGENT_DESK.queueOpen = false;
+  const f = document.getElementById('agent-queue-flyout');
+  if (f) { f.classList.remove('open'); f.setAttribute('aria-hidden','true'); }
+  const s = document.getElementById('agent-queue-scrim');
+  if (s) s.classList.remove('open');
+}
+function agentQueueToggle(){ AGENT_DESK.queueOpen ? agentQueueClose() : agentQueueOpen(); }
+
+/* ── sessions mount on the merchant record ── */
+function agentBackToMerchant(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (sess) _agentSnapshot(sess);
+  AGENT_DESK.active = null;
+  if (sess && sess.m) navigateToMerchant(sess.merchant, sess.m.status);   // m.status is live — routes to app view / Deal Room by current stage
+  else switchMerchantMode('merchants', document.getElementById('nav-merchants'));
+}
+/* legacy name → merchant record (there is no desk anymore) */
+agentBackToDesk = agentBackToMerchant;
+
+function agentCrumbMerchants(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (sess) _agentSnapshot(sess);
+  AGENT_DESK.active = null;
+  switchMerchantMode('merchants', document.getElementById('nav-merchants'));
+}
+
+function _agentSessionCrumb(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!sess) return;
+  const el = document.getElementById('agent-session-title');
+  if (el) el.innerHTML =
+    '<span class="agq-crumb">' +
+    '<span class="agq-crumb-link" onclick="agentCrumbMerchants()">Merchants</span>' +
+    '<span class="agq-crumb-sep">→</span>' +
+    '<span class="agq-crumb-link" onclick="agentBackToMerchant()" title="Open the merchant record">'+_agdkEscHtml(sess.merchant)+'</span>' +
+    '<span class="agq-crumb-sep">→</span>' +
+    '<span class="agq-crumb-cur">'+(sess.kind==='uw' ? 'UW Session' : 'Deployment Session')+'</span>' +
+    '</span>';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('nav-merchants');
+  if (nav) nav.classList.add('active');
+}
+
+/* wrap agentOpenSession (wraps B2's handoff-aware wrapper): snapshot the session
+   being left when jumping deals from the flyout, close the flyout, set the crumb */
+(function(){
+  const _open = agentOpenSession;
+  agentOpenSession = function(name){
+    if (AGENT_DESK.active && AGENT_DESK.active !== name) {
+      const cur = AGENT_DESK.sessions[AGENT_DESK.active];
+      if (cur) _agentSnapshot(cur);
+    }
+    _open(name);
+    agentQueueClose();
+    _agentSessionCrumb();
+  };
+})();
+
+/* "Open agent session" button on the merchant record (md-topbar + Deal Room topbar) */
+function _agentSyncOpenBtn(name){
+  const m = merchantData.find(x => x.name === name);
+  const eligible = !!m && (m.status === 'underwriting' || m.status === 'approved' || m.status === 'boarding' ||
+    AGENT_DESK.extraQueue.includes(name));
+  window._agdkRecordName = name;
+  ['agent-open-session-btn-md','agent-open-session-btn-dr'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.style.display = eligible ? '' : 'none';
+  });
+}
+function agentOpenFromRecord(){
+  if (window._agdkRecordName) agentOpenSession(window._agdkRecordName);
+}
+(function(){
+  const _nav = navigateToMerchant;
+  navigateToMerchant = function(name, status){
+    _nav.apply(this, arguments);
+    _agentSyncOpenBtn(name);
+  };
+})();
+
+/* ── scripted Neon Nightclub LA beat — now armed on page load (any view), not on a tab ── */
+_agentFireNotif = function(){
+  if (AGENT_DESK.notifFired) return;
+  AGENT_DESK.notifFired = true;
+  AGENT_DESK.extraQueue.push('Neon Nightclub LA');
+  AGENT_DESK.justAdded = 'Neon Nightclub LA';
+  AGENT_DESK.notifTime = Date.now();
+  agentRenderQueue();
+  const pill = document.getElementById('agent-queue-pill');
+  if (pill) { pill.classList.add('agq-pulse'); setTimeout(() => pill.classList.remove('agq-pulse'), 1600); }
+  setTimeout(() => { AGENT_DESK.justAdded = null; }, 1400);
+  agentToast('🔔', '<strong>Neon Nightclub LA</strong> — application signed → entered UW queue' +
+    '<span class="tkt-toast-link" onclick="agentToastOpen()"> → Open session</span>', 4200);
+};
+
+initAgentDesk = function(){
+  agentRenderQueue();
+  if (!AGENT_DESK.notifArmed) {
+    AGENT_DESK.notifArmed = true;
+    setTimeout(_agentFireNotif, 6000);   // once per page load, fires on whatever view is up
+  }
+};
+
+/* ── queue chaining: session ends → agent offers the next deal ── */
+function _agentNextInQueue(exclude){
+  return _agentQueueEntries().find(e =>
+    e.name !== exclude && !(e.sess && (e.sess.ended || e.sess.decision))) || null;
+}
+(function(){
+  const _end = agentEndSession;
+  agentEndSession = function(){
+    const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+    _end();
+    if (!sess || sess._chainOffered) return;
+    sess._chainOffered = true;
+    const nxt = _agentNextInQueue(sess.merchant);
+    if (nxt) {
+      agentAddMsg(sess, 'That wraps <b>'+_agdkEscHtml(sess.merchant)+'</b>. Next in queue: <b>'+_agdkEscHtml(nxt.name)+'</b> — waiting '+nxt.waitLabel+'.' +
+        '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+        '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentOpenSession(\''+_agdkEsc(nxt.name)+'\')">▶ Start — '+_agdkEscHtml(nxt.name)+'</button>' +
+        '<span style="font-size:11px;color:var(--text-muted);">'+(nxt.kind==='uw' ? 'UW session' : 'Deployment session')+' · '+_agdkEscHtml(_agqReason(nxt))+'</span></div>');
+    } else {
+      agentAddMsg(sess, 'That wraps <b>'+_agdkEscHtml(sess.merchant)+'</b> — and the queue is clear. Nothing else waiting on a human right now.');
+    }
+  };
+})();
+
+/* boot: pill renders + notification beat arms immediately on load, whatever the view */
+initAgentDesk();
 /* ===== /AGENT DESK ===== */
 </script>
 </body>
