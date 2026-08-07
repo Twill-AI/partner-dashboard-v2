@@ -78,7 +78,6 @@ export async function onRequestPost({ request, env }) {
   const payload = {
     model: MODEL,
     max_tokens: MAX_TOKENS,
-    temperature: 0.4,
     system: systemPrompt(body.sessionType, body.merchant || {}, body.board || {}),
     messages: collapsed,
   };
@@ -94,7 +93,8 @@ export async function onRequestPost({ request, env }) {
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      return jsonResponse({ error: "Upstream error " + res.status }, 502);
+      const detail = (await res.text().catch(() => "")).slice(0, 300);
+      return jsonResponse({ error: "Upstream error " + res.status, detail }, 502);
     }
     const data = await res.json();
     const text = (data.content || [])
