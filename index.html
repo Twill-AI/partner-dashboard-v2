@@ -1125,6 +1125,76 @@
 /* ── SIGNATURE / UW FULL-SCREEN CHAT MODE ─────────────────── */
 #sig-uw-overlay { display:none; flex:1; flex-direction:column; min-height:0; overflow:hidden; }
 .sig-uw-active #sig-uw-overlay { display:flex; }
+
+/* ── UW WORKBENCH (underwriter decision surface) ─────────────── */
+#uw-workbench { display:none; flex:1; min-height:0; overflow-y:auto; padding:16px 22px 44px; }
+.uw-bench-active #uw-workbench { display:block; }
+.uw-bench-active .sig-uw-body { display:none !important; }
+.uwb-wrap { max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+.uwb-banner { display:flex; align-items:center; gap:14px; border-radius:10px; padding:13px 18px; border:1px solid; }
+.uwb-banner.go { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.28); }
+.uwb-banner.review { background:rgba(245,158,11,.07); border-color:rgba(245,158,11,.3); }
+.uwb-banner.halt { background:rgba(239,68,68,.06); border-color:rgba(239,68,68,.3); }
+.uwb-light { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.uwb-banner.go .uwb-light{background:rgba(34,197,94,.15);} .uwb-banner.review .uwb-light{background:rgba(245,158,11,.15);} .uwb-banner.halt .uwb-light{background:rgba(239,68,68,.14);}
+.uwb-banner-title{font-size:14px;font-weight:700;font-family:var(--font-ui);}
+.uwb-banner.go .uwb-banner-title{color:var(--green);} .uwb-banner.review .uwb-banner-title{color:var(--amber);} .uwb-banner.halt .uwb-banner-title{color:var(--red);}
+.uwb-banner-sub{font-size:13px;color:var(--text-secondary);margin-top:2px;line-height:1.45;}
+.uwb-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+@media(max-width:1100px){ .uwb-grid{grid-template-columns:repeat(2,1fr);} }
+.uwb-check { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:11px 13px; }
+.uwb-check.warn { border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.04); }
+.uwb-check.fail { border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.04); }
+.uwb-check-hdr { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+.uwb-check-name { font-size:10px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.05em; color:var(--text-secondary); }
+.uwb-chip { margin-left:auto; font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.04em; }
+.uwb-chip.pass { background:rgba(34,197,94,.1); color:var(--green); }
+.uwb-chip.warn { background:rgba(245,158,11,.12); color:var(--amber); }
+.uwb-chip.fail { background:rgba(239,68,68,.12); color:var(--red); }
+.uwb-check-val { font-size:13px; color:var(--text-primary); line-height:1.45; }
+.uwb-check-meta { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:9px; color:var(--text-muted); font-family:var(--font-mono); }
+.uwb-rerun { margin-left:auto; cursor:pointer; font-family:var(--font-ui); font-size:9px; color:var(--text-muted); border:1px solid var(--border-strong); border-radius:4px; padding:1px 7px; background:var(--bg-surface); }
+.uwb-rerun:hover { color:var(--text-primary); }
+.uwb-sec { background:var(--bg-surface); border:1px solid var(--border); border-radius:10px; }
+.uwb-sec-hdr { display:flex; align-items:center; gap:8px; padding:9px 16px; border-bottom:1px solid var(--border-strong); font-size:11px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary); }
+.uwb-sec-body { padding:10px 16px; }
+.uwb-route-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:900px){ .uwb-route-row{grid-template-columns:1fr;} }
+.uwb-route { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:11px 14px; display:flex; gap:11px; align-items:flex-start; }
+.uwb-pend { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+.uwb-pend:last-child { border-bottom:none; }
+.uwb-audit-row { display:flex; gap:10px; padding:6px 0; font-size:11px; border-bottom:1px solid var(--border); align-items:baseline; }
+.uwb-audit-row:last-child{border-bottom:none;}
+.uwb-audit-time { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); width:118px; flex-shrink:0; }
+.sig-uw-mode-toggle { display:none; align-items:center; gap:0; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:6px; padding:2px; }
+.sig-uw-mode-toggle.visible { display:inline-flex; }
+.sig-uw-mode-btn { font-size:11px; font-weight:600; font-family:var(--font-ui); padding:4px 12px; border-radius:5px; cursor:pointer; color:var(--text-muted); white-space:nowrap; }
+.sig-uw-mode-btn.on { background:var(--bg-base); color:var(--text-primary); box-shadow:0 1px 2px rgba(0,0,0,.07); }
+
+/* ── DEAL ROOM: DEPLOYMENT PANEL ─────────────────────────────── */
+.drd-sec { background:var(--bg-surface); border:1px solid var(--border); border-radius:10px; margin-bottom:14px; }
+.drd-sec-hdr { display:flex; align-items:center; gap:8px; padding:9px 16px; border-bottom:1px solid var(--border-strong); font-size:11px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary); }
+.drd-sec-body { padding:12px 16px; }
+.drd-rail { display:flex; overflow-x:auto; padding:2px 0; }
+.drd-node { flex:1; min-width:126px; position:relative; padding:9px 12px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:9px; margin-right:20px; }
+.drd-node:last-child{margin-right:0;}
+.drd-node:not(:last-child):after{content:"";position:absolute;right:-16px;top:50%;transform:translateY(-50%);border:6px solid transparent;border-left:9px solid var(--border-strong);}
+.drd-node.done { border-color:rgba(34,197,94,.3); }
+.drd-node.now { border-color:rgba(245,158,11,.4); background:rgba(245,158,11,.04); }
+.drd-node-label { font-size:10px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.04em; color:var(--text-secondary); display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+.drd-node-val { font-size:11px; font-family:var(--font-mono); color:var(--text-primary); word-break:break-all; }
+.drd-node-time { font-size:9px; font-family:var(--font-mono); color:var(--text-muted); margin-top:3px; }
+.drd-equip-row { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--border); }
+.drd-equip-row:last-child{border-bottom:none;}
+.drd-pay-chip { font-size:10px; font-weight:700; font-family:var(--font-ui); padding:2px 8px; border-radius:4px; white-space:nowrap; }
+.drd-pay-chip.paid { background:rgba(34,197,94,.1); color:var(--green); }
+.drd-pay-chip.due { background:rgba(245,158,11,.12); color:var(--amber); }
+.drd-track { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--text-muted); font-family:var(--font-ui); flex-wrap:wrap; }
+.drd-track b { color:var(--text-primary); font-weight:600; }
+.drd-track .tstep { display:inline-flex; align-items:center; gap:4px; }
+.drd-track .tsep { color:var(--border-strong); }
+.drd-alert { display:flex; gap:10px; align-items:flex-start; border-radius:9px; padding:11px 14px; border:1px solid rgba(239,68,68,.3); background:rgba(239,68,68,.05); margin-bottom:12px; }
+.drd-watch { display:flex; gap:10px; align-items:center; border-radius:9px; padding:10px 14px; border:1px dashed var(--border-strong); background:var(--bg-elevated); font-size:11px; color:var(--text-secondary); }
 .sig-uw-active .body-row { display:none !important; }
 #locked-banner { display:none; }
 .sig-uw-sub-hdr { display:flex; align-items:center; gap:10px; padding:9px 16px; background:var(--bg-surface); border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -1198,8 +1268,8 @@
   /* ── DEAL ROOM ─────────────────────────────────── */
   #view-deal-room.active { display:flex; flex-direction:column; }
   .dr-topbar { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid rgba(0,0,0,0.05); background:var(--bg-surface); flex-shrink:0; }
-  .dr-topbar-info { flex:1; }
-  .dr-topbar-name { font-size:16px; font-weight:600; }
+  .dr-topbar-info { flex:1; min-width:170px; }
+  .dr-topbar-name { font-size:16px; font-weight:600; white-space:nowrap; }
   .dr-topbar-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
   .dr-topbar-actions { display:flex; gap:6px; align-items:center; }
   .dr-days { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:600; padding:5px 10px; border-radius:6px; }
@@ -4961,6 +5031,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <span id="sig-uw-status-badge" style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:5px;font-size:11px;font-weight:700;color:var(--amber);">&#x1F510; Out for Signature</span>
           <span style="font-size:12px;font-weight:600;color:var(--text-primary);" id="sig-uw-merchant-name">Fresh Brew Coffee Co.</span>
           <span id="sig-uw-partner-line" style="font-size:11px;color:var(--text-muted);">/ Application &middot; Summit Lending</span>
+          <div class="sig-uw-mode-toggle" id="sig-uw-mode-toggle" style="margin-left:14px;">
+            <div class="sig-uw-mode-btn" id="sig-uw-mode-bench" onclick="sigUWSetSurface('bench')">&#x1F6E1; UW Workbench</div>
+            <div class="sig-uw-mode-btn" id="sig-uw-mode-chat" onclick="sigUWSetSurface('chat')">&#x1F4AC; Conversation</div>
+          </div>
           <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
             <button onclick="minimizeSigUWChat()" style="display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-primary);cursor:pointer;font-family:var(--font-ui);box-shadow:0 1px 3px rgba(0,0,0,.08);" title="Go back to application form">&#x2190; Back to Application</button>
           </div>
@@ -5065,6 +5139,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             </div>
           </div><!-- /sig-uw-chat -->
         </div><!-- /sig-uw-body -->
+        <div id="uw-workbench"></div>
       </div><!-- /sig-uw-overlay -->
 
       <!-- Body: step nav + form + chat -->
@@ -7273,6 +7348,9 @@ function nudgeWithDocs() {
               </div>
             </div>
           </div>
+
+          <!-- DEPLOYMENT PANEL (approved / boarding — auto-board rail, equipment fulfillment, activation watch) -->
+          <div id="dr-deploy" style="display:none;"></div>
 
           <!-- UW PENDS (interactive — replaces old static UW card) -->
           <div class="dr-pends" id="dr-pends" style="display:none;"></div>
@@ -13653,6 +13731,443 @@ function navigateToMerchant(name, status) {
     setTimeout(() => renderSolutionBuilder(name), 50);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   UW WORKBENCH + DEPLOYMENT FLOW
+   Underwriting: verification grid, go/halt banner, concurrence
+   routing, structured pends, immutable audit trail, decisioning.
+   Deployment: auto-board rail, equipment fulfillment w/ payment
+   gate + serials, shipping tracking, first-batch activation watch.
+   ═══════════════════════════════════════════════════════════════ */
+
+const UW_WORKBENCH_DATA = {
+  'Pacific Coast Retail': {
+    riskTier: 'T-2 · Card Present', queuedBy: 'Auto-router', queuedOn: 'Mar 2, 9:41 AM',
+    checks: [
+      { name:'MATCH', icon:'🗂', state:'pass', val:'No match found', meta:'Mastercard MATCH · Mar 2, 9:41 AM' },
+      { name:'OFAC / Sanctions', icon:'🌐', state:'pass', val:'Clear — 0 hits (business + 2 owners)', meta:'OFAC SDN · Mar 2, 9:41 AM' },
+      { name:'TIN Check', icon:'#️⃣', state:'pass', val:'EIN ••-•••4821 matches IRS records', meta:'IRS TIN Match · Mar 2, 9:41 AM' },
+      { name:'GIACT Bank', icon:'🏦', state:'pass', val:'Chase ••4417 verified · account open, positive', meta:'GIACT gVerify · Mar 2, 9:41 AM' },
+      { name:'Credit Report', icon:'📊', state:'warn', val:'688 · thin file — 1 tradeline. Review with bank statements.', meta:'Experian Soft Pull · Mar 2, 9:42 AM' },
+      { name:'KYB / SOS', icon:'🏛', state:'pass', val:'Pacific Coast Retail LLC — Active, CA · filed 2023', meta:'CA SOS · Mar 2, 9:42 AM' },
+    ],
+    concurrence: { required:true, reason:'Projected volume $150K/mo exceeds the $100K senior co-approval threshold', routedTo:'R. Alvarez (Senior UW)', state:'Queued — notified 2h ago' },
+    audit: [
+      { t:'Mar 2 · 9:40 AM', who:'M. Wright (rep)', what:'Submitted application to underwriting' },
+      { t:'Mar 2 · 9:41 AM', who:'System', what:'Verification package ran — 6 checks in 1.8s, 0 API failures' },
+      { t:'Mar 2 · 9:41 AM', who:'System', what:'Concurrence rule matched ($150K > $100K) — routed to Senior UW queue' },
+      { t:'Mar 3 · 2:12 PM', who:'S. Reyes (partner)', what:'Uploaded bank_stmt_feb.pdf', note:'satisfies 1 of 3 months' },
+      { t:'Mar 4 · 8:03 AM', who:'S. Reyes (partner)', what:'Deleted bank_stmt_feb_v1.pdf', flag:'Retained — original preserved in UW vault' },
+      { t:'Mar 5 · 10:30 AM', who:'J. Rivera (UW)', what:'Pend sent to partner — Owner ID + 2 months bank statements' },
+    ],
+  },
+  'Maple Street Bakery': {
+    riskTier: 'T-1 · Swipe', queuedBy: 'Auto-router', queuedOn: 'Feb 26, 8:15 AM',
+    checks: [
+      { name:'MATCH', icon:'🗂', state:'pass', val:'No match found', meta:'Mastercard MATCH · Feb 26, 8:15 AM' },
+      { name:'OFAC / Sanctions', icon:'🌐', state:'pass', val:'Clear — 0 hits', meta:'OFAC SDN · Feb 26, 8:15 AM' },
+      { name:'TIN Check', icon:'#️⃣', state:'pass', val:'EIN ••-•••2210 matches IRS records', meta:'IRS TIN Match · Feb 26, 8:15 AM' },
+      { name:'GIACT Bank', icon:'🏦', state:'pass', val:'Wells Fargo ••8092 verified', meta:'GIACT gVerify · Feb 26, 8:15 AM' },
+      { name:'Credit Report', icon:'📊', state:'pass', val:'742 · clean, 6 tradelines', meta:'Experian Soft Pull · Feb 26, 8:16 AM' },
+      { name:'KYB / SOS', icon:'🏛', state:'warn', val:'Maple Street Bakery LLC — Active, WA · registered agent mismatch vs application. Overnight upload may resolve.', meta:'WA SOS · Feb 26, 8:16 AM' },
+    ],
+    concurrence: { required:false, reason:'Projected volume $35K/mo — under all co-approval thresholds', routedTo:null, state:'Single-underwriter decision' },
+    audit: [
+      { t:'Feb 26 · 8:14 AM', who:'S. Patel (rep)', what:'Submitted application to underwriting' },
+      { t:'Feb 26 · 8:15 AM', who:'System', what:'Verification package ran — 6 checks in 1.6s, 0 API failures' },
+      { t:'Feb 27 · 3:20 PM', who:'J. Rivera (UW)', what:'Pend sent — Owner ID + bank statements (3 months)' },
+      { t:'Today · 2:44 AM', who:'Merchant', what:'Uploaded 3 documents overnight via merchant link' },
+      { t:'Today · 2:45 AM', who:'Twill AI', what:'Analyzed uploads — 1 pend satisfied, 1 partial (2 of 3 bank statements)' },
+    ],
+  },
+  'TechForge Solutions': {
+    riskTier: 'T-4 · Enterprise CNP', queuedBy: 'Auto-router', queuedOn: 'Feb 6, 11:02 AM',
+    checks: [
+      { name:'MATCH', icon:'🗂', state:'pass', val:'No match found', meta:'Mastercard MATCH · Feb 6, 11:02 AM' },
+      { name:'OFAC / Sanctions', icon:'🌐', state:'pass', val:'Clear — 0 hits (business + 3 owners)', meta:'OFAC SDN · Feb 6, 11:02 AM' },
+      { name:'TIN Check', icon:'#️⃣', state:'pass', val:'EIN ••-•••0977 matches IRS records', meta:'IRS TIN Match · Feb 6, 11:02 AM' },
+      { name:'GIACT Bank', icon:'🏦', state:'pass', val:'SVB ••3308 verified', meta:'GIACT gVerify · Feb 6, 11:02 AM' },
+      { name:'Credit Report', icon:'📊', state:'fail', val:'Fraud alert on principal’s consumer report — call-out verification required before decision.', meta:'Experian Soft Pull · Feb 6, 11:03 AM' },
+      { name:'KYB / SOS', icon:'🏛', state:'pass', val:'TechForge Solutions Inc — Active, DE · foreign-qualified TX', meta:'DE SOS · Feb 6, 11:03 AM' },
+    ],
+    concurrence: { required:true, reason:'Projected volume $2.1M/mo — enhanced due diligence tier. Virtual site inspection pending.', routedTo:'R. Alvarez (Senior UW) + Risk Committee', state:'Fraud-alert call-out queued — 2 ahead in queue' },
+    audit: [
+      { t:'Feb 6 · 11:01 AM', who:'M. Wright (rep)', what:'Submitted application to underwriting' },
+      { t:'Feb 6 · 11:02 AM', who:'System', what:'Verification package ran — 6 checks in 2.1s, 0 API failures' },
+      { t:'Feb 6 · 11:03 AM', who:'System', what:'Fraud alert detected on credit pull — routed to call-out verification queue' },
+      { t:'Feb 6 · 11:03 AM', who:'System', what:'EDD rule matched ($2.1M volume) — virtual site inspection task created' },
+      { t:'Feb 20 · 4:40 PM', who:'R. Alvarez (UW)', what:'Reviewed processing history — 14 months at Stripe, 0.4% CB ratio', note:'within tolerance' },
+    ],
+  },
+};
+
+function _uwbDefaultData(name) {
+  return { riskTier:'T-2 · Card Present', queuedBy:'Auto-router', queuedOn:'—',
+    checks:[
+      { name:'MATCH', icon:'🗂', state:'pass', val:'No match found', meta:'Mastercard MATCH' },
+      { name:'OFAC / Sanctions', icon:'🌐', state:'pass', val:'Clear — 0 hits', meta:'OFAC SDN' },
+      { name:'TIN Check', icon:'#️⃣', state:'pass', val:'EIN verified', meta:'IRS TIN Match' },
+      { name:'GIACT Bank', icon:'🏦', state:'pass', val:'Bank account verified', meta:'GIACT gVerify' },
+      { name:'Credit Report', icon:'📊', state:'pass', val:'Within tolerance', meta:'Experian Soft Pull' },
+      { name:'KYB / SOS', icon:'🏛', state:'pass', val:'Entity active', meta:'SOS' },
+    ],
+    concurrence:{ required:false, reason:'Under all co-approval thresholds', routedTo:null, state:'Single-underwriter decision' }, audit:[] };
+}
+
+function sigUWSetSurface(mode) {
+  const view = document.getElementById('view-merchant-detail');
+  if (!view) return;
+  const benchBtn = document.getElementById('sig-uw-mode-bench');
+  const chatBtn  = document.getElementById('sig-uw-mode-chat');
+  if (mode === 'bench') {
+    view.classList.add('uw-bench-active');
+    benchBtn?.classList.add('on'); chatBtn?.classList.remove('on');
+    renderUWWorkbench(_currentSBMerchant);
+  } else {
+    view.classList.remove('uw-bench-active');
+    chatBtn?.classList.add('on'); benchBtn?.classList.remove('on');
+  }
+}
+
+function renderUWWorkbench(name) {
+  const host = document.getElementById('uw-workbench');
+  if (!host) return;
+  const m   = merchantData.find(x => x.name === name);
+  const uwb = UW_WORKBENCH_DATA[name] || _uwbDefaultData(name);
+  const dr  = (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name]) || null;
+  const pends = (dr && dr.pends) ? dr.pends : [];
+  const openPends = pends.filter(p => p.status === 'open');
+  const fails = uwb.checks.filter(c => c.state === 'fail');
+  const warns = uwb.checks.filter(c => c.state === 'warn');
+
+  let bannerCls, bannerIcon, bannerTitle;
+  if (fails.length) { bannerCls='halt'; bannerIcon='🔴'; bannerTitle='Halt — resolve before decision'; }
+  else if (warns.length || openPends.length) { bannerCls='review'; bannerIcon='🟡'; bannerTitle='Review — items need attention'; }
+  else { bannerCls='go'; bannerIcon='🟢'; bannerTitle='Green — all checks passed, no open pends'; }
+  const lookAt = [
+    ...fails.map(c => c.name + ': ' + c.val),
+    ...warns.map(c => c.name + ': ' + c.val),
+    ...openPends.map(p => 'Pend: ' + p.title),
+  ];
+
+  const checksHTML = uwb.checks.map(c => `
+    <div class="uwb-check ${c.state==='pass'?'':c.state}">
+      <div class="uwb-check-hdr"><span style="font-size:13px;">${c.icon}</span><span class="uwb-check-name">${c.name}</span>
+        <span class="uwb-chip ${c.state}">${c.state==='pass'?'✓ Clear':c.state==='warn'?'⚠ Review':'✕ Halt'}</span></div>
+      <div class="uwb-check-val">${c.val}</div>
+      <div class="uwb-check-meta"><span>${c.meta}</span><span class="uwb-rerun" onclick="event.stopPropagation();this.textContent='⟳ re-running…';setTimeout(()=>this.textContent='⟳ Re-run',900);">⟳ Re-run</span></div>
+    </div>`).join('');
+
+  const pendStateChip = p => p.status==='open'
+    ? '<span class="uwb-chip warn" style="flex-shrink:0;">Waiting on partner</span>'
+    : '<span class="uwb-chip pass" style="flex-shrink:0;">Satisfied</span>';
+  const pendsHTML = pends.length ? pends.map(p => `
+    <div class="uwb-pend">
+      <span style="font-size:13px;flex-shrink:0;">${p.status==='open' ? (p.severity==='red'?'🔴':'🟡') : '✅'}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${p.title}</div>
+        <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;margin-top:2px;">${p.desc}</div>
+        ${p.resolvedNote ? `<div style="font-size:11px;color:var(--green);margin-top:3px;">✓ ${p.resolvedNote}</div>` : ''}
+      </div>
+      ${pendStateChip(p)}
+      ${p.status==='open' ? '<button class="btn btn-ghost" style="font-size:10px;padding:3px 9px;flex-shrink:0;" onclick="event.stopPropagation();this.textContent=\'✓ Nudged\';">📣 Nudge</button>' : ''}
+    </div>`).join('')
+    : '<div style="font-size:12px;color:var(--text-muted);padding:6px 0;">No pends — nothing outstanding from the partner or merchant.</div>';
+
+  const auditHTML = uwb.audit.length ? uwb.audit.map(a => `
+    <div class="uwb-audit-row">
+      <span class="uwb-audit-time">${a.t}</span>
+      <span style="flex-shrink:0;font-weight:600;color:var(--text-secondary);min-width:120px;">${a.who}</span>
+      <span style="color:var(--text-primary);flex:1;">${a.what}
+        ${a.note ? `<span style="color:var(--text-muted);"> — ${a.note}</span>` : ''}
+        ${a.flag ? `<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(239,68,68,.1);color:var(--red);">🔒 ${a.flag}</span>` : ''}
+      </span>
+    </div>`).join('')
+    : '<div style="font-size:12px;color:var(--text-muted);">No events yet.</div>';
+
+  const conc = uwb.concurrence;
+  host.innerHTML = `<div class="uwb-wrap">
+    <div class="uwb-banner ${bannerCls}">
+      <div class="uwb-light">${bannerIcon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="uwb-banner-title">${bannerTitle}</div>
+        <div class="uwb-banner-sub">${lookAt.length ? 'Look at: ' + lookAt.join(' · ') : 'Ready for a decision. All verification sources returned clean and no conditions are outstanding.'}</div>
+      </div>
+      <div class="uwb-actions">
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;" onclick="uwbPend('${name.replace(/'/g,"\\'")}')">⏸ Pend</button>
+        <button class="btn btn-danger" style="font-size:11px;padding:6px 12px;" onclick="uwbDecline('${name.replace(/'/g,"\\'")}')">✕ Decline</button>
+        <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" ${fails.length?'disabled title="Blocked by red checks"':''} onclick="uwbApprove('${name.replace(/'/g,"\\'")}')">✓ Approve${conc.required?' (co-sign)':''}</button>
+      </div>
+    </div>
+
+    <div class="uwb-grid">${checksHTML}</div>
+
+    <div class="uwb-route-row">
+      <div class="uwb-route">
+        <span style="font-size:15px;">🎚</span>
+        <div><div style="font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px;">Risk Category</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${uwb.riskTier}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Queued ${uwb.queuedOn} · ${uwb.queuedBy}</div></div>
+      </div>
+      <div class="uwb-route" ${conc.required?'style="border-color:rgba(245,158,11,.35);"':''}>
+        <span style="font-size:15px;">${conc.required?'👥':'👤'}</span>
+        <div><div style="font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px;">Concurrence</div>
+        <div style="font-size:13px;font-weight:600;color:${conc.required?'var(--amber)':'var(--text-primary)'};">${conc.state}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${conc.reason}${conc.routedTo?' · '+conc.routedTo:''}</div></div>
+      </div>
+    </div>
+
+    <div class="uwb-sec">
+      <div class="uwb-sec-hdr">📋 Conditions / Pends <span style="margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:none;letter-spacing:0;">${openPends.length} open · ${pends.length-openPends.length} resolved</span></div>
+      <div class="uwb-sec-body">${pendsHTML}</div>
+    </div>
+
+    <div class="uwb-sec">
+      <div class="uwb-sec-hdr">🔒 Audit Trail <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">immutable — deletions are retained, nothing edits history</span></div>
+      <div class="uwb-sec-body">${auditHTML}</div>
+    </div>
+  </div>`;
+}
+
+function uwbApprove(name) {
+  const m = merchantData.find(x => x.name === name);
+  if (!m) return;
+  m.status = 'approved';
+  m.tags = (m.tags||[]).filter(t => t !== 'Action Required');
+  if (typeof DEAL_ROOM_DATA !== 'undefined') {
+    const dr = DEAL_ROOM_DATA[name] || (DEAL_ROOM_DATA[name] = { solution:'POS Terminal', solutionLabel:'POS Terminal', currentStep:3, stalled:false, daysInStage:0, daysClass:'', stepDates:[], stepDetails:{}, pends:[],
+      synopsis:{ business:{type:'—',location:'—',owner:'—',monthlyVol:'—',prevProcessor:'—'}, solution:{name:'—',gateway:'—',pricing:'—',equipment:'—',contract:'—'}, uw:{score:'100%',riskLevel:'Low',status:'Approved via UW Workbench',flags:[],passed:[]}, missing:[] },
+      activity:[ { type:'sys', time:'Today · now', color:'var(--green)', text:'✅ Approved via UW Workbench — auto-boarding started' } ] });
+    dr.currentStep = 3; dr.stalled = false; dr.daysInStage = 0; dr.daysClass = '';
+    if (dr.stepDates) dr.stepDates[3] = 'Today';
+    if (dr.stepDetails) dr.stepDetails.approved = 'Approved via UW Workbench just now. Auto-boarding to processor started.';
+    dr.deploy = dr.deploy || {
+      rail: [
+        { label:'MID assigned', val:'7823-9917-0126', time:'Just now', state:'done' },
+        { label:'VAR created', val:'Building VAR file…', time:'In progress', state:'now' },
+        { label:'Gateway creds', val:'NMI — queued', time:'~24h', state:'queued' },
+        { label:'Welcome kit', val:'Email queued', time:'—', state:'queued' },
+      ],
+      equipment: [ { device:'PAX A920 Pro', qty:1, serial:null, pay:'due', payNote:null, shipTo:'Merchant' } ],
+      activation: { install:'Not yet scheduled', tests:{ tap:false, chip:false, swipe:false }, note:'Auto-activates on first settled batch — no manual flip needed.' },
+    };
+  }
+  const view = document.getElementById('view-merchant-detail');
+  view?.classList.remove('sig-uw-active','uw-bench-active');
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  navigateToMerchant(name, 'approved');
+}
+
+function uwbPend(name) {
+  const uwb = UW_WORKBENCH_DATA[name];
+  if (uwb) uwb.audit.push({ t:'Just now', who:'You (UW)', what:'Pend sent to partner — status set to Waiting on partner, alert emailed' });
+  renderUWWorkbench(name);
+}
+
+function uwbDecline(name) {
+  const m = merchantData.find(x => x.name === name);
+  if (!m) return;
+  const uwb = UW_WORKBENCH_DATA[name];
+  if (uwb) uwb.audit.push({ t:'Just now', who:'You (UW)', what:'Declined — reason logged, partner notified with decline summary' });
+  m.status = 'declined';
+  const view = document.getElementById('view-merchant-detail');
+  view?.classList.remove('sig-uw-active','uw-bench-active');
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  switchMerchantMode('applications', document.getElementById('nav-applications'));
+}
+
+/* Default the underwriting stage to the workbench; keep chat for signature */
+const _origEnterSigUW = enterSigUWMode;
+enterSigUWMode = function(name, status, options) {
+  _origEnterSigUW(name, status, options);
+  const toggle = document.getElementById('sig-uw-mode-toggle');
+  const isUW = status === 'underwriting';
+  if (toggle) toggle.classList.toggle('visible', isUW);
+  sigUWSetSurface(isUW ? 'bench' : 'chat');
+};
+const _origMinimizeSigUW = minimizeSigUWChat;
+minimizeSigUWChat = function() {
+  document.getElementById('view-merchant-detail')?.classList.remove('uw-bench-active');
+  _origMinimizeSigUW();
+};
+
+/* ── Deployment data for approved / boarding merchants ── */
+if (typeof DEAL_ROOM_DATA !== 'undefined') {
+  if (DEAL_ROOM_DATA['Bella Cucina Restaurant']) DEAL_ROOM_DATA['Bella Cucina Restaurant'].deploy = {
+    rail: [
+      { label:'MID assigned', val:'7823-8804-0122', time:'Feb 24 · 9:02 AM', state:'done' },
+      { label:'VAR created', val:'TSYS VAR #V-88412', time:'Feb 24 · 9:02 AM', state:'done' },
+      { label:'Gateway creds', val:'NMI — issued & emailed', time:'Feb 24 · 4:15 PM', state:'done' },
+      { label:'Welcome kit', val:'Sent to owner', time:'Feb 24 · 4:16 PM', state:'done' },
+    ],
+    equipment: [ { device:'PAX A920 Pro', qty:2, serial:'PAX-4821-7734 · PAX-4821-7791', pay:'paid', payNote:'Billed to merchant · paid Feb 25', shipTo:'Merchant — 88 Union St, Seattle',
+      ship:{ carrier:'UPS', code:'1Z 999 AA1 01 2345 6784', eta:'Thu', steps:[{label:'Label created',done:true},{label:'In transit',done:true},{label:'Out for delivery',done:false},{label:'Delivered',done:false}] } } ],
+    activation: { install:'Install call scheduled — Fri 10:00 AM (Toast menu import first)', tests:{ tap:false, chip:false, swipe:false }, note:'Auto-activates on first settled batch — watcher armed.' },
+  };
+  DEAL_ROOM_DATA['Bright Star Solar'] = {
+    solution:'POS Terminal', processorEmail:'boarding@coastalcommerce.com',
+    solutionLabel:'POS Terminal — PAX A920 Pro + NMI Gateway',
+    currentStep:7, stalled:true, stalledDays:11,
+    stalledReason:'Equipment delivered 11 days ago — no install call completed and no first transaction. Merchant went quiet after delivery.',
+    stalledSuggest:'Call the owner directly — equipment is on site. Offer a 20-minute remote install session today; the terminal only needs Wi-Fi + batch config.',
+    daysInStage:11, daysClass:'danger',
+    stepDates:['Feb 10','Feb 14','Feb 18','Feb 22','Feb 23','Feb 25','Feb 26','',''],
+    stepDetails:{
+      submitted:'Application submitted by J. Rivera — 2 locations, solar equipment retail.',
+      signed:'Signed by owner. IC+ 0.30% + $0.10. PAX A920 Pro.',
+      uw:'Cleared underwriting Feb 22 — no pends.',
+      approved:'Approved Feb 22. MID + VAR issued same day.',
+      demo:'Demo call done Feb 23.',
+      config:'Terminal configured — auto-batch 9:30 PM, tip adjust off.',
+      equip:'Shipped Feb 25, delivered Mar 2 (FedEx).',
+      test:'BLOCKED — install call not completed. No test transactions run.',
+      golive:'Waiting on install + first batch.',
+    },
+    pends:[],
+    synopsis: {
+      business:{ type:'Solar equipment retail', location:'Phoenix, AZ (2 locations)', owner:'D. Okafor (100%)', monthlyVol:'$130K est.', prevProcessor:'Square' },
+      solution:{ name:'PAX A920 Pro', gateway:'NMI', pricing:'IC+ 0.30% + $0.10', equipment:'1× A920 Pro (delivered)', contract:'Signed Feb 14' },
+      uw:{ score:'100%', riskLevel:'Medium', status:'Approved Feb 22 — no pends', flags:[], passed:['MATCH','OFAC','TIN','GIACT','Credit'] },
+      missing:[ { severity:'red', item:'Install call', note:'Never completed — equipment on site since Mar 2' }, { severity:'amber', item:'First test transaction', note:'Blocked on install' } ],
+    },
+    activity: [
+      { type:'sys', time:'Feb 25 · 2:10 PM', color:'var(--green)', text:'Equipment shipped — FedEx 7749 3708 3377' },
+      { type:'sys', time:'Mar 2 · 11:32 AM', color:'var(--green)', text:'Delivered — signed by front desk' },
+      { type:'msg', mode:'out', time:'Mar 4 · 9:00 AM', sender:'J. Rivera', av:'JR', avColor:'#6B839B', text:'Hi! Your terminal arrived Monday — want to grab 20 minutes this week to set it up and run a test payment?' },
+      { type:'sys', time:'Mar 8 · 9:00 AM', color:'var(--amber)', text:'Watcher: 6 days since delivery, no first batch — reminder sent' },
+      { type:'sys', time:'Mar 13 · 8:00 AM', color:'var(--red)', text:'Watcher: Activation Overdue tag applied — 11 days, no install, no batch' },
+    ],
+    deploy: {
+      overdue:{ title:'Activation overdue — delivered 11 days ago, no first transaction', desc:'Boarding started 18 days ago. Equipment was delivered Mar 2 and the install call was never completed. Escalate to the deployment queue or schedule a remote install now.', actions:['📞 Schedule remote install','⚠ Escalate to deployment queue'] },
+      rail: [
+        { label:'MID assigned', val:'7823-7702-0118', time:'Feb 22 · 11:40 AM', state:'done' },
+        { label:'VAR created', val:'TSYS VAR #V-88371', time:'Feb 22 · 11:40 AM', state:'done' },
+        { label:'Gateway creds', val:'NMI — issued & emailed', time:'Feb 22 · 3:05 PM', state:'done' },
+        { label:'Welcome kit', val:'Sent to owner', time:'Feb 22 · 3:06 PM', state:'done' },
+      ],
+      equipment: [ { device:'PAX A920 Pro', qty:1, serial:'PAX-4820-1108', pay:'paid', payNote:'Invoiced partner · paid Feb 24', shipTo:'Merchant — 4402 Sunview Dr, Phoenix',
+        ship:{ carrier:'FedEx', code:'7749 3708 3377', eta:'Delivered Mar 2', steps:[{label:'Label created',done:true},{label:'In transit',done:true},{label:'Out for delivery',done:true},{label:'Delivered',done:true}] } } ],
+      activation: { install:'NOT scheduled — 3 outreach attempts since delivery', tests:{ tap:false, chip:false, swipe:false }, note:'Watcher armed 18 days — no batch detected. This is what flips the Activation Overdue tag.' },
+    },
+  };
+  DEAL_ROOM_DATA['Urban Salon Collective'] = {
+    solution:'POS Terminal', processorEmail:'boarding@summitlending.com',
+    solutionLabel:'POS Terminal — PAX A920 Pro + NMI Gateway',
+    currentStep:3, stalled:false,
+    daysInStage:0, daysClass:'',
+    stepDates:['Mar 1','Mar 3','Mar 4','Today','','','','',''],
+    stepDetails:{
+      submitted:'Application submitted by M. Wright.',
+      signed:'Signed by owner Mar 3. IC+ 0.28% + $0.10.',
+      uw:'Cleared underwriting — no pends, clean checks.',
+      approved:'Approved today. Auto-boarding to processor running now.',
+      demo:'To be scheduled once equipment decision is made.',
+      config:'Pending equipment assignment.',
+      equip:'Awaiting payment decision + inventory assignment.',
+      test:'—', golive:'—',
+    },
+    pends:[],
+    synopsis: {
+      business:{ type:'Salon collective (6 chairs)', location:'San Francisco, CA', owner:'L. Tran (80%) · P. Kim (20%)', monthlyVol:'$65K est.', prevProcessor:'None — first processor' },
+      solution:{ name:'PAX A920 Pro', gateway:'NMI', pricing:'IC+ 0.28% + $0.10', equipment:'1× A920 Pro (to assign)', contract:'Signed Mar 3' },
+      uw:{ score:'100%', riskLevel:'Low', status:'Approved today — clean checks, no pends', flags:[], passed:['MATCH','OFAC','TIN','GIACT','Credit'] },
+      missing:[ { severity:'amber', item:'Equipment payment method', note:'Choose bill-merchant / invoice-partner before ship' } ],
+    },
+    activity: [
+      { type:'sys', time:'Today · 9:14 AM', color:'var(--green)', text:'✅ Approved — MID 7823-9906-0125 assigned automatically' },
+      { type:'sys', time:'Today · 9:14 AM', color:'var(--blue)', text:'Auto-boarding started — VAR file building, gateway creds queued' },
+      { type:'msg', mode:'int', time:'Today · 9:15 AM', sender:'Twill AI', av:'AI', avColor:'var(--yellow)', text:'Next step: pick the equipment payment method so fulfillment can pull a serial and ship. Merchant card on file is available.' },
+    ],
+    deploy: {
+      rail: [
+        { label:'MID assigned', val:'7823-9906-0125', time:'Today · 9:14 AM', state:'done' },
+        { label:'VAR created', val:'Building VAR file…', time:'In progress', state:'now' },
+        { label:'Gateway creds', val:'NMI — queued', time:'~24h', state:'queued' },
+        { label:'Welcome kit', val:'Email queued', time:'—', state:'queued' },
+      ],
+      equipment: [ { device:'PAX A920 Pro', qty:1, serial:null, pay:'due', payNote:null, shipTo:'Merchant — 219 Fillmore St, SF' } ],
+      activation: { install:'Not yet scheduled', tests:{ tap:false, chip:false, swipe:false }, note:'Auto-activates on first settled batch — no manual flip needed.' },
+    },
+  };
+}
+
+function renderDrDeploy(m, dr) {
+  const host = document.getElementById('dr-deploy');
+  if (!host) return;
+  const dep = dr && dr.deploy;
+  if (!dep || !['approved','boarding'].includes(m.status)) { host.style.display='none'; host.innerHTML=''; return; }
+
+  const railHTML = dep.rail.map(n => `
+    <div class="drd-node ${n.state==='done'?'done':n.state==='now'?'now':''}">
+      <div class="drd-node-label">${n.state==='done'?'<span style="color:var(--green);">✓</span>':n.state==='now'?'<span style="color:var(--amber);">⏳</span>':'<span style="color:var(--text-muted);">○</span>'} ${n.label}</div>
+      <div class="drd-node-val">${n.val}</div>
+      <div class="drd-node-time">${n.time}</div>
+    </div>`).join('');
+
+  const equipHTML = dep.equipment.map(e => {
+    const payHTML = e.pay==='paid'
+      ? `<span class="drd-pay-chip paid">✓ Paid</span><span style="font-size:10px;color:var(--text-muted);">${e.payNote||''}</span>`
+      : `<span class="drd-pay-chip due">Payment required before ship</span>
+         <select style="font-size:11px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:5px;background:var(--bg-elevated);color:var(--text-primary);font-family:var(--font-ui);" onchange="this.nextElementSibling.style.display='inline'">
+           <option>Bill merchant (card on file)</option><option>Invoice partner</option><option>Deduct from partner payout</option>
+         </select><span style="display:none;font-size:10px;color:var(--green);">✓ set</span>`;
+    const serialHTML = e.serial
+      ? `<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-primary);">${e.serial}</span>`
+      : `<button class="btn btn-ghost" style="font-size:10px;padding:3px 9px;" onclick="this.outerHTML='<span style=&quot;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);&quot;>PAX-4823-0651 <span style=&quot;color:var(--green);font-size:10px;&quot;>✓ pulled from inventory</span></span>'">⊕ Assign serial from inventory</button>`;
+    const trackHTML = e.ship ? `
+      <div class="drd-track" style="margin-top:6px;">
+        <b>${e.ship.carrier}</b><span style="font-family:var(--font-mono);">${e.ship.code}</span><span class="tsep">·</span>
+        ${e.ship.steps.map(s => `<span class="tstep">${s.done?'<span style="color:var(--green);">●</span>':'<span style="color:var(--border-strong);">○</span>'} ${s.label}</span>`).join('<span class="tsep">→</span>')}
+        <span class="tsep">·</span><b>${e.ship.eta}</b>
+      </div>` : '';
+    return `<div class="drd-equip-row" style="flex-wrap:wrap;">
+      <span style="font-size:16px;">📦</span>
+      <div style="min-width:170px;"><div style="font-size:13px;font-weight:600;color:var(--text-primary);">${e.qty}× ${e.device}</div>
+        <div style="font-size:10px;color:var(--text-muted);">Ship to: ${e.shipTo}</div></div>
+      <div style="min-width:200px;">${serialHTML}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;">${payHTML}</div>
+      ${trackHTML ? `<div style="flex-basis:100%;">${trackHTML}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const t = dep.activation.tests;
+  const testChip = (label, done) => `<span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid ${done?'rgba(34,197,94,.35)':'var(--border-strong)'};color:${done?'var(--green)':'var(--text-muted)'};background:${done?'rgba(34,197,94,.07)':'var(--bg-elevated)'};">${done?'✓':'○'} ${label}</span>`;
+
+  host.style.display = 'block';
+  host.innerHTML = `
+    ${dep.overdue ? `<div class="drd-alert">
+      <span style="font-size:16px;">🚨</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--red);">${dep.overdue.title}</div>
+        <div style="font-size:11px;color:var(--text-secondary);line-height:1.55;margin-top:3px;">${dep.overdue.desc}</div>
+        <div style="display:flex;gap:6px;margin-top:8px;">${dep.overdue.actions.map(a=>`<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">${a}</button>`).join('')}</div>
+      </div>
+    </div>` : ''}
+    <div class="drd-sec">
+      <div class="drd-sec-hdr">⚙️ Processor Boarding — Automated <span style="margin-left:auto;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">runs on approval · no re-keying</span></div>
+      <div class="drd-sec-body"><div class="drd-rail">${railHTML}</div></div>
+    </div>
+    <div class="drd-sec">
+      <div class="drd-sec-hdr">📦 Equipment Fulfillment <span style="margin-left:auto;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">serials from inventory · payment gates shipping</span></div>
+      <div class="drd-sec-body">${equipHTML}</div>
+    </div>
+    <div class="drd-sec">
+      <div class="drd-sec-hdr">🚀 Install &amp; Activation</div>
+      <div class="drd-sec-body">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px;">
+          <span style="font-size:13px;color:var(--text-primary);font-weight:600;">${dep.activation.install}</span>
+          <span style="margin-left:auto;display:flex;gap:5px;">${testChip('Tap',t.tap)}${testChip('Chip',t.chip)}${testChip('Swipe',t.swipe)}</span>
+        </div>
+        <div class="drd-watch">📡 ${dep.activation.note}</div>
+      </div>
+    </div>`;
+}
+
+const _origPopulateDealRoom = populateDealRoom;
+populateDealRoom = function(m) {
+  _origPopulateDealRoom(m);
+  try { renderDrDeploy(m, DEAL_ROOM_DATA[m.name]); } catch(e) { console.error('renderDrDeploy', e); }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('ccWorkList')) initCC();
