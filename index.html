@@ -84,6 +84,7 @@
   .page-sub { font-size:11px; color:var(--text-secondary); font-family:var(--font-data); }
   .topbar-right { display:flex; align-items:center; gap:8px; }
   .btn { display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; border:none; transition:all 0.15s ease; font-family:var(--font-ui); letter-spacing:0; line-height:1; white-space:nowrap; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
   .btn-ghost { background:transparent; color:var(--text-primary); border:1px solid rgba(0,0,0,0.15); }
   .btn-ghost:hover { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.25); }
   .btn-primary { background:var(--navy); color:#fff; border:1px solid var(--navy); }
@@ -13715,6 +13716,10 @@ function navigateToMerchant(name, status) {
     setTimeout(initMaOverviewCharts, 50);
   } else {
     _currentSBMerchant = name;
+    // Tear down any sig/UW overlay state left over from a previously viewed merchant
+    const mdView = document.getElementById('view-merchant-detail');
+    mdView?.classList.remove('sig-uw-active','uw-bench-active');
+    document.getElementById('sig-uw-mode-toggle')?.classList.remove('visible');
     document.getElementById('md-merchant-name').textContent = name;
     const thread = document.getElementById('chatThread');
     if (thread && alertsHTML) {
@@ -13836,7 +13841,7 @@ function renderUWWorkbench(name) {
   const uwb = UW_WORKBENCH_DATA[name] || _uwbDefaultData(name);
   const dr  = (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name]) || null;
   const pends = (dr && dr.pends) ? dr.pends : [];
-  const openPends = pends.filter(p => p.status === 'open');
+  const openPends = pends.filter(p => p.status === 'open' || p.status === 'partial');
   const fails = uwb.checks.filter(c => c.state === 'fail');
   const warns = uwb.checks.filter(c => c.state === 'warn');
 
@@ -13860,17 +13865,20 @@ function renderUWWorkbench(name) {
 
   const pendStateChip = p => p.status==='open'
     ? '<span class="uwb-chip warn" style="flex-shrink:0;">Waiting on partner</span>'
+    : p.status==='partial'
+    ? `<span class="uwb-chip warn" style="flex-shrink:0;">Partial${p.uploadedDocs&&p.missingDocs?` — ${p.uploadedDocs.length} of ${p.uploadedDocs.length+p.missingDocs.length}`:''}</span>`
     : '<span class="uwb-chip pass" style="flex-shrink:0;">Satisfied</span>';
   const pendsHTML = pends.length ? pends.map(p => `
     <div class="uwb-pend">
-      <span style="font-size:13px;flex-shrink:0;">${p.status==='open' ? (p.severity==='red'?'🔴':'🟡') : '✅'}</span>
+      <span style="font-size:13px;flex-shrink:0;">${p.status==='open' ? (p.severity==='red'?'🔴':'🟡') : p.status==='partial' ? '🟡' : '✅'}</span>
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${p.title}</div>
         <div style="font-size:11px;color:var(--text-secondary);line-height:1.5;margin-top:2px;">${p.desc}</div>
-        ${p.resolvedNote ? `<div style="font-size:11px;color:var(--green);margin-top:3px;">✓ ${p.resolvedNote}</div>` : ''}
+        ${p.status!=='partial' && p.resolvedNote ? `<div style="font-size:11px;color:var(--green);margin-top:3px;">✓ ${p.resolvedNote}</div>` : ''}
+        ${p.status==='partial' && p.partialNote ? `<div style="font-size:11px;color:var(--amber);margin-top:3px;">⚠ ${p.partialNote}</div>` : ''}
       </div>
       ${pendStateChip(p)}
-      ${p.status==='open' ? '<button class="btn btn-ghost" style="font-size:10px;padding:3px 9px;flex-shrink:0;" onclick="event.stopPropagation();this.textContent=\'✓ Nudged\';">📣 Nudge</button>' : ''}
+      ${p.status==='open' || p.status==='partial' ? '<button class="btn btn-ghost" style="font-size:10px;padding:3px 9px;flex-shrink:0;" onclick="event.stopPropagation();this.textContent=\'✓ Nudged\';">📣 Nudge</button>' : ''}
     </div>`).join('')
     : '<div style="font-size:12px;color:var(--text-muted);padding:6px 0;">No pends — nothing outstanding from the partner or merchant.</div>';
 
@@ -13927,6 +13935,8 @@ function renderUWWorkbench(name) {
       <div class="uwb-sec-body">${auditHTML}</div>
     </div>
   </div>`;
+  // Open each merchant's workbench at the top — but keep scroll on same-merchant re-renders (e.g. after Pend)
+  if (host.dataset.uwbFor !== name) { host.scrollTop = 0; host.dataset.uwbFor = name; }
 }
 
 function uwbApprove(name) {
@@ -13934,6 +13944,9 @@ function uwbApprove(name) {
   if (!m) return;
   m.status = 'approved';
   m.tags = (m.tags||[]).filter(t => t !== 'Action Required');
+  m.actionItem = 'Approved — begin deployment: assign equipment + payment method';
+  m.notes = [];
+  if (typeof ccQ !== 'undefined') ccQ.filter(i => i.merchant === name && !i.done).forEach(i => i.done = true);
   if (typeof DEAL_ROOM_DATA !== 'undefined') {
     const dr = DEAL_ROOM_DATA[name] || (DEAL_ROOM_DATA[name] = { solution:'POS Terminal', solutionLabel:'POS Terminal', currentStep:3, stalled:false, daysInStage:0, daysClass:'', stepDates:[], stepDetails:{}, pends:[],
       synopsis:{ business:{type:'—',location:'—',owner:'—',monthlyVol:'—',prevProcessor:'—'}, solution:{name:'—',gateway:'—',pricing:'—',equipment:'—',contract:'—'}, uw:{score:'100%',riskLevel:'Low',status:'Approved via UW Workbench',flags:[],passed:[]}, missing:[] },
@@ -13941,6 +13954,22 @@ function uwbApprove(name) {
     dr.currentStep = 3; dr.stalled = false; dr.daysInStage = 0; dr.daysClass = '';
     if (dr.stepDates) dr.stepDates[3] = 'Today';
     if (dr.stepDetails) dr.stepDetails.approved = 'Approved via UW Workbench just now. Auto-boarding to processor started.';
+    // Clear underwriting-era content so the Deal Room reads as approved (existing entries too)
+    dr.merchantResponded = false;
+    dr.overnightUpdates = null;
+    dr.aiAnalysis = null;
+    (dr.pends || []).forEach(p => {
+      if (p.status === 'open' || p.status === 'partial') {
+        p.status = 'resolved';
+        p.resolvedNote = 'Cleared at approval — approved via UW Workbench.';
+      }
+    });
+    if (dr.synopsis) {
+      if (dr.synopsis.uw) { dr.synopsis.uw.status = 'Approved via UW Workbench — just now'; dr.synopsis.uw.score = '100%'; dr.synopsis.uw.flags = []; }
+      dr.synopsis.missing = [];
+    }
+    dr.activity = dr.activity || [];
+    dr.activity.push({ type:'sys', time:'Today · now', color:'var(--green)', text:'✅ Approved via UW Workbench — auto-boarding started' });
     dr.deploy = dr.deploy || {
       rail: [
         { label:'MID assigned', val:'7823-9917-0126', time:'Just now', state:'done' },
@@ -13951,6 +13980,9 @@ function uwbApprove(name) {
       equipment: [ { device:'PAX A920 Pro', qty:1, serial:null, pay:'due', payNote:null, shipTo:'Merchant' } ],
       activation: { install:'Not yet scheduled', tests:{ tap:false, chip:false, swipe:false }, note:'Auto-activates on first settled batch — no manual flip needed.' },
     };
+    // Keep the header MID in sync with the boarding rail's assigned MID
+    const midNode = dr.deploy && dr.deploy.rail && dr.deploy.rail.find(n => n.label === 'MID assigned' && n.state === 'done');
+    if (midNode && midNode.val && /\d/.test(midNode.val)) m.mid = midNode.val;
   }
   const view = document.getElementById('view-merchant-detail');
   view?.classList.remove('sig-uw-active','uw-bench-active');
@@ -13970,6 +14002,31 @@ function uwbDecline(name) {
   const uwb = UW_WORKBENCH_DATA[name];
   if (uwb) uwb.audit.push({ t:'Just now', who:'You (UW)', what:'Declined — reason logged, partner notified with decline summary' });
   m.status = 'declined';
+  m.tags = (m.tags||[]).filter(t => t !== 'Action Required');
+  m.actionItem = 'Declined — notify partner with decline summary';
+  m.notes = [];
+  if (typeof ccQ !== 'undefined') ccQ.filter(i => i.merchant === name && !i.done).forEach(i => i.done = true);
+  // Put the Deal Room entry into a terminal declined state — no live underwriting content
+  if (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name]) {
+    const dr = DEAL_ROOM_DATA[name];
+    dr.stalled = false; dr.daysInStage = 0; dr.daysClass = '';
+    dr.merchantResponded = false;
+    dr.overnightUpdates = null;
+    dr.aiAnalysis = null;
+    (dr.pends || []).forEach(p => {
+      if (p.status === 'open' || p.status === 'partial') {
+        p.status = 'resolved';
+        p.resolvedNote = 'Closed — application declined.';
+      }
+    });
+    if (dr.synopsis) {
+      if (dr.synopsis.uw) { dr.synopsis.uw.status = 'Declined via UW Workbench'; dr.synopsis.uw.flags = []; }
+      dr.synopsis.missing = [];
+    }
+    if (dr.stepDetails) dr.stepDetails.uw = 'Declined via UW Workbench — reason logged, partner notified with decline summary.';
+    dr.activity = dr.activity || [];
+    dr.activity.push({ type:'sys', time:'Today · now', color:'var(--red)', text:'✕ Declined via UW Workbench — partner notified with decline summary' });
+  }
   const view = document.getElementById('view-merchant-detail');
   view?.classList.remove('sig-uw-active','uw-bench-active');
   if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
@@ -13988,6 +14045,9 @@ enterSigUWMode = function(name, status, options) {
 const _origMinimizeSigUW = minimizeSigUWChat;
 minimizeSigUWChat = function() {
   document.getElementById('view-merchant-detail')?.classList.remove('uw-bench-active');
+  // Keep the surface toggle in sync — a later expand reopens on the Conversation surface
+  document.getElementById('sig-uw-mode-chat')?.classList.add('on');
+  document.getElementById('sig-uw-mode-bench')?.classList.remove('on');
   _origMinimizeSigUW();
 };
 
@@ -14091,6 +14151,16 @@ if (typeof DEAL_ROOM_DATA !== 'undefined') {
   };
 }
 
+function drdOverdueAct(name, idx, btn) {
+  const dep = typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name] && DEAL_ROOM_DATA[name].deploy;
+  if (!dep || !dep.overdue) return;
+  const label = dep.overdue.actions[idx] || '';
+  const done = /escalate/i.test(label) ? '✓ Escalated — deployment queue notified' : '✓ Booked — remote install call scheduled';
+  (dep.overdue.doneActs = dep.overdue.doneActs || {})[idx] = done;
+  if (btn) { btn.textContent = done; btn.disabled = true; }
+  if (DEAL_ROOM_DATA[name].activity) DEAL_ROOM_DATA[name].activity.push({ type:'sys', time:'Today · now', color:'var(--green)', text: done });
+}
+
 function renderDrDeploy(m, dr) {
   const host = document.getElementById('dr-deploy');
   if (!host) return;
@@ -14104,16 +14174,18 @@ function renderDrDeploy(m, dr) {
       <div class="drd-node-time">${n.time}</div>
     </div>`).join('');
 
-  const equipHTML = dep.equipment.map(e => {
+  const nmEsc = m.name.replace(/'/g, "\\'");
+  const equipHTML = dep.equipment.map((e, ei) => {
+    const payOpts = ['Bill merchant (card on file)','Invoice partner','Deduct from partner payout'];
     const payHTML = e.pay==='paid'
       ? `<span class="drd-pay-chip paid">✓ Paid</span><span style="font-size:10px;color:var(--text-muted);">${e.payNote||''}</span>`
       : `<span class="drd-pay-chip due">Payment required before ship</span>
-         <select style="font-size:11px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:5px;background:var(--bg-elevated);color:var(--text-primary);font-family:var(--font-ui);" onchange="this.nextElementSibling.style.display='inline'">
-           <option>Bill merchant (card on file)</option><option>Invoice partner</option><option>Deduct from partner payout</option>
-         </select><span style="display:none;font-size:10px;color:var(--green);">✓ set</span>`;
+         <select style="font-size:11px;padding:3px 6px;border:1px solid var(--border-strong);border-radius:5px;background:var(--bg-elevated);color:var(--text-primary);font-family:var(--font-ui);" onchange="drdSetPay('${nmEsc}',${ei},this.value);this.nextElementSibling.style.display='inline'">
+           ${payOpts.map(o => `<option${e.payChoice===o?' selected':''}>${o}</option>`).join('')}
+         </select><span style="display:${e.payChoice?'inline':'none'};font-size:10px;color:var(--green);">✓ set</span>`;
     const serialHTML = e.serial
-      ? `<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-primary);">${e.serial}</span>`
-      : `<button class="btn btn-ghost" style="font-size:10px;padding:3px 9px;" onclick="this.outerHTML='<span style=&quot;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);&quot;>PAX-4823-0651 <span style=&quot;color:var(--green);font-size:10px;&quot;>✓ pulled from inventory</span></span>'">⊕ Assign serial from inventory</button>`;
+      ? `<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-primary);">${e.serial}${e.serialNote?` <span style="color:var(--green);font-size:10px;">${e.serialNote}</span>`:''}</span>`
+      : `<button class="btn btn-ghost" style="font-size:10px;padding:3px 9px;" onclick="drdAssignSerial('${nmEsc}',${ei})">⊕ Assign serial from inventory</button>`;
     const trackHTML = e.ship ? `
       <div class="drd-track" style="margin-top:6px;">
         <b>${e.ship.carrier}</b><span style="font-family:var(--font-mono);">${e.ship.code}</span><span class="tsep">·</span>
@@ -14140,7 +14212,7 @@ function renderDrDeploy(m, dr) {
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:700;color:var(--red);">${dep.overdue.title}</div>
         <div style="font-size:11px;color:var(--text-secondary);line-height:1.55;margin-top:3px;">${dep.overdue.desc}</div>
-        <div style="display:flex;gap:6px;margin-top:8px;">${dep.overdue.actions.map(a=>`<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">${a}</button>`).join('')}</div>
+        <div style="display:flex;gap:6px;margin-top:8px;">${dep.overdue.actions.map((a,ai)=>{ const done=dep.overdue.doneActs&&dep.overdue.doneActs[ai]; return `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" ${done?'disabled':''} onclick="drdOverdueAct('${m.name.replace(/'/g,"\\'")}',${ai},this)">${done||a}</button>`; }).join('')}</div>
       </div>
     </div>` : ''}
     <div class="drd-sec">
@@ -14161,6 +14233,23 @@ function renderDrDeploy(m, dr) {
         <div class="drd-watch">📡 ${dep.activation.note}</div>
       </div>
     </div>`;
+}
+
+/* Persist equipment fulfillment choices in DEAL_ROOM_DATA so re-renders keep them */
+function drdAssignSerial(name, idx) {
+  const dr = (typeof DEAL_ROOM_DATA !== 'undefined') && DEAL_ROOM_DATA[name];
+  const e = dr && dr.deploy && dr.deploy.equipment && dr.deploy.equipment[idx];
+  if (!e) return;
+  e.serial = 'PAX-4823-0651';
+  e.serialNote = '✓ pulled from inventory';
+  const m = merchantData.find(x => x.name === name);
+  if (m) renderDrDeploy(m, dr);
+}
+function drdSetPay(name, idx, value) {
+  const dr = (typeof DEAL_ROOM_DATA !== 'undefined') && DEAL_ROOM_DATA[name];
+  const e = dr && dr.deploy && dr.deploy.equipment && dr.deploy.equipment[idx];
+  if (!e) return;
+  e.payChoice = value;
 }
 
 const _origPopulateDealRoom = populateDealRoom;
@@ -14579,13 +14668,13 @@ const merchantData = [
     notes:[], actionItem:'Send solutions proposal — partner referral', potVol:'$85K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Mar 9, 2026', lastAct:'6h ago', recent24h:true },
   { name:'Urban Salon Collective',mid:'Pending',        status:'approved',     risk:'Low',    tags:[],                    partner:'Summit Lending',   assignee:'M. Wright', avColor:'#A09E9A', av:'MW',
     notes:[{icon:'💬',cls:'ni-msg',tip:'Approval confirmed — ready to begin boarding'}], actionItem:'Initiate boarding — send welcome kit + equipment order', potVol:'$65K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Mar 5, 2026', lastAct:'2d ago', recent24h:false },
-  { name:'Bright Star Solar',     mid:'Pending',        status:'boarding',     risk:'Medium', tags:['Activation Overdue'],partner:'Coastal Commerce', assignee:'J. Rivera',  avColor:'#6B839B', av:'JR',
+  { name:'Bright Star Solar',     mid:'7823-7702-0118', status:'boarding',     risk:'Medium', tags:['Activation Overdue'],partner:'Coastal Commerce', assignee:'J. Rivera',  avColor:'#6B839B', av:'JR',
     notes:[{icon:'🔴',cls:'ni-over',tip:'Activation overdue: boarding started 18 days ago, no first transaction'}], actionItem:'Escalate activation — equipment delivered but not set up', potVol:'$130K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Feb 22, 2026', lastAct:'7d ago', recent24h:false },
   { name:'Summit Chiropractic',   mid:'—',              status:'declined',     risk:'High',   tags:[],                    partner:'Apex Elite',       assignee:'J. Rivera',  avColor:'#6B839B', av:'JR',
     notes:[{icon:'📋',cls:'ni-uw',tip:'UW declined: excessive chargebacks at previous processor'}], actionItem:'Notify partner — provide decline reason summary', potVol:'$55K', volMTD:null, residual:null, lastBatch:null, mca:null, created:'Feb 10, 2026', lastAct:'28d ago', recent24h:false },
   { name:'Maple Street Bakery', mid:'Pending', status:'underwriting', risk:'Low', tags:['Action Required'], partner:'Summit Lending', assignee:'S. Patel', avColor:'#5B7A5E', av:'SP',
     notes:[{icon:'📬',cls:'ni-msg',tip:'🌙 Overnight: 3 docs uploaded + 1 message. AI analyzed — 1 pend satisfied, 1 partial.'},{icon:'📋',cls:'ni-uw',tip:'UW pends: Owner ID ✅, Bank stmts ⚠️ 2 of 3'}], actionItem:'Review overnight uploads — AI analysis ready', potVol:'$35K', volMTD:'—', residual:'—', lastBatch:'—', mca:'—', created:'Feb 24', lastAct:'2h', recent24h:true, partnerType:'External' },
-  { name:'Bella Cucina Restaurant', mid:'Pending', status:'boarding', risk:'Low', tags:[], partner:'NovaPay', assignee:'S. Patel', avColor:'#5B7A5E', av:'SP',
+  { name:'Bella Cucina Restaurant', mid:'7823-8804-0122', status:'boarding', risk:'Low', tags:[], partner:'NovaPay', assignee:'S. Patel', avColor:'#5B7A5E', av:'SP',
     notes:[], actionItem:'Get menu export from Toast', potVol:'$95K', volMTD:'—', residual:'—', lastBatch:'—', mca:'—', created:'Feb 10', lastAct:'3d', recent24h:false, partnerType:'External' },
   { name:'TechForge Solutions', mid:'Pending', status:'underwriting', risk:'Low', tags:[], partner:'Priority Commerce', assignee:'M. Wright', avColor:'#A67C5B', av:'MW',
     notes:[{icon:'📋',cls:'ni-uw',tip:'Enhanced due diligence — virtual site inspection pending'}], actionItem:'Schedule virtual site inspection', potVol:'$2.1M', volMTD:'—', residual:'—', lastBatch:'—', mca:'—', created:'Feb 5', lastAct:'3d', recent24h:false, partnerType:'External' },
