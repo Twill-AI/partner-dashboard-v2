@@ -1219,6 +1219,71 @@
 .uwm-paper .amt { font-family:var(--font-mono); text-align:right; }
 .uwm-line { height:7px; border-radius:3px; background:#E8E4DC; margin:7px 0; }
 
+  /* ── KNOWLEDGE LIBRARY (klb-*) ───────────── */
+  .klb-layout { display:flex; gap:16px; align-items:flex-start; }
+  .klb-aside { width:256px; flex-shrink:0; display:flex; flex-direction:column; gap:16px; }
+  .klb-microlabel { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:8px; font-family:var(--font-ui); }
+  .klb-tree-row { display:flex; align-items:center; gap:6px; padding:5px 6px; border-radius:6px; cursor:pointer; font-size:12px; color:var(--text-secondary); }
+  .klb-tree-row:hover { background:var(--bg-hover); }
+  .klb-tree-row.sel { background:var(--yellow-dim); color:var(--navy); font-weight:600; }
+  .klb-tree-row.shared { opacity:.78; }
+  .klb-tree-row .klb-add { opacity:0; margin-left:auto; border:none; background:none; cursor:pointer; color:var(--text-muted); font-size:13px; line-height:1; padding:0 4px; border-radius:4px; flex-shrink:0; }
+  .klb-tree-row:hover .klb-add { opacity:1; }
+  .klb-tree-row .klb-add:hover { color:var(--text-primary); background:var(--bg-elevated); }
+  .klb-chip { font-size:8px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.04em; font-family:var(--font-ui); flex-shrink:0; }
+  .klb-chip.rep { background:rgba(166,124,91,.16); color:var(--amber); }
+  .klb-chip.shared { background:rgba(166,124,91,.16); color:var(--amber); text-transform:none; font-size:9px; }
+  .klb-chip.restricted { background:transparent; color:#7C6FA0; border:1px solid rgba(124,111,160,.45); text-transform:none; }
+  .klb-chip.ai { background:rgba(107,131,155,.14); color:var(--blue); text-transform:none; font-size:9px; }
+  .klb-table { width:100%; border-collapse:collapse; }
+  .klb-table th { text-align:left; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; padding:8px 12px; border-bottom:1px solid var(--border-strong); font-family:var(--font-ui); }
+  .klb-table td { padding:8px 12px; border-bottom:1px solid var(--border); font-size:12px; color:var(--text-secondary); vertical-align:middle; }
+  .klb-table tbody tr:hover td { background:var(--bg-hover); }
+  .klb-row-acts { display:flex; gap:2px; justify-content:flex-end; opacity:0; }
+  .klb-table tbody tr:hover .klb-row-acts { opacity:1; }
+  .klb-iconbtn { border:none; background:none; cursor:pointer; font-size:12px; padding:2px 5px; border-radius:4px; color:var(--text-muted); font-family:var(--font-ui); }
+  .klb-iconbtn:hover { background:var(--bg-elevated); color:var(--text-primary); }
+  .klb-pill { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 9px; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-secondary); cursor:pointer; font-family:var(--font-ui); white-space:nowrap; }
+  .klb-pill:hover { border-color:var(--text-muted); }
+  .klb-pop { position:fixed; z-index:13000; background:var(--bg-base); border:1px solid var(--border-strong); border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,.18); width:232px; padding:10px 12px; display:none; }
+  .klb-pop.open { display:block; }
+  .klb-check { display:flex; align-items:center; gap:7px; padding:4px 2px; font-size:11px; color:var(--text-secondary); cursor:pointer; }
+  .klb-check input { accent-color:var(--navy); flex-shrink:0; }
+  .klb-check .em { color:var(--text-muted); font-size:10px; }
+  .klb-search { width:100%; border:1px solid var(--border-strong); border-radius:6px; padding:5px 8px; font-size:11px; background:var(--bg-base); color:var(--text-primary); font-family:var(--font-data); margin:6px 0; }
+  .klb-search:focus { outline:none; border-color:var(--navy); }
+  .klb-toggle { position:relative; width:30px; height:17px; border-radius:9px; background:var(--border-strong); cursor:pointer; transition:background .15s; flex-shrink:0; }
+  .klb-toggle::after { content:''; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 2px rgba(0,0,0,.2); }
+  .klb-toggle.on { background:var(--green); }
+  .klb-toggle.on::after { left:15px; }
+  .klb-chat { width:0; overflow:hidden; background:var(--bg-base); display:flex; flex-direction:column; transition:width .18s ease; flex-shrink:0; border-left:1px solid transparent; }
+  .klb-chat.open { width:340px; border-left-color:var(--border-strong); }
+  .klb-chat-fab { position:absolute; right:18px; bottom:18px; width:42px; height:42px; border-radius:50%; background:var(--navy); color:var(--yellow); border:none; font-size:16px; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.25); z-index:60; }
+  .klb-chat-fab:hover { filter:brightness(1.15); }
+  .klb-chat.open ~ .klb-chat-fab { display:none; }
+  .klb-msg { margin-bottom:12px; }
+  .klb-msg .who { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:3px; font-family:var(--font-ui); }
+  .klb-bub { border:1px solid var(--border); border-radius:8px; padding:8px 11px; font-size:12px; line-height:1.55; color:var(--text-secondary); background:var(--bg-elevated); }
+  .klb-msg.user .klb-bub { background:var(--yellow-dim); border-color:rgba(201,168,0,.25); color:var(--text-primary); }
+  .klb-src { margin-top:8px; border:1px solid rgba(107,131,155,.35); background:rgba(107,131,155,.07); border-radius:8px; padding:8px 10px; }
+  .klb-src-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--blue); margin-bottom:6px; font-family:var(--font-ui); }
+  .klb-src-pill { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600; color:var(--blue); border:1px solid rgba(107,131,155,.35); background:var(--bg-base); border-radius:5px; padding:3px 8px; margin:2px 4px 2px 0; }
+  .klb-cursor { display:inline-block; width:7px; height:12px; background:var(--navy); vertical-align:text-bottom; animation:klbBlink .8s steps(1) infinite; margin-left:1px; }
+  @keyframes klbBlink { 50% { opacity:0; } }
+  .klb-chipq { display:block; text-align:left; width:100%; border:1px solid var(--border-strong); background:var(--bg-elevated); border-radius:8px; padding:7px 10px; font-size:11px; color:var(--text-secondary); cursor:pointer; margin-top:6px; font-family:var(--font-data); line-height:1.4; }
+  .klb-chipq:hover { border-color:var(--text-muted); color:var(--text-primary); }
+  .klb-fit td { padding:4px 8px; border-bottom:1px solid var(--border); font-size:11px; }
+  .klb-cat { font-size:9px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:.04em; font-family:var(--font-ui); white-space:nowrap; }
+  .klb-cat.yes { background:rgba(91,122,94,.14); color:var(--green); }
+  .klb-cat.maybe { background:rgba(166,124,91,.16); color:var(--amber); }
+  .klb-cat.no { background:rgba(155,107,91,.14); color:var(--red); }
+  /* ── ADDENDUM 2: Library citation chips (routing / pricing / solutions ⇄ Library) ── */
+  .klb-cite { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; color:var(--blue); border:1px solid rgba(107,131,155,.35); background:rgba(107,131,155,.07); border-radius:4px; padding:1px 7px; cursor:pointer; font-family:var(--font-ui); white-space:nowrap; vertical-align:middle; line-height:1.5; }
+  .klb-cite:hover { border-color:var(--blue); background:rgba(107,131,155,.15); }
+  @keyframes klbRowFlash { 0%,55% { background:rgba(107,131,155,.16); } 100% { background:transparent; } }
+  tr.klb-hl > td { animation:klbRowFlash 2.2s ease-out; }
+
+
 /* ── UW WORKBENCH: AGENT GATE / BIN ROUTING / PRICING & FEES ── */
 .uwb-bin { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:11px 14px; display:flex; gap:12px; align-items:flex-start; }
 .uwb-bin + .uwb-bin { margin-top:8px; }
@@ -2696,6 +2761,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="nav-item" id="nav-inventory" onclick="showView('inventory', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l6 3v8l-6 3-6-3V4l6-3zm0 2.2L4.2 5.1 8 7l3.8-1.9L8 3.2zM3.5 6.3v4.8L7.3 13V8.2L3.5 6.3zm9 0L8.7 8.2V13l3.8-1.9V6.3z" opacity=".8"/></svg>
         Inventory
+      </div>
+      <div class="nav-item" id="nav-library" onclick="showView('library', this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c-3.3 0-6 .95-6 2.12v8.76c0 1.17 2.7 2.12 6 2.12s6-.95 6-2.12V3.62c0-1.17-2.7-2.12-6-2.12zm0 1.2c2.87 0 4.8.66 4.8.92s-1.93.92-4.8.92-4.8-.66-4.8-.92 1.93-.92 4.8-.92zM3.2 5.15c1.1.5 2.86.81 4.8.81s3.7-.31 4.8-.81v2.03c0 .26-1.93.92-4.8.92s-4.8-.66-4.8-.92V5.15zm0 3.55c1.1.5 2.86.81 4.8.81s3.7-.31 4.8-.81v2.03c0 .26-1.93.92-4.8.92s-4.8-.66-4.8-.92V8.7zm0 3.55c1.1.5 2.86.81 4.8.81s3.7-.31 4.8-.81v.13c0 .26-1.93.92-4.8.92s-4.8-.66-4.8-.92v-.13z" opacity=".8"/></svg>
+        Library
       </div>
     </div>
 
@@ -4924,6 +4993,53 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       </div>
     </div>
 
+    <!-- ── LIBRARY (Knowledge Base) ────────────────────────── -->
+    <div class="view" id="view-library">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div>
+            <div class="page-title">Library</div>
+            <div class="page-sub">Manage files and folders for AI-powered knowledge retrieval</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" onclick="klbNewFolder(null)">+ New Folder</button>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;overflow:hidden;position:relative;background:var(--bg-surface);">
+        <div style="flex:1;overflow:auto;padding:20px 24px;min-width:0;">
+          <div class="klb-layout">
+            <div class="klb-aside">
+              <div class="card"><div style="padding:12px 14px;">
+                <div class="klb-microlabel">Folders</div>
+                <div id="klb-tree"></div>
+              </div></div>
+              <div class="card"><div style="padding:12px 14px;" id="klb-settings"></div></div>
+            </div>
+            <div class="card" style="flex:1;min-width:0;align-self:flex-start;" id="klb-files"></div>
+          </div>
+        </div>
+        <div class="klb-chat" id="klb-chat">
+          <div style="width:340px;display:flex;flex-direction:column;height:100%;">
+            <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border-strong);flex-shrink:0;">
+              <div style="width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">✦</div>
+              <div style="min-width:0;">
+                <div style="font-size:12px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);">Library Assistant</div>
+                <div style="font-size:10px;color:var(--text-muted);">Answers questions from your documents</div>
+              </div>
+              <button class="klb-iconbtn" title="Close library chat" style="margin-left:auto;font-size:13px;" onclick="klbToggleChat()">✕</button>
+            </div>
+            <div id="klbChatThread" style="flex:1;overflow-y:auto;padding:12px 14px;"></div>
+            <div style="padding:10px 12px;border-top:1px solid var(--border-strong);display:flex;gap:8px;flex-shrink:0;">
+              <input id="klb-chat-input" class="klb-search" style="margin:0;flex:1;padding:8px 10px;font-size:12px;" placeholder="Ask about your library..." onkeydown="if(event.key==='Enter')klbSendInput()">
+              <button class="btn btn-primary" style="font-size:12px;padding:6px 12px;" onclick="klbSendInput()">↑</button>
+            </div>
+          </div>
+        </div>
+        <button class="klb-chat-fab" id="klb-chat-fab" title="Open library chat" onclick="klbToggleChat()">💬</button>
+      </div>
+    </div>
+
     <div class="view" id="view-merchants">
       <!-- topbar -->
       <div class="topbar">
@@ -5465,6 +5581,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             </div>
             <div style="display:none;padding:12px 16px;background:linear-gradient(135deg,rgba(255,222,0,.04),rgba(34,197,94,.02));border:1px solid rgba(255,222,0,.2);border-top:none;border-radius:0 0 10px 10px;">
               <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Based on Fresh Brew's processing history ($31K/mo, $10.98 avg ticket, 91% card-present), we recommend <strong style="color:var(--text-primary);">IC+ pricing with a PAX A920 Pro terminal</strong>. This configuration saves an estimated <strong style="color:var(--green);">$287/mo vs. their current Square setup</strong>. All rates and equipment are fully editable below.</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="klb-cite" title="Open in Knowledge Library" onclick="klbOpenDoc('d-ocref')">📚 Order Counter Solution Reference</button><button class="klb-cite" title="Open in Knowledge Library" onclick="klbOpenDoc('d-mx')">📚 POS Integration Matrix</button><span style="font-size:10px;color:var(--text-muted);">Advisor cites documents you can open.</span></div>
             </div>
           </div>
 
@@ -12575,7 +12692,7 @@ const DEAL_ROOM_DATA = {
     ],
   },
   'Maple Street Bakery': {
-    solution: 'POS Terminal', solutionLabel: 'POS Terminal — PAX A80 + NMI Gateway',
+    solution: 'POS Terminal', solutionLabel: 'POS Terminal — PAX A920 Pro + NMI Gateway',
     currentStep: 2, stalled: false, stalledDays: 0,
     stalledReason: '',
     stalledSuggest: '',
@@ -12585,12 +12702,12 @@ const DEAL_ROOM_DATA = {
     stepDates: ['Feb 24','Feb 28','Mar 8','','','','','',''],
     stepDetails: {
       submitted: 'Application submitted by S. Patel. Single-location bakery in Santa Monica. Cash + card split. Currently on Square Reader.',
-      signed: 'Signed by Lisa Park (sole owner). PAX A80 countertop terminal selected.',
+      signed: 'Signed by Lisa Park (sole owner). PAX A920 Pro countertop terminal selected.',
       uw: 'In underwriting at Summit Lending. Pends issued Mar 8: Owner ID and 3 months bank statements. Merchant responded overnight Mar 11–12.',
       approved: 'Pending — UW pends being addressed.',
       demo: 'No demo needed — simple countertop terminal. Merchant familiar with card readers.',
       config: 'Basic retail configuration. No menu transfer needed — bakery uses simple item entry.',
-      equip: '1× PAX A80 to ship to 2847 Main St, Santa Monica, CA 90405.',
+      equip: '1× PAX A920 Pro to ship to 2847 Main St, Santa Monica, CA 90405.',
       test: 'Test tap, chip, manual entry. Verify batch settlement.',
       golive: 'Target: 2 days post-approval. Simple cutover from Square Reader.'
     },
@@ -12679,7 +12796,7 @@ const DEAL_ROOM_DATA = {
     },
     synopsis: {
       business: { name:'Maple Street Bakery', type:'Retail Bakery', location:'Santa Monica, CA', prevProcessor:'Square Reader', monthlyVol:'$35K avg', owner:'Lisa Park (100%)', years:'4 years' },
-      solution: { name:'PAX A80', gateway:'NMI Gateway', pricing:'IC+ 0.20% + $0.08', equipment:'1× PAX A80 ($199)', monthly:'Gateway $10/mo', contract:'2 years' },
+      solution: { name:'PAX A920 Pro', gateway:'NMI Gateway', pricing:'IC+ 0.20% + $0.08', equipment:'1× PAX A920 Pro ($299)', monthly:'Gateway $10/mo', contract:'2 years' },
       uw: { score:'68%', riskLevel:'Low', flags:['Dec bank stmt pending'], passed:['SIC 5461 approved','Business verified','Owner ID verified (overnight)','Banking verified (2 of 3 mo)'], status:'In Review — 1 item remaining' },
       missing: [
         { item:'Bank Statement — Dec 2025', severity:'amber', note:'Merchant\'s bank requires in-person request. 3–5 business days. Bank letter may substitute.' },
@@ -13857,8 +13974,8 @@ const UW_WORKBENCH_DATA = {
     concurrence: { required:true, reason:'Projected volume $150K/mo exceeds the $100K senior co-approval threshold', routedTo:'R. Alvarez (Senior UW)', state:'Queued — notified 2h ago' },
     agentGate: { rep:'M. Wright', tier:'Tier 2', tierDesc:'up to Medium-risk MCCs, ≤$250K/mo', dealClass:'MCC 5999 · Medium risk · $150K/mo', allowed:true, reason:'Deal class within Tier 2 submission authority' },
     routing: { mode:'open', accepted:null, options:[
-      { bin:'4242-42', label:'First Data Omaha', processor:'First Data', fitPct:92, minimums:'FD monthly minimum 62% met', why:['FD monthly minimum 62% met — this deal closes the gap','Retail card-present profile prices best on FD Omaha IC+ tables for MCC 5999'] },
-      { bin:'4885-10', label:'TSYS — Merchant BIN 10', processor:'TSYS', fitPct:78, minimums:'TSYS minimum already met', why:['TSYS minimum already met — no minimums pressure from this placement','Weaker CP interchange table for MCC 5999 vs FD Omaha'] },
+      { bin:'4242-42', label:'First Data Omaha', processor:'First Data', fitPct:92, minimums:'FD monthly minimum 62% met', why:['FD monthly minimum 62% met — this deal closes the gap','Retail card-present profile prices best on FD Omaha IC+ tables for MCC 5999'], whyCites:['d-min','d-fdic'] },
+      { bin:'4885-10', label:'TSYS — Merchant BIN 10', processor:'TSYS', fitPct:78, minimums:'TSYS minimum already met', why:['TSYS minimum already met — no minimums pressure from this placement','Weaker CP interchange table for MCC 5999 vs FD Omaha'], whyCites:['d-min','d-tsys'] },
     ] },
     fees: [
       { label:'Annual Fee', value:'$99.00', source:'application' },
@@ -13901,8 +14018,8 @@ const UW_WORKBENCH_DATA = {
     concurrence: { required:false, reason:'Projected volume $35K/mo — under all co-approval thresholds', routedTo:null, state:'Single-underwriter decision' },
     agentGate: { rep:'S. Patel', tier:'Tier 1', tierDesc:'up to Low-risk MCCs, ≤$50K/mo', dealClass:'MCC 5462 · Low risk · $35K/mo', allowed:true, reason:'Deal class within Tier 1 submission authority' },
     routing: { mode:'open', accepted:null, options:[
-      { bin:'4885-10', label:'TSYS — Merchant BIN 10', processor:'TSYS', fitPct:88, minimums:'TSYS monthly minimum 71% met', why:['TSYS monthly minimum 71% met — small-ticket swipe deal closes the gap','Best small-ticket debit interchange table for MCC 5462 (bakery)'] },
-      { bin:'4242-42', label:'First Data Omaha', processor:'First Data', fitPct:84, minimums:'FD minimum already met', why:['FD minimum already met — no minimums pressure from this placement','Slightly worse per-item pricing at a $12 average ticket'] },
+      { bin:'4885-10', label:'TSYS — Merchant BIN 10', processor:'TSYS', fitPct:88, minimums:'TSYS monthly minimum 71% met', why:['TSYS monthly minimum 71% met — small-ticket swipe deal closes the gap','Best small-ticket debit interchange table for MCC 5462 (bakery)'], whyCites:['d-min','d-tsys'] },
+      { bin:'4242-42', label:'First Data Omaha', processor:'First Data', fitPct:84, minimums:'FD minimum already met', why:['FD minimum already met — no minimums pressure from this placement','Slightly worse per-item pricing at a $12 average ticket'], whyCites:['d-min','d-fdic'] },
     ] },
     fees: [
       { label:'Annual Fee', value:'$79.00', source:'application' },
@@ -13941,7 +14058,7 @@ const UW_WORKBENCH_DATA = {
     concurrence: { required:true, reason:'Projected volume $2.1M/mo — enhanced due diligence tier. Virtual site inspection pending.', routedTo:'R. Alvarez (Senior UW) + Risk Committee', state:'Fraud-alert call-out queued — 2 ahead in queue' },
     agentGate: { rep:'M. Wright', tier:'Tier 2', tierDesc:'up to Medium-risk MCCs, ≤$250K/mo', dealClass:'Enterprise CNP · High risk · $2.1M/mo', allowed:false, reason:'$2.1M/mo exceeds rep tier cap — senior override required' },
     routing: { mode:'forced', accepted:0, rule:'volume tier > $1M routes to FD Enterprise BIN only', options:[
-      { bin:'4427-88', label:'FD Enterprise', processor:'First Data', fitPct:96, minimums:'No minimums pressure at this tier', why:['Enterprise CNP program — the only BIN certified for the >$1M/mo volume tier','Supports the 5% rolling reserve structure recommended for the first 90 days'] },
+      { bin:'4427-88', label:'FD Enterprise', processor:'First Data', fitPct:96, minimums:'No minimums pressure at this tier', why:['Enterprise CNP program — the only BIN certified for the >$1M/mo volume tier','Supports the 5% rolling reserve structure recommended for the first 90 days'], whyCites:['d-ecnp','d-mcc'] },
     ] },
     fees: [
       { label:'Annual Fee', value:'$0.00 (waived — enterprise)', source:'application' },
@@ -13985,8 +14102,8 @@ function _uwbDefaultData(name) {
     concurrence:{ required:false, reason:'Under all co-approval thresholds', routedTo:null, state:'Single-underwriter decision' },
     agentGate:{ rep:'Partner rep', tier:'Tier 2', tierDesc:'up to Medium-risk MCCs, ≤$250K/mo', dealClass:'Card Present · Medium risk', allowed:true, reason:'Deal class within rep tier submission authority' },
     routing:{ mode:'open', accepted:null, options:[
-      { bin:'4242-42', label:'First Data Omaha', processor:'First Data', fitPct:88, minimums:'FD monthly minimum 74% met', why:['FD monthly minimum 74% met — this deal closes the gap'] },
-      { bin:'4885-10', label:'TSYS — Merchant BIN 10', processor:'TSYS', fitPct:76, minimums:'TSYS minimum already met', why:['TSYS minimum already met — no minimums pressure from this placement'] },
+      { bin:'4242-42', label:'First Data Omaha', processor:'First Data', fitPct:88, minimums:'FD monthly minimum 74% met', why:['FD monthly minimum 74% met — this deal closes the gap'], whyCites:['d-min'] },
+      { bin:'4885-10', label:'TSYS — Merchant BIN 10', processor:'TSYS', fitPct:76, minimums:'TSYS minimum already met', why:['TSYS minimum already met — no minimums pressure from this placement'], whyCites:['d-min'] },
     ] },
     fees:[
       { label:'Annual Fee', value:'$99.00', source:'application' },
@@ -14195,7 +14312,7 @@ function renderUWWorkbench(name) {
           ${isAccepted && !binForced ? `<span class="uwb-chip pass" style="margin-left:0;">✓ Routed → ${o.label}</span>` : ''}
           ${isAccepted && binForced ? '<span class="uwb-chip pass" style="margin-left:0;">✓ Routed</span>' : ''}
         </div>
-        <div class="uwb-bin-why">${(o.why||[]).map(w => '• ' + w).join('<br>')}</div>
+        <div class="uwb-bin-why">${(o.why||[]).map((w, wi) => '• ' + w + ((o.whyCites && o.whyCites[wi] && typeof klbCiteChip === 'function') ? klbCiteChip(o.whyCites[wi]) : '')).join('<br>')}</div>
       </div>
       ${!binForced && routedIdx == null ? `<button class="btn ${oi===0?'btn-primary':'btn-ghost'}" style="font-size:11px;padding:6px 12px;flex-shrink:0;" onclick="uwbAcceptRoute('${nEsc}',${oi})">Accept routing</button>` : ''}
     </div>`;
@@ -14203,10 +14320,13 @@ function renderUWWorkbench(name) {
   const routedHdrChip = !routing ? '' : routedIdx != null
     ? `<span style="margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--green);text-transform:none;letter-spacing:0;">✓ Routed → ${routing.options[routedIdx].bin} · ${routing.options[routedIdx].label}</span>`
     : '<span style="margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--amber);text-transform:none;letter-spacing:0;">BIN not yet selected</span>';
+  const kbSrcN = (typeof klbSourceCount === 'function') ? klbSourceCount('f-proc') : 0;
   const routingHTML = routing ? `
     <div class="uwb-sec">
       <div class="uwb-sec-hdr">🧭 Routing — BIN placement ${routedHdrChip}</div>
-      <div class="uwb-sec-body">${binCards}</div>
+      <div class="uwb-sec-body">
+        <div style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">Rules compiled from <span style="color:var(--blue);font-weight:600;cursor:pointer;" title="Open Processor Information in the Knowledge Library" onclick="klbOpenLibrary('f-proc')">Knowledge Library → Processor Information</span> · ${kbSrcN} source${kbSrcN === 1 ? '' : 's'}</div>
+        ${binCards}</div>
     </div>` : '';
 
   /* ── Pricing & Fees section (read-only validation — editing lives in the application wizard) ── */
@@ -14230,7 +14350,7 @@ function renderUWWorkbench(name) {
           <span class="uwb-fee-label">${f.label}</span>
           <div style="flex:1;min-width:0;">
             <span class="uwb-fee-val">${f.value}</span>
-            ${f.mismatch ? `<div style="font-size:11px;color:var(--amber);margin-top:3px;line-height:1.45;">${f.mismatch}</div>` : ''}
+            ${f.mismatch ? `<div style="font-size:11px;color:var(--amber);margin-top:3px;line-height:1.45;">${f.mismatch} <button class="klb-cite" title="Open in Knowledge Library" onclick="klbOpenLibrary('f-uw')">📚 Underwriting / Risk Knowledge</button></div>` : ''}
           </div>
           ${f.mismatch ? '<span class="uwb-chip warn" style="margin-left:0;flex-shrink:0;">⚠ Differs from signed application</span>' : '<span class="uwb-chip pass" style="margin-left:0;flex-shrink:0;">✓ Matches application</span>'}
         </div>`).join('') : '<div style="font-size:12px;color:var(--text-muted);padding:6px 0;">No pricing on file yet.</div>'}
@@ -14427,7 +14547,10 @@ function uwbAcceptRoute(name, idx) {
   const o = r.options[idx];
   if (!o) return;
   r.accepted = idx;
-  uwb.audit.push({ t:'Just now', who:'You (UW)', what:'Routing accepted — ' + o.bin + ' · ' + o.label });
+  const citeNames = (o.whyCites || [])
+    .map(id => (typeof klbDocName === 'function') ? klbDocName(id) : null)
+    .filter((v, i, a) => v && a.indexOf(v) === i);
+  uwb.audit.push({ t:'Just now', who:'You (UW)', what:'Routing accepted — ' + o.bin + ' · ' + o.label + (citeNames.length ? ' — per Knowledge Library: ' + citeNames.join(', ') : '') });
   if (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name]) {
     const dr = DEAL_ROOM_DATA[name];
     dr.activity = dr.activity || [];
@@ -14968,6 +15091,579 @@ function renderInventoryView() {
       <span style="font-weight:600;color:var(--text-primary);cursor:pointer;text-decoration:underline;text-decoration-color:var(--border-strong);text-underline-offset:2px;" onclick="invGoMerchant('${p.merchant.replace(/'/g,"\\'")}')">${p.merchant}</span>
       <span style="margin-left:auto;color:var(--text-muted);font-size:11px;">by Deployment · <span style="font-family:var(--font-mono);">${p.when}</span></span>
     </div>`).join('') : '<div style="font-size:11px;color:var(--text-muted);">No recent pulls</div>';
+}
+
+/* ═══════════════════════════════════════════════════════
+   KNOWLEDGE LIBRARY (klb-*) — Library view: folder tree,
+   tri-state visibility (null = All, [] = None, [ids] = subset),
+   AI-maintained doc previews (uwm-* modal), Library Assistant.
+   ═══════════════════════════════════════════════════════ */
+const KB_USERS = [
+  { id:'u-mike',   name:'Mike Wright',   email:'mike@twillpayments.com' },
+  { id:'u-nader',  name:'Nader H.',      email:'nader@twillpayments.com' },
+  { id:'u-sara',   name:'Sara Patel',    email:'sara@twillpayments.com' },
+  { id:'u-jordan', name:'Jordan Rivera', email:'jordan@twillpayments.com' },
+  { id:'u-dan',    name:'Dan Mercer',    email:'dan.m@summitlending.com' },
+  { id:'u-tara',   name:'Tara Price',    email:'tara.p@rivermark.com' },
+  { id:'u-alex',   name:'Alex Kim',      email:'alex@twillpayments.com' },
+];
+
+const KB_DATA = {
+  selected: 'f-pos',
+  editingFolder: null,
+  confirmDelete: null,
+  pendingParent: null,
+  pendingUpload: null,
+  chatInit: false,
+  folders: [
+    { id:'f-product',  name:'Product Guides',                parent:null,     shared:true,  hiddenFromReps:false, userIds:null },
+    { id:'f-proc',     name:'Processor Information',         parent:null,     shared:false, hiddenFromReps:true,  userIds:null, ops:true },
+    { id:'f-priority', name:'Priority',                      parent:'f-proc', shared:false, hiddenFromReps:true,  userIds:null, ops:true },
+    { id:'f-ems',      name:'EMS / Kurv',                    parent:'f-proc', shared:false, hiddenFromReps:true,  userIds:null, ops:true },
+    { id:'f-luqra',    name:'Luqra',                         parent:'f-proc', shared:false, hiddenFromReps:true,  userIds:null, ops:true },
+    { id:'f-lumino',   name:'Lumino',                        parent:'f-proc', shared:false, hiddenFromReps:true,  userIds:null, ops:true },
+    { id:'f-pos',      name:'POS',                           parent:null,     shared:false, hiddenFromReps:false, userIds:null },
+    { id:'f-uw',       name:'Underwriting / Risk Knowledge', parent:null,     shared:false, hiddenFromReps:false, userIds:['u-mike','u-sara'] },
+    { id:'f-slicks',   name:'Terminal Slicks',               parent:null,     shared:false, hiddenFromReps:false, userIds:null },
+  ],
+  files: [
+    { id:'d-plat',  folderId:'f-product',  name:'Twill Platform Overview.pdf',       bytes:2516582, uploaded:'Jun 12, 2026', by:'Twill',    userIds:null, kind:'doc' },
+    { id:'d-onb',   folderId:'f-product',  name:'Merchant Onboarding Playbook.pdf',  bytes:1887436, uploaded:'Jun 12, 2026', by:'Twill',    userIds:null, kind:'doc' },
+    { id:'d-gwset', folderId:'f-product',  name:'Gateway Setup Guide.pdf',           bytes:962560,  uploaded:'May 30, 2026', by:'Twill',    userIds:null, kind:'doc' },
+    { id:'d-ocref', folderId:'f-pos',      name:'Order Counter POS — Comprehensive Solution Reference', bytes:131072, uploaded:'Jul 28, 2026', by:'Twill AI', ai:true, userIds:null, kind:'ref' },
+    { id:'d-ocan',  folderId:'f-pos',      name:'OrderCounter_POS_Analysis.md',      bytes:47104,   uploaded:'Aug 2, 2026',  by:'Twill AI', ai:true, userIds:null, kind:'analysis' },
+    { id:'d-mx',    folderId:'f-pos',      name:'twill_pos_integration_matrix.xlsx', bytes:90112,   uploaded:'Jul 30, 2026', by:'Twill AI', ai:true, userIds:null, kind:'matrix' },
+    { id:'d-mcc',   folderId:'f-priority', name:'Priority — High-Risk MCC Sheet.pdf', bytes:524288, uploaded:'Jul 8, 2026',  by:'Mike W.',  userIds:null, kind:'doc' },
+    { id:'d-buy',   folderId:'f-priority', name:'Priority Buy Rates 2026.xlsx',      bytes:75776,   uploaded:'Jun 30, 2026', by:'Mike W.',  userIds:['u-mike','u-sara'], kind:'doc' },
+    { id:'d-kurv',  folderId:'f-ems',      name:'Kurv Gateway Boarding Guide.pdf',   bytes:1153434, uploaded:'Jun 18, 2026', by:'Mike W.',  userIds:null, kind:'doc' },
+    { id:'d-luq',   folderId:'f-luqra',    name:'Luqra Program Guide.pdf',           bytes:2306867, uploaded:'May 29, 2026', by:'Mike W.',  userIds:null, kind:'doc' },
+    { id:'d-lum',   folderId:'f-lumino',   name:'Lumino Onboarding Checklist.pdf',   bytes:348160,  uploaded:'Jun 3, 2026',  by:null,       userIds:null, kind:'doc' },
+    { id:'d-min',   folderId:'f-proc',     name:'BIN Minimums Tracker.xlsx',         bytes:55296,   uploaded:'Aug 1, 2026',  by:'Twill AI', ai:true, userIds:null, kind:'doc' },
+    { id:'d-fdic',  folderId:'f-priority', name:'Priority — FD Omaha IC+ Rate Tables.xlsx', bytes:69632, uploaded:'Jul 14, 2026', by:'Mike W.', userIds:null, kind:'doc' },
+    { id:'d-ecnp',  folderId:'f-priority', name:'Priority — Enterprise CNP Program & Reserve Policy.pdf', bytes:911360, uploaded:'Jul 3, 2026', by:'Mike W.', userIds:null, kind:'doc' },
+    { id:'d-tsys',  folderId:'f-ems',      name:'EMS — TSYS BIN 10 Program Guide.pdf', bytes:1258291, uploaded:'Jun 20, 2026', by:'Mike W.', userIds:null, kind:'doc' },
+    { id:'d-pend',  folderId:'f-uw',       name:'UW Pend Playbook.pdf',              bytes:706560,  uploaded:'Jul 21, 2026', by:'Mike W.',  userIds:null, kind:'doc' },
+    { id:'d-risk',  folderId:'f-uw',       name:'Risk Category Definitions.md',      bytes:22528,   uploaded:'Jul 21, 2026', by:'Twill AI', ai:true, userIds:null, kind:'doc' },
+    { id:'d-pax',   folderId:'f-slicks',   name:'PAX A920 Pro Slick.pdf',            bytes:3250586, uploaded:'May 12, 2026', by:'Mike W.',  userIds:null, kind:'doc' },
+    { id:'d-lane',  folderId:'f-slicks',   name:'Ingenico Lane 3000 Slick.pdf',      bytes:2831155, uploaded:'May 12, 2026', by:'Mike W.',  userIds:null, kind:'doc' },
+  ],
+};
+
+function klbFolder(id) { return KB_DATA.folders.find(x => x.id === id); }
+function klbFile(id)   { return KB_DATA.files.find(x => x.id === id); }
+function klbFmtBytes(b) {
+  if (b == null) return '—';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(b < 102400 ? 1 : 0).replace(/\.0$/,'') + ' KB';
+  if (b < 1073741824) return (b/1048576).toFixed(1) + ' MB';
+  return (b/1073741824).toFixed(1) + ' GB';
+}
+function klbVisLabel(v) { return v === null ? 'All users' : (v.length === 0 ? 'No users' : v.length + ' users'); }
+
+/* ── Folder tree ── */
+function klbRenderTree() {
+  const host = document.getElementById('klb-tree'); if (!host) return;
+  if (!KB_DATA.folders.length) { host.innerHTML = '<div style="font-size:11px;color:var(--text-muted);padding:4px 2px;">No folders yet.</div>'; return; }
+  const row = (f, depth) => {
+    const sel = KB_DATA.selected === f.id;
+    const restricted = Array.isArray(f.userIds) && f.userIds.length > 0;
+    const iconColor = sel ? 'var(--navy)' : (f.shared ? 'var(--amber)' : 'var(--text-muted)');
+    const icon = sel
+      ? `<svg width="13" height="13" viewBox="0 0 16 16" fill="${iconColor}" style="flex-shrink:0;"><path d="M1.5 4.2c0-.8.6-1.4 1.4-1.4h2.9l1.5 1.5h5.2c.8 0 1.4.6 1.4 1.4v.5H4.6c-.7 0-1.3.5-1.5 1.2l-1.6 4.4V4.2z"/><path d="M3.9 7.6c.1-.4.5-.7.9-.7h9.6c.6 0 1 .6.9 1.2l-1.3 4.2c-.1.4-.5.7-.9.7H3.5c-.6 0-1-.6-.9-1.2l1.3-4.2z"/></svg>`
+      : `<svg width="13" height="13" viewBox="0 0 16 16" fill="${iconColor}" style="flex-shrink:0;"><path d="M1.5 4.2c0-.8.6-1.4 1.4-1.4h3l1.5 1.5h5.7c.8 0 1.4.6 1.4 1.4v6.1c0 .8-.6 1.4-1.4 1.4H2.9c-.8 0-1.4-.6-1.4-1.4V4.2z"/></svg>`;
+    return `<div class="klb-tree-row ${sel?'sel':''} ${f.shared?'shared':''}" style="padding-left:${6+depth*14}px;" onclick="klbSelect('${f.id}')">
+      ${icon}
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</span>
+      ${f.hiddenFromReps ? '<span class="klb-chip rep" title="Hidden from sales reps">REP-HIDDEN</span>' : ''}
+      ${restricted ? '<span class="klb-chip restricted">restricted</span>' : ''}
+      ${f.shared ? '' : `<button class="klb-add" title="New Sub-folder" onclick="event.stopPropagation();klbNewFolder('${f.id}')">+</button>`}
+    </div>` + KB_DATA.folders.filter(c => c.parent === f.id).map(c => row(c, depth + 1)).join('');
+  };
+  host.innerHTML = KB_DATA.folders.filter(f => !f.parent).map(r => row(r, 0)).join('');
+}
+
+/* ── Folder Settings panel ── */
+function klbRenderSettings() {
+  const host = document.getElementById('klb-settings'); if (!host) return;
+  const f = klbFolder(KB_DATA.selected);
+  if (!f) { host.innerHTML = '<div class="klb-microlabel">Folder Settings</div><div style="font-size:11px;color:var(--text-muted);">Select a folder.</div>'; return; }
+  let h = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div class="klb-microlabel" style="margin-bottom:0;">Folder Settings</div>${f.shared?'<span class="klb-chip shared">Shared</span>':''}</div>`;
+  if (KB_DATA.editingFolder === f.id) {
+    h += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+      <input id="klb-rename-input" class="klb-search" style="margin:0;flex:1;" value="${f.name.replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')klbRenameCommit('${f.id}');if(event.key==='Escape')klbRenameCancel();">
+      <button class="klb-iconbtn" title="Save" onclick="klbRenameCommit('${f.id}')">✓</button>
+      <button class="klb-iconbtn" title="Cancel" onclick="klbRenameCancel()">✕</button></div>`;
+  } else {
+    h += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+      <span style="font-size:12px;font-weight:600;color:var(--text-primary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</span>
+      ${f.shared?'':`<button class="klb-iconbtn" title="Rename" onclick="klbRenameStart('${f.id}')">✎</button>`}</div>`;
+  }
+  if (f.ops) h += `<div style="font-size:10px;color:var(--amber);background:var(--amber-dim);border:1px solid rgba(166,124,91,.25);border-radius:6px;padding:6px 9px;margin-bottom:10px;">Ops-only. Compiles into deal routing.</div>`;
+  if (f.shared) {
+    h += `<div style="font-size:10px;color:var(--text-muted);border:1px dashed var(--border-strong);border-radius:6px;padding:7px 9px;line-height:1.5;">Provisioned by the Twill master library. Contents and visibility are managed centrally — read-only here.</div>`;
+    host.innerHTML = h; return;
+  }
+  h += `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0 10px;">
+    <span style="font-size:11px;color:var(--text-secondary);">Hidden from reps</span>
+    <div class="klb-toggle ${f.hiddenFromReps?'on':''}" role="switch" aria-checked="${!!f.hiddenFromReps}" onclick="klbToggleReps('${f.id}')"></div></div>`;
+  h += `<div style="border-top:1px solid var(--border);margin:2px 0 10px;"></div>`;
+  h += `<div class="klb-microlabel">Restrict to specific users</div>`;
+  h += klbUserSelectorHTML('folder', f.id, f.userIds);
+  h += `<div style="border-top:1px solid var(--border);margin:12px 0 10px;"></div>`;
+  if (KB_DATA.confirmDelete === f.id) {
+    h += `<div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px;">Delete this folder?</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn" style="font-size:10px;padding:4px 10px;background:rgba(155,107,91,.14);color:var(--red);border:1px solid rgba(155,107,91,.3);" onclick="klbDeleteFolder('${f.id}')">Yes, delete</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;" onclick="KB_DATA.confirmDelete=null;klbRenderSettings();">Cancel</button></div>`;
+  } else {
+    h += `<button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;color:var(--red);border-color:rgba(155,107,91,.3);" onclick="KB_DATA.confirmDelete='${f.id}';klbRenderSettings();">Delete folder</button>`;
+  }
+  host.innerHTML = h;
+}
+
+/* ── Tri-state user selector (shared by Folder Settings + file visibility popover) ── */
+function klbUserSelectorHTML(kind, id, v) {
+  const all = v === null;
+  const listId = `klb-ulist-${kind}-${id}`;
+  let h = `<label class="klb-check" style="font-weight:600;color:var(--text-primary);">
+    <input type="checkbox" ${all?'checked':''} onchange="klbVisAll('${kind}','${id}',this.checked)"> All users</label>`;
+  if (KB_USERS.length > 5) h += `<input class="klb-search" placeholder="Search..." onkeyup="klbFilterUsers(this,'${listId}')">`;
+  h += `<div id="${listId}" style="max-height:150px;overflow-y:auto;">`;
+  KB_USERS.forEach(u => {
+    const on = all || (Array.isArray(v) && v.includes(u.id));
+    h += `<label class="klb-check klb-urow" data-search="${(u.name+' '+u.email).toLowerCase()}">
+      <input type="checkbox" ${on?'checked':''} onchange="klbVisUser('${kind}','${id}','${u.id}',this.checked)">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${u.name} <span class="em">(${u.email})</span></span></label>`;
+  });
+  h += `<div class="klb-nomatch" style="display:none;font-size:11px;color:var(--text-muted);padding:4px 2px;">No matches</div></div>`;
+  return h;
+}
+function klbFilterUsers(inp, listId) {
+  const list = document.getElementById(listId); if (!list) return;
+  const q = inp.value.trim().toLowerCase(); let n = 0;
+  list.querySelectorAll('.klb-urow').forEach(r => {
+    const hit = !q || r.dataset.search.indexOf(q) !== -1;
+    r.style.display = hit ? '' : 'none'; if (hit) n++;
+  });
+  const nm = list.querySelector('.klb-nomatch'); if (nm) nm.style.display = n ? 'none' : '';
+}
+function klbVisTarget(kind, id) { return kind === 'folder' ? klbFolder(id) : klbFile(id); }
+function klbVisAll(kind, id, checked) {
+  const t = klbVisTarget(kind, id); if (!t) return;
+  t.userIds = checked ? null : [];
+  klbAfterVisChange(kind, id);
+}
+function klbVisUser(kind, id, uid, checked) {
+  const t = klbVisTarget(kind, id); if (!t) return;
+  let v = t.userIds === null ? KB_USERS.map(u => u.id) : (t.userIds || []).slice();
+  v = checked ? (v.indexOf(uid) === -1 ? v.concat(uid) : v) : v.filter(x => x !== uid);
+  t.userIds = v.length === KB_USERS.length ? null : v;
+  klbAfterVisChange(kind, id);
+}
+function klbAfterVisChange(kind, id) {
+  klbRenderTree();
+  if (kind === 'folder') klbRenderSettings();
+  klbRenderFiles();
+  if (kind === 'file') klbRepop(id);
+}
+
+/* ── File visibility popover (portal-rendered, escapes table clipping) ── */
+let _klbPop = { kind:null, id:null };
+function klbEnsurePop() {
+  let p = document.getElementById('klb-pop');
+  if (!p) {
+    p = document.createElement('div'); p.id = 'klb-pop'; p.className = 'klb-pop';
+    document.body.appendChild(p);
+    document.addEventListener('click', e => {
+      if (!p.classList.contains('open')) return;
+      if (e.target.closest && (e.target.closest('#klb-pop') || e.target.closest('.klb-pill'))) return;
+      klbClosePop();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') klbClosePop(); });
+    document.addEventListener('scroll', e => {
+      if (e.target && e.target.closest && e.target.closest('#klb-pop')) return;
+      klbClosePop();
+    }, true);
+    window.addEventListener('resize', () => klbClosePop());
+  }
+  return p;
+}
+function klbOpenPop(ev, kind, id) {
+  ev.stopPropagation();
+  const p = klbEnsurePop();
+  if (p.classList.contains('open') && _klbPop.id === id && _klbPop.kind === kind) { klbClosePop(); return; }
+  const t = klbVisTarget(kind, id); if (!t) return;
+  _klbPop = { kind, id };
+  p.innerHTML = klbUserSelectorHTML(kind, id, t.userIds);
+  const r = ev.currentTarget.getBoundingClientRect();
+  p.classList.add('open');
+  const w = 232;
+  const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 12));
+  const top = r.bottom + 6;
+  p.style.left = left + 'px'; p.style.top = top + 'px';
+  requestAnimationFrame(() => {
+    const hgt = p.offsetHeight;
+    if (top + hgt > window.innerHeight - 8) p.style.top = Math.max(8, r.top - hgt - 6) + 'px';
+  });
+}
+function klbClosePop() {
+  const p = document.getElementById('klb-pop');
+  if (p) p.classList.remove('open');
+  _klbPop = { kind:null, id:null };
+}
+function klbRepop(id) {
+  const p = document.getElementById('klb-pop');
+  if (p && p.classList.contains('open') && _klbPop.id === id) {
+    const t = klbVisTarget(_klbPop.kind, id);
+    if (t) p.innerHTML = klbUserSelectorHTML(_klbPop.kind, id, t.userIds);
+  }
+}
+
+/* ── File table ── */
+function klbRenderFiles() {
+  const host = document.getElementById('klb-files'); if (!host) return;
+  const f = klbFolder(KB_DATA.selected);
+  if (!f) {
+    host.innerHTML = `<div class="card-header"><div><div class="card-title">Files</div></div></div>
+      <div style="padding:44px 20px;text-align:center;font-size:12px;color:var(--text-muted);">Select a folder to view files.</div>`;
+    return;
+  }
+  const files = KB_DATA.files.filter(x => x.folderId === f.id);
+  let h = `<div class="card-header"><div style="display:flex;align-items:center;gap:8px;min-width:0;">
+      <div class="card-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</div>
+      ${f.shared?'<span class="klb-chip shared">Shared</span>':''}
+      ${f.hiddenFromReps?'<span class="klb-chip rep" title="Hidden from sales reps">REP-HIDDEN</span>':''}
+    </div>
+    ${f.shared?'':`<button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="klbUpload()">Upload</button>`}</div>`;
+  if (!files.length) {
+    h += `<div style="padding:44px 20px;text-align:center;">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">No files yet.</div>
+      ${f.shared?'':'<button class="btn btn-ghost" style="font-size:11px;" onclick="klbUpload()">Upload File</button>'}</div>`;
+  } else {
+    h += `<div style="overflow-x:auto;"><table class="klb-table">
+      <thead><tr><th>Name</th><th>Size</th><th>Uploaded</th><th>Uploaded By</th><th>Visibility</th><th></th></tr></thead><tbody>`;
+    files.forEach(d => {
+      const pill = f.shared
+        ? `<span class="klb-pill" style="cursor:default;">${klbVisLabel(d.userIds)}</span>`
+        : `<button class="klb-pill" onclick="klbOpenPop(event,'file','${d.id}')" title="Click to edit user visibility">${klbVisLabel(d.userIds)}</button>`;
+      const ic = d.kind === 'matrix' ? '📊' : d.kind === 'analysis' ? '🧾' : d.kind === 'ref' ? '📘' : '📄';
+      h += `<tr id="klb-frow-${d.id}">
+        <td style="max-width:290px;"><div style="display:flex;align-items:center;gap:7px;min-width:0;">
+          <span style="flex-shrink:0;">${ic}</span>
+          <span class="klb-fname" id="klb-fname-${d.id}" ${f.shared?'':`title="Click to rename" onclick="klbRenameFile('${d.id}')"`} style="color:var(--text-primary);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${f.shared?'':'cursor:text;'}">${d.name}</span>
+          ${d.ai?'<span class="klb-chip ai" title="Authored and kept current by Twill AI">AI-maintained</span>':''}</div></td>
+        <td style="font-family:var(--font-mono);font-size:11px;white-space:nowrap;">${klbFmtBytes(d.bytes)}</td>
+        <td style="font-family:var(--font-mono);font-size:11px;white-space:nowrap;">${d.uploaded}</td>
+        <td style="white-space:nowrap;">${d.by || '—'}</td>
+        <td>${pill}</td>
+        <td><div class="klb-row-acts">
+          <button class="klb-iconbtn" title="Preview" onclick="klbPreviewFile('${d.id}')">👁</button>
+          <button class="klb-iconbtn" title="Download" onclick="this.textContent='✓';this.title='Queued';">⬇</button>
+          ${f.shared?'':`<button class="klb-iconbtn" title="Delete" onclick="klbDeleteFile('${d.id}')">🗑</button>`}
+        </div></td></tr>`;
+    });
+    h += `</tbody></table></div>`;
+  }
+  host.innerHTML = h;
+}
+function klbRenameFile(id) {
+  const d = klbFile(id); if (!d) return;
+  const span = document.getElementById('klb-fname-' + id); if (!span) return;
+  const inp = document.createElement('input');
+  inp.className = 'klb-search'; inp.style.cssText = 'margin:0;flex:1;font-size:12px;min-width:180px;'; inp.value = d.name;
+  inp.onkeydown = e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') { inp.value = d.name; inp.blur(); } };
+  inp.onblur = () => { const v = inp.value.trim(); if (v) d.name = v; klbRenderFiles(); };
+  span.replaceWith(inp); inp.focus(); inp.select();
+}
+function klbDeleteFile(id) { KB_DATA.files = KB_DATA.files.filter(x => x.id !== id); klbClosePop(); klbRenderFiles(); }
+
+/* ── Folder actions ── */
+function klbSelect(id) { KB_DATA.selected = id; KB_DATA.confirmDelete = null; KB_DATA.editingFolder = null; klbClosePop(); klbRenderAll(); }
+function klbRenameStart(id) { KB_DATA.editingFolder = id; klbRenderSettings(); const i = document.getElementById('klb-rename-input'); if (i) { i.focus(); i.select(); } }
+function klbRenameCommit(id) { const f = klbFolder(id); const i = document.getElementById('klb-rename-input'); if (f && i && i.value.trim()) f.name = i.value.trim(); KB_DATA.editingFolder = null; klbRenderAll(); }
+function klbRenameCancel() { KB_DATA.editingFolder = null; klbRenderSettings(); }
+function klbToggleReps(id) { const f = klbFolder(id); if (!f) return; f.hiddenFromReps = !f.hiddenFromReps; klbRenderAll(); }
+function klbDeleteFolder(id) {
+  const dead = [id]; let grew = true;
+  while (grew) { grew = false; KB_DATA.folders.forEach(f => { if (f.parent && dead.indexOf(f.parent) !== -1 && dead.indexOf(f.id) === -1) { dead.push(f.id); grew = true; } }); }
+  KB_DATA.folders = KB_DATA.folders.filter(f => dead.indexOf(f.id) === -1);
+  KB_DATA.files = KB_DATA.files.filter(d => dead.indexOf(d.folderId) === -1);
+  KB_DATA.selected = null; KB_DATA.confirmDelete = null;
+  klbRenderAll();
+}
+function klbRenderAll() { klbRenderTree(); klbRenderSettings(); klbRenderFiles(); }
+
+/* ── Create Folder modal (uwm-*) ── */
+function klbNewFolder(parentId) {
+  const parent = parentId ? klbFolder(parentId) : null;
+  KB_DATA.pendingParent = parent ? parent.id : null;
+  uwmOpen(
+    `<span style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text-primary);">${parent ? 'New Sub-folder in ' + parent.name : 'New Folder'}</span>`,
+    `<div style="max-width:400px;margin:0 auto;">
+      <div class="klb-microlabel">Folder Name</div>
+      <input id="klb-nf-name" class="klb-search" style="margin:0 0 14px;font-size:12px;padding:8px 10px;" placeholder="e.g. Product Guides" onkeydown="if(event.key==='Enter')klbCreateFolder()">
+      <label class="klb-check" style="align-items:flex-start;margin-bottom:16px;">
+        <input type="checkbox" id="klb-nf-reps" checked style="margin-top:2px;">
+        <span><span style="font-weight:600;color:var(--text-primary);">Visible to sales reps</span><br>
+        <span style="font-size:10px;color:var(--text-muted);">Reps can browse and download files in this folder</span></span></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-ghost" style="font-size:11px;" onclick="uwmClose()">Cancel</button>
+        <button class="btn btn-primary" style="font-size:11px;" onclick="klbCreateFolder()">Create Folder</button></div></div>`);
+  setTimeout(() => { const i = document.getElementById('klb-nf-name'); if (i) i.focus(); }, 60);
+}
+function klbCreateFolder() {
+  const inp = document.getElementById('klb-nf-name');
+  const name = (inp ? inp.value : '').trim();
+  if (!name) { if (inp) { inp.style.borderColor = 'var(--red)'; inp.focus(); } return; }
+  const visible = !document.getElementById('klb-nf-reps') || document.getElementById('klb-nf-reps').checked;
+  const id = 'f-' + Date.now();
+  KB_DATA.folders.push({ id, name, parent: KB_DATA.pendingParent || null, shared:false, hiddenFromReps:!visible, userIds:null });
+  KB_DATA.selected = id; KB_DATA.pendingParent = null;
+  uwmClose(); klbRenderAll();
+}
+
+/* ── Upload modal (uwm-*) ── */
+function klbUpload() {
+  KB_DATA.pendingUpload = null;
+  uwmOpen(`<span style="font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text-primary);">Upload File</span>`, klbUploadBody());
+}
+function klbUploadBody() {
+  const p = KB_DATA.pendingUpload;
+  return `<div style="max-width:430px;margin:0 auto;">
+    <div id="klb-dz" style="border:2px dashed var(--border-strong);border-radius:8px;padding:30px 16px;text-align:center;cursor:pointer;background:var(--bg-elevated);"
+      onclick="document.getElementById('klb-fileinput').click()"
+      ondragover="event.preventDefault();this.style.borderColor='var(--navy)';"
+      ondragleave="this.style.borderColor='var(--border-strong)';"
+      ondrop="klbDrop(event)">
+      <div style="font-size:20px;margin-bottom:6px;">📁</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-primary);">Drag &amp; drop or browse</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">Any file type supported</div>
+      <input type="file" id="klb-fileinput" style="display:none;" onchange="klbPick(this)">
+    </div>
+    ${p ? `<div style="display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:6px;padding:7px 10px;margin-top:12px;font-size:11px;">
+      <span>📄</span><span style="font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</span>
+      <span style="font-family:var(--font-mono);color:var(--text-muted);flex-shrink:0;">${klbFmtBytes(p.bytes)}</span>
+      <button class="klb-iconbtn" style="margin-left:auto;font-size:10px;flex-shrink:0;" onclick="KB_DATA.pendingUpload=null;klbRefreshUpload();">Remove</button></div>` : ''}
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+      <button class="btn btn-ghost" style="font-size:11px;" onclick="uwmClose()">Cancel</button>
+      <button class="btn btn-primary" style="font-size:11px;${p?'':'opacity:.45;pointer-events:none;'}" onclick="klbDoUpload()">Upload</button></div></div>`;
+}
+function klbRefreshUpload() { const b = document.getElementById('uwm-body'); if (b) b.innerHTML = klbUploadBody(); }
+function klbPick(inp) {
+  const f = inp.files && inp.files[0];
+  KB_DATA.pendingUpload = f ? { name:f.name, bytes:f.size } : { name:'Q3_Rate_Update.pdf', bytes:1245184 };
+  klbRefreshUpload();
+}
+function klbDrop(ev) {
+  ev.preventDefault();
+  const f = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+  KB_DATA.pendingUpload = f ? { name:f.name, bytes:f.size } : { name:'Q3_Rate_Update.pdf', bytes:1245184 };
+  klbRefreshUpload();
+}
+function klbDoUpload() {
+  const p = KB_DATA.pendingUpload; if (!p || !KB_DATA.selected) return;
+  KB_DATA.files.push({ id:'d-'+Date.now(), folderId:KB_DATA.selected, name:p.name, bytes:p.bytes, uploaded:'Aug 6, 2026', by:'Mike W.', userIds:null, kind:'doc' });
+  KB_DATA.pendingUpload = null; uwmClose(); klbRenderFiles();
+}
+
+/* ── File previews (shared uwm-* modal) ── */
+function klbPreviewFile(id) {
+  const d = klbFile(id); if (!d) return;
+  const chip = d.ai ? '<span class="klb-chip ai">AI-maintained</span>' : '';
+  uwmOpen(
+    `<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text-primary);">${d.name}</span>${chip}
+     <button class="btn btn-ghost" style="font-size:10px;padding:3px 10px;" onclick="this.textContent='✓ Queued'">⬇ Download</button>`,
+    klbPreviewBody(d) +
+    `<div style="font-size:10px;color:var(--text-muted);margin-top:10px;">Uploaded by ${d.by || '—'} · ${d.uploaded} · indexed for AI retrieval</div>`);
+}
+function klbPreviewBody(d) {
+  if (d.kind === 'matrix') {
+    const cat = c => `<span class="klb-cat ${c.toLowerCase()}">${c}</span>`;
+    const rows = [
+      ['Order Counter POS','YES','Priority (native), NMI, Authorize.Net','ordercounter.com/integrations','—','—'],
+      ['TouchBistro','YES','Chase, Moneris, TSYS','touchbistro.com/partners','—','—'],
+      ['Clover','MAYBE','Fiserv-anchored; semi-integration only','clover.com/docs','—','Gateway locked to Fiserv rails — verify per deal'],
+      ['SkyTab (Shift4)','MAYBE','Shift4 gateway; 3rd-party via API cert','shift4.com/skytab','—','Conditional — API certification required'],
+      ['Lightspeed Restaurant','MAYBE','Lightspeed Payments default; legacy gateways grandfathered','lightspeedhq.com','—','New accounts pushed to in-house payments'],
+      ['Toast POS','NO','Toast Payments only (closed loop)','pos.toasttab.com','Order Counter POS','Processing locked to Toast — full POS replacement required'],
+      ['Square for Restaurants','NO','Square only (closed loop)','squareup.com','Order Counter POS / TouchBistro','Closed loop — compete on rate + coursing depth'],
+    ];
+    return `<div class="uwm-paper" style="padding:16px 18px;">
+      <div style="font-size:13px;font-weight:800;margin-bottom:2px;">POS Integration Matrix</div>
+      <div style="font-size:10px;color:#6B655C;margin-bottom:12px;">Verified (sourced) · YES = supports 3rd-party integrated payments, MAYBE = unclear/conditional, NO = closed loop (replacement required)</div>
+      <div style="overflow-x:auto;"><table style="min-width:660px;">
+        <tr><th>POS System</th><th>Category</th><th>Known Gateways / Processors</th><th>Sources</th><th>If NO – Replace With</th><th>If NO – Compete Notes</th></tr>
+        ${rows.map(r=>`<tr><td style="font-weight:600;white-space:nowrap;">${r[0]}</td><td>${cat(r[1])}</td><td>${r[2]}</td><td style="font-family:var(--font-mono);font-size:10px;">${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('')}
+      </table></div></div>`;
+  }
+  if (d.kind === 'ref') {
+    const seg = [
+      ['Full-service restaurants','✅ Excellent','Coursing, kitchen ticket routing, table &amp; floor management'],
+      ['Quick-service / counter service','✅ Strong','Speed-of-service flows, KDS, modifier depth'],
+      ['Bars &amp; nightlife','⚠️ Moderate','Tab management solid; no pour-level inventory'],
+      ['Retail','❌ Not ideal','Restaurant-first feature set'],
+    ];
+    return `<div class="uwm-paper">
+      <div style="font-size:15px;font-weight:800;border-bottom:2px solid #2A2620;padding-bottom:8px;margin-bottom:8px;">Order Counter POS — Comprehensive Solution Reference</div>
+      <div style="font-size:10px;color:#6B655C;margin-bottom:14px;">Maintained by: Twill AI · Last Updated: Jul 28, 2026 · Status: Active Twill Solution · Website: ordercounter.com</div>
+      <div style="font-size:11px;font-weight:700;margin-bottom:4px;">Company Overview</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:12px;">Restaurant-first POS platform (est. 2010, Louisville KY). Cloud-hybrid architecture with local resilience — terminals keep taking orders through internet outages. Payments-agnostic: integrates with third-party gateways rather than locking processing to the POS vendor.</div>
+      <div style="font-size:11px;font-weight:700;margin-bottom:4px;">Architecture vs. closed-loop competitors</div>
+      <table style="margin-bottom:12px;"><tr><th></th><th>Order Counter</th><th>Toast</th><th>Square</th></tr>
+        <tr><td style="font-weight:600;">Payments</td><td>Agnostic — 3rd-party gateways</td><td>Closed loop</td><td>Closed loop</td></tr>
+        <tr><td style="font-weight:600;">Deployment</td><td>Cloud hybrid, local resilience</td><td>Cloud</td><td>Cloud</td></tr>
+        <tr><td style="font-weight:600;">Hardware</td><td>Standard Android + PAX</td><td>Proprietary</td><td>Proprietary</td></tr></table>
+      <div style="font-size:11px;font-weight:700;margin-bottom:4px;">Target Segments</div>
+      <table style="margin-bottom:12px;"><tr><th>Segment</th><th>Fit</th><th>Key reasons</th></tr>
+        ${seg.map(s=>`<tr><td>${s[0]}</td><td style="white-space:nowrap;">${s[1]}</td><td>${s[2]}</td></tr>`).join('')}</table>
+      <div style="font-size:11px;font-weight:700;margin-bottom:4px;">Feature Set (reference)</div>
+      <div style="font-size:11px;line-height:1.7;">• Course-based kitchen tickets &amp; KDS routing<br>• Customer profiles with phone-number lookup at order entry<br>• Table + floor management, split checks, tab transfer<br>• Online ordering module (verify integration path per deal)<br>• Multi-location menu sync &amp; reporting</div></div>`;
+  }
+  if (d.kind === 'analysis') {
+    return `<div class="uwm-paper">
+      <div style="font-size:14px;font-weight:800;border-bottom:2px solid #2A2620;padding-bottom:8px;margin-bottom:8px;">OrderCounter POS — Solution Analysis</div>
+      <div style="font-size:10px;color:#6B655C;margin-bottom:14px;">Client: Bella Cucina Restaurant · Partner: NovaPay (Sara R.) · Evaluated By: Twill AI · Date: Aug 2, 2026 · Source: ordercounter.com</div>
+      <div style="font-size:11px;font-weight:700;margin-bottom:4px;">Client Requirements Summary</div>
+      <table style="margin-bottom:14px;"><tr><th>#</th><th>Requirement</th><th>Priority</th></tr>
+        <tr><td>1</td><td>Course-based kitchen tickets</td><td>Core</td></tr>
+        <tr><td>2</td><td>Customer phone lookup</td><td>Core</td></tr>
+        <tr><td>3</td><td>Online ordering integration</td><td>Add-on</td></tr></table>
+      <div style="font-size:11px;font-weight:700;margin-bottom:3px;">✅ Requirement 1: Course-based kitchen tickets — Fit: Strong</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:10px;">Native coursing with per-course fire control and KDS routing by station; confirmed in current release notes.<br><i>Recommendation:</i> walk a 3-course ticket end-to-end in the demo.</div>
+      <div style="font-size:11px;font-weight:700;margin-bottom:3px;">✅ Requirement 2: Customer phone lookup — Fit: Excellent</div>
+      <div style="font-size:11px;line-height:1.6;margin-bottom:10px;">Customer profiles are keyed to phone number with order-history recall at order entry — matches the stated host-stand workflow exactly.</div>
+      <div style="font-size:11px;font-weight:700;margin-bottom:3px;">⚠️ Requirement 3: Online ordering integration — Fit: Moderate — needs verification</div>
+      <div style="font-size:11px;line-height:1.6;">First-party online ordering module exists; third-party marketplace injection is unverified for this menu structure.<br><i>Recommendation:</i> add this as a specific demo requirement before contract.</div></div>`;
+  }
+  return `<div class="uwm-paper">
+    <div style="text-align:center;border-bottom:2px solid #2A2620;padding-bottom:10px;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:800;letter-spacing:.04em;">TWILL KNOWLEDGE LIBRARY</div>
+      <div style="font-size:10px;color:#6B655C;margin-top:2px;">${d.name}</div>
+    </div>
+    <div style="font-size:12px;font-weight:700;margin-bottom:10px;">${d.name}</div>
+    <div class="uwm-line" style="width:96%;"></div><div class="uwm-line" style="width:99%;"></div><div class="uwm-line" style="width:92%;"></div><div class="uwm-line" style="width:97%;"></div><div class="uwm-line" style="width:64%;"></div>
+    <div style="height:10px;"></div>
+    <div class="uwm-line" style="width:98%;"></div><div class="uwm-line" style="width:94%;"></div><div class="uwm-line" style="width:97%;"></div><div class="uwm-line" style="width:41%;"></div>
+    <div style="height:10px;"></div>
+    <div class="uwm-line" style="width:95%;"></div><div class="uwm-line" style="width:99%;"></div><div class="uwm-line" style="width:58%;"></div>
+  </div>`;
+}
+
+/* ── Library Assistant (scripted, streaming) ── */
+const KLB_SCRIPTS = [
+  {
+    q: 'Full-service restaurant, needs course-based kitchen tickets + customer phone lookup — what POS fits?',
+    a: 'Order Counter POS is the strongest fit. It is an active Twill solution, payments-agnostic (integrates with our gateways — no closed-loop lock-in), and both requirements are covered natively: course-based kitchen ticket routing is a core full-service feature, and customer profiles support phone-number lookup at order entry. Toast and Square also match the feature set but are closed loop (NO in the integration matrix) — replacement targets, not placements.',
+    fit: [
+      ['✅','Course-based kitchen tickets','Fit: Strong — native coursing + KDS routing'],
+      ['✅','Customer phone lookup','Fit: Excellent — profile lookup at order entry'],
+      ['⚠️','Online ordering integration','Fit: Moderate — needs verification; add as a demo requirement'],
+    ],
+    sources: ['Order Counter POS — Comprehensive Solution Reference','twill_pos_integration_matrix.xlsx'],
+  },
+  {
+    q: 'Which processor should this deal go to?',
+    a: 'Processor placement is compiled from the ops-only Processor Information folder — it is rep-hidden, so reps never see processors, BINs, or Schedule A. For a full-service restaurant on Order Counter, the routing rules point to Priority: Order Counter integrates natively with the Priority gateway and the MCC is clear on the Priority high-risk sheet. Review and accept the placement in Deal Routing in the UW Workbench — the accepted route is logged to the audit trail with its citing documents.',
+    sources: ['Priority — High-Risk MCC Sheet.pdf','Priority Buy Rates 2026.xlsx'],
+  },
+];
+function klbToggleChat() {
+  const c = document.getElementById('klb-chat'); const fab = document.getElementById('klb-chat-fab');
+  if (!c) return;
+  const open = c.classList.toggle('open');
+  if (fab) { fab.textContent = open ? '✕' : '💬'; fab.title = open ? 'Close library chat' : 'Open library chat'; }
+  if (open) klbChatInit();
+}
+function klbChatInit() {
+  if (KB_DATA.chatInit) return;
+  const th = document.getElementById('klbChatThread'); if (!th) return;
+  KB_DATA.chatInit = true;
+  th.innerHTML = `<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:14px 8px 10px;">Ask anything about the documents in your library.</div>
+    <div id="klb-chips" style="margin-bottom:12px;">
+      <button class="klb-chipq" onclick="klbAskChip(0)">Full-service restaurant, needs course-based kitchen tickets + customer phone lookup — what POS fits?</button>
+      <button class="klb-chipq" onclick="klbAskChip(1)">Which processor should this deal go to?</button>
+    </div>`;
+}
+function klbAskChip(i) { const s = KLB_SCRIPTS[i]; if (s) klbChatSend(s.q, i); }
+function klbSendInput() {
+  const inp = document.getElementById('klb-chat-input'); if (!inp) return;
+  const t = inp.value.trim(); if (!t) return;
+  inp.value = '';
+  const match = KLB_SCRIPTS.findIndex(s => s.q.toLowerCase() === t.toLowerCase());
+  klbChatSend(t, match >= 0 ? match : null);
+}
+function klbChatSend(text, scriptIdx) {
+  const th = document.getElementById('klbChatThread'); if (!th) return;
+  th.insertAdjacentHTML('beforeend', `<div class="klb-msg user"><div class="who">You</div><div class="klb-bub">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div></div>`);
+  const mid = 'klb-a-' + Date.now();
+  th.insertAdjacentHTML('beforeend', `<div class="klb-msg"><div class="who">Library Assistant</div><div class="klb-bub" id="${mid}"><span class="klb-cursor"></span></div></div>`);
+  th.scrollTop = th.scrollHeight;
+  const s = scriptIdx != null ? KLB_SCRIPTS[scriptIdx] : null;
+  const answer = s ? s.a : `I can answer questions grounded in the ${KB_DATA.files.length} documents in this library — solution references, the POS integration matrix, processor guides and underwriting knowledge. Try one of the suggested questions, or ask about a specific document.`;
+  const el = document.getElementById(mid);
+  klbStream(el, answer, () => {
+    if (!s) { th.scrollTop = th.scrollHeight; return; }
+    if (s.fit) {
+      el.insertAdjacentHTML('beforeend',
+        `<table class="klb-fit" style="width:100%;border-collapse:collapse;margin-top:8px;">${s.fit.map(r=>`<tr><td style="white-space:nowrap;">${r[0]}</td><td style="font-weight:600;color:var(--text-primary);">${r[1]}</td><td style="color:var(--text-muted);">${r[2]}</td></tr>`).join('')}</table>`);
+    }
+    if (s.sources && s.sources.length) {
+      el.closest('.klb-msg').insertAdjacentHTML('beforeend',
+        `<div class="klb-src"><div class="klb-src-title">Sources</div>${s.sources.map(x=>`<span class="klb-src-pill">📄 Source: ${x}</span>`).join('')}</div>`);
+    }
+    th.scrollTop = th.scrollHeight;
+  });
+}
+function klbStream(el, text, done) {
+  if (!el) { if (done) done(); return; }
+  const start = Date.now(); const cps = 140; /* chars/sec — time-based so throttled timers still finish */
+  const tick = setInterval(() => {
+    const i = Math.floor((Date.now() - start) / 1000 * cps);
+    const th = document.getElementById('klbChatThread');
+    if (i >= text.length) { clearInterval(tick); el.textContent = text; if (done) done(); }
+    else el.innerHTML = text.slice(0, i).replace(/&/g,'&amp;').replace(/</g,'&lt;') + '<span class="klb-cursor"></span>';
+    if (th) th.scrollTop = th.scrollHeight;
+  }, 28);
+}
+
+/* Entry: nav → showView('library') → renderLibraryView(); klbOpenLibrary(folderId)
+   is the cross-module hook (e.g. 📚 chips in UW routing) to land on a folder. */
+function renderLibraryView() { klbRenderAll(); }
+function klbOpenLibrary(folderId) {
+  showView('library', document.getElementById('nav-library'));
+  if (folderId && klbFolder(folderId)) { KB_DATA.selected = folderId; klbRenderAll(); }
+}
+
+/* ── ADDENDUM 2: Library citations — chips on routing/pricing/solutions that
+   open the Library at the cited doc. Coupling stays shallow: name + navigate. ── */
+function klbDocName(fileId) {
+  const d = (typeof klbFile === 'function') ? klbFile(fileId) : null;
+  return d ? d.name.replace(/\.(pdf|xlsx|xls|md|docx|csv)$/i, '') : null;
+}
+function klbCiteChip(fileId) {
+  const n = klbDocName(fileId);
+  return n ? ` <button class="klb-cite" title="Open in Knowledge Library" onclick="event.stopPropagation();klbOpenDoc('${fileId}')">📚 ${n}</button>` : '';
+}
+function klbSubtreeIds(rootId) {
+  const ids = [rootId]; let grew = true;
+  while (grew) { grew = false; KB_DATA.folders.forEach(f => { if (f.parent && ids.indexOf(f.parent) !== -1 && ids.indexOf(f.id) === -1) { ids.push(f.id); grew = true; } }); }
+  return ids;
+}
+function klbSourceCount(rootId) {
+  if (typeof KB_DATA === 'undefined' || !klbFolder(rootId)) return 0;
+  const ids = klbSubtreeIds(rootId);
+  return KB_DATA.files.filter(d => ids.indexOf(d.folderId) !== -1).length;
+}
+function klbOpenDoc(fileId) {
+  const d = klbFile(fileId);
+  klbOpenLibrary(d ? d.folderId : null);
+  if (!d) return;
+  const row = document.getElementById('klb-frow-' + fileId);
+  if (row) {
+    row.classList.remove('klb-hl'); void row.offsetWidth; row.classList.add('klb-hl');
+    row.scrollIntoView({ block:'nearest' });
+    setTimeout(() => { row.classList.remove('klb-hl'); }, 2400);
+  }
 }
 
 const _origPopulateDealRoom = populateDealRoom;
@@ -18054,6 +18750,11 @@ function renderSolutionBuilder(merchantName) {
               <span class="p-badge bb" style="font-size:9px;">${s.type}</span>
             </div>
             <div style="font-size:11px;color:var(--text-secondary);line-height:1.45;margin-bottom:6px;">${s.shortWhy}</div>
+            ${isFirst ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+              <button class="klb-cite" title="Open in Knowledge Library" onclick="event.stopPropagation();klbOpenDoc('d-ocref')">📚 Order Counter Solution Reference</button>
+              <button class="klb-cite" title="Open in Knowledge Library" onclick="event.stopPropagation();klbOpenDoc('d-mx')">📚 POS Integration Matrix</button>
+              <span style="font-size:10px;color:var(--text-muted);">Advisor cites documents you can open.</span>
+            </div>` : ''}
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
               <span style="font-size:10px;color:var(--text-muted);">Approval: <strong style="color:var(--text-primary);">${s.approval}</strong></span>
               <span style="color:var(--border);">|</span>
@@ -32405,6 +33106,7 @@ function showView(name, clickedNav) {
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
   if (name === 'merchant-active') { setTimeout(initMaOverviewCharts, 50); }
   if (name === 'inventory' && typeof renderInventoryView === 'function') { renderInventoryView(); }
+  if (name === 'library' && typeof renderLibraryView === 'function') { renderLibraryView(); }
   if (name === 'tickets' && typeof initTicketDashboard === 'function') { setTimeout(initTicketDashboard, 30); }
   if (name === 'residuals' && !resChartsReady) { resChartsReady = true; setTimeout(initResCharts, 50); }
   if (name === 'alerts') {
