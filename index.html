@@ -12575,7 +12575,7 @@ const DEAL_ROOM_DATA = {
     ],
   },
   'Maple Street Bakery': {
-    solution: 'POS Terminal', solutionLabel: 'POS Terminal — PAX A80 + NMI Gateway',
+    solution: 'POS Terminal', solutionLabel: 'POS Terminal — PAX A920 Pro + NMI Gateway',
     currentStep: 2, stalled: false, stalledDays: 0,
     stalledReason: '',
     stalledSuggest: '',
@@ -12585,7 +12585,7 @@ const DEAL_ROOM_DATA = {
     stepDates: ['Feb 24','Feb 28','Mar 8','','','','','',''],
     stepDetails: {
       submitted: 'Application submitted by S. Patel. Single-location bakery in Santa Monica. Cash + card split. Currently on Square Reader.',
-      signed: 'Signed by Lisa Park (sole owner). PAX A80 countertop terminal selected.',
+      signed: 'Signed by Lisa Park (sole owner). PAX A920 Pro terminal selected.',
       uw: 'In underwriting at Summit Lending. Pends issued Mar 8: Owner ID and 3 months bank statements. Merchant responded overnight Mar 11–12.',
       approved: 'Pending — UW pends being addressed.',
       demo: 'No demo needed — simple countertop terminal. Merchant familiar with card readers.',
@@ -38735,8 +38735,13 @@ function agentFlowMessage(sess){
       detail = 'MID '+(sess.m.mid||'pending')+' has been requested on '+_agentProc(sess)+'. Next up on our side: equipment assignment and shipping. Nothing needed from you right now.';
     } else if (sess.kind === 'uw') {
       const warns = (sess.uwb.checks||[]).filter(c => c.state !== 'pass');
-      statusLine = 'in underwriting review — '+(warns.length ? warns.length+' item'+(warns.length>1?'s':'')+' under review.' : 'checks are running clean so far.');
-      detail = warns.length ? 'Under review: '+warns.map(c => c.name).join(', ')+'. We’ll come back to you the moment anything needs your side.'
+      const openPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status === 'open' || p.status === 'partial');
+      const itemCount = warns.length + openPends.length;
+      statusLine = 'in underwriting review — '+(itemCount ? itemCount+' item'+(itemCount>1?'s':'')+' need'+(itemCount>1?'':'s')+' attention.' : 'checks are running clean so far.');
+      detail = itemCount
+        ? (openPends.length ? 'Outstanding from your side: '+openPends.map(p => p.title).join(', ')+'. ' : '')
+          + (warns.length ? 'Under review here: '+warns.map(c => c.name).join(', ')+'. ' : '')
+          + 'We’ll come back to you the moment anything else needs your side.'
         : 'All verification sources have come back clean so far. Expecting a decision shortly.';
     } else {
       const d = (sess.dr && sess.dr.deploy) || {};
