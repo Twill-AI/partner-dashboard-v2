@@ -2628,6 +2628,13 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         Applications
         <span style="margin-left:auto;background:var(--border-strong);color:var(--text-secondary);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;font-family:var(--font-mono);">5</span>
       </div>
+      <!-- ===== AGENT DESK ===== -->
+      <div class="nav-item" id="nav-agent-desk" onclick="showView('agent-desk', this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5a5.5 5.5 0 00-5.5 5.5c0 1.23.4 2.36 1.08 3.28L2.5 13.5l3.35-.94A5.5 5.5 0 108 1.5zm0 2.9l.72 1.83 1.83.72-1.83.72L8 9.5l-.72-1.83-1.83-.72 1.83-.72L8 4.4z" opacity=".85"/></svg>
+        Agent Desk
+        <span id="nav-agent-desk-badge" style="margin-left:auto;background:var(--yellow-dim);color:var(--yellow);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;font-family:var(--font-mono);">6</span>
+      </div>
+      <!-- ===== /AGENT DESK ===== -->
       <div class="nav-item" id="nav-merchants" onclick="switchMerchantMode('merchants', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 3h10a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1zm5 3a2 2 0 100 4 2 2 0 000-4z" opacity=".8"/></svg>
         Merchants
@@ -2684,6 +2691,59 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
        MAIN CONTENT
   ══════════════════════════════════════════════════ -->
   <div class="main">
+
+    <!-- ===== AGENT DESK ===== -->
+    <!-- View: session queue / inbox -->
+    <div class="view" id="view-agent-desk">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div>
+            <div class="page-title">Agent Desk</div>
+            <div class="page-sub">AI ops sessions · human in the loop · <span id="agdk-queue-count">—</span></div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;" onclick="agentRenderQueue()">⟳ Refresh queue</button>
+        </div>
+      </div>
+      <div class="agdk-desk-body">
+        <div class="agdk-desk-inner" id="agent-desk-queue"></div>
+      </div>
+    </div>
+
+    <!-- View: full-screen agent session (chat + Session Board rail) -->
+    <div class="view" id="view-agent-session">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;" onclick="agentBackToDesk()">← Agent Desk</button>
+          <div>
+            <div class="page-title" id="agent-session-title">Session</div>
+            <div class="page-sub" id="agent-session-sub"></div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span class="p-badge" id="agent-session-status" style="background:var(--yellow-dim);color:var(--yellow);">✦ AI session</span>
+          <button class="btn btn-ghost" id="agent-end-session-btn" data-hook="agent-end-session" style="font-size:11px;padding:5px 11px;" onclick="agentEndSession()">■ End session</button>
+        </div>
+      </div>
+      <div class="agdk-body">
+        <div class="agdk-chat">
+          <div class="agdk-thread" id="agent-thread"></div>
+          <div class="agdk-composer" id="agent-composer">
+            <textarea id="agent-composer-input" class="agdk-ta" rows="1" placeholder="Message the session — start with @team to loop in colleagues…" onkeydown="agentComposerKey(event)"></textarea>
+            <button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentComposerSend()">Send</button>
+          </div>
+        </div>
+        <div class="agdk-rail" id="agent-rail"></div>
+      </div>
+    </div>
+
+    <!-- Agent Desk toast (own node — never hijacks #tkt-toast) -->
+    <div class="tkt-toast" id="agent-toast">
+      <div class="tkt-toast-icon" id="agent-toast-icon">🔔</div>
+      <div class="tkt-toast-text" id="agent-toast-text"></div>
+    </div>
+    <!-- ===== /AGENT DESK ===== -->
 
     <!-- ── VIEW: DASHBOARD ──────────────────────────── -->
     <!-- ── VIEW: DASHBOARD (Portfolio Overview) ─────────── -->
@@ -31685,6 +31745,7 @@ function showView(name, clickedNav) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (clickedNav) clickedNav.classList.add('active');
   if (name === 'dashboard') { setTimeout(initDashCharts, 30); }
+  if (name === 'agent-desk' && typeof initAgentDesk === 'function') { setTimeout(initAgentDesk, 30); } /* ===== AGENT DESK ===== */
   if (name === 'command-center' && typeof initCC === 'function') { setTimeout(initCC, 20); }
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
   if (name === 'merchant-active') { setTimeout(initMaOverviewCharts, 50); }
@@ -37348,6 +37409,695 @@ closeFS = function(){
   restoreExpandedThread();
   _origCloseFS();
 };
+</script>
+
+<style>
+/* ===== AGENT DESK ===== */
+/* Queue / inbox */
+.agdk-desk-body{flex:1;overflow-y:auto;padding:20px 24px 44px;}
+.agdk-desk-inner{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:22px;}
+.agdk-sec-label{font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.agdk-count{background:var(--border-strong);color:var(--text-secondary);font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;font-family:var(--font-mono);}
+.agdk-qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px;}
+.agdk-qcard{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:10px;padding:13px 15px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s ease, box-shadow .15s ease;}
+.agdk-qcard:hover{border-color:rgba(0,0,0,.14);box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.agdk-qcard.agdk-new{animation:agdkSlideIn .45s cubic-bezier(.2,.8,.3,1);}
+@keyframes agdkSlideIn{0%{opacity:0;transform:translateY(-10px) scale(.98);}100%{opacity:1;transform:none;}}
+.agdk-qkind{font-size:9px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+.agdk-qname{font-size:13px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);letter-spacing:-.01em;}
+.agdk-qmeta{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);}
+/* Session layout */
+.agdk-body{display:flex;flex:1;min-height:0;overflow:hidden;}
+.agdk-chat{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg-base);}
+.agdk-thread{flex:1;overflow-y:auto;padding:16px 0 22px;display:flex;flex-direction:column;gap:1px;}
+.agdk-thread .act{max-width:780px;width:100%;margin:0 auto;}
+.agdk-composer{border-top:1px solid var(--border);background:var(--bg-surface);padding:10px 14px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;}
+.agdk-ta{flex:1;resize:none;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg-elevated);padding:8px 11px;font-size:12px;font-family:var(--font-body);color:var(--text-primary);min-height:34px;outline:none;line-height:1.4;}
+.agdk-ta:focus{border-color:rgba(0,0,0,.2);}
+/* Session Board (right rail) */
+.agdk-rail{width:292px;flex-shrink:0;border-left:1px solid var(--border);background:var(--bg-surface);overflow-y:auto;}
+.agdk-rail-sec{padding:13px 16px;border-bottom:1px solid var(--border);}
+.agdk-rail-title{font-size:9px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.agdk-kv{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11px;color:var(--text-secondary);margin-bottom:5px;}
+.agdk-kv b{color:var(--text-primary);font-weight:600;text-align:right;min-width:0;}
+.agdk-vrow{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:11px;}
+.agdk-vrow:last-child{margin-bottom:0;}
+.agdk-vicon{flex-shrink:0;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-top:1px;border:1px solid var(--border);}
+.agdk-empty{font-size:11px;color:var(--text-muted);}
+.agdk-doc-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:11px;}
+.agdk-doc-row:first-of-type{border-top:none;}
+/* Tool-call cards in chat */
+.agdk-tool{background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:8px 11px;margin-left:26px;display:flex;gap:9px;align-items:flex-start;font-size:12px;}
+.agdk-tool.warn{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.04);}
+.agdk-tool.fail{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);}
+.agdk-tool-name{font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);}
+.agdk-spin{width:12px;height:12px;border:2px solid var(--border-strong);border-top-color:var(--text-muted);border-radius:50%;animation:agdkSpin .7s linear infinite;flex-shrink:0;margin-top:2px;}
+@keyframes agdkSpin{to{transform:rotate(360deg);}}
+/* Next-best-action chips */
+.agdk-nba{display:flex;flex-wrap:wrap;gap:7px;margin-left:26px;padding:4px 0 6px;}
+.agdk-chip{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-ui);border:1px solid var(--border-strong);transition:all .15s;background:var(--bg-elevated);color:var(--text-secondary);}
+.agdk-chip:hover{color:var(--text-primary);background:var(--bg-hover);}
+.agdk-chip.approve{background:var(--green-dim);color:var(--green);border-color:rgba(91,122,94,.3);}
+.agdk-chip.approve:hover{background:rgba(91,122,94,.15);}
+.agdk-chip.pend{background:var(--amber-dim);color:var(--amber);border-color:rgba(166,124,91,.3);}
+.agdk-chip.pend:hover{background:rgba(166,124,91,.15);}
+.agdk-chip.locked{opacity:.45;cursor:not-allowed;}
+.agdk-chip.locked:hover{background:var(--green-dim);color:var(--green);}
+/* ===== /AGENT DESK ===== */
+</style>
+
+<script>
+/* ===== AGENT DESK ===== */
+/* Chat-first ops surface: session queue + UW session chat + Session Board rail.
+   Parallel to (never touching) the sig-uw chat machinery. All state client-side,
+   survives view switches within the page session. */
+
+const AGENT_DESK = {
+  active: null,       // merchant name of the session currently on screen
+  sessions: {},       // name -> session state object
+  extraQueue: [],     // scripted queue additions (Neon Nightclub LA beat)
+  justAdded: null,    // name that should slide-in on next queue render
+  notifArmed: false,
+  notifFired: false,
+};
+
+/* ── tiny utils ── */
+function _agdkSlug(n){ return n.replace(/[^a-z0-9]+/gi,'-').toLowerCase(); }
+function _agdkEsc(n){ return n.replace(/'/g,"\\'"); }
+function _agdkEscHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _agdkTime(){ return new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+function _agdkWait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ── toast (own node, imitates .tkt-toast mechanics) ── */
+function agentToast(icon, html, dur){
+  const t = document.getElementById('agent-toast');
+  if (!t) return;
+  document.getElementById('agent-toast-icon').textContent = icon || '✅';
+  document.getElementById('agent-toast-text').innerHTML = html;
+  t.classList.add('show');
+  clearTimeout(t._agdkHide);
+  t._agdkHide = setTimeout(() => t.classList.remove('show'), dur || 2600);
+}
+function agentToastOpen(){
+  document.getElementById('agent-toast').classList.remove('show');
+  agentOpenSession('Neon Nightclub LA');
+}
+
+/* ── queue / inbox ── */
+function initAgentDesk(){
+  agentRenderQueue();
+  if (!AGENT_DESK.notifArmed) {
+    AGENT_DESK.notifArmed = true;
+    setTimeout(_agentFireNotif, 6000);   // once per page load
+  }
+}
+
+function _agentFireNotif(){
+  if (AGENT_DESK.notifFired) return;
+  AGENT_DESK.notifFired = true;
+  AGENT_DESK.extraQueue.push('Neon Nightclub LA');
+  AGENT_DESK.justAdded = 'Neon Nightclub LA';
+  agentRenderQueue();
+  setTimeout(() => { AGENT_DESK.justAdded = null; }, 1200);
+  agentToast('🔔', '<strong>Neon Nightclub LA</strong> — application signed → entered UW queue' +
+    '<span class="tkt-toast-link" onclick="agentToastOpen()"> → Open session</span>', 4200);
+}
+
+function _agdkQCard(m, kind, isNew){
+  const sess = AGENT_DESK.sessions[m.name];
+  const esc = _agdkEsc(m.name);
+  const stageLabel = kind==='uw' ? 'Underwriting' : (m.status==='approved' ? 'Approved' : 'Boarding');
+  const stageColor = kind==='uw' ? mStatusConfig.underwriting.color : (mStatusConfig[m.status]||{}).color || '#7C849A';
+  const overdue = (m.tags||[]).includes('Activation Overdue');
+  const state = sess
+    ? (sess.stage==='verdict' ? {t:'Verdict ready — decision pending', c:'var(--amber)'}
+      : sess.goStarted ? {t:'Session in progress', c:'var(--amber)'}
+      : {t:'Session opened', c:'var(--blue)'})
+    : {t:'Ready to start', c:'var(--green)'};
+  const waiting = isNew ? 'just now' : (m.lastAct || '—');
+  return '<div class="agdk-qcard'+(isNew && AGENT_DESK.justAdded===m.name ? ' agdk-new':'')+'">' +
+    '<div class="agdk-qkind">'+(kind==='uw'?'✦ UW Session':'✦ Deployment Session')+
+      '<span style="margin-left:auto;font-size:9px;font-weight:600;color:'+state.c+';text-transform:none;letter-spacing:0;">● '+state.t+'</span></div>' +
+    '<div class="agdk-qname">'+m.name+'</div>' +
+    '<div class="agdk-qmeta">'+(m.partner||'—')+' · '+(m.potVol||'—')+'/mo · waiting '+waiting+'</div>' +
+    '<div style="display:flex;gap:5px;flex-wrap:wrap;">' +
+      '<span class="p-badge" style="background:'+stageColor+'22;color:'+stageColor+';border:1px solid '+stageColor+'40;">'+stageLabel+'</span>' +
+      '<span class="p-badge" style="background:var(--bg-elevated);color:'+(mRiskColor[m.risk]||'var(--text-secondary)')+';border:1px solid var(--border-strong);">'+m.risk+' risk</span>' +
+      (overdue ? '<span class="p-badge" style="background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);">Activation overdue</span>' : '') +
+    '</div>' +
+    '<button class="btn btn-primary" style="font-size:11px;padding:6px 12px;width:100%;margin-top:2px;" onclick="agentOpenSession(\''+esc+'\')">Open session '+(sess?'→':'▶')+'</button>' +
+    '</div>';
+}
+
+function agentRenderQueue(){
+  const host = document.getElementById('agent-desk-queue');
+  if (!host) return;
+  const uwCards = [], depCards = [];
+  merchantData.filter(m => m.status === 'underwriting').forEach(m => uwCards.push(_agdkQCard(m, 'uw', false)));
+  AGENT_DESK.extraQueue.forEach(n => {
+    const m = merchantData.find(x => x.name === n);
+    if (m) uwCards.push(_agdkQCard(m, 'uw', true));
+  });
+  merchantData.filter(m => (m.status==='approved' || m.status==='boarding') &&
+    typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[m.name] && DEAL_ROOM_DATA[m.name].deploy)
+    .forEach(m => depCards.push(_agdkQCard(m, 'deploy', false)));
+  host.innerHTML =
+    '<div><div class="agdk-sec-label">Underwriting sessions <span class="agdk-count">'+uwCards.length+'</span></div>' +
+    '<div class="agdk-qgrid">'+(uwCards.join('')||'<div class="agdk-empty">Queue clear.</div>')+'</div></div>' +
+    '<div><div class="agdk-sec-label">Deployment sessions <span class="agdk-count">'+depCards.length+'</span></div>' +
+    '<div class="agdk-qgrid">'+(depCards.join('')||'<div class="agdk-empty">Queue clear.</div>')+'</div></div>';
+  const badge = document.getElementById('nav-agent-desk-badge');
+  if (badge) badge.textContent = uwCards.length + depCards.length;
+  const cnt = document.getElementById('agdk-queue-count');
+  if (cnt) cnt.textContent = (uwCards.length + depCards.length) + ' sessions waiting';
+}
+
+/* ── session state ── */
+function agentGetSession(name){ return AGENT_DESK.sessions[name] || null; }
+
+function _agentSeedDocs(name, dr){
+  const map = {
+    'Pacific Coast Retail': [
+      {name:'MPA — signed S. Chen', type:'Agreement', date:'Feb 26'},
+      {name:'BankStmt_Feb2026.pdf', type:'Bank stmt', date:'Feb 22'},
+      {name:'Articles of Incorporation', type:'KYB', date:'Feb 22'},
+      {name:'Voided check', type:'Banking', date:'Feb 22'},
+    ],
+    'Maple Street Bakery': [
+      {name:'MPA — signed L. Park', type:'Agreement', date:'Feb 28'},
+      {name:'Lisa_Park_Drivers_License.jpg', type:'Owner ID', date:'Today 2:14 AM'},
+      {name:'BankStmt_Jan2026.pdf', type:'Bank stmt', date:'Today 2:18 AM'},
+      {name:'BankStmt_Feb2026.pdf', type:'Bank stmt', date:'Today 2:19 AM'},
+    ],
+    'TechForge Solutions': [
+      {name:'MPA — signed D. Kim + A. Kim', type:'Agreement', date:'Feb 8'},
+      {name:'PCI-DSS Level 2 certificate', type:'Compliance', date:'Feb 10'},
+      {name:'Beneficial ownership form', type:'KYB', date:'Feb 10'},
+      {name:'Bank statements (3 mo)', type:'Bank stmt', date:'Feb 10'},
+    ],
+  };
+  if (map[name]) return map[name].slice();
+  const contract = dr && dr.synopsis && dr.synopsis.solution ? dr.synopsis.solution.contract : null;
+  return [
+    {name:'Merchant application', type:'Application', date:'—'},
+    {name:'MPA'+(contract ? ' — '+contract.toLowerCase() : ' — signed'), type:'Agreement', date:'—'},
+  ];
+}
+
+function _agentCreateSession(name){
+  const m = merchantData.find(x => x.name === name) || { name, partner:'—', risk:'—', tags:[] };
+  const kind = (m.status==='approved' || m.status==='boarding') ? 'deploy' : 'uw';
+  const dr = (typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[name]) || null;
+  const uwb = kind==='uw' ? ((typeof UW_WORKBENCH_DATA !== 'undefined' && UW_WORKBENCH_DATA[name]) || _uwbDefaultData(name)) : null;
+  const sess = {
+    merchant: name, kind, m, dr, uwb,
+    threadHTML: '',
+    stage: 'new',            // new → intro → running → verdict/synced
+    goStarted: false,
+    checkResults: [],        // completed check objects (uw) or rail nodes (deploy)
+    verdict: null,           // 'go' | 'review' | 'halt'
+    comms: [],               // partner comms log: {time, to, label, preview}
+    docs: _agentSeedDocs(name, dr),
+  };
+  AGENT_DESK.sessions[name] = sess;
+  return sess;
+}
+
+/* ── thread plumbing ──
+   sess.threadHTML holds the FINALIZED transcript. Live DOM = finals + transient
+   nodes (typing / running spinners, class .agdk-transient) that never persist. */
+function _agentLive(sess){ return AGENT_DESK.active === sess.merchant; }
+
+function _agentFinal(sess, html){
+  sess.threadHTML += html;
+  if (_agentLive(sess)) {
+    const t = document.getElementById('agent-thread');
+    if (t) { t.insertAdjacentHTML('beforeend', html); t.scrollTop = t.scrollHeight; }
+  }
+}
+
+function _agentSnapshot(sess){
+  if (!_agentLive(sess)) return;
+  const t = document.getElementById('agent-thread');
+  if (!t) return;
+  const clone = t.cloneNode(true);
+  clone.querySelectorAll('.agdk-transient').forEach(n => n.remove());
+  sess.threadHTML = clone.innerHTML;
+}
+
+function _agentMsgHtml(role, html){
+  const time = _agdkTime();
+  const cfgs = {
+    ai:   { av:'<div class="aav" style="background:var(--navy);color:var(--yellow);">&#x2736;</div>', name:'Twill AI', mode:'int', label:'Agent' },
+    user: { av:'<div class="aav" style="background:var(--yellow);color:var(--text-inverse);">MA</div>', name:'Master Admin', mode:'int', label:'Internal' },
+  };
+  const c = cfgs[role] || cfgs.ai;
+  return '<div class="act"><div class="ah">'+c.av+'<span class="aname">'+c.name+'</span>' +
+    '<span class="amode '+c.mode+'">'+c.label+'</span><span class="atime">'+time+'</span></div>' +
+    '<div class="abub '+c.mode+'">'+html+'</div></div>';
+}
+
+function agentAddMsg(sess, html){ _agentFinal(sess, _agentMsgHtml('ai', html)); }
+function agentAddUserMsg(sess, html){ _agentFinal(sess, _agentMsgHtml('user', html)); }
+function agentAddSys(sess, text, color){
+  _agentFinal(sess, '<div class="act sys"><div class="syse"><div class="sysd" style="background:'+(color||'var(--blue)')+';"></div>' +
+    '<div class="syst">'+text+'</div><div class="systt">'+_agdkTime()+'</div></div></div>');
+}
+
+function agentAddTyping(sess){
+  if (!_agentLive(sess)) return;
+  const t = document.getElementById('agent-thread');
+  if (!t) return;
+  t.insertAdjacentHTML('beforeend', '<div class="act agdk-transient agdk-typing"><div class="ah">' +
+    '<div class="aav" style="background:var(--navy);color:var(--yellow);">&#x2736;</div><span class="aname">Twill AI</span></div>' +
+    '<div class="abub"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>');
+  t.scrollTop = t.scrollHeight;
+}
+function agentRemoveTyping(){
+  document.querySelectorAll('#agent-thread .agdk-typing').forEach(n => n.remove());
+}
+
+/* ── open / navigate ── */
+function agentOpenSession(name){
+  let sess = AGENT_DESK.sessions[name];
+  const fresh = !sess;
+  if (!sess) sess = _agentCreateSession(name);
+  AGENT_DESK.active = name;
+  const title = document.getElementById('agent-session-title');
+  const sub = document.getElementById('agent-session-sub');
+  if (title) title.textContent = (sess.kind==='uw' ? 'UW Session — ' : 'Deployment Session — ') + name;
+  if (sub) sub.textContent = sess.kind==='uw'
+    ? (sess.m.partner||'—') + ' · ' + (sess.uwb.riskTier||'') + ' · queued ' + (sess.uwb.queuedOn||'—')
+    : (sess.m.partner||'—') + ' · ' + (sess.dr ? sess.dr.solutionLabel : '');
+  const thread = document.getElementById('agent-thread');
+  if (thread) { thread.innerHTML = sess.threadHTML; }
+  showView('agent-session', document.getElementById('nav-agent-desk'));
+  agentRenderRail();
+  if (thread) thread.scrollTop = thread.scrollHeight;
+  if (fresh) _agentIntro(sess);
+}
+
+function agentBackToDesk(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (sess) _agentSnapshot(sess);
+  AGENT_DESK.active = null;
+  showView('agent-desk', document.getElementById('nav-agent-desk'));
+}
+
+/* ── intro + GO ── */
+function _agentIntroHtml(sess){
+  const s = (sess.dr && sess.dr.synopsis) || {};
+  const b = s.business || {}, sol = s.solution || {};
+  const kv = (k,v) => v ? '<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-top:1px solid var(--border);font-size:11px;">' +
+    '<span style="color:var(--text-muted);flex-shrink:0;">'+k+'</span><b style="text-align:right;color:var(--text-primary);font-weight:600;">'+v+'</b></div>' : '';
+  if (sess.kind === 'uw') {
+    return '<b>'+sess.merchant+'</b> is up in the underwriting queue. The shape of the deal:' +
+      '<div style="margin-top:7px;">' +
+      kv('Partner', sess.m.partner) + kv('Business', b.type) + kv('Location', b.location) +
+      kv('Monthly volume', b.monthlyVol || sess.m.potVol) + kv('Owner', b.owner) +
+      kv('Prior processor', b.prevProcessor) + kv('Pricing', sol.pricing) +
+      kv('Solution', sess.dr ? sess.dr.solutionLabel : sol.name) + kv('Risk tier', sess.uwb.riskTier) +
+      '</div><div style="margin-top:8px;">Six checks are staged — MATCH, OFAC, TIN, GIACT bank, credit, KYB. Ready when you are.</div>';
+  }
+  const rail = (sess.dr && sess.dr.deploy && sess.dr.deploy.rail) || [];
+  const mid = rail.length && rail[0].state==='done' ? rail[0].val : sess.m.mid;
+  const overdue = sess.dr && sess.dr.deploy && sess.dr.deploy.overdue;
+  return '<b>'+sess.merchant+'</b> is '+(sess.m.status==='approved' ? 'freshly approved — boarding starts now' : 'in boarding')+'.' +
+    '<div style="margin-top:7px;">' +
+    kv('Partner', sess.m.partner) + kv('Business', b.type) + kv('Location', b.location) +
+    kv('Monthly volume', b.monthlyVol || sess.m.potVol) + kv('Solution', sess.dr ? sess.dr.solutionLabel : '') +
+    kv('Pricing', sol.pricing) + kv('MID', mid) + '</div>' +
+    (overdue ? '<div style="margin-top:8px;color:var(--red);font-weight:600;">⚠ '+overdue.title+'</div>' : '') +
+    '<div style="margin-top:8px;">I’ll sync the boarding rail — MID, VAR, gateway credentials, welcome kit — then we walk the human decisions.</div>';
+}
+
+function _agentAddGo(sess){
+  const id = 'agdk-go-' + _agdkSlug(sess.merchant);
+  const fn = sess.kind==='uw' ? 'agentUWGo' : 'agentDeployGo';
+  const hint = sess.kind==='uw' ? 'Runs the 6-check verification package' : 'Syncs the boarding rail, then walks the decisions';
+  _agentFinal(sess, '<div class="act" id="'+id+'"><div style="margin-left:26px;display:flex;align-items:center;gap:10px;padding:4px 0 6px;">' +
+    '<button class="btn btn-primary" style="font-size:13px;padding:9px 18px;" onclick="'+fn+'(\''+_agdkEsc(sess.merchant)+'\')">Let’s start this ▶</button>' +
+    '<span style="font-size:11px;color:var(--text-muted);">'+hint+'</span></div></div>');
+}
+
+async function _agentIntro(sess){
+  agentAddSys(sess, 'Session opened — ' + (sess.kind==='uw' ? 'underwriting queue' : 'deployment queue'), 'var(--blue)');
+  agentAddTyping(sess);
+  await _agdkWait(850);
+  agentRemoveTyping();
+  agentAddMsg(sess, _agentIntroHtml(sess));
+  sess.stage = 'intro';
+  await _agdkWait(150);
+  _agentAddGo(sess);
+  agentRenderQueue();
+}
+
+function _agentConsumeGo(sess){
+  const goEl = document.getElementById('agdk-go-' + _agdkSlug(sess.merchant));
+  if (goEl) goEl.remove();
+  _agentSnapshot(sess);
+}
+
+/* ── UW session: streaming verification package ── */
+function _agentToolCardHtml(c){
+  const chip = c.state==='pass' ? '<span class="uwb-chip pass">✓ Clear</span>'
+    : c.state==='warn' ? '<span class="uwb-chip warn">⚠ Review</span>'
+    : '<span class="uwb-chip fail">✕ Halt</span>';
+  return '<div class="act"><div class="agdk-tool '+(c.state==='pass' ? '' : c.state)+'">' +
+    '<span style="font-size:13px;flex-shrink:0;">'+c.icon+'</span>' +
+    '<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;"><span class="agdk-tool-name">'+c.name+'</span>'+chip+'</div>' +
+    '<div style="font-size:12px;color:var(--text-primary);margin-top:3px;line-height:1.45;">'+c.val+'</div>' +
+    '<div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px;">'+c.meta+'</div></div></div></div>';
+}
+
+function _agentRunningCard(sess, i, label, source){
+  if (!_agentLive(sess)) return;
+  const t = document.getElementById('agent-thread');
+  if (!t) return;
+  t.insertAdjacentHTML('beforeend', '<div class="act agdk-transient" id="agdk-run-'+_agdkSlug(sess.merchant)+'-'+i+'">' +
+    '<div class="agdk-tool"><div class="agdk-spin"></div><div style="flex:1;">' +
+    '<div class="agdk-tool-name">'+label+'</div>' +
+    '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Calling '+source+'…</div></div></div></div>');
+  t.scrollTop = t.scrollHeight;
+}
+function _agentClearRunning(sess, i){
+  const el = document.getElementById('agdk-run-'+_agdkSlug(sess.merchant)+'-'+i);
+  if (el) el.remove();
+}
+
+async function agentUWGo(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.goStarted) return;
+  sess.goStarted = true; sess.stage = 'running';
+  _agentConsumeGo(sess);
+  agentAddUserMsg(sess, 'Let’s start this.');
+  agentAddSys(sess, 'Verification package started — 6 checks queued', 'var(--blue)');
+  agentRenderQueue();
+  agentRenderRail();
+  await _agdkWait(400);
+  const checks = sess.uwb.checks;
+  for (let i = 0; i < checks.length; i++){
+    const c = checks[i];
+    _agentRunningCard(sess, i, c.icon+' '+c.name, (c.meta.split('·')[0]||'source').trim());
+    await _agdkWait(620 + Math.random()*380);
+    _agentClearRunning(sess, i);
+    _agentFinal(sess, _agentToolCardHtml(c));
+    sess.checkResults.push(c);
+    agentRenderRail();
+  }
+  await _agdkWait(280);
+  agentAddTyping(sess);
+  await _agdkWait(900);
+  agentRemoveTyping();
+  _agentVerdict(sess);
+}
+
+function _agentVerdict(sess){
+  const checks = sess.uwb.checks;
+  const fails = checks.filter(c => c.state==='fail');
+  const warns = checks.filter(c => c.state==='warn');
+  const pends = (sess.dr && sess.dr.pends) || [];
+  const openPends = pends.filter(p => p.status==='open' || p.status==='partial');
+  let cls, icon, title;
+  if (fails.length) { cls='halt'; icon='🔴'; title='Halt — resolve before decision'; }
+  else if (warns.length || openPends.length) { cls='review'; icon='🟡'; title='Review — items need attention'; }
+  else { cls='go'; icon='🟢'; title='Green — all checks passed, no open pends'; }
+  sess.verdict = cls;
+  const col = cls==='go' ? 'var(--green)' : cls==='review' ? 'var(--amber)' : 'var(--red)';
+  const lookAt = fails.map(c => '<b>'+c.name+':</b> '+c.val)
+    .concat(warns.map(c => '<b>'+c.name+':</b> '+c.val))
+    .concat(openPends.map(p => '<b>Pend:</b> '+p.title));
+  let msg = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:15px;">'+icon+'</span>' +
+    '<b style="font-size:13px;color:'+col+';">'+title+'</b></div>';
+  msg += lookAt.length
+    ? '<div style="font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:4px;">Look at</div>' +
+      '<ul style="margin:0;padding-left:16px;">'+lookAt.map(l=>'<li style="margin-bottom:3px;">'+l+'</li>').join('')+'</ul>'
+    : 'All six sources came back clean and nothing is outstanding from the partner. This one is ready for a decision.';
+  const conc = sess.uwb.concurrence;
+  if (conc && conc.required) msg += '<div style="margin-top:8px;font-size:11px;color:var(--text-secondary);">👥 <b>Concurrence:</b> '+conc.reason+(conc.routedTo ? ' · '+conc.routedTo : '')+'</div>';
+  if (cls==='halt') msg += '<div style="margin-top:8px;">Approve stays locked while a red check is open. I’d loop in the risk team.</div>';
+  agentAddMsg(sess, msg);
+  _agentAddNBA(sess, fails.length > 0);
+  sess.stage = 'verdict';
+  agentRenderRail();
+  agentRenderQueue();
+}
+
+/* ── NBA chips — Pend/Approve/Message/Team are Builder-2 hooks (visible, marked stubs) ── */
+function _agentAddNBA(sess, locked){
+  const n = _agdkEsc(sess.merchant);
+  _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-'+_agdkSlug(sess.merchant)+'">' +
+    '<button class="agdk-chip approve'+(locked?' locked':'')+'" data-hook="agent-nba-approve"'+(locked?' title="Blocked by red checks"':'')+' onclick="agentNBA(\'approve\',\''+n+'\')">✓ Approve</button>' +
+    '<button class="agdk-chip pend" data-hook="agent-nba-pend" onclick="agentNBA(\'pend\',\''+n+'\')">⏸ Pend</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-message" onclick="agentNBA(\'message\',\''+n+'\')">✉ Message partner</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-team" onclick="agentNBA(\'team\',\''+n+'\')">👥 Ask the team</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\''+n+'\')">📄 View documents</button>' +
+    '</div></div>');
+}
+
+function _agentAddDeployNBA(sess){
+  const n = _agdkEsc(sess.merchant);
+  const d = (sess.dr && sess.dr.deploy) || {};
+  const eq = d.equipment || [];
+  const needsSerial = eq.some(e => !e.serial);
+  const needsPay = eq.some(e => e.pay === 'due');
+  let chips = '';
+  if (d.overdue) {
+    chips += '<button class="agdk-chip pend" data-hook="agent-nba-install" onclick="agentNBA(\'install\',\''+n+'\')">📞 Book install call</button>' +
+      '<button class="agdk-chip" data-hook="agent-nba-escalate" onclick="agentNBA(\'escalate\',\''+n+'\')">⚠ Escalate</button>';
+  } else {
+    if (needsSerial) chips += '<button class="agdk-chip approve" data-hook="agent-nba-serial" onclick="agentNBA(\'serial\',\''+n+'\')">🔢 Assign serial</button>';
+    if (needsPay) chips += '<button class="agdk-chip pend" data-hook="agent-nba-pay" onclick="agentNBA(\'pay\',\''+n+'\')">💳 Payment method</button>';
+    chips += '<button class="agdk-chip'+(needsPay?' locked':'')+'" data-hook="agent-nba-ship"'+(needsPay?' title="Payment gates shipping — choose a payment method first"':'')+' onclick="agentNBA(\'ship\',\''+n+'\')">📦 Create shipment</button>';
+  }
+  chips += '<button class="agdk-chip" data-hook="agent-nba-message" onclick="agentNBA(\'message\',\''+n+'\')">✉ Message partner</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\''+n+'\')">📄 View documents</button>';
+  _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-'+_agdkSlug(sess.merchant)+'">'+chips+'</div></div>');
+}
+
+/* Dispatcher. 'docs' is live; the rest are wired by later build steps. */
+function agentNBA(action, name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  if (action === 'docs') { _agentShowDocs(sess); return; }
+  const labels = { approve:'Approve flow', pend:'Pend flow', message:'Partner message flow', team:'Team thread',
+    serial:'Serial assignment', pay:'Payment method flow', ship:'Shipment flow', install:'Install-call booking', escalate:'Escalation' };
+  agentAddSys(sess, '🔧 ' + (labels[action]||action) + ' — wired in the next build step (stub)', 'var(--amber)');
+}
+
+function _agentShowDocs(sess){
+  const rows = sess.docs.map(d =>
+    '<div class="agdk-doc-row" style="padding:7px 0;"><span style="font-size:13px;">📄</span>' +
+    '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text-primary);">'+d.name+'</div>' +
+    '<div style="font-size:10px;color:var(--text-muted);">'+d.date+'</div></div>' +
+    '<span class="p-badge" style="background:var(--blue-dim);color:var(--blue);flex-shrink:0;">'+d.type+'</span>' +
+    (d.badge ? '<span class="p-badge" style="background:var(--yellow-dim);color:var(--yellow);flex-shrink:0;">'+d.badge+'</span>' : '') +
+    '</div>').join('');
+  agentAddMsg(sess, '<b>'+sess.docs.length+' documents on file</b> — mirrored on the Session Board →' +
+    '<div style="margin-top:6px;">'+rows+'</div>');
+}
+
+/* ── Deployment session (base flow; decision chips are Builder-3 hooks) ── */
+function _agentRailNodeCardHtml(nd){
+  const chip = nd.state==='done' ? '<span class="uwb-chip pass">✓ Done</span>'
+    : nd.state==='now' ? '<span class="uwb-chip warn">⏳ In progress</span>'
+    : '<span class="uwb-chip" style="background:var(--bg-hover);color:var(--text-muted);">○ Queued</span>';
+  return '<div class="act"><div class="agdk-tool '+(nd.state==='now' ? 'warn' : '')+'">' +
+    '<span style="font-size:13px;flex-shrink:0;">'+(nd.state==='done'?'✅':nd.state==='now'?'⚙️':'🕘')+'</span>' +
+    '<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;"><span class="agdk-tool-name">'+nd.label+'</span>'+chip+'</div>' +
+    '<div style="font-size:12px;color:var(--text-primary);margin-top:3px;font-family:var(--font-mono);">'+nd.val+'</div>' +
+    '<div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px;">'+nd.time+'</div></div></div></div>';
+}
+
+async function agentDeployGo(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.goStarted) return;
+  sess.goStarted = true; sess.stage = 'running';
+  _agentConsumeGo(sess);
+  agentAddUserMsg(sess, 'Let’s start this.');
+  agentAddSys(sess, 'Boarding rail sync started', 'var(--blue)');
+  agentRenderQueue();
+  const d = (sess.dr && sess.dr.deploy) || {};
+  const rail = d.rail || [];
+  for (let i = 0; i < rail.length; i++){
+    _agentRunningCard(sess, i, rail[i].label, 'processor boarding API');
+    await _agdkWait(550 + Math.random()*300);
+    _agentClearRunning(sess, i);
+    _agentFinal(sess, _agentRailNodeCardHtml(rail[i]));
+    sess.checkResults.push(rail[i]);
+    agentRenderRail();
+  }
+  await _agdkWait(280);
+  agentAddTyping(sess);
+  await _agdkWait(850);
+  agentRemoveTyping();
+  const eq = d.equipment || [];
+  const needsSerial = eq.some(e => !e.serial);
+  const needsPay = eq.some(e => e.pay === 'due');
+  let msg;
+  if (d.overdue) {
+    msg = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:15px;">🔴</span>' +
+      '<b style="font-size:13px;color:var(--red);">'+d.overdue.title+'</b></div>' + d.overdue.desc;
+  } else if (needsSerial || needsPay) {
+    const items = [];
+    if (needsSerial) items.push('<b>assign a terminal serial</b>');
+    if (needsPay) items.push('<b>pick the equipment payment method</b>');
+    msg = 'Boarding rail is synced. Two things need a human: ' + items.join(' and ') +
+      '. Payment gates shipping — nothing ships until the payment method is chosen.';
+  } else {
+    msg = 'Boarding rail is fully green and equipment is handled. Nothing needs a decision right now — I’ll flag it the moment something does.';
+  }
+  agentAddMsg(sess, msg);
+  _agentAddDeployNBA(sess);
+  sess.stage = 'verdict';
+  agentRenderRail();
+  agentRenderQueue();
+}
+
+/* ── Session Board (right rail) — RAIL LAW: nothing exists only in scrollback ── */
+function agentLogComm(name, entry){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  sess.comms.push(entry);
+  agentRenderRail();
+}
+function agentAddDoc(name, doc){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  sess.docs.push(doc);
+  agentRenderRail();
+}
+
+function agentRenderRail(){
+  const host = document.getElementById('agent-rail');
+  if (!host) return;
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!sess) { host.innerHTML = ''; return; }
+  const s = (sess.dr && sess.dr.synopsis) || {};
+  const b = s.business || {}, sol = s.solution || {};
+  const kv = (k,v) => v ? '<div class="agdk-kv"><span>'+k+'</span><b>'+v+'</b></div>' : '';
+
+  /* header */
+  let html = '<div class="agdk-rail-sec" style="background:var(--bg-elevated);">' +
+    '<div class="agdk-rail-title" style="margin-bottom:4px;">✦ Session Board</div>' +
+    '<div style="font-size:12px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);">'+sess.merchant+'</div>' +
+    '<div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;">'+(sess.kind==='uw'?'Underwriting session':'Deployment session')+'</div></div>';
+
+  /* application summary */
+  html += '<div class="agdk-rail-sec"><div class="agdk-rail-title">📋 Application summary</div>' +
+    kv('Partner', sess.m.partner) + kv('Business', b.type) + kv('Location', b.location) +
+    kv('Monthly volume', b.monthlyVol || sess.m.potVol) + kv('Owner', b.owner) +
+    kv('Prior processor', b.prevProcessor) + kv('Pricing', sol.pricing) +
+    (sess.kind==='uw' ? kv('Risk tier', sess.uwb.riskTier) : kv('MID', sess.m.mid)) + '</div>';
+
+  if (sess.kind === 'uw') {
+    /* verification grid */
+    const verdictChip = sess.verdict
+      ? (sess.verdict==='go' ? '<span class="uwb-chip pass" style="margin-left:auto;">🟢 Green</span>'
+        : sess.verdict==='review' ? '<span class="uwb-chip warn" style="margin-left:auto;">🟡 Review</span>'
+        : '<span class="uwb-chip fail" style="margin-left:auto;">🔴 Halt</span>')
+      : '';
+    const rows = sess.uwb.checks.map((c,i) => {
+      const done = i < sess.checkResults.length;
+      const st = done ? c.state : 'idle';
+      const bg = st==='pass' ? 'rgba(34,197,94,.12)' : st==='warn' ? 'rgba(245,158,11,.14)' : st==='fail' ? 'rgba(239,68,68,.13)' : 'var(--bg-elevated)';
+      const fg = st==='pass' ? 'var(--green)' : st==='warn' ? 'var(--amber)' : st==='fail' ? 'var(--red)' : 'var(--text-muted)';
+      const glyph = st==='pass' ? '✓' : st==='warn' ? '!' : st==='fail' ? '✕' : '·';
+      const sub = done ? c.val : (sess.goStarted && sess.stage==='running' && i===sess.checkResults.length ? 'Running…' : 'Queued');
+      return '<div class="agdk-vrow"><div class="agdk-vicon" style="background:'+bg+';color:'+fg+';">'+glyph+'</div>' +
+        '<div style="flex:1;min-width:0;"><div style="font-weight:600;color:var(--text-primary);">'+c.name+'</div>' +
+        '<div style="color:var(--text-muted);font-size:10px;line-height:1.4;margin-top:1px;">'+sub+'</div></div></div>';
+    }).join('');
+    html += '<div class="agdk-rail-sec"><div class="agdk-rail-title">🛡 Verification'+verdictChip+'</div>'+rows+'</div>';
+  } else {
+    /* boarding rail */
+    const d = (sess.dr && sess.dr.deploy) || {};
+    const rows = (d.rail||[]).map(nd => {
+      const bg = nd.state==='done' ? 'rgba(34,197,94,.12)' : nd.state==='now' ? 'rgba(245,158,11,.14)' : 'var(--bg-elevated)';
+      const fg = nd.state==='done' ? 'var(--green)' : nd.state==='now' ? 'var(--amber)' : 'var(--text-muted)';
+      const glyph = nd.state==='done' ? '✓' : nd.state==='now' ? '⏳' : '○';
+      return '<div class="agdk-vrow"><div class="agdk-vicon" style="background:'+bg+';color:'+fg+';">'+glyph+'</div>' +
+        '<div style="flex:1;min-width:0;"><div style="font-weight:600;color:var(--text-primary);">'+nd.label+'</div>' +
+        '<div style="color:var(--text-muted);font-size:10px;line-height:1.4;margin-top:1px;font-family:var(--font-mono);">'+nd.val+' · '+nd.time+'</div></div></div>';
+    }).join('');
+    html += '<div class="agdk-rail-sec"><div class="agdk-rail-title">🚀 Boarding rail</div>'+(rows||'<div class="agdk-empty">No boarding data.</div>')+'</div>';
+    /* equipment */
+    const eqRows = (d.equipment||[]).map(e =>
+      '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+      '<div style="display:flex;align-items:center;gap:7px;"><b style="color:var(--text-primary);">'+e.qty+'× '+e.device+'</b>' +
+      '<span class="drd-pay-chip '+e.pay+'" style="margin-left:auto;">'+(e.pay==='paid'?'Paid':'Payment due')+'</span></div>' +
+      '<div style="color:var(--text-muted);font-size:10px;margin-top:3px;font-family:var(--font-mono);">'+(e.serial ? 'S/N '+e.serial : 'Serial — unassigned')+'</div>' +
+      '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">'+e.shipTo+'</div>' +
+      (e.ship ? '<div style="color:var(--text-secondary);font-size:10px;margin-top:3px;">📦 '+e.ship.carrier+' '+e.ship.code+' · '+e.ship.eta+'</div>' : '') +
+      '</div>').join('');
+    if (eqRows) html += '<div class="agdk-rail-sec"><div class="agdk-rail-title">🖥 Equipment</div>'+eqRows+'</div>';
+  }
+
+  /* open pends */
+  const pends = (sess.dr && sess.dr.pends) || [];
+  const open = pends.filter(p => p.status==='open' || p.status==='partial');
+  const resolved = pends.length - open.length;
+  const pendRows = open.length ? open.map(p =>
+    '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+    '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="flex-shrink:0;">'+(p.status==='partial'?'🟡':(p.severity==='red'?'🔴':'🟡'))+'</span>' +
+    '<div style="flex:1;min-width:0;"><b style="color:var(--text-primary);">'+p.title+'</b>' +
+    '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">'+(p.status==='partial' ? (p.partialNote||'Partial') : 'Waiting on partner')+'</div></div></div></div>').join('')
+    : '<div class="agdk-empty">No open pends.</div>';
+  html += '<div class="agdk-rail-sec" id="agent-rail-pends"><div class="agdk-rail-title">📌 Open pends' +
+    '<span style="margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:0;">'+open.length+' open · '+resolved+' resolved</span></div>'+pendRows+'</div>';
+
+  /* partner comms */
+  const commRows = sess.comms.length ? sess.comms.map(cm =>
+    '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+    '<div style="display:flex;align-items:center;gap:6px;"><span class="amode out" style="flex-shrink:0;">→ Partner</span>' +
+    '<b style="color:var(--text-primary);flex:1;min-width:0;">'+cm.label+'</b>' +
+    '<span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0;">'+cm.time+'</span></div>' +
+    (cm.preview ? '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;line-height:1.4;">'+cm.preview+'</div>' : '') +
+    '</div>').join('')
+    : '<div class="agdk-empty">No partner messages this session.</div>';
+  html += '<div class="agdk-rail-sec" id="agent-rail-comms"><div class="agdk-rail-title">✉ Partner comms</div>'+commRows+'</div>';
+
+  /* session documents */
+  const docRows = sess.docs.length ? sess.docs.map(d =>
+    '<div class="agdk-doc-row"><span style="font-size:12px;">📄</span>' +
+    '<div style="flex:1;min-width:0;"><div style="font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+d.name+'</div>' +
+    '<div style="color:var(--text-muted);font-size:9px;font-family:var(--font-mono);">'+d.type+' · '+d.date+'</div></div>' +
+    (d.badge ? '<span class="p-badge" style="background:var(--yellow-dim);color:var(--yellow);flex-shrink:0;font-size:9px;">'+d.badge+'</span>' : '') +
+    '</div>').join('')
+    : '<div class="agdk-empty">No documents yet.</div>';
+  html += '<div class="agdk-rail-sec" id="agent-rail-docs"><div class="agdk-rail-title">🗂 Session documents' +
+    '<span style="margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:0;">'+sess.docs.length+'</span></div>'+docRows+'</div>';
+
+  host.innerHTML = html;
+}
+
+/* ── composer ── */
+function agentComposerSend(){
+  const ta = document.getElementById('agent-composer-input');
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!ta || !sess) return;
+  const val = (ta.value||'').trim();
+  if (!val) return;
+  ta.value = '';
+  agentAddUserMsg(sess, _agdkEscHtml(val));
+  if (/^@team/i.test(val)) {
+    agentAddSys(sess, '👥 Posted to the team thread — logged to session', 'var(--blue)');
+  } else {
+    agentAddTyping(sess);
+    setTimeout(() => { agentRemoveTyping(); agentAddMsg(sess, 'Noted — logged to the session record.'); }, 700);
+  }
+}
+function agentComposerKey(e){
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); agentComposerSend(); }
+}
+
+/* ── End session — Builder-2 hook (session report doc) ── */
+function agentEndSession(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!sess) { agentBackToDesk(); return; }
+  agentAddSys(sess, '📄 Session report generation lands here — wired in the next build step (stub)', 'var(--amber)');
+}
+/* ===== /AGENT DESK ===== */
 </script>
 </body>
 </html>
