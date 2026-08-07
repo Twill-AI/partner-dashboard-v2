@@ -53,6 +53,10 @@ SAY: *"That's the spreadsheet your deployment team emails to finance every month
 **19.** LEFT NAV → **Library**. Tour the tree: Product Guides (Shared), **Processor Information (REP-HIDDEN — "Ops-only. Compiles into deal routing.")**, POS, Underwriting/Risk Knowledge. Open the **POS Integration Matrix** — YES/MAYBE/NO with sources and "if NO, replace with."
 **20.** Open the **Library Assistant** → run the scripted question (coursing + phone-lookup POS) → streamed answer with fit table and **Sources** cards citing the actual documents.
 SAY: *"Leslie — your partner guide finally has a home that answers questions. And it cites what it says, from documents you control rep-by-rep."*
+**20b.** Library header → **Routing Rules** tab. The **Eligibility Grid** (Solution × Platform — Native / VAR swap / Review / Blocked; click a cell, it edits) and the rule list: R-01 Clover→North only, R-02 split funding→TSYS, weights, the concurrence flag, and the Suggest-first mode card.
+SAY: *"This is what makes a deal forced vs open — your playbook as configuration, not code."*
+**20c.** THE CLOSER: in the plain-language box TYPE: **"Any deal with a TAP device over $200k must go to TSYS"** → Create rule. Watch it compile: trigger, condition, action, platform, the hardcoded spec — then **Add rule** → R-10 lands in the list, badged NEW, with your sentence quoted.
+SAY: *"You just wrote a routing rule in English. No ticket, no dev cycle — Jennie's team owns the rulebook. This screen doesn't exist in the rep view."*
 
 ## PART 8 — BRIGHT STAR + THE REVERSAL (2.5 min)
 **21.** Inventory → Recent Pulls → **Bright Star Solar** → red **Activation Overdue** alert (delivered 11 days, no first batch — the watcher flagged it). CLICK **Escalate** — locks in, partner notified.

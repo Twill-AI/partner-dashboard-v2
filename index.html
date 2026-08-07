@@ -5069,6 +5069,10 @@ applyBrand(BRAND);   /* portal defaults to the Suede skin */
             <div class="page-title">Library</div>
             <div class="page-sub">Manage files and folders for AI-powered knowledge retrieval</div>
           </div>
+          <div class="sig-uw-mode-toggle visible" id="klb-rt-toggle" style="margin-left:16px;">
+            <div class="sig-uw-mode-btn on" id="klb-tab-files" onclick="klbLibTab('files')">📁 Files</div>
+            <div class="sig-uw-mode-btn" id="klb-tab-routing" onclick="klbLibTab('routing')">🧭 Routing Rules</div>
+          </div>
         </div>
         <div class="topbar-right">
           <button class="btn btn-primary" onclick="klbNewFolder(null)">+ New Folder</button>
@@ -5076,6 +5080,7 @@ applyBrand(BRAND);   /* portal defaults to the Suede skin */
       </div>
       <div style="flex:1;display:flex;overflow:hidden;position:relative;background:var(--bg-surface);">
         <div style="flex:1;overflow:auto;padding:20px 24px;min-width:0;">
+          <div id="klb-routing" style="display:none;max-width:1080px;"></div>
           <div class="klb-layout">
             <div class="klb-aside">
               <div class="card"><div style="padding:12px 14px;">
@@ -14411,7 +14416,7 @@ function renderUWWorkbench(name) {
     <div class="uwb-sec">
       <div class="uwb-sec-hdr">🧭 Routing — BIN placement ${routedHdrChip}</div>
       <div class="uwb-sec-body">
-        <div style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">Rules compiled from <span style="color:var(--blue);font-weight:600;cursor:pointer;" title="Open Processor Information in the Knowledge Library" onclick="klbOpenLibrary('f-proc')">Knowledge Library → Processor Information</span> · ${kbSrcN} source${kbSrcN === 1 ? '' : 's'}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin:0 0 10px;">Rules compiled from <span style="color:var(--blue);font-weight:600;cursor:pointer;" title="Open Processor Information in the Knowledge Library" onclick="klbOpenLibrary('f-proc')">Knowledge Library → Processor Information</span> · ${kbSrcN} source${kbSrcN === 1 ? '' : 's'} · <span style="color:var(--blue);font-weight:600;cursor:pointer;" onclick="showView('library', document.getElementById('nav-library')); klbLibTab('routing');">Manage rules →</span></div>
         ${binCards}</div>
     </div>` : '';
 
@@ -39219,6 +39224,152 @@ function poEquipDeduct(name, e, on) {
   if (typeof poRender === 'function' && document.getElementById('po-partner-tbody')) { try { poRender(); } catch (err) {} }
   if (typeof poRenderDrawer === 'function' && typeof poState !== 'undefined' && poState.drawerId === p.id) { try { poRenderDrawer(); } catch (err) {} }
   return amt;
+}
+</script>
+<style>
+/* ── LIBRARY: ROUTING RULES PANEL (klbr-*) ── */
+body.persona-rep #klb-rt-toggle, body.persona-rep #klb-routing { display:none !important; }
+.klbr-sec { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; margin-bottom:16px; overflow:hidden; }
+.klbr-hdr { display:flex; align-items:baseline; gap:10px; padding:11px 18px; border-bottom:1px solid var(--border-strong); }
+.klbr-hdr b { font-size:11px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.06em; color:var(--text-secondary); }
+.klbr-hdr span { font-size:11px; color:var(--text-muted); }
+.klbr-table { width:100%; border-collapse:collapse; font-size:13px; }
+.klbr-table th { text-align:left; padding:8px 18px; font-size:10px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); border-bottom:1px solid var(--border-strong); }
+.klbr-table td { padding:10px 18px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.klbr-table tr:last-child td { border-bottom:none; }
+.klbr-sub { font-size:10px; color:var(--text-muted); margin-top:2px; }
+.klbr-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; font-family:var(--font-ui); padding:2px 10px; border-radius:5px; cursor:pointer; user-select:none; }
+.klbr-chip:before { content:"●"; font-size:8px; }
+.klbr-chip.g { background:rgba(34,197,94,.1); color:var(--green); }
+.klbr-chip.a { background:rgba(245,158,11,.13); color:var(--amber); }
+.klbr-chip.r { background:rgba(239,68,68,.1); color:var(--red); }
+.klbr-rule { display:flex; align-items:baseline; gap:12px; background:var(--bg-surface); border:1px solid var(--border); border-radius:9px; padding:12px 16px; margin:0 18px 10px; font-size:13px; }
+.klbr-rule .rid { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); flex-shrink:0; width:38px; }
+.klbr-rule .klbr-chip { cursor:default; flex-shrink:0; }
+.klbr-new { font-size:9px; font-weight:800; font-family:var(--font-ui); background:var(--yellow); color:#fff; border-radius:4px; padding:1px 6px; letter-spacing:.05em; }
+.klbr-compose { margin:0 18px 14px; border:1px dashed var(--border-strong); border-radius:9px; padding:12px 14px; background:var(--bg-surface); }
+.klbr-compose input { width:100%; border:1px solid var(--border-strong); border-radius:6px; padding:9px 12px; font-size:13px; font-family:var(--font-data); background:var(--bg-elevated); color:var(--text-primary); }
+.klbr-spec { background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:8px; padding:12px 14px; margin-top:10px; }
+.klbr-spec table { font-size:12px; border-collapse:collapse; }
+.klbr-spec td { padding:3px 14px 3px 0; vertical-align:top; }
+.klbr-spec td:first-child { font-size:10px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); white-space:nowrap; }
+.klbr-json { font-family:var(--font-mono); font-size:10.5px; background:var(--bg-base); border:1px solid var(--border); border-radius:6px; padding:9px 12px; margin-top:8px; white-space:pre-wrap; color:var(--text-secondary); }
+.klbr-foot { padding:10px 18px 14px; font-size:11px; color:var(--text-muted); }
+</style>
+<script>
+/* ── LIBRARY ROUTING RULES — eligibility grid + rules + NL rule composer ── */
+const KLBR_STATES = ['Native','VAR swap','Review','Blocked','Supported','Eligible'];
+const KLBR_CLS = { 'Native':'g','Supported':'g','Eligible':'g','VAR swap':'a','Review':'a','Blocked':'r' };
+const KLBR_PLATFORMS = ['TSYS','North FSP','VPC','Fiserv'];
+const KLBR_GRID = [
+  { name:'Valor VL100 · dual pricing', sub:'TAP-eligible · instant VAR sheet', cells:['Native','VAR swap','Native','Blocked'] },
+  { name:'Valor VP550 countertop', sub:'TAP-eligible', cells:['Native','VAR swap','Native','Blocked'] },
+  { name:'Clover Flex / Mini', sub:'Fiserv hardware family', cells:['Blocked','Native','Blocked','Native'] },
+  { name:'PAX A920 · dual pricing', sub:'', cells:['Native','VAR swap','Native','Review'] },
+  { name:'Split funding (up to 4 accts)', sub:'', cells:['Supported','Blocked','Blocked','Blocked'] },
+  { name:'TAP program device', sub:'adds TAP merchant addendum', cells:['Eligible','Eligible','Review','Blocked'] },
+  { name:'E-commerce / gateway only', sub:'', cells:['Review','Review','Native','Native'] },
+];
+const KLBR_RULES = [
+  { id:'R-01', kind:'block', label:'Hard block', text:'Clover hardware → <b>North FSP only</b>. Deal is forced — routes itself, rule logged.' },
+  { id:'R-02', kind:'block', label:'Hard block', text:'Split funding selected → <b>TSYS only</b> (4-account split supported on TSYS platform).' },
+  { id:'R-04', kind:'warn', label:'Warning', text:'Dual pricing on VPC → auto-attach cash discount attestation addendum to the signature package.' },
+  { id:'R-07', kind:'weight', label:'Weight +25', text:'Platform behind monthly commitment pace → prefer it when eligibility ties. <span style="font-family:var(--font-mono)">TSYS currently +25</span>.' },
+  { id:'R-09', kind:'warn', label:'Warning', text:'Stated volume > <span style="font-family:var(--font-mono)">$150K/mo</span> → flag for concurrence queue before boarding (any platform).' },
+];
+let _klbrNextId = 10, _klbrDraft = null;
+
+function klbLibTab(tab) {
+  const routing = document.getElementById('klb-routing');
+  const files = document.querySelector('#view-library .klb-layout');
+  const bF = document.getElementById('klb-tab-files'), bR = document.getElementById('klb-tab-routing');
+  if (tab === 'routing') { routing.style.display='block'; if (files) files.style.display='none'; bR.classList.add('on'); bF.classList.remove('on'); klbrRender(); }
+  else { routing.style.display='none'; if (files) files.style.display=''; bF.classList.add('on'); bR.classList.remove('on'); }
+}
+
+function klbrCycle(ri, ci) {
+  const cur = KLBR_GRID[ri].cells[ci];
+  const cycle = ['Native','VAR swap','Review','Blocked'];
+  const base = cycle.includes(cur) ? cur : 'Review';
+  KLBR_GRID[ri].cells[ci] = cycle[(cycle.indexOf(base)+1) % cycle.length];
+  klbrRender();
+}
+
+function klbrChip(state, attrs) { return `<span class="klbr-chip ${KLBR_CLS[state]||'a'}" ${attrs||''}>${state}</span>`; }
+
+function klbrRuleChip(r) {
+  const cls = r.kind==='block'?'r':r.kind==='weight'?'g':'a';
+  return `<span class="klbr-chip ${cls}">${r.label}</span>`;
+}
+
+function klbrParse(text) {
+  const t = text.toLowerCase();
+  const plats = KLBR_PLATFORMS.filter(p => t.includes(p.toLowerCase()) || (p==='North FSP' && /\bnorth\b/.test(t)));
+  const equipMap = { clover:'Clover hardware', vl100:'Valor VL100', vp550:'Valor VP550', valor:'Valor devices', pax:'PAX A920', a920:'PAX A920', tap:'TAP program device', 'split funding':'Split funding', gateway:'E-commerce / gateway', ecom:'E-commerce / gateway', 'e-commerce':'E-commerce / gateway', 'dual pricing':'Dual pricing', 'cash discount':'Dual pricing' };
+  const equip = Object.keys(equipMap).filter(k => t.includes(k)).map(k => equipMap[k]);
+  const vol = t.match(/\$?\s?(\d+)\s?k/);
+  let kind='warn', label='Warning';
+  const wNum = t.match(/\+\s?(\d+)/);
+  if (/\bonly\b|\bmust\b|\bnever\b|\bblock/.test(t)) { kind='block'; label='Hard block'; }
+  else if (/prefer|weight|behind|pace|tie|priorit/.test(t)) { kind='weight'; label='Weight +' + (wNum?wNum[1]:'20'); }
+  const trigger = equip.length ? equip.join(' + ') : (vol ? 'Stated volume > $'+vol[1]+'K/mo' : 'Deal attribute match');
+  let action;
+  if (kind==='block') action = plats.length ? 'Force route → ' + plats.join(' / ') + ' only' : 'Block submission until reviewed';
+  else if (kind==='weight') action = 'Add routing weight ' + label.replace('Weight ','') + (plats.length ? ' to ' + plats.join(' / ') : ' when eligibility ties');
+  else action = plats.length ? 'Flag + route note for ' + plats.join(' / ') : (/concurrence|senior/.test(t) ? 'Flag for concurrence queue before boarding' : /addendum|attach/.test(t) ? 'Auto-attach required addendum to signature package' : 'Flag for ops review at submission');
+  return { kind, label, trigger, platforms: plats.length?plats:['Any'], action, condition: vol ? 'volume > $'+vol[1]+'K/mo' : (equip.length ? equip.join(' + ') + ' selected' : 'attribute present'), evalAt:'submission', source:'Authored in plain language · compiled by Twill AI' };
+}
+
+function klbrCompose() {
+  const inp = document.getElementById('klbr-input');
+  const txt = (inp?.value||'').trim();
+  if (!txt) return;
+  const host = document.getElementById('klbr-preview');
+  host.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 2px;">🤖 Analyzing rule intent against the eligibility grid + processor program docs…</div>';
+  setTimeout(() => {
+    const spec = klbrParse(txt);
+    _klbrDraft = { spec, raw: txt };
+    const json = JSON.stringify({ id:'R-'+_klbrNextId, type:spec.kind, trigger:spec.condition, platforms:spec.platforms, action:spec.action, evaluate_at:spec.evalAt }, null, 2);
+    host.innerHTML = `<div class="klbr-spec">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">Generated specification</span>${klbrRuleChip({kind:spec.kind,label:spec.label})}<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">R-${_klbrNextId} (draft)</span></div>
+      <table><tr><td>Trigger</td><td>${spec.trigger}</td></tr><tr><td>Condition</td><td>${spec.condition}</td></tr><tr><td>Action</td><td>${spec.action}</td></tr><tr><td>Platforms</td><td>${spec.platforms.join(' · ')}</td></tr><tr><td>Evaluated</td><td>at ${spec.evalAt}</td></tr></table>
+      <div class="klbr-json">${json.replace(/</g,'&lt;')}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="klbrAddRule()">✓ Add rule</button><button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="document.getElementById('klbr-preview').innerHTML='';_klbrDraft=null;">✕ Discard</button></div>
+    </div>`;
+  }, 700);
+}
+
+function klbrAddRule() {
+  if (!_klbrDraft) return;
+  const s = _klbrDraft.spec;
+  KLBR_RULES.push({ id:'R-'+_klbrNextId, kind:s.kind, label:s.label, text: s.trigger + ' → <b>' + s.action + '</b>. <span style="font-size:11px;color:var(--text-muted)">(“' + _klbrDraft.raw.replace(/</g,'&lt;') + '”)</span>', isNew:true });
+  _klbrNextId++; _klbrDraft = null;
+  klbrRender();
+  const inp = document.getElementById('klbr-input'); if (inp) inp.value='';
+}
+
+function klbrRender() {
+  const host = document.getElementById('klb-routing');
+  if (!host) return;
+  host.innerHTML = `
+  <div class="klbr-sec">
+    <div class="klbr-hdr"><b>Eligibility Grid — Solution × Platform</b><span>what makes a deal forced vs open · compiled from the Library’s equipment specs + processor program docs · click a cell to edit</span></div>
+    <div style="overflow-x:auto;"><table class="klbr-table">
+      <tr><th>Solution / Equipment</th>${KLBR_PLATFORMS.map(p=>`<th>${p}</th>`).join('')}</tr>
+      ${KLBR_GRID.map((row,ri)=>`<tr><td><div style="font-weight:600;">${row.name}</div>${row.sub?`<div class="klbr-sub">${row.sub}</div>`:''}</td>${row.cells.map((c,ci)=>`<td>${klbrChip(c,`onclick="klbrCycle(${ri},${ci})" title="Click to edit"`)}</td>`).join('')}</tr>`).join('')}
+    </table></div>
+  </div>
+  <div class="klbr-sec">
+    <div class="klbr-hdr"><b>Routing Rules</b><span>hard blocks force; weights prefer — evaluated at submission</span></div>
+    <div class="klbr-compose" style="margin-top:14px;">
+      <div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">✍️ Write a rule in plain language — Twill AI compiles the specification</div>
+      <div style="display:flex;gap:8px;"><input id="klbr-input" placeholder='e.g. "Any deal with a Clover device must go to North FSP" or "Prefer VPC when we&apos;re behind on minimums"' onkeydown="if(event.key==='Enter')klbrCompose()"><button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="klbrCompose()">Create rule</button></div>
+      <div id="klbr-preview"></div>
+    </div>
+    ${KLBR_RULES.map(r=>`<div class="klbr-rule"><span class="rid">${r.id}</span>${klbrRuleChip(r)}<span style="flex:1;">${r.text}</span>${r.isNew?'<span class="klbr-new">NEW</span>':''}</div>`).join('')}
+    <div class="klbr-rule" style="border-style:dashed;"><span class="rid">MODE</span><span class="klbr-chip g">Suggest-first</span><span>Open deals wait for one ops click today. Per-rule auto-route unlocks once a rule’s accept rate proves out (e.g. <span style="font-family:var(--font-mono)">95% over 60 days</span>).</span></div>
+    <div class="klbr-foot">All merchants and figures are illustrative sample data. Weights, commitments and the grid are ops configuration, never hard-coded — and none of this screen exists in the rep view.</div>
+  </div>`;
 }
 </script>
 </body>
