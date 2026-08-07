@@ -14459,6 +14459,8 @@ function renderUWWorkbench(name) {
     </div>
     ${pendCompHTML}
 
+    ${routingHTML}
+
     <div class="uwb-grid">${checksHTML}</div>
 
     ${docsHTML}
@@ -14479,8 +14481,6 @@ function renderUWWorkbench(name) {
         <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${conc.reason}${conc.routedTo?' · '+conc.routedTo:''}</div></div>
       </div>
     </div>
-
-    ${routingHTML}
 
     ${feesHTML}
 
@@ -18664,7 +18664,7 @@ const SB_PROFILES = {
     ],
     solutions: [
       {
-        id:'sol1', name:'First Data Omaha + PAX A920 Pro', fit:85, badge:'Best Match', risk:'Low', type:'Card Present',
+        id:'sol1', name:'Card-Present Package — PAX A920 Pro + NMI', fit:85, badge:'Best Match', risk:'Low', type:'Card Present',
         approval:'24–48 hrs', pricing:'IC+ 0.25% + $0.10', terminal:'PAX A920 Pro', gateway:'NMI',
         shortWhy:'Best fit for QSR switching from Square — competitive IC+ beats flat-rate at their volume.',
         whyWorks: [
@@ -18678,7 +18678,7 @@ const SB_PROFILES = {
           { point:'If they need Toast-level POS features, terminal-only may underserve', severity:'low' },
         ],
         marketing: [
-          { name:'First Data Product Sheet', icon:'📄', type:'PDF' },
+          { name:'Card-Present Package Product Sheet', icon:'📄', type:'PDF' },
           { name:'IC+ vs Flat Rate Comparison', icon:'📊', type:'PDF' },
           { name:'PAX A920 Pro Features', icon:'📱', type:'PDF' },
         ],
@@ -19301,7 +19301,7 @@ const DEMO_EVENTS = [
   // ─── SIGNATURE STAGE ───
   { type:'status', status:'signature', label:'Sent for Signature', delay:0 },
   { type:'sys', color:'var(--green)', text:'Application package sent to sarah@freshbrewcoffee.com for e-signature', delay:800 },
-  { type:'sys', color:'var(--blue)', text:'Solution: First Data Omaha + PAX A920 Pro · IC+ 0.25% + $0.10 · NMI Gateway', delay:600 },
+  { type:'sys', color:'var(--blue)', text:'Solution: Card-Present Package — PAX A920 Pro · IC+ 0.25% + $0.10 · NMI Gateway', delay:600 },
   { type:'ai', text:'Hi Sarah! Your merchant processing agreement for Fresh Brew Coffee Co. is ready for review and signature.\n\nI\'ve attached the full application with:\n• <strong>First Data Omaha</strong> processing — IC+ pricing at 0.25% + $0.10\n• <strong>PAX A920 Pro</strong> terminal with built-in tipping\n• <strong>NMI Gateway</strong> for your WooCommerce online orders\n\nPlease review everything and sign when ready. I\'m here if you have any questions!', mode:'out', delay:1200 },
   { type:'sys', color:'var(--text-muted)', text:'Follow-up sequence scheduled: Day 1, 2, 3, 5, 7', delay:500 },
   { type:'ai', text:'Application sent. Follow-up automation is active — I\'ll nudge Sarah if she hasn\'t signed within 24 hours. Estimated time to signature: 1-2 days based on similar QSR merchants.', mode:'int', delay:1000 },

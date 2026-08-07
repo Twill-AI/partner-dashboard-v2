@@ -15,7 +15,7 @@ SAY: *"Jennie — your MS Review Ready, Waiting on ISO, your New York callouts, 
 
 ## PART 2 — PACIFIC COAST: THE WORKBENCH (5 min)
 **2.** CLICK Pacific Coast Retail in the queue → the UW Workbench opens (Conversation is one toggle away).
-**3.** The banner: *"Review — items need attention"* listing exactly what to look at. Below: **MATCH, OFAC, TIN, GIACT, Credit, KYB** — one panel, timestamps, re-run buttons.
+**3.** The banner: *"Review — items need attention"* listing exactly what to look at. **Directly beneath it: Routing — BIN placement** — front and center, because placement drives everything downstream. Then the verification grid: **MATCH, OFAC, TIN, GIACT, Credit, KYB** — one panel, timestamps, re-run buttons.
 SAY: *"All six checks, one source, under two seconds — and a green-go/red-halt that tells the underwriter what to look at. Your words, Jennie."*
 **4.** Documents rail → CLICK the Feb bank statement — the actual statement opens. Point at the two missing docs.
 **5.** Scroll to the **Audit Trail** → the row *"Deleted bank_stmt_feb_v1.pdf — 🔒 Retained, original preserved in UW vault."*
@@ -24,7 +24,7 @@ SAY: *"Deletions don't delete. The trail is immutable."*
 **7.** Middle cards: Risk Category · **Agent Gate** (rep within tier) · **Concurrence** (queued to Senior UW — $150K > $100K threshold).
 **8.** In Documents, CLICK **Request** on the missing Owner ID → the pend composer opens prefilled. Point at the new checkbox: **"Partner may forward this request to their merchant."**
 SAY: *"Default is your model — the partner is the intermediary. But a sub-partner can choose to pass the request straight through. Their call, not a system limitation."* → Send Pend.
-**9.** **Routing — BIN placement**: *"Rules compiled from Knowledge Library → Processor Information · 9 sources."* Two ranked BINs with fit % — every reason carries a **📚 source chip** (BIN Minimums Tracker, FD Rate Tables). CLICK a chip → you're in the Library, on that document. Go back, **Accept** First Data Omaha.
+**9.** SCROLL BACK UP to **Routing — BIN placement** (top of the page, under the banner): *"Rules compiled from Knowledge Library → Processor Information · 9 sources."* Two ranked BINs with fit % — every reason carries a **📚 source chip** (BIN Minimums Tracker, FD Rate Tables). CLICK a chip → you're in the Library, on that document. Go back, **Accept** First Data Omaha.
 SAY: *"Routing isn't tribal knowledge — it's your playbook, cited. Accepting it logs the sources into the audit trail."*
 
 ## PART 3 — TECHFORGE: WHEN THE SYSTEM SAYS NO (2 min)
