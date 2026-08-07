@@ -12679,7 +12679,7 @@ const DEAL_ROOM_DATA = {
     },
     synopsis: {
       business: { name:'Maple Street Bakery', type:'Retail Bakery', location:'Santa Monica, CA', prevProcessor:'Square Reader', monthlyVol:'$35K avg', owner:'Lisa Park (100%)', years:'4 years' },
-      solution: { name:'PAX A80', gateway:'NMI Gateway', pricing:'IC+ 0.20% + $0.08', equipment:'1× PAX A80 ($199)', monthly:'Gateway $10/mo', contract:'2 years' },
+      solution: { name:'PAX A920 Pro', gateway:'NMI Gateway', pricing:'IC+ 0.20% + $0.08', equipment:'1× PAX A920 Pro ($299)', monthly:'Gateway $10/mo', contract:'2 years' },
       uw: { score:'68%', riskLevel:'Low', flags:['Dec bank stmt pending'], passed:['SIC 5461 approved','Business verified','Owner ID verified (overnight)','Banking verified (2 of 3 mo)'], status:'In Review — 1 item remaining' },
       missing: [
         { item:'Bank Statement — Dec 2025', severity:'amber', note:'Merchant\'s bank requires in-person request. 3–5 business days. Bank letter may substitute.' },
@@ -37935,6 +37935,7 @@ function _agentAddNBA(sess, locked){
   _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-'+_agdkSlug(sess.merchant)+'">' +
     '<button class="agdk-chip approve'+(locked?' locked':'')+'" data-hook="agent-nba-approve"'+(locked?' title="Blocked by red checks"':'')+' onclick="agentNBA(\'approve\',\''+n+'\')">✓ Approve</button>' +
     '<button class="agdk-chip pend" data-hook="agent-nba-pend" onclick="agentNBA(\'pend\',\''+n+'\')">⏸ Pend</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-route" onclick="agentNBA(\'route\',\''+n+'\')">🧭 BIN routing</button>' +
     '<button class="agdk-chip" data-hook="agent-nba-message" onclick="agentNBA(\'message\',\''+n+'\')">✉ Message partner</button>' +
     '<button class="agdk-chip" data-hook="agent-nba-team" onclick="agentNBA(\'team\',\''+n+'\')">👥 Ask the team</button>' +
     '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\''+n+'\')">📄 View documents</button>' +
@@ -38276,6 +38277,29 @@ function agentRenderRail(){
       (e.ship ? '<div style="color:var(--text-secondary);font-size:10px;margin-top:3px;">📦 '+e.ship.carrier+' '+e.ship.code+' · '+e.ship.eta+'</div>' : '') +
       '</div>').join('');
     if (eqRows) html += '<div class="agdk-rail-sec"><div class="agdk-rail-title">🖥 Equipment</div>'+eqRows+'</div>';
+  }
+
+  /* BIN routing (UW sessions) */
+  if (sess.kind === 'uw') {
+    const binEsc = _agdkEsc(sess.merchant);
+    let routeRow;
+    if (sess.bin) {
+      routeRow = '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+        '<div style="display:flex;align-items:center;gap:7px;"><span>🧭</span><b style="color:var(--text-primary);">'+sess.bin.processor+'</b>' +
+        '<span style="font-family:var(--font-mono);color:var(--text-secondary);">BIN '+sess.bin.bin+'</span>' +
+        '<span style="margin-left:auto;font-family:var(--font-mono);font-weight:700;color:var(--green);">'+sess.bin.fit+'%</span></div>' +
+        '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">'+sess.bin.bank+' · confirmed by underwriter</div></div>';
+    } else {
+      const sug = _agentBinOptions(sess)[0];
+      routeRow = '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
+        '<div style="display:flex;align-items:center;gap:7px;"><span>🧭</span><b style="color:var(--text-primary);">'+sug.processor+'</b>' +
+        '<span style="font-family:var(--font-mono);color:var(--text-secondary);">BIN '+sug.bin+'</span>' +
+        '<span style="margin-left:auto;font-family:var(--font-mono);font-weight:700;color:var(--amber);">'+sug.fit+'%</span></div>' +
+        '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">✦ AI suggestion — awaiting confirmation</div>' +
+        (!_agentDecided(sess) ? '<button class="agdk-chip" style="font-size:10px;padding:2px 9px;margin-top:5px;" onclick="agentNBA(\'route\',\''+binEsc+'\')">Review &amp; confirm</button>' : '') +
+        '</div>';
+    }
+    html += '<div class="agdk-rail-sec" id="agent-rail-routing"><div class="agdk-rail-title">🧭 BIN routing</div>'+routeRow+'</div>';
   }
 
   /* open pends */
@@ -38769,19 +38793,105 @@ function agentFlowApprove(sess){
   }
   if (sess._apprOpen) return;
   sess._apprOpen = true;
+  if (!sess.bin) { _agentShowBinRouting(sess, true); return; }
+  agentAddTyping(sess);
+  setTimeout(() => { agentRemoveTyping(); _agentApproveConfirmCard(sess); }, 650);
+}
+
+function _agentApproveConfirmCard(sess){
+  const proc = _agentProc(sess);
+  const openPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status==='open' || p.status==='partial');
+  const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
+  agentAddMsg(sess, '<div class="agdk-confirm" id="agdk-appr-'+sl+'">' +
+    'Approve <b>'+sess.merchant+'</b>? A MID will be requested on <b>'+proc+'</b>' +
+    (sess.bin ? ' · BIN <b>'+sess.bin.bin+'</b> ('+sess.bin.bank+')' : '') +
+    ' and auto-boarding starts immediately.' +
+    (openPends.length ? '<div style="margin-top:6px;font-size:11px;color:var(--amber);">⚠ '+openPends.length+' open pend'+(openPends.length>1?'s':'')+' will be marked resolved at approval — cleared by underwriter decision.</div>' : '') +
+    '<div class="agdk-confirm-foot" id="agdk-appr-foot-'+sl+'">' +
+    '<button class="agdk-chip approve" onclick="agentApproveConfirm(\''+esc+'\')">✓ Confirm approval</button>' +
+    '<button class="agdk-chip" onclick="agentApproveCancel(\''+esc+'\')">Cancel</button></div></div>');
+}
+
+/* ── BIN routing — AI suggests where the account lives, the underwriter confirms ── */
+function _agentBinOptions(sess){
+  if (sess._binOpts) return sess._binOpts;
+  const m = sess.m || {};
+  const proc = _agentProc(sess);
+  const tier = m.riskTier || 'T-1';
+  const primary = { processor: proc, bin: '424330', bank: 'Wells Fargo — Omaha', fit: 92, why: [
+      tier + ' swipe profile sits inside this BIN’s risk appetite',
+      'Pricing program (' + (m.pricing || 'as configured') + ') fully supported',
+      'Monthly minimums clear at ' + (m.volume || 'stated volume') ] };
+  const altProc = /TSYS/i.test(proc) ? 'First Data Omaha' : 'TSYS';
+  const opts = [
+    primary,
+    { processor: altProc, bin: '439871', bank: 'Synovus', fit: 79, why: [
+        'Supported program, but a monthly-minimum gap opens at this volume' ] },
+    { processor: 'VPC', bin: '402944', bank: 'Visa Platform Connect', fit: 61, why: [
+        'No matching pricing program on this BIN — repricing required to board here' ] },
+  ];
+  sess._binOpts = opts;
+  return opts;
+}
+function _agentBinRowsHtml(sess){
+  const esc = _agdkEsc(sess.merchant);
+  const sel = (sess._binSel == null) ? 0 : sess._binSel;
+  return _agentBinOptions(sess).map((o, i) => {
+    const isSel = i === sel;
+    const fitCol = o.fit >= 85 ? 'var(--green)' : o.fit >= 70 ? 'var(--amber)' : 'var(--text-muted)';
+    return '<div onclick="agentPickBin(\''+esc+'\','+i+')" style="cursor:pointer;padding:8px 10px;margin-top:6px;border:1.5px solid '+(isSel?'var(--primary,#BF3203)':'var(--border)')+';border-radius:8px;'+(isSel?'background:rgba(191,50,3,.04);':'')+'">' +
+      '<div style="display:flex;align-items:center;gap:8px;font-size:12px;">' +
+      '<span style="width:13px;flex-shrink:0;">'+(isSel?'◉':'○')+'</span>' +
+      '<b style="color:var(--text-primary);">'+o.processor+'</b>' +
+      '<span style="font-family:var(--font-mono);color:var(--text-secondary);">BIN '+o.bin+'</span>' +
+      '<span style="color:var(--text-muted);font-size:11px;">'+o.bank+'</span>' +
+      (i===0 ? '<span class="p-badge" style="background:rgba(191,50,3,.1);color:var(--primary,#BF3203);flex-shrink:0;">✦ AI suggests</span>' : '') +
+      '<span style="margin-left:auto;font-family:var(--font-mono);font-weight:700;color:'+fitCol+';flex-shrink:0;">'+o.fit+'%</span></div>' +
+      '<div style="height:3px;background:var(--border);border-radius:2px;margin:6px 0 0 21px;"><div style="width:'+o.fit+'%;height:3px;border-radius:2px;background:'+fitCol+';"></div></div>' +
+      (isSel ? '<div style="margin:6px 0 0 21px;font-size:11px;color:var(--text-secondary);line-height:1.5;">'+o.why.map(w => '· '+w).join('<br>')+'</div>' : '') +
+      '</div>';
+  }).join('');
+}
+function _agentShowBinRouting(sess, thenApprove){
+  sess._binThenApprove = !!thenApprove;
+  if (sess._binSel == null) sess._binSel = 0;
+  const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
   agentAddTyping(sess);
   setTimeout(() => {
     agentRemoveTyping();
-    const proc = _agentProc(sess);
-    const openPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status==='open' || p.status==='partial');
-    const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
-    agentAddMsg(sess, '<div class="agdk-confirm" id="agdk-appr-'+sl+'">' +
-      'Approve <b>'+sess.merchant+'</b>? A MID will be requested on <b>'+proc+'</b> and auto-boarding starts immediately.' +
-      (openPends.length ? '<div style="margin-top:6px;font-size:11px;color:var(--amber);">⚠ '+openPends.length+' open pend'+(openPends.length>1?'s':'')+' will be marked resolved at approval — cleared by underwriter decision.</div>' : '') +
-      '<div class="agdk-confirm-foot" id="agdk-appr-foot-'+sl+'">' +
-      '<button class="agdk-chip approve" onclick="agentApproveConfirm(\''+esc+'\')">✓ Confirm approval</button>' +
-      '<button class="agdk-chip" onclick="agentApproveCancel(\''+esc+'\')">Cancel</button></div></div>');
-  }, 650);
+    agentAddMsg(sess, '<b>Where should this account live?</b> Forced-routing rules ran first — none matched, so this is an open deal. Ranked by fit against BIN appetite, pricing program, and minimums:' +
+      '<div class="agdk-confirm" id="agdk-bin-'+sl+'" style="margin-top:7px;">' +
+      '<div id="agdk-bin-rows-'+sl+'">'+_agentBinRowsHtml(sess)+'</div>' +
+      '<div class="agdk-confirm-foot" id="agdk-bin-foot-'+sl+'">' +
+      '<button class="agdk-chip approve" onclick="agentConfirmBin(\''+esc+'\')">🧭 Confirm BIN</button>' +
+      '<span style="font-size:10px;color:var(--text-muted);">Routing rule + rationale are logged with the decision</span>' +
+      '</div></div>');
+  }, 700);
+}
+function agentPickBin(name, i){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.bin) return;
+  sess._binSel = i;
+  const rows = document.getElementById('agdk-bin-rows-'+_agdkSlug(name));
+  if (rows) rows.innerHTML = _agentBinRowsHtml(sess);
+}
+function agentConfirmBin(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || sess.bin) return;
+  const o = _agentBinOptions(sess)[(sess._binSel == null) ? 0 : sess._binSel];
+  sess.bin = o;
+  const sl = _agdkSlug(name);
+  const foot = document.getElementById('agdk-bin-foot-'+sl);
+  if (foot) foot.innerHTML = '<span class="agdk-ck-done">🧭 Routed by Master Admin · '+_agdkTime()+'</span>';
+  _agentLog(sess, 'Master Admin', 'BIN routing confirmed — '+o.processor+' BIN '+o.bin+' ('+o.bank+') · fit '+o.fit+'%'+((sess._binSel||0)===0 ? ' · accepted AI suggestion' : ' · overrode AI suggestion'));
+  if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Master Admin (agent session)', what:'BIN routing — '+o.processor+' BIN '+o.bin+((sess._binSel||0)===0 ? ' (AI-suggested)' : ' (manual override)') });
+  agentAddSys(sess, '🧭 Routed — '+o.processor+' · BIN '+o.bin+' ('+o.bank+')', 'var(--blue)');
+  agentRenderRail();
+  if (sess._binThenApprove) {
+    sess._binThenApprove = false;
+    agentAddTyping(sess);
+    setTimeout(() => { agentRemoveTyping(); _agentApproveConfirmCard(sess); }, 650);
+  }
 }
 
 function agentApproveCancel(name){
@@ -38850,9 +38960,9 @@ function agentApproveConfirm(name){
   const hadPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status==='open' || p.status==='partial').length;
   _agentApplyApprove(name);
   if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Master Admin (agent session)', what:'Approved — MID requested, auto-boarding started' });
-  sess.decision = { type:'approved', time:_agdkTime(), mid: sess.m.mid, processor:_agentProc(sess) };
+  sess.decision = { type:'approved', time:_agdkTime(), mid: sess.m.mid, processor:_agentProc(sess), bin: sess.bin || null };
   const proc = _agentProc(sess);
-  agentAddSys(sess, '✅ Approved — MID '+(sess.m.mid||'requested')+' on '+proc+(hadPends ? ' · '+hadPends+' pend'+(hadPends>1?'s':'')+' resolved' : ''), 'var(--green)');
+  agentAddSys(sess, '✅ Approved — MID '+(sess.m.mid||'requested')+' on '+proc+(sess.bin ? ' · BIN '+sess.bin.bin : '')+(hadPends ? ' · '+hadPends+' pend'+(hadPends>1?'s':'')+' resolved' : ''), 'var(--green)');
   agentAddTyping(sess);
   setTimeout(() => {
     agentRemoveTyping();
@@ -38982,7 +39092,7 @@ function _agentBuildReport(sess){
   let decision;
   const d = sess.decision;
   if (d && d.type === 'approved') {
-    decision = '<b style="color:var(--green);">APPROVED</b> by Master Admin at '+d.time+'. MID <b>'+(d.mid||'requested')+'</b> requested on '+(d.processor||_agentProc(sess))+'; auto-boarding started immediately. All open pends were resolved at approval.';
+    decision = '<b style="color:var(--green);">APPROVED</b> by Master Admin at '+d.time+'. MID <b>'+(d.mid||'requested')+'</b> requested on '+(d.processor||_agentProc(sess))+(d.bin ? ' · BIN <b>'+d.bin.bin+'</b> ('+d.bin.bank+', fit '+d.bin.fit+'%)' : '')+'; auto-boarding started immediately. All open pends were resolved at approval.';
   } else if (d && d.type === 'pended') {
     decision = '<b style="color:var(--amber);">PENDED</b> at '+d.time+' — '+d.items.length+' item'+(d.items.length>1?'s':'')+' requested from '+(sess.m.partner||'partner')+', reply-by <b>'+d.replyBy+'</b>:<ul style="margin:6px 0 0;padding-left:18px;">'+d.items.map(x=>'<li style="margin-bottom:2px;">'+x+'</li>').join('')+'</ul>';
   } else if (d && d.type === 'escalated') {
@@ -39279,6 +39389,11 @@ function agentNBA(action, name){
     case 'docs':     _agentShowDocs(sess); return;
     case 'approve':  agentFlowApprove(sess); return;
     case 'pend':     agentFlowPend(sess); return;
+    case 'route':
+      if (_agentDecided(sess)) return;
+      agentAddUserMsg(sess, '🧭 BIN routing.');
+      if (sess.bin) { agentAddSys(sess, '🧭 Already routed — '+sess.bin.processor+' · BIN '+sess.bin.bin+' ('+sess.bin.bank+')', 'var(--blue)'); return; }
+      _agentShowBinRouting(sess, false); return;
     case 'message':  agentFlowMessage(sess); return;
     case 'team':     agentFlowTeam(sess); return;
     case 'serial':   agentFlowSerial(sess); return;
