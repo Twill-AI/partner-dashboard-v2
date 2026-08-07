@@ -37972,15 +37972,174 @@ function agentNBA(action, name){
 }
 
 function _agentShowDocs(sess){
-  const rows = sess.docs.map(d =>
+  const n = _agdkEsc(sess.merchant);
+  const rows = sess.docs.map((d, i) =>
     '<div class="agdk-doc-row" style="padding:7px 0;"><span style="font-size:13px;">📄</span>' +
     '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text-primary);">'+d.name+'</div>' +
     '<div style="font-size:10px;color:var(--text-muted);">'+d.date+'</div></div>' +
     '<span class="p-badge" style="background:var(--blue-dim);color:var(--blue);flex-shrink:0;">'+d.type+'</span>' +
     (d.badge ? '<span class="p-badge" style="background:var(--yellow-dim);color:var(--yellow);flex-shrink:0;">'+d.badge+'</span>' : '') +
+    (d.analyzed
+      ? '<span class="p-badge" style="background:rgba(91,122,94,.14);color:var(--green);flex-shrink:0;">✓ Analyzed</span>'
+      : '<button class="agdk-chip" style="flex-shrink:0;font-size:10px;padding:3px 10px;" onclick="agentAnalyzeDoc(\''+n+'\','+i+')">✦ Analyze</button>') +
     '</div>').join('');
   agentAddMsg(sess, '<b>'+sess.docs.length+' documents on file</b> — mirrored on the Session Board →' +
     '<div style="margin-top:6px;">'+rows+'</div>');
+}
+
+/* ── AI document analysis — one click, analysis lands in the chat ── */
+function _agdkVolNum(sess){
+  const v = (sess.m && sess.m.volume || '').replace(/[^0-9.]/g, '');
+  return parseFloat(v) || 35;
+}
+function _agdkMoney(k){ return '$' + (Math.round(k * 10) / 10) + 'K'; }
+function _agdkAnalysisRow(label, val, state){
+  const col = state==='warn' ? 'var(--amber)' : state==='pass' ? 'var(--green)' : 'var(--text-primary)';
+  return '<div style="display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-top:1px solid var(--border);font-size:11.5px;">' +
+    '<span style="color:var(--text-secondary);">'+label+'</span>' +
+    '<span style="font-family:var(--font-mono);font-weight:600;color:'+col+';text-align:right;">'+val+'</span></div>';
+}
+function _agentDocAnalysisHtml(sess, d, idx){
+  const owner = ((sess.m && sess.m.owner) || 'the owner').replace(/\s*\(.*$/, '');
+  const vol = _agdkVolNum(sess);
+  let title, verdict, vClass, body, readout;
+  if (d.type === 'Bank stmt') {
+    const mult = [1.092, 1.074, 1.081][idx % 3];
+    const dep = vol * mult, cardShare = idx % 2 ? 76 : 78;
+    const month = (d.name.match(/([A-Z][a-z]{2})(\d{4})/) || [,'','']).slice(1).join(' ');
+    const stmts = sess.docs.filter(x => x.type === 'Bank stmt').length;
+    const coverageShort = stmts < 3;
+    body =
+      _agdkAnalysisRow('Total deposits ('+(month||'period')+')', _agdkMoney(dep)) +
+      _agdkAnalysisRow('Card settlements', cardShare+'% of deposits · daily batches') +
+      _agdkAnalysisRow('Avg daily balance', _agdkMoney(vol * 0.31)) +
+      _agdkAnalysisRow('Ending balance', _agdkMoney(vol * (0.33 + 0.02 * (idx % 3)))) +
+      _agdkAnalysisRow('NSF / overdrafts', '0', 'pass') +
+      _agdkAnalysisRow('Negative-balance days', '0', 'pass') +
+      _agdkAnalysisRow('Largest single deposit', _agdkMoney(vol * 0.18) + ' · card settlement batch') +
+      _agdkAnalysisRow('Account holder', 'matches legal entity ✓', 'pass');
+    readout = 'Deposits run <b>'+Math.round((mult - 1) * 100)+'% above stated volume</b> — supports the application, no inflation flag. Cash flow is clean: zero NSFs, zero negative days.' +
+      (coverageShort ? ' <span style="color:var(--amber);">Coverage is '+stmts+' of 3 months — the missing statement is the open pend.</span>' : ' Full 3-month coverage on file.');
+    title = 'Bank statement'; verdict = coverageShort ? 'Supports · coverage short' : 'Supports application'; vClass = coverageShort ? 'warn' : 'pass';
+  } else if (d.type === 'Owner ID') {
+    body =
+      _agdkAnalysisRow('Name', owner + ' — matches application ✓', 'pass') +
+      _agdkAnalysisRow('Address', 'matches business owner record ✓', 'pass') +
+      _agdkAnalysisRow('Expiry', 'Aug 2028 · >6 months out', 'pass') +
+      _agdkAnalysisRow('Document integrity', 'template + security features pass', 'pass');
+    readout = 'Identity document is consistent with the application on every extracted field. Nothing to chase here.';
+    title = 'Owner ID'; verdict = 'Clear'; vClass = 'pass';
+  } else if (d.type === 'Agreement') {
+    const signer = (d.name.split('— signed ')[1] || owner);
+    body =
+      _agdkAnalysisRow('Signatures', signer + ' — all fields executed ✓', 'pass') +
+      _agdkAnalysisRow('Pricing page', ((sess.m && sess.m.pricing) || 'configured fees') + ' — matches system ✓', 'pass') +
+      _agdkAnalysisRow('Personal guarantee', 'present + signed', 'pass') +
+      _agdkAnalysisRow('Equipment schedule', ((sess.m && sess.m.solutionLabel) || 'as configured') + ' ✓', 'pass');
+    readout = 'Executed package is complete and every extracted value matches what’s configured on this record — nothing was altered between send and signature.';
+    title = 'Signed agreement'; verdict = 'Complete + consistent'; vClass = 'pass';
+  } else if (d.type === 'Banking') {
+    body =
+      _agdkAnalysisRow('Routing / DDA', 'matches application + bank validation ✓', 'pass') +
+      _agdkAnalysisRow('Account holder', 'matches legal entity ✓', 'pass');
+    readout = 'Deposit account details line up with the application and the bank-validation pull.';
+    title = 'Banking document'; verdict = 'Clear'; vClass = 'pass';
+  } else if (d.type === 'KYB') {
+    const kybWarn = ((sess.uwb && sess.uwb.checks) || []).find(c => /KYB/i.test(c.name) && c.state !== 'pass');
+    body =
+      _agdkAnalysisRow('Entity status', 'Active — state registry ✓', 'pass') +
+      _agdkAnalysisRow('Officers', 'match application ✓', 'pass') +
+      _agdkAnalysisRow('Registered agent', kybWarn ? 'mismatch vs application — see KYB check' : 'matches ✓', kybWarn ? 'warn' : 'pass');
+    readout = kybWarn
+      ? 'Document corroborates the KYB check: the registered agent on file differs from the application. An overnight registry refresh may clear it — otherwise this is a one-line partner clarification.'
+      : 'Registry record and application tell the same story.';
+    title = 'KYB document'; verdict = kybWarn ? 'One field to reconcile' : 'Clear'; vClass = kybWarn ? 'warn' : 'pass';
+  } else {
+    body = _agdkAnalysisRow('Completeness', 'all pages present, legible ✓', 'pass') +
+      _agdkAnalysisRow('Dates', 'current — no expiry issues', 'pass');
+    readout = 'Document is complete and consistent with the file. No underwriter action indicated.';
+    title = d.type; verdict = 'Clear'; vClass = 'pass';
+  }
+  return '<div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);">✦ AI document analysis</div>' +
+    '<div style="display:flex;align-items:center;gap:8px;margin:4px 0 2px;"><b>'+d.name+'</b>' +
+    '<span class="uwb-chip '+(vClass==='warn'?'warn':'pass')+'" style="flex-shrink:0;">'+(vClass==='warn'?'⚠ ':'✓ ')+verdict+'</span></div>' +
+    '<div style="margin-top:4px;">'+body+'</div>' +
+    '<div style="margin-top:7px;font-size:12px;color:var(--text-secondary);line-height:1.5;">'+readout+'</div>' +
+    '<div style="margin-top:6px;font-size:9px;color:var(--text-muted);font-family:var(--font-mono);">'+title+' · extracted from file contents · cross-checked against application data</div>';
+}
+function agentAnalyzeDoc(name, idx){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || !sess.docs[idx] || sess.docs[idx].analyzed) return;
+  const d = sess.docs[idx];
+  d.analyzed = true;
+  agentAddUserMsg(sess, '✦ Analyze ' + d.name + '.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    agentAddMsg(sess, _agentDocAnalysisHtml(sess, d, idx));
+    _agentLog(sess, 'Twill AI', 'AI analysis run on ' + d.name);
+    agentRenderRail();
+  }, 900);
+}
+
+/* ── Waive a pend — underwriter override, reason required, fully logged ── */
+function agentWaivePend(name, pi){
+  const sess = AGENT_DESK.sessions[name];
+  const p = sess && sess.dr && sess.dr.pends && sess.dr.pends[pi];
+  if (!sess || !p || (p.status!=='open' && p.status!=='partial') || _agentDecided(sess)) return;
+  if (sess._waiveOpen) return;
+  sess._waiveOpen = true;
+  const sl = _agdkSlug(name), esc = _agdkEsc(name);
+  agentAddUserMsg(sess, '✋ Waive pend: ' + p.title + '.');
+  agentAddMsg(sess, '<div class="agdk-confirm" id="agdk-waive-'+sl+'">' +
+    'Waive <b>'+p.title+'</b>? This is an underwriter override — the pend closes without the partner supplying it, and the waiver (with your reason) is written to the audit trail and the session report.' +
+    '<div style="margin-top:8px;"><input id="agdk-waive-reason-'+sl+'" type="text" value="Compensating factors on file — consistent financials, low-risk SIC" ' +
+    'style="width:100%;box-sizing:border-box;background:var(--bg-inset,rgba(0,0,0,.04));border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text-primary);font-family:inherit;"></div>' +
+    '<div class="agdk-confirm-foot">' +
+    '<button class="agdk-chip approve" onclick="agentWaivePendConfirm(\''+esc+'\','+pi+')">✋ Waive &amp; log</button>' +
+    '<button class="agdk-chip" onclick="agentWaivePendCancel(\''+esc+'\')">Cancel</button>' +
+    '</div></div>');
+}
+function _agdkStripTags(s){ const el = document.createElement('div'); el.textContent = s; return el.innerHTML; }
+function agentWaivePendCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  sess._waiveOpen = false;
+  const card = document.getElementById('agdk-waive-'+_agdkSlug(name));
+  if (card) card.innerHTML = '<span style="color:var(--text-muted);font-size:11px;">Waiver cancelled — pend stays open.</span>';
+  _agentLog(sess, 'Master Admin', 'Pend waiver cancelled');
+}
+function agentWaivePendConfirm(name, pi){
+  const sess = AGENT_DESK.sessions[name];
+  const p = sess && sess.dr && sess.dr.pends && sess.dr.pends[pi];
+  if (!sess || !p || (p.status!=='open' && p.status!=='partial')) return;
+  const sl = _agdkSlug(name);
+  const input = document.getElementById('agdk-waive-reason-'+sl);
+  const reason = _agdkStripTags((input && input.value.trim()) || 'Underwriter discretion');
+  p.status = 'resolved';
+  p.waived = true; p.waivedBy = 'Master Admin'; p.waivedReason = reason;
+  sess._waiveOpen = false;
+  const card = document.getElementById('agdk-waive-'+sl);
+  if (card) card.innerHTML = '<span style="color:var(--green);font-size:11px;">✋ Waived &amp; logged.</span>';
+  _agentLog(sess, 'Master Admin', 'WAIVED pend "'+p.title+'" — reason: '+reason);
+  agentAddSys(sess, '🔏 Pend waived — "'+p.title+'" · reason logged to the audit trail', 'var(--amber)');
+  const uwb = (typeof UW_WORKBENCH_DATA !== 'undefined') && UW_WORKBENCH_DATA[name];
+  if (uwb && uwb.audit) uwb.audit.push({ t:'Just now', who:'Master Admin (UW)', what:'Pend waived — "'+p.title+'" · '+reason });
+  agentRenderRail(); agentRenderQueue();
+  const remaining = (sess.dr.pends||[]).filter(x => x.status==='open' || x.status==='partial');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    if (!remaining.length && sess.verdict !== 'halt') {
+      agentAddMsg(sess, 'Waiver recorded. <b>No open pends remain</b> — the file is clear to decision. Ready when you are.');
+      _agentAddNBA(sess, false);
+    } else if (remaining.length) {
+      agentAddMsg(sess, 'Waiver recorded. <b>'+remaining.length+' pend'+(remaining.length>1?'s':'')+' still open</b> — waive, resolve, or approve with '+(remaining.length>1?'them':'it')+' noted.');
+      _agentAddNBA(sess, sess.verdict === 'halt');
+    } else {
+      agentAddMsg(sess, 'Waiver recorded. The red check still blocks approval — that one can’t be waived from this seat.');
+    }
+  }, 700);
 }
 
 /* ── Deployment session (base flow; decision chips are Builder-3 hooks) ── */
@@ -38123,11 +38282,15 @@ function agentRenderRail(){
   const pends = (sess.dr && sess.dr.pends) || [];
   const open = pends.filter(p => p.status==='open' || p.status==='partial');
   const resolved = pends.length - open.length;
-  const pendRows = open.length ? open.map(p =>
+  const railEsc = _agdkEsc(sess.merchant);
+  const pendRows = open.length ? pends.map((p, pi) =>
+    (p.status!=='open' && p.status!=='partial') ? '' :
     '<div style="padding:6px 0;border-top:1px solid var(--border);font-size:11px;">' +
     '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="flex-shrink:0;">'+(p.status==='partial'?'🟡':(p.severity==='red'?'🔴':'🟡'))+'</span>' +
     '<div style="flex:1;min-width:0;"><b style="color:var(--text-primary);">'+p.title+'</b>' +
-    '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">'+(p.status==='partial' ? (p.partialNote||'Partial') : 'Waiting on partner')+'</div></div></div></div>').join('')
+    '<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">'+(p.status==='partial' ? (p.partialNote||'Partial') : 'Waiting on partner')+'</div>' +
+    (sess.kind==='uw' && !_agentDecided(sess) ? '<button class="agdk-chip" style="font-size:10px;padding:2px 9px;margin-top:5px;" onclick="agentWaivePend(\''+railEsc+'\','+pi+')">✋ Waive</button>' : '') +
+    '</div></div></div>').join('')
     : '<div class="agdk-empty">No open pends.</div>';
   html += '<div class="agdk-rail-sec" id="agent-rail-pends"><div class="agdk-rail-title">📌 Open pends' +
     '<span style="margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--text-muted);text-transform:none;letter-spacing:0;">'+open.length+' open · '+resolved+' resolved</span></div>'+pendRows+'</div>';
