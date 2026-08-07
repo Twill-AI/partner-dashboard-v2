@@ -5879,7 +5879,7 @@ function nudgeWithDocs() {
                 <span style="font-size:24px;font-weight:800;font-family:var(--font-mono);color:var(--amber);">2</span>
                 <span style="font-size:11px;color:var(--text-muted);">addendums</span>
               </div>
-              <div style="font-size:10px;color:var(--text-muted);margin-top:9px;">Processor addendums · not yet sent</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:9px;">Program addendums · not yet sent</div>
             </div>
           </div>
 
@@ -13275,21 +13275,21 @@ function nmOpenApplication(name) {
           <strong>Business Records:</strong><br>
           • Legal Name: ${d.legalName}<br>
           • Entity: ${d.bizType} · SIC ${d.sic}<br>
-          • State: ${d.stateOfInc} · Started ${d.yearStarted}<br>
+          ${d.stateOfInc || d.yearStarted ? '• ' + [d.stateOfInc ? 'State: ' + d.stateOfInc : '', d.yearStarted ? 'Started ' + d.yearStarted : ''].filter(Boolean).join(' · ') + '<br>' : ''}
           • Address: ${d.address || e.address || '—'}<br>
           • Phone: ${d.phone || '—'}<br>
           • Email: ${d.email || '—'}<br>
-          • Owner: ${d.owner} (${d.ownerTitle})<br><br>
-          <strong>Website Analysis:</strong><br>
-          • ${d.services}<br>
-          • Pricing: ${d.pricing}<br>
-          • ${d.clients}<br>
-          ${d.relatedBiz ? '• ' + d.relatedBiz + '<br>' : ''}<br>
-          <strong>Processing Estimate:</strong><br>
-          • Revenue: ${d.annualRevenue}<br>
-          • Card Vol: ${d.monthlyVolume}<br>
-          • Risk: ${d.riskLevel} — ${d.riskNotes}<br><br>
-          <strong>3 Processor Matches:</strong><br>
+          ${d.owner ? '• Owner: ' + d.owner + ' (' + (d.ownerTitle || 'Owner') + ')<br>' : ''}<br>
+          ${d.services || d.pricing || d.clients ? `<strong>Website Analysis:</strong><br>
+          ${d.services ? '• ' + d.services + '<br>' : ''}
+          ${d.pricing ? '• Pricing: ' + d.pricing + '<br>' : ''}
+          ${d.clients ? '• ' + d.clients + '<br>' : ''}
+          ${d.relatedBiz ? '• ' + d.relatedBiz + '<br>' : ''}<br>` : ''}
+          ${d.annualRevenue || d.monthlyVolume || d.riskLevel ? `<strong>Processing Estimate:</strong><br>
+          ${d.annualRevenue ? '• Revenue: ' + d.annualRevenue + '<br>' : ''}
+          ${d.monthlyVolume ? '• Card Vol: ' + d.monthlyVolume + '<br>' : ''}
+          ${d.riskLevel ? '• Risk: ' + d.riskLevel + (d.riskNotes ? ' — ' + d.riskNotes : '') + '<br>' : ''}<br>` : ''}
+          <strong>3 Solution Matches:</strong><br>
           1. Summit Lending — IC+ 0.25%+$0.10<br>
           2. NovaPay — IC+ 0.30%+$0.10<br>
           3. Priority Commerce — IC+ 0.28%+$0.08 + free terminal<br><br>
@@ -13297,6 +13297,33 @@ function nmOpenApplication(name) {
         </div></div>`;
       chatThread.innerHTML = aiSummary;
       setTimeout(() => chatThread.scrollTop = chatThread.scrollHeight, 100);
+    }
+
+    // Step 8: personalize the static Send-for-Signature block — it is hard-coded to the
+    // scripted demo owner (Sarah Chen · sarah@pacificcoastretail.com) otherwise
+    const ownerName = d.owner || '';
+    const ownerEmail = d.email || e.email || '';
+    if (ownerName || ownerEmail) {
+      const s8 = view.querySelector('#step-8');
+      if (s8) {
+        // Snapshot the pristine markup once; restore before each personalization so
+        // replacements never compound and scripted merchants can get the default back
+        if (!window._s8OriginalHTML) window._s8OriginalHTML = s8.innerHTML;
+        else s8.innerHTML = window._s8OriginalHTML;
+        const walker = document.createTreeWalker(s8, NodeFilter.SHOW_TEXT);
+        let tn;
+        while ((tn = walker.nextNode())) {
+          if (ownerName)  tn.nodeValue = tn.nodeValue.split('Sarah Chen').join(ownerName);
+          if (ownerEmail) tn.nodeValue = tn.nodeValue.split('sarah@pacificcoastretail.com').join(ownerEmail);
+          if (ownerName && tn.nodeValue.trim() === 'SC' && tn.parentElement && tn.parentElement.style.fontWeight === '700') {
+            tn.nodeValue = ownerName.replace(/\(.*?\)/g,'').trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+          }
+        }
+        if (ownerName) {
+          const ta = s8.querySelector('textarea[placeholder*="Hi Sarah"]');
+          if (ta) ta.placeholder = ta.placeholder.replace('Hi Sarah', 'Hi ' + ownerName.replace(/\(.*?\)/g,'').trim().split(/\s+/)[0]);
+        }
+      }
     }
   }, 200);
 }
@@ -13411,6 +13438,11 @@ function navigateToMerchant(name, status) {
     showView('merchant-detail', null);
     // Reset wizard to the default landing step so we don't inherit the last app's step
     if (typeof goStep === 'function') { try { goStep(6); } catch(e){} }
+    // Restore the default step-8 signer block if an ad-hoc merchant personalized it
+    if (window._s8OriginalHTML) {
+      const s8r = mdView?.querySelector('#step-8');
+      if (s8r) s8r.innerHTML = window._s8OriginalHTML;
+    }
     // Render Solution Builder for all application merchants
     _currentSBMerchant = name;
     setTimeout(() => renderSolutionBuilder(name), 50);
@@ -13524,9 +13556,19 @@ function renderUWWorkbench(name) {
   const openPends = pends.filter(p => p.status === 'open' || p.status === 'partial');
   const fails = uwb.checks.filter(c => c.state === 'fail');
   const warns = uwb.checks.filter(c => c.state === 'warn');
+  /* AGENT DESK — a merchant with an unworked UW session (verification package not yet run)
+     must not read as decision-ready: no curated workbench data + a live uw session that
+     hasn't reached a verdict means the default all-pass checks are placeholders. */
+  const _agSess = (typeof AGENT_DESK !== 'undefined' && AGENT_DESK.sessions) ? AGENT_DESK.sessions[name] : null;
+  const uwNotRun = !UW_WORKBENCH_DATA[name] && (
+    (_agSess && _agSess.kind === 'uw' && _agSess.stage !== 'verdict' && !_agSess.decision) ||               // chained UW session, checks not yet run
+    (_agSess && _agSess.kind === 'sig' && _agSess.decision && _agSess.decision.type === 'sig-submitted') || // submitted from sig session, UW session not yet opened
+    (!_agSess && typeof AGENT_DESK !== 'undefined' && (AGENT_DESK.extraQueue || []).includes(name))         // scripted beat pushed it into the UW queue
+  );
 
   let bannerCls, bannerIcon, bannerTitle;
-  if (fails.length) { bannerCls='halt'; bannerIcon='🔴'; bannerTitle='Halt — resolve before decision'; }
+  if (uwNotRun) { bannerCls='review'; bannerIcon='🟡'; bannerTitle='Verification package ready to run'; }
+  else if (fails.length) { bannerCls='halt'; bannerIcon='🔴'; bannerTitle='Halt — resolve before decision'; }
   else if (warns.length || openPends.length) { bannerCls='review'; bannerIcon='🟡'; bannerTitle='Review — items need attention'; }
   else { bannerCls='go'; bannerIcon='🟢'; bannerTitle='Green — all checks passed, no open pends'; }
   const lookAt = [
@@ -13535,7 +13577,13 @@ function renderUWWorkbench(name) {
     ...openPends.map(p => 'Pend: ' + p.title),
   ];
 
-  const checksHTML = uwb.checks.map(c => `
+  const checksHTML = uwb.checks.map(c => uwNotRun ? `
+    <div class="uwb-check">
+      <div class="uwb-check-hdr"><span style="font-size:13px;">${c.icon}</span><span class="uwb-check-name">${c.name}</span>
+        <span class="uwb-chip" style="background:var(--bg-hover);color:var(--text-muted);">○ Queued</span></div>
+      <div class="uwb-check-val" style="color:var(--text-muted);">Not yet run</div>
+      <div class="uwb-check-meta"><span>${c.meta}</span></div>
+    </div>` : `
     <div class="uwb-check ${c.state==='pass'?'':c.state}">
       <div class="uwb-check-hdr"><span style="font-size:13px;">${c.icon}</span><span class="uwb-check-name">${c.name}</span>
         <span class="uwb-chip ${c.state}">${c.state==='pass'?'✓ Clear':c.state==='warn'?'⚠ Review':'✕ Halt'}</span></div>
@@ -13579,12 +13627,14 @@ function renderUWWorkbench(name) {
       <div class="uwb-light">${bannerIcon}</div>
       <div class="uwb-banner-text">
         <div class="uwb-banner-title">${bannerTitle}</div>
-        <div class="uwb-banner-sub">${lookAt.length ? 'Look at: ' + lookAt.join(' · ') : 'Ready for a decision. All verification sources returned clean and no conditions are outstanding.'}</div>
+        <div class="uwb-banner-sub">${uwNotRun ? 'No checks have run yet — open the UW session to run the 6-check verification package before a decision.' : lookAt.length ? 'Look at: ' + lookAt.join(' · ') : 'Ready for a decision. All verification sources returned clean and no conditions are outstanding.'}</div>
       </div>
       <div class="uwb-actions">
         <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;" onclick="uwbPend('${name.replace(/'/g,"\\'")}')">⏸ Pend</button>
         <button class="btn btn-danger" style="font-size:11px;padding:6px 12px;" onclick="uwbDecline('${name.replace(/'/g,"\\'")}')">✕ Decline</button>
-        <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" ${fails.length?'disabled title="Blocked by red checks"':''} onclick="uwbApprove('${name.replace(/'/g,"\\'")}')">✓ Approve${conc.required?' (co-sign)':''}</button>
+        ${uwNotRun
+          ? `<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" onclick="${(_agSess && _agSess.kind==='sig') ? 'agentSigHandoffUW' : 'agentOpenSession'}('${name.replace(/'/g,"\\'")}')">▶ Run checks in UW session</button>`
+          : `<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" ${fails.length?'disabled title="Blocked by red checks"':''} onclick="uwbApprove('${name.replace(/'/g,"\\'")}')">✓ Approve${conc.required?' (co-sign)':''}</button>`}
       </div>
     </div>
 
@@ -13595,7 +13645,7 @@ function renderUWWorkbench(name) {
         <span style="font-size:15px;">🎚</span>
         <div><div style="font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:3px;">Risk Category</div>
         <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${uwb.riskTier}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Queued ${uwb.queuedOn} · ${uwb.queuedBy}</div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${uwb.queuedOn && uwb.queuedOn !== '—' ? 'Queued ' + uwb.queuedOn : 'In queue'} · ${uwb.queuedBy}</div></div>
       </div>
       <div class="uwb-route" ${conc.required?'style="border-color:rgba(245,158,11,.35);"':''}>
         <span style="font-size:15px;">${conc.required?'👥':'👤'}</span>
@@ -17002,6 +17052,13 @@ function renderSolutionBuilder(merchantName) {
   if (!activeView) return;
   const panel = activeView.querySelector('#step-5');
   if (!panel) return;
+
+  // Steps rail: reflect the actual number of recommended solutions (static markup says "3 recommended")
+  const sbStepSub = Array.from(activeView.querySelectorAll('.step-info'))
+    .find(si => (si.querySelector('.step-title')||{}).textContent === 'Solution Builder');
+  if (sbStepSub && sbStepSub.querySelector('.step-sub')) {
+    sbStepSub.querySelector('.step-sub').textContent = ((P.solutions || []).length || 0) + ' recommended';
+  }
 
   const confColor = P.confidence >= 70 ? '#22C55E' : P.confidence >= 50 ? '#F59E0B' : '#EF4444';
   const riskColor = P.risk==='Low' ? '#22C55E' : P.risk==='Medium' ? '#F59E0B' : '#EF4444';
@@ -31409,6 +31466,11 @@ function goToTicket(idx) {
 function showView(name, clickedNav) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
+  // Overlay hygiene: sig/UW overlay classes must not outlive the merchant-detail view —
+  // any entry path that shows the view without its own teardown would inherit the overlay.
+  if (name !== 'merchant-detail') {
+    document.getElementById('view-merchant-detail')?.classList.remove('sig-uw-active','uw-bench-active');
+  }
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (clickedNav) clickedNav.classList.add('active');
   if (name === 'dashboard') { setTimeout(initDashCharts, 30); }
@@ -37412,7 +37474,8 @@ function agentOpenSession(name){
   const sub = document.getElementById('agent-session-sub');
   if (title) title.textContent = (sess.kind==='uw' ? 'UW Session — ' : sess.kind==='sig' ? 'Signature Session — ' : 'Deployment Session — ') + name;
   if (sub) sub.textContent = sess.kind==='uw'
-    ? (sess.m.partner||'—') + ' · ' + (sess.uwb.riskTier||'') + ' · queued ' + (sess.uwb.queuedOn||'—')
+    ? (sess.m.partner||'—') + ' · ' + (sess.uwb.riskTier||'') +
+      (sess.uwb.queuedOn && sess.uwb.queuedOn !== '—' ? ' · queued ' + sess.uwb.queuedOn : ' · in queue')
     : sess.kind==='sig'
     ? (sess.m.partner||'—') + ' · ' + (sess.sig ? sess.sig.p.program : '') + ' · ' + (sess.sig ? sess.sig.statusLabel() : '')
     : (sess.m.partner||'—') + ' · ' + (sess.dr ? sess.dr.solutionLabel : '');
@@ -38055,6 +38118,7 @@ const AGENT_PROCESSORS = {
   'Pacific Coast Retail':'First Data Omaha', 'Maple Street Bakery':'First Data Omaha',
   'TechForge Solutions':'Priority', 'Neon Nightclub LA':'Elavon',
   'Urban Salon Collective':'First Data Omaha', 'Bright Star Solar':'First Data Omaha',
+  'Metro Print Shop':'TSYS', 'Pinnacle Fitness':'TSYS',
 };
 
 /* ── tiny utils ── */
@@ -39776,6 +39840,16 @@ _agentFireNotif = function(){
   AGENT_DESK.extraQueue.push('Neon Nightclub LA');
   AGENT_DESK.justAdded = 'Neon Nightclub LA';
   AGENT_DESK.notifTime = Date.now();
+  /* flip the merchant row too — the Applications list must agree with the queue/toast */
+  const _neon = (typeof merchantData !== 'undefined') && merchantData.find(x => x.name === 'Neon Nightclub LA');
+  if (_neon && _neon.status === 'signature') {
+    _neon.status = 'underwriting';
+    _neon.actionItem = 'Signed — in UW queue, verification package ready to run';
+    _neon.notes = [{icon:'💬',cls:'ni-msg',tip:'Application signed — entered underwriting queue'}];
+    _neon.lastAct = 'Just now'; _neon.recent24h = true;
+    if (typeof renderMerchantTable === 'function') try { renderMerchantTable(); } catch(e) {}
+    if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  }
   agentRenderQueue();
   const pill = document.getElementById('agent-queue-pill');
   if (pill) { pill.classList.add('agq-pulse'); setTimeout(() => pill.classList.remove('agq-pulse'), 1600); }
@@ -40519,6 +40593,20 @@ function _agentSigRefreshNBA(sess){
   _agentAddSigNBA(sess);
 }
 
+/* ── keep the full-screen session header subtitle in sync with live sig state
+      (envelope out — stalled → executed → submitted); piggybacks on agentRenderRail,
+      which every sig state flip already calls ── */
+function _agentSigSyncHeader(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!sess || sess.kind !== 'sig' || !sess.sig) return;
+  const sub = document.getElementById('agent-session-sub');
+  if (sub) sub.textContent = (sess.m.partner||'—') + ' · ' + (sess.sig.p.program||'') + ' · ' + sess.sig.statusLabel();
+}
+(function(){
+  const _railSync = agentRenderRail;
+  agentRenderRail = function(){ _railSync.apply(this, arguments); _agentSigSyncHeader(); };
+})();
+
 /* ── ⏰ NUDGE SIGNER — draft reminder, approve-to-send, logged to the comms rail ── */
 function agentSigFlowNudge(sess){
   const g = sess.sig;
@@ -40797,6 +40885,8 @@ function _agentSigRailHtml(sess){
   html += '<div class="agdk-rail-sec" id="agent-rail-envelope"><div class="agdk-rail-title">✉️ Envelope' + stChip + '</div>' +
     (g.envId
       ? '<div style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted);padding:2px 0 4px;">' + g.envId + ' · ordered signing — partner certifies first</div>'
+      : g.envStatus === 'out'
+      ? '<div style="font-size:10px;color:var(--text-muted);padding:2px 0 4px;">Prior envelope out — never opened · Assemble &amp; send voids it and re-issues fresh</div>'
       : '<div style="font-size:10px;color:var(--text-muted);padding:2px 0 4px;">No envelope yet — run Assemble &amp; send</div>') +
     signerRows + '</div>';
   /* documents (analyzed chips) */
