@@ -1163,6 +1163,10 @@
 .uwb-sec-body { padding:10px 16px; }
 .uwb-route-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 @media(max-width:900px){ .uwb-route-row{grid-template-columns:1fr;} }
+/* AGENT DESK: keep the "✦ Open agent session" CTA fully on-screen at 1280-wide
+   viewports — the merchant-detail topbar overflows ~15px there, so drop the
+   optional "+ Rep" chip until the window is wide enough */
+@media(max-width:1360px){ #md-addrep-btn{ display:none !important; } }
 .uwb-route { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:11px 14px; display:flex; gap:11px; align-items:flex-start; }
 .uwb-pend { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
 .uwb-pend:last-child { border-bottom:none; }
@@ -5091,7 +5095,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <span class="p-badge bm">Medium Risk</span>
           <span class="p-badge bp">Awaiting Docs</span>
           <div style="width:1px;height:20px;background:var(--border-strong);margin:0 4px;flex-shrink:0;"></div>
-          <span style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;" id="md-assign-bar"><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'partner','md')"><span style="width:18px;height:18px;border-radius:50%;background:#8C7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SL</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Partner</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Summit Lending</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><span style="display:inline-block;width:1px;height:16px;background:var(--border-strong);margin:0 4px;vertical-align:middle;"></span><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'rep','md')"><span style="width:18px;height:18px;border-radius:50%;background:#5B7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SR</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Rep</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Sara Reyes</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><button style="display:inline-flex;align-items:center;gap:4px;background:none;border:1px dashed var(--border-strong);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;" onclick="assignAddRep(this,'md')">+ Rep</button></span>
+          <span style="display:inline-flex;align-items:center;gap:5px;flex-shrink:0;" id="md-assign-bar"><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'partner','md')"><span style="width:18px;height:18px;border-radius:50%;background:#8C7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SL</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Partner</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Summit Lending</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><span style="display:inline-block;width:1px;height:16px;background:var(--border-strong);margin:0 4px;vertical-align:middle;"></span><span style="display:inline-flex;align-items:center;gap:5px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:3px 10px 3px 5px;font-size:11px;cursor:pointer;white-space:nowrap;" onclick="assignDropdown(this,'rep','md')"><span style="width:18px;height:18px;border-radius:50%;background:#5B7A5E;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">SR</span><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Rep</span><span style="font-size:11px;font-weight:600;color:var(--text-primary);">Sara Reyes</span><span style="font-size:9px;color:var(--text-muted);opacity:0.5;">✎</span></span><button style="display:inline-flex;align-items:center;gap:4px;background:none;border:1px dashed var(--border-strong);border-radius:6px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;" id="md-addrep-btn" onclick="assignAddRep(this,'md')">+ Rep</button></span>
         </div>
         <div class="topbar-right">
           <!-- ===== AGENT DESK ===== open the AI session from the merchant record -->
@@ -38248,6 +38252,12 @@ function _agentSnapshotActive(){
     const _dva = drViewApplication;
     drViewApplication = function(){
       _dva.apply(this, arguments);
+      /* tear down any stale UW workbench overlay left by a previously viewed
+         merchant — legacy drViewApplication() skips navigateToMerchant's
+         else-branch teardown, so the wrong merchant's checks would render
+         over this application and hide the Internal Documents card */
+      document.getElementById('view-merchant-detail')?.classList.remove('sig-uw-active','uw-bench-active');
+      document.getElementById('sig-uw-mode-toggle')?.classList.remove('visible');
       const nm = document.getElementById('md-merchant-name');
       if (nm) _agentSyncInternalDocs(nm.textContent);
     };
@@ -38978,7 +38988,7 @@ function _agentDecorateRail(){
 <style>
 /* ===== AGENT DESK ===== */
 /* B3: deployment session decision flows */
-.agdk-chip.agdk-spent{opacity:.5;cursor:default;pointer-events:none;}
+.agdk-chip.agdk-spent{opacity:.5;cursor:not-allowed;}
 .agdk-pick{margin-top:8px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg-surface);padding:10px 12px;font-size:12px;}
 .agdk-pick.agdk-frozen{opacity:.72;}
 .agdk-pick-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
@@ -39056,7 +39066,7 @@ function _agentRefreshDeployNBA(sess){
   const old = document.getElementById('agdk-nba-'+_agdkSlug(sess.merchant));
   if (old) {
     old.removeAttribute('id');
-    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); });
+    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); b.title = 'Already handled — see the latest card below'; });
   }
   _agentSnapshotActive();
   _agentAddDeployNBA(sess);
@@ -40013,7 +40023,7 @@ function _agentReofferNBA(sess){
   const old = document.getElementById('agdk-nba-' + _agdkSlug(sess.merchant));
   if (old) {
     old.removeAttribute('id');
-    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); });
+    old.querySelectorAll('.agdk-chip').forEach(b => { b.disabled = true; b.classList.add('agdk-spent'); b.title = 'Already handled — see the latest card below'; });
   }
   _agentSnapshotActive();
   if (sess.kind === 'deploy') { _agentAddDeployNBA(sess); return; }
