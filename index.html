@@ -2743,6 +2743,21 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="tkt-toast-icon" id="agent-toast-icon">🔔</div>
       <div class="tkt-toast-text" id="agent-toast-text"></div>
     </div>
+
+    <!-- Session document modal (UW Review Report / Deployment Record) -->
+    <div class="agdk-modal-ov" id="agent-doc-modal" onclick="if(event.target===this)agentDocModalClose()">
+      <div class="agdk-doc-sheet">
+        <div class="agdk-doc-top">
+          <div style="min-width:0;">
+            <div class="agdk-doc-title" id="agent-doc-title">Session Report</div>
+            <div class="agdk-doc-meta" id="agent-doc-meta"></div>
+          </div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 11px;flex-shrink:0;" onclick="agentDocModalClose()">✕ Close</button>
+        </div>
+        <div class="agdk-doc-body res-modal-scroll" id="agent-doc-body"></div>
+        <div class="agdk-doc-foot" id="agent-doc-foot"></div>
+      </div>
+    </div>
     <!-- ===== /AGENT DESK ===== -->
 
     <!-- ── VIEW: DASHBOARD ──────────────────────────── -->
@@ -6151,6 +6166,16 @@ function nudgeWithDocs() {
               </div>
             </div>
           </div>
+
+          <!-- ===== AGENT DESK ===== internal documents (AI session reports saved to record) -->
+          <div class="sc" id="agent-internal-docs-card" style="display:none;margin-top:14px;border-color:rgba(255,222,0,.25);">
+            <div class="sc-hdr" style="background:rgba(255,222,0,.05);border-bottom:1px solid rgba(255,222,0,.15);">
+              <div class="sc-hdr-left"><span class="sc-icon">✦</span><div><div class="sc-title">Internal Documents</div><div class="sc-desc">AI session reports saved to this merchant’s record</div></div></div>
+              <span class="p-badge" id="agent-internal-docs-count" style="background:var(--yellow-dim);color:var(--yellow);">0</span>
+            </div>
+            <div id="agent-internal-docs-rows"></div>
+          </div>
+          <!-- ===== /AGENT DESK ===== -->
 
           <div class="form-nav" style="margin-top:12px;">
             <button class="btn btn-ghost" onclick="goStep(5)">← Solution Builder</button>
@@ -37463,6 +37488,56 @@ closeFS = function(){
 .agdk-chip.pend:hover{background:rgba(166,124,91,.15);}
 .agdk-chip.locked{opacity:.45;cursor:not-allowed;}
 .agdk-chip.locked:hover{background:var(--green-dim);color:var(--green);}
+/* B2: checkbox card (pend item picker) */
+.agdk-ckcard{margin-top:8px;border:1px solid var(--border-strong);border-radius:8px;background:var(--bg-surface);overflow:hidden;}
+.agdk-ckcard.agdk-frozen{opacity:.72;}
+.agdk-ck{display:flex;align-items:flex-start;gap:9px;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px;}
+.agdk-ck:hover{background:var(--bg-hover);}
+.agdk-ck input{margin-top:2px;accent-color:var(--navy);flex-shrink:0;}
+.agdk-ck b{font-weight:600;color:var(--text-primary);}
+.agdk-ck-note{font-size:10px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+.agdk-ck-add{display:flex;gap:7px;padding:8px 12px;border-bottom:1px solid var(--border);}
+.agdk-ck-add input{flex:1;border:1px dashed var(--border-strong);border-radius:6px;background:var(--bg-elevated);padding:6px 9px;font-size:11px;font-family:var(--font-body);color:var(--text-primary);outline:none;}
+.agdk-ck-add input:focus{border-color:rgba(0,0,0,.2);border-style:solid;}
+.agdk-ck-foot{display:flex;gap:7px;align-items:center;padding:9px 12px;background:var(--bg-elevated);}
+.agdk-ck-done{font-size:11px;font-weight:600;color:var(--green);}
+/* B2: draft message card (editable partner / team message) */
+.agdk-draft{margin-top:8px;border:1px solid rgba(34,197,94,.28);border-radius:8px;background:var(--bg-surface);overflow:hidden;}
+.agdk-draft.team{border-color:rgba(255,222,0,.3);}
+.agdk-draft-hd{display:flex;align-items:center;gap:7px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;}
+.agdk-draft-hd b{color:var(--text-primary);font-weight:600;}
+.agdk-draft-em{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-left:auto;}
+.agdk-draft-sub{padding:7px 12px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-primary);background:var(--bg-elevated);}
+.agdk-draft-body{padding:10px 12px;font-size:12px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap;outline:none;min-height:60px;}
+.agdk-draft-body[contenteditable="true"]:focus{background:rgba(255,222,0,.04);box-shadow:inset 2px 0 0 var(--yellow);}
+.agdk-draft-foot{display:flex;gap:7px;align-items:center;padding:9px 12px;background:var(--bg-elevated);border-top:1px solid var(--border);}
+.agdk-sent{font-size:11px;font-weight:600;color:var(--green);}
+.agdk-cancelled{font-size:11px;font-weight:600;color:var(--text-muted);}
+/* B2: confirm card */
+.agdk-confirm{margin-top:8px;border:1px solid rgba(91,122,94,.3);border-radius:8px;background:var(--green-dim);padding:10px 12px;font-size:12px;}
+.agdk-confirm-foot{display:flex;gap:7px;margin-top:9px;}
+/* B2: session document modal */
+.agdk-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.agdk-modal-ov.open{display:flex;}
+.agdk-doc-sheet{background:var(--bg-base);border:1px solid var(--border-strong);border-radius:12px;box-shadow:0 16px 56px rgba(0,0,0,.3);width:760px;max-width:94vw;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+.agdk-doc-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border-strong);background:var(--bg-surface);flex-shrink:0;}
+.agdk-doc-title{font-size:15px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);letter-spacing:-.01em;}
+.agdk-doc-meta{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:3px;}
+.agdk-doc-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.agdk-doc-foot{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--border-strong);background:var(--bg-surface);flex-shrink:0;}
+.agdk-rep-sec{margin-bottom:20px;}
+.agdk-rep-h{font-size:10px;font-weight:700;font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding-bottom:5px;border-bottom:1px solid var(--border-strong);margin-bottom:9px;}
+.agdk-rep-p{font-size:12px;line-height:1.6;color:var(--text-primary);}
+.agdk-rep table{width:100%;border-collapse:collapse;font-size:11px;}
+.agdk-rep th{text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:5px 8px;border-bottom:1px solid var(--border-strong);}
+.agdk-rep td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text-primary);}
+.agdk-rep-log{font-family:var(--font-mono);font-size:10px;line-height:1.5;color:var(--text-secondary);}
+.agdk-rep-log .lt{color:var(--text-muted);display:inline-block;min-width:64px;}
+.agdk-rep-log .lw{color:var(--text-primary);font-weight:600;display:inline-block;min-width:88px;}
+/* B2: internal documents card rows (merchant detail) */
+.agdk-int-row{display:flex;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-top:1px solid var(--border);cursor:pointer;}
+.agdk-int-row:first-child{border-top:none;}
+.agdk-int-row:hover{background:var(--bg-hover);}
 /* ===== /AGENT DESK ===== */
 </style>
 
@@ -38096,6 +38171,799 @@ function agentEndSession(){
   const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
   if (!sess) { agentBackToDesk(); return; }
   agentAddSys(sess, '📄 Session report generation lands here — wired in the next build step (stub)', 'var(--amber)');
+}
+/* ===== /AGENT DESK ===== */
+</script>
+
+<script>
+/* ===== AGENT DESK ===== */
+/* B2: human-in-the-loop decision flows (pend / approve / halt-escalate / partner + team
+   comms) and the session-document system (End session → report modal → save to merchant
+   record). Builds strictly on B1's API; overrides are done by re-declaration/wrapping —
+   no B1 lines were edited. */
+
+/* ── stores ── */
+const AGENT_INTERNAL_DOCS = {};   // merchant name -> [savedDoc {name,type,date,badge,reportHTML,saved}]
+const AGENT_PARTNER_REPS = {
+  'Summit Lending':    { rep:'Alex Rivera',    email:'ops@summitlending.com' },
+  'Priority Commerce': { rep:'Dana Whitfield', email:'ops@prioritycommerce.com' },
+  'NovaPay':           { rep:'Marcus Cole',    email:'ops@novapay.com' },
+  'Coastal Commerce':  { rep:'Jenna Ortiz',    email:'boarding@coastalcommerce.com' },
+};
+const AGENT_PROCESSORS = {
+  'Pacific Coast Retail':'First Data Omaha', 'Maple Street Bakery':'First Data Omaha',
+  'TechForge Solutions':'Priority', 'Neon Nightclub LA':'Elavon',
+  'Urban Salon Collective':'First Data Omaha', 'Bright Star Solar':'First Data Omaha',
+};
+
+/* ── tiny utils ── */
+function _agdkStrip(html){
+  return String(html).replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<')
+    .replace(/&gt;/g,'>').replace(/&#x2736;/g,'').replace(/\s+/g,' ').trim().slice(0,220);
+}
+function _agdkToday(){ return 'Today · ' + _agdkTime(); }
+function _agdkReplyBy(){
+  return new Date(Date.now() + 3*864e5).toLocaleDateString([], {month:'short', day:'numeric'});
+}
+function _agentRep(sess){
+  const p = AGENT_PARTNER_REPS[sess.m.partner] ||
+    { rep:'the partner team', email:'ops@' + String(sess.m.partner||'partner').replace(/[^a-z0-9]+/gi,'').toLowerCase() + '.com' };
+  return { rep:p.rep, first:p.rep.split(' ')[0], email:p.email };
+}
+function _agentProc(sess){ return AGENT_PROCESSORS[sess.merchant] || 'the processor'; }
+function _agentLog(sess, who, text){
+  if (!sess) return;
+  (sess.log = sess.log || []).push({ t:_agdkTime(), who, text });
+}
+function _agentSnapshotActive(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (sess) _agentSnapshot(sess);
+}
+
+/* ── wrap B1 plumbing: every semantic message also lands in the session log; the
+   Internal Documents card follows the merchant-detail view; rail rows get decorated ── */
+(function(){
+  const _msg = agentAddMsg, _usr = agentAddUserMsg, _sys = agentAddSys, _clr = _agentClearRunning;
+  agentAddMsg = function(sess, html){ _msg(sess, html); _agentLog(sess, 'Twill AI', _agdkStrip(html)); };
+  agentAddUserMsg = function(sess, html){ _usr(sess, html); _agentLog(sess, 'Master Admin', _agdkStrip(html)); };
+  agentAddSys = function(sess, text, color){ _sys(sess, text, color); _agentLog(sess, 'System', _agdkStrip(text)); };
+  _agentClearRunning = function(sess, i){
+    _clr(sess, i);
+    try {
+      const c = sess.kind === 'uw' ? sess.uwb.checks[i]
+        : ((sess.dr && sess.dr.deploy && sess.dr.deploy.rail) || [])[i];
+      if (c) _agentLog(sess, 'Tool', (c.name || c.label) + ' — ' + _agdkStrip((c.state ? c.state.toUpperCase() + ' · ' : '') + (c.val || '')));
+    } catch(e) {}
+  };
+  const _nav = navigateToMerchant;
+  navigateToMerchant = function(name, status){ _nav.apply(this, arguments); _agentSyncInternalDocs(name); };
+  if (typeof drViewApplication === 'function') {
+    const _dva = drViewApplication;
+    drViewApplication = function(){
+      _dva.apply(this, arguments);
+      const nm = document.getElementById('md-merchant-name');
+      if (nm) _agentSyncInternalDocs(nm.textContent);
+    };
+  }
+  const _rail = agentRenderRail;
+  agentRenderRail = function(){ _rail(); _agentDecorateRail(); };
+  /* a UW session whose merchant has since been approved hands off to a fresh
+     deployment session instead of reopening the archived UW transcript */
+  const _open = agentOpenSession;
+  agentOpenSession = function(name){
+    const sess = AGENT_DESK.sessions[name];
+    const m = merchantData.find(x => x.name === name);
+    if (sess && sess.kind === 'uw' && m && (m.status === 'approved' || m.status === 'boarding') &&
+        sess.decision && sess.decision.type === 'approved') {
+      agentHandoffDeploy(name);
+      return;
+    }
+    _open(name);
+  };
+})();
+
+/* ── queue card: decision-aware session state (re-declaration of B1's _agdkQCard) ── */
+function _agdkDecisionState(sess){
+  const d = sess.decision;
+  if (d) {
+    if (d.type === 'approved')  return { t:'Approved ✓', c:'var(--green)' };
+    if (d.type === 'pended')    return { t:'Pended — awaiting partner', c:'var(--amber)' };
+    if (d.type === 'escalated') return { t:'Escalated to risk team', c:'var(--red)' };
+  }
+  if (sess.ended) return { t:'Session ended — report available', c:'var(--text-muted)' };
+  return null;
+}
+function _agdkQCard(m, kind, isNew){
+  const sess = AGENT_DESK.sessions[m.name];
+  const esc = _agdkEsc(m.name);
+  const stageLabel = kind==='uw' ? 'Underwriting' : (m.status==='approved' ? 'Approved' : 'Boarding');
+  const stageColor = kind==='uw' ? mStatusConfig.underwriting.color : (mStatusConfig[m.status]||{}).color || '#7C849A';
+  const overdue = (m.tags||[]).includes('Activation Overdue');
+  const state = sess
+    ? (_agdkDecisionState(sess)
+      || (sess.stage==='verdict' ? {t:'Verdict ready — decision pending', c:'var(--amber)'}
+        : sess.goStarted ? {t:'Session in progress', c:'var(--amber)'}
+        : {t:'Session opened', c:'var(--blue)'}))
+    : {t:'Ready to start', c:'var(--green)'};
+  const waiting = isNew ? 'just now' : (m.lastAct || '—');
+  return '<div class="agdk-qcard'+(isNew && AGENT_DESK.justAdded===m.name ? ' agdk-new':'')+'">' +
+    '<div class="agdk-qkind">'+(kind==='uw'?'✦ UW Session':'✦ Deployment Session')+
+      '<span style="margin-left:auto;font-size:9px;font-weight:600;color:'+state.c+';text-transform:none;letter-spacing:0;">● '+state.t+'</span></div>' +
+    '<div class="agdk-qname">'+m.name+'</div>' +
+    '<div class="agdk-qmeta">'+(m.partner||'—')+' · '+(m.potVol||'—')+'/mo · waiting '+waiting+'</div>' +
+    '<div style="display:flex;gap:5px;flex-wrap:wrap;">' +
+      '<span class="p-badge" style="background:'+stageColor+'22;color:'+stageColor+';border:1px solid '+stageColor+'40;">'+stageLabel+'</span>' +
+      '<span class="p-badge" style="background:var(--bg-elevated);color:'+(mRiskColor[m.risk]||'var(--text-secondary)')+';border:1px solid var(--border-strong);">'+m.risk+' risk</span>' +
+      (overdue ? '<span class="p-badge" style="background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);">Activation overdue</span>' : '') +
+    '</div>' +
+    '<button class="btn btn-primary" style="font-size:11px;padding:6px 12px;width:100%;margin-top:2px;" onclick="agentOpenSession(\''+esc+'\')">Open session '+(sess?'→':'▶')+'</button>' +
+    '</div>';
+}
+
+/* ── NBA dispatcher (re-declaration: pend/approve/message/team now live;
+   serial/pay/ship/install/escalate remain Builder-3 stubs) ── */
+function agentNBA(action, name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  switch(action){
+    case 'docs':    _agentShowDocs(sess); return;
+    case 'approve': agentFlowApprove(sess); return;
+    case 'pend':    agentFlowPend(sess); return;
+    case 'message': agentFlowMessage(sess); return;
+    case 'team':    agentFlowTeam(sess); return;
+    default: {
+      const labels = { serial:'Serial assignment', pay:'Payment method flow', ship:'Shipment flow',
+        install:'Install-call booking', escalate:'Escalation' };
+      agentAddSys(sess, '🔧 ' + (labels[action]||action) + ' — wired in the next build step (stub)', 'var(--amber)');
+    }
+  }
+}
+
+function _agentDecided(sess){
+  if (sess.decision && sess.decision.type === 'approved') {
+    agentAddSys(sess, 'File is already approved — decision recorded at ' + sess.decision.time, 'var(--green)');
+    return true;
+  }
+  return false;
+}
+
+/* ══════════════════ PEND FLOW ══════════════════ */
+function _agentPendCandidates(sess){
+  const out = [];
+  const seen = {};
+  const add = (label, note, pre) => {
+    const k = label.toLowerCase().slice(0,10);
+    if (seen[k]) return;
+    seen[k] = 1;
+    out.push({ label, note, pre:!!pre });
+  };
+  (sess.uwb ? sess.uwb.checks : []).forEach(c => {
+    if (c.state === 'warn' || c.state === 'fail') add(c.name, c.val, true);
+  });
+  const missing = (sess.dr && sess.dr.synopsis && sess.dr.synopsis.missing) || [];
+  missing.forEach(mi => add(mi.item, mi.note, true));
+  const openPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status==='open' || p.status==='partial');
+  openPends.forEach(p => add(p.title, (p.status==='partial' ? (p.partialNote||p.desc) : p.desc), true));
+  return out;
+}
+
+function _agdkCk(el){
+  if (el.checked) el.setAttribute('checked',''); else el.removeAttribute('checked');
+  _agentSnapshotActive();
+}
+
+function agentFlowPend(sess){
+  if (_agentDecided(sess)) return;
+  if (sess._pendOpen) return;
+  sess._pendOpen = true;
+  agentAddUserMsg(sess, '⏸ Pend this file.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const items = _agentPendCandidates(sess);
+    sess._pendCandidates = items;
+    const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
+    const rows = items.map((it,i) =>
+      '<label class="agdk-ck"><input type="checkbox" '+(it.pre?'checked ':'')+'data-i="'+i+'" onchange="_agdkCk(this)">' +
+      '<div><b>'+it.label+'</b>'+(it.note ? '<div class="agdk-ck-note">'+it.note+'</div>' : '')+'</div></label>').join('');
+    agentAddMsg(sess, 'Which items are we pending on? I seeded the list from the review flags — untick anything you don’t need, or add your own.' +
+      '<div class="agdk-ckcard" id="agdk-pendbox-'+sl+'">' + rows +
+      '<div class="agdk-ck-add"><input type="text" id="agdk-pendadd-'+sl+'" placeholder="Add another item…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();agentPendAddItem(\''+esc+'\');}">' +
+      '<button class="agdk-chip" onclick="agentPendAddItem(\''+esc+'\')">+ Add</button></div>' +
+      '<div class="agdk-ck-foot" id="agdk-pendfoot-'+sl+'">' +
+      '<button class="agdk-chip pend" onclick="agentPendConfirm(\''+esc+'\')">Continue → draft partner message</button>' +
+      '<button class="agdk-chip" onclick="agentPendCancel(\''+esc+'\')">Cancel</button></div></div>');
+  }, 700);
+}
+
+function agentPendAddItem(name){
+  const sess = AGENT_DESK.sessions[name];
+  const sl = _agdkSlug(name);
+  const inp = document.getElementById('agdk-pendadd-'+sl);
+  const box = document.getElementById('agdk-pendbox-'+sl);
+  if (!sess || !inp || !box) return;
+  const val = (inp.value||'').trim();
+  if (!val) return;
+  inp.value = '';
+  const i = sess._pendCandidates.length;
+  sess._pendCandidates.push({ label:_agdkEscHtml(val), note:'Added by Master Admin', custom:true });
+  const addRow = box.querySelector('.agdk-ck-add');
+  addRow.insertAdjacentHTML('beforebegin',
+    '<label class="agdk-ck"><input type="checkbox" checked data-i="'+i+'" onchange="_agdkCk(this)">' +
+    '<div><b>'+_agdkEscHtml(val)+'</b><div class="agdk-ck-note">Added by Master Admin</div></div></label>');
+  _agentSnapshotActive();
+}
+
+function agentPendCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  const sl = _agdkSlug(name);
+  const box = document.getElementById('agdk-pendbox-'+sl);
+  const foot = document.getElementById('agdk-pendfoot-'+sl);
+  if (box) {
+    box.classList.add('agdk-frozen');
+    box.querySelectorAll('input').forEach(el => el.setAttribute('disabled',''));
+    if (foot) foot.innerHTML = '<span class="agdk-cancelled">Pend flow cancelled — nothing sent</span>';
+  }
+  if (sess) { sess._pendOpen = false; }
+  _agentSnapshotActive();
+  if (sess) agentAddSys(sess, 'Pend flow cancelled', 'var(--text-muted)');
+}
+
+function agentPendConfirm(name){
+  const sess = AGENT_DESK.sessions[name];
+  const sl = _agdkSlug(name);
+  const box = document.getElementById('agdk-pendbox-'+sl);
+  const foot = document.getElementById('agdk-pendfoot-'+sl);
+  if (!sess || !box) return;
+  const selected = [];
+  box.querySelectorAll('input[type="checkbox"]').forEach(el => {
+    if (el.checked) { const it = sess._pendCandidates[+el.dataset.i]; if (it) selected.push(it); }
+  });
+  if (!selected.length) { agentToast('⚠️', 'Select at least one item to pend on'); return; }
+  sess._pendItems = selected;
+  box.classList.add('agdk-frozen');
+  box.querySelectorAll('input').forEach(el => el.setAttribute('disabled',''));
+  if (foot) foot.innerHTML = '<span class="agdk-ck-done">✓ '+selected.length+' item'+(selected.length>1?'s':'')+' selected</span>';
+  _agentSnapshotActive();
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const r = _agentRep(sess);
+    const replyBy = _agdkReplyBy();
+    sess._pendReplyBy = replyBy;
+    const list = selected.map((it,i) => '  '+(i+1)+'. '+it.label+(it.note && !it.custom ? ' — '+_agdkStrip(it.note).slice(0,90) : '')).join('\n');
+    const body = 'Hi '+r.first+',\n\n'+sess.merchant+'’s file is in underwriting review and we need the following to finish:\n\n'+list+
+      '\n\nPlease reply by '+replyBy+' so we can keep the file moving — anything you send here routes straight back into the review session.\n\nThanks,\nTwill AI · on behalf of '+(sess.m.assignee||'Twill Underwriting');
+    _agentDraftCard(sess, {
+      kind:'pend', channel:'partner',
+      to: r.rep + ' · ' + (sess.m.partner||'Partner'), email: r.email,
+      subject: sess.merchant + ' — items needed to complete underwriting',
+      body,
+      intro: 'Here’s the partner message, merged from the application — edit inline, then approve to send.',
+    });
+  }, 750);
+}
+
+/* ══════════════════ DRAFT MESSAGE CARD (shared: pend / generic / team) ══════════════════ */
+function _agentDraftCard(sess, draft){
+  const seq = sess._seq = (sess._seq||0) + 1;
+  sess._draft = Object.assign({ seq }, draft);
+  const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
+  const id = 'agdk-draft-'+sl+'-'+seq;
+  sess._draftId = id;
+  const isTeam = draft.channel === 'team';
+  const chip = isTeam ? '<span class="amode int">→ Team</span>' : '<span class="amode out">→ Partner</span>';
+  agentAddMsg(sess, (draft.intro||'Draft ready — edit anything inline, then approve to send.') +
+    '<div class="agdk-draft'+(isTeam?' team':'')+'" id="'+id+'">' +
+    '<div class="agdk-draft-hd">'+chip+'<b>'+draft.to+'</b><span class="agdk-draft-em">'+draft.email+'</span></div>' +
+    '<div class="agdk-draft-sub">'+draft.subject+'</div>' +
+    '<div class="agdk-draft-body" id="'+id+'-body" contenteditable="true" oninput="_agentSnapshotActive()">'+_agdkEscHtml(draft.body)+'</div>' +
+    '<div class="agdk-draft-foot" id="'+id+'-foot">' +
+    '<button class="agdk-chip approve" onclick="agentDraftSend(\''+esc+'\')">✓ Approve &amp; '+(isTeam?'post':'send')+'</button>' +
+    '<button class="agdk-chip" onclick="agentDraftEdit(\''+esc+'\')">✎ Edit</button>' +
+    '<button class="agdk-chip" onclick="agentDraftCancel(\''+esc+'\')">Cancel</button></div></div>');
+}
+
+function agentDraftEdit(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || !sess._draftId) return;
+  const body = document.getElementById(sess._draftId+'-body');
+  if (!body) return;
+  body.focus();
+  const rng = document.createRange(); rng.selectNodeContents(body); rng.collapse(false);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(rng);
+}
+
+function _agentFreezeDraft(sess, footHtml){
+  const body = document.getElementById(sess._draftId+'-body');
+  const foot = document.getElementById(sess._draftId+'-foot');
+  if (body) body.setAttribute('contenteditable','false');
+  if (foot) foot.innerHTML = footHtml;
+  _agentSnapshotActive();
+}
+
+function agentDraftCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || !sess._draft) return;
+  _agentFreezeDraft(sess, '<span class="agdk-cancelled">Cancelled — not sent</span>');
+  agentAddSys(sess, 'Draft discarded — nothing sent', 'var(--text-muted)');
+  sess._draft = null;
+  sess._pendOpen = false;
+}
+
+function agentDraftSend(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess || !sess._draft) return;
+  const d = sess._draft;
+  const bodyEl = document.getElementById(sess._draftId+'-body');
+  const bodyText = bodyEl ? bodyEl.innerText : d.body;
+  _agentFreezeDraft(sess, '<span class="agdk-sent">✓ '+(d.channel==='team'?'Posted':'Sent')+' · '+_agdkTime()+'</span>');
+  sess._draft = null;
+  if (d.kind === 'pend')      _agentPendCommit(sess, d, bodyText);
+  else if (d.kind === 'team') _agentTeamCommit(sess, d, bodyText);
+  else                        _agentMsgCommit(sess, d, bodyText);
+}
+
+/* pend commit: mutate DEAL_ROOM_DATA + merchantData + UW audit, log everywhere */
+function _agentPendCommit(sess, d, bodyText){
+  const name = sess.merchant;
+  const items = sess._pendItems || [];
+  const replyBy = sess._pendReplyBy || _agdkReplyBy();
+  const dr = sess.dr || (typeof DEAL_ROOM_DATA !== 'undefined'
+    ? (DEAL_ROOM_DATA[name] = DEAL_ROOM_DATA[name] || { pends:[], activity:[] }) : null);
+  if (dr) {
+    sess.dr = dr;
+    dr.pends = dr.pends || [];
+    items.forEach((it, i) => {
+      const k = it.label.toLowerCase().slice(0,8);
+      const existing = dr.pends.find(p => (p.status==='open'||p.status==='partial') && p.title.toLowerCase().slice(0,8) === k);
+      if (existing) {
+        existing.desc = (existing.desc||'') + ' Re-requested via AI agent session — reply-by ' + replyBy + '.';
+      } else {
+        dr.pends.push({ id:'agp-'+Date.now().toString(36)+'-'+i, title:it.label, severity:'amber', status:'open',
+          priority:'High', desc: it.note || 'Requested in AI agent session.',
+          uwSource:'AI agent session — pend request, reply-by ' + replyBy });
+      }
+    });
+    dr.activity = dr.activity || [];
+    dr.activity.push({ type:'sys', time:_agdkToday(), color:'var(--amber)',
+      text:'⏸ Pend request sent to partner via AI agent session — '+items.length+' item'+(items.length>1?'s':'')+', reply-by '+replyBy });
+  }
+  if (sess.m) {
+    if ((sess.m.tags||[]).indexOf('Pended') < 0) (sess.m.tags = sess.m.tags||[]).push('Pended');
+    sess.m.actionItem = 'Pended — waiting on partner: '+items.map(x=>x.label).join(', ');
+  }
+  if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Twill AI (agent session)',
+    what:'Pend sent to partner — '+items.length+' item'+(items.length>1?'s':'')+', reply-by '+replyBy });
+  sess.decision = { type:'pended', time:_agdkTime(), items:items.map(x=>x.label), replyBy };
+  agentLogComm(name, { time:_agdkTime(), kind:'partner', label:'Pend request — '+items.length+' item'+(items.length>1?'s':''),
+    preview:_agdkStrip(bodyText).slice(0,110) });
+  const r = _agentRep(sess);
+  agentAddSys(sess, '✉ Pend request sent to '+r.rep+' ('+(sess.m.partner||'partner')+') — reply-by '+replyBy+' · pends opened · logged', 'var(--amber)');
+  agentAddMsg(sess, 'Done. <b>'+items.length+' pend'+(items.length>1?'s are':' is')+' open</b> on the board → and the file is marked <b>waiting on partner</b>. I’ll surface the reply here the moment it lands.');
+  agentToast('✉', 'Pend request sent — <strong>'+name+'</strong> · reply-by '+replyBy);
+  sess._pendOpen = false;
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  agentRenderRail();
+  agentRenderQueue();
+}
+
+/* generic partner message commit */
+function _agentMsgCommit(sess, d, bodyText){
+  agentLogComm(sess.merchant, { time:_agdkTime(), kind:'partner', label:d.subject, preview:_agdkStrip(bodyText).slice(0,110) });
+  const r = _agentRep(sess);
+  agentAddSys(sess, '✉ Sent to '+r.rep+' ('+(sess.m.partner||'partner')+') — logged to Partner comms', 'var(--green)');
+  agentToast('✉', 'Message sent — <strong>'+sess.merchant+'</strong>');
+  if (sess.dr) {
+    sess.dr.activity = sess.dr.activity || [];
+    sess.dr.activity.push({ type:'sys', time:_agdkToday(), color:'var(--blue)', text:'✉ Partner update sent via AI agent session — "'+d.subject+'"' });
+  }
+}
+
+/* team escalation commit (halt path — @NY-risk) */
+function _agentTeamCommit(sess, d, bodyText){
+  sess.comms.push({ time:_agdkTime(), kind:'team', label:'Escalation → #NY-risk', preview:_agdkStrip(bodyText).slice(0,110) });
+  sess.decision = { type:'escalated', time:_agdkTime(), to:'#NY-risk' };
+  if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Twill AI (agent session)',
+    what:'Escalated to #NY-risk — fraud alert on principal, call-out verification requested' });
+  agentAddSys(sess, '👥 Posted to #NY-risk — 3 risk analysts notified · approve stays locked pending verification', 'var(--red)');
+  agentToast('👥', 'Escalated to <strong>#NY-risk</strong> — '+sess.merchant);
+  agentRenderRail();
+  agentRenderQueue();
+}
+
+/* ══════════════════ APPROVE FLOW ══════════════════ */
+function agentFlowApprove(sess){
+  if (_agentDecided(sess)) return;
+  agentAddUserMsg(sess, '✓ Approve.');
+  if (sess.verdict === 'halt') {
+    agentAddTyping(sess);
+    setTimeout(() => {
+      agentRemoveTyping();
+      const fail = (sess.uwb.checks||[]).find(c => c.state === 'fail');
+      agentAddMsg(sess, '<b>Approve is locked.</b> '+(fail ? fail.name+' came back red — '+fail.val : 'A red check is open.')+
+        ' I can’t clear this one myself: call-out verification has to be run by a human on the risk team.' +
+        ' <b>Ask the team</b> and I’ll draft the escalation to #NY-risk.');
+    }, 650);
+    return;
+  }
+  if (sess._apprOpen) return;
+  sess._apprOpen = true;
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const proc = _agentProc(sess);
+    const openPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status==='open' || p.status==='partial');
+    const sl = _agdkSlug(sess.merchant), esc = _agdkEsc(sess.merchant);
+    agentAddMsg(sess, '<div class="agdk-confirm" id="agdk-appr-'+sl+'">' +
+      'Approve <b>'+sess.merchant+'</b>? A MID will be requested on <b>'+proc+'</b> and auto-boarding starts immediately.' +
+      (openPends.length ? '<div style="margin-top:6px;font-size:11px;color:var(--amber);">⚠ '+openPends.length+' open pend'+(openPends.length>1?'s':'')+' will be marked resolved at approval — cleared by underwriter decision.</div>' : '') +
+      '<div class="agdk-confirm-foot" id="agdk-appr-foot-'+sl+'">' +
+      '<button class="agdk-chip approve" onclick="agentApproveConfirm(\''+esc+'\')">✓ Confirm approval</button>' +
+      '<button class="agdk-chip" onclick="agentApproveCancel(\''+esc+'\')">Cancel</button></div></div>');
+  }, 650);
+}
+
+function agentApproveCancel(name){
+  const sess = AGENT_DESK.sessions[name];
+  const foot = document.getElementById('agdk-appr-foot-'+_agdkSlug(name));
+  if (foot) foot.innerHTML = '<span class="agdk-cancelled">Cancelled — no decision recorded</span>';
+  if (sess) sess._apprOpen = false;
+  _agentSnapshotActive();
+  if (sess) agentAddSys(sess, 'Approval cancelled — file stays in review', 'var(--text-muted)');
+}
+
+/* state mutations forked from uwbApprove (same data coherence, no navigation) */
+function _agentApplyApprove(name){
+  const m = merchantData.find(x => x.name === name);
+  if (!m) return;
+  m.status = 'approved';
+  m.tags = (m.tags||[]).filter(t => t !== 'Action Required' && t !== 'Pended');
+  m.actionItem = 'Approved — begin deployment: assign equipment + payment method';
+  m.notes = [];
+  if (typeof ccQ !== 'undefined') ccQ.filter(i => i.merchant === name && !i.done).forEach(i => i.done = true);
+  if (typeof DEAL_ROOM_DATA !== 'undefined') {
+    const dr = DEAL_ROOM_DATA[name] || (DEAL_ROOM_DATA[name] = { solution:'POS Terminal', solutionLabel:'POS Terminal', currentStep:3, stalled:false, daysInStage:0, daysClass:'', stepDates:[], stepDetails:{}, pends:[],
+      synopsis:{ business:{type:'—',location:'—',owner:'—',monthlyVol:'—',prevProcessor:'—'}, solution:{name:'—',gateway:'—',pricing:'—',equipment:'—',contract:'—'}, uw:{score:'100%',riskLevel:'Low',status:'Approved via AI agent session',flags:[],passed:[]}, missing:[] },
+      activity:[] });
+    dr.currentStep = 3; dr.stalled = false; dr.daysInStage = 0; dr.daysClass = '';
+    if (dr.stepDates) dr.stepDates[3] = 'Today';
+    if (dr.stepDetails) dr.stepDetails.approved = 'Approved via AI agent session just now. Auto-boarding to processor started.';
+    dr.merchantResponded = false;
+    dr.overnightUpdates = null;
+    dr.aiAnalysis = null;
+    (dr.pends || []).forEach(p => {
+      if (p.status === 'open' || p.status === 'partial') {
+        p.status = 'resolved';
+        p.resolvedNote = 'Cleared at approval — approved via AI agent session.';
+      }
+    });
+    if (dr.synopsis) {
+      if (dr.synopsis.uw) { dr.synopsis.uw.status = 'Approved via AI agent session — just now'; dr.synopsis.uw.score = '100%'; dr.synopsis.uw.flags = []; }
+      dr.synopsis.missing = [];
+    }
+    dr.activity = dr.activity || [];
+    dr.activity.push({ type:'sys', time:_agdkToday(), color:'var(--green)', text:'✅ Approved via AI agent session — auto-boarding started' });
+    dr.deploy = dr.deploy || {
+      rail: [
+        { label:'MID assigned', val:'7823-9917-0126', time:'Just now', state:'done' },
+        { label:'VAR created', val:'Building VAR file…', time:'In progress', state:'now' },
+        { label:'Gateway creds', val:'NMI — queued', time:'~24h', state:'queued' },
+        { label:'Welcome kit', val:'Email queued', time:'—', state:'queued' },
+      ],
+      equipment: [ { device:'PAX A920 Pro', qty:1, serial:null, pay:'due', payNote:null, shipTo:'Merchant' } ],
+      activation: { install:'Not yet scheduled', tests:{ tap:false, chip:false, swipe:false }, note:'Auto-activates on first settled batch — no manual flip needed.' },
+    };
+    const midNode = dr.deploy && dr.deploy.rail && dr.deploy.rail.find(n => n.label === 'MID assigned' && n.state === 'done');
+    if (midNode && midNode.val && /\d/.test(midNode.val)) m.mid = midNode.val;
+  }
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+}
+
+function agentApproveConfirm(name){
+  const sess = AGENT_DESK.sessions[name];
+  if (!sess) return;
+  const foot = document.getElementById('agdk-appr-foot-'+_agdkSlug(name));
+  if (foot) foot.innerHTML = '<span class="agdk-ck-done">✓ Confirmed by Master Admin · '+_agdkTime()+'</span>';
+  _agentSnapshotActive();
+  sess._apprOpen = false;
+  const hadPends = ((sess.dr && sess.dr.pends) || []).filter(p => p.status==='open' || p.status==='partial').length;
+  _agentApplyApprove(name);
+  if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Master Admin (agent session)', what:'Approved — MID requested, auto-boarding started' });
+  sess.decision = { type:'approved', time:_agdkTime(), mid: sess.m.mid, processor:_agentProc(sess) };
+  const proc = _agentProc(sess);
+  agentAddSys(sess, '✅ Approved — MID '+(sess.m.mid||'requested')+' on '+proc+(hadPends ? ' · '+hadPends+' pend'+(hadPends>1?'s':'')+' resolved' : ''), 'var(--green)');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const esc = _agdkEsc(name);
+    agentAddMsg(sess, 'That’s a clean approval. <b>'+name+'</b> is on the books — MID <b>'+(sess.m.mid||'pending')+'</b>, auto-boarding is running, and the partner sees the status flip in their portal.' +
+      '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;">' +
+      '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentHandoffDeploy(\''+esc+'\')">Deployment session created — open it now ▶</button>' +
+      '<span style="font-size:11px;color:var(--text-muted);">or find it later in the Agent Desk queue</span></div>');
+    agentToast('✅', '<strong>'+name+'</strong> approved — deployment session queued');
+    agentRenderRail();
+    agentRenderQueue();
+  }, 800);
+}
+
+function agentHandoffDeploy(name){
+  const old = AGENT_DESK.sessions[name];
+  if (old && old.kind === 'uw') {
+    _agentSnapshot(old);
+    (AGENT_DESK.archived = AGENT_DESK.archived || {})[name + '::uw'] = old;
+    delete AGENT_DESK.sessions[name];
+  }
+  AGENT_DESK.active = null;
+  agentOpenSession(name);
+  const s2 = AGENT_DESK.sessions[name];
+  if (s2) {
+    (AGENT_INTERNAL_DOCS[name]||[]).forEach(d => {
+      if (!s2.docs.some(x => x.name === d.name)) s2.docs.push(d);
+    });
+    agentRenderRail();
+  }
+}
+
+/* ══════════════════ MESSAGE PARTNER (generic status update) ══════════════════ */
+function agentFlowMessage(sess){
+  agentAddUserMsg(sess, '✉ Message the partner.');
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const r = _agentRep(sess);
+    let statusLine, detail;
+    if (sess.decision && sess.decision.type === 'approved') {
+      statusLine = 'approved — auto-boarding is underway.';
+      detail = 'MID '+(sess.m.mid||'pending')+' has been requested on '+_agentProc(sess)+'. Next up on our side: equipment assignment and shipping. Nothing needed from you right now.';
+    } else if (sess.kind === 'uw') {
+      const warns = (sess.uwb.checks||[]).filter(c => c.state !== 'pass');
+      statusLine = 'in underwriting review — '+(warns.length ? warns.length+' item'+(warns.length>1?'s':'')+' under review.' : 'checks are running clean so far.');
+      detail = warns.length ? 'Under review: '+warns.map(c => c.name).join(', ')+'. We’ll come back to you the moment anything needs your side.'
+        : 'All verification sources have come back clean so far. Expecting a decision shortly.';
+    } else {
+      const d = (sess.dr && sess.dr.deploy) || {};
+      statusLine = (sess.m.status === 'boarding' ? 'in deployment.' : 'approved and boarding.');
+      detail = d.overdue ? 'Heads up: activation is overdue — equipment was delivered but no install call has been completed. We’re escalating on our side; a nudge from you to the merchant would help.'
+        : 'Boarding rail is moving — MID assigned and VAR in progress. We’ll send tracking as soon as equipment ships.';
+    }
+    const body = 'Hi '+r.first+',\n\nQuick status on '+sess.merchant+': the file is '+statusLine+'\n\n'+detail+
+      '\n\nReply here and it routes straight into the live session.\n\nThanks,\nTwill AI · on behalf of '+(sess.m.assignee||'Twill Ops');
+    _agentDraftCard(sess, {
+      kind:'msg', channel:'partner',
+      to: r.rep + ' · ' + (sess.m.partner||'Partner'), email: r.email,
+      subject: sess.merchant + ' — status update',
+      body,
+      intro: 'Status update drafted from the live session state — edit inline, then approve to send.',
+    });
+  }, 700);
+}
+
+/* ══════════════════ ASK THE TEAM ══════════════════ */
+function agentFlowTeam(sess){
+  if (sess.verdict === 'halt') {
+    agentAddUserMsg(sess, '👥 Ask the team.');
+    agentAddTyping(sess);
+    setTimeout(() => {
+      agentRemoveTyping();
+      const fail = (sess.uwb.checks||[]).find(c => c.state === 'fail');
+      const body = '@NY-risk — '+sess.merchant+' ('+((sess.dr && sess.dr.synopsis && sess.dr.synopsis.business && sess.dr.synopsis.business.monthlyVol) || sess.m.potVol || '—')+'/mo · '+(sess.m.partner||'—')+'):\n\n'+
+        (fail ? fail.val : 'Red check open on this file.')+'\n\nThe file is locked in UW — approve is disabled until verification clears. Can someone run the call-out verification today? Session transcript is attached; everything is logged.';
+      _agentDraftCard(sess, {
+        kind:'team', channel:'team',
+        to:'#NY-risk', email:'risk-ny@twillpayments.com',
+        subject:'Fraud alert — '+sess.merchant+' (UW halt)',
+        body,
+        intro:'Escalation drafted for the risk team — edit if needed, then post. Approve stays locked either way until they clear it.',
+      });
+    }, 700);
+    return;
+  }
+  const ta = document.getElementById('agent-composer-input');
+  if (ta) { ta.value = '@team '; ta.focus(); }
+  agentAddSys(sess, '👥 Composer armed — @team routes to the internal thread and logs to the session', 'var(--blue)');
+}
+
+/* composer (re-declaration: @team notes now land on the Session Board too) */
+function agentComposerSend(){
+  const ta = document.getElementById('agent-composer-input');
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!ta || !sess) return;
+  const val = (ta.value||'').trim();
+  if (!val) return;
+  ta.value = '';
+  agentAddUserMsg(sess, _agdkEscHtml(val));
+  if (/^@team/i.test(val)) {
+    agentAddSys(sess, '👥 Posted to the team thread — logged to session', 'var(--blue)');
+    sess.comms.push({ time:_agdkTime(), kind:'team', label:'Team note', preview:_agdkStrip(val.replace(/^@team\s*/i,'')).slice(0,110) });
+    agentRenderRail();
+  } else {
+    agentAddTyping(sess);
+    setTimeout(() => { agentRemoveTyping(); agentAddMsg(sess, 'Noted — logged to the session record.'); }, 700);
+  }
+}
+
+/* ══════════════════ SESSION DOCUMENT (End session → report → save to record) ══════════════════ */
+function _agentVerdictLabel(v){
+  return v==='go' ? '🟢 Green — all checks passed' : v==='review' ? '🟡 Review — items flagged' : v==='halt' ? '🔴 Halt — red check open' : '— not run';
+}
+
+function _agentBuildReport(sess){
+  const uw = sess.kind === 'uw';
+  const chip = st => st==='pass' ? '<span class="uwb-chip pass">✓ Clear</span>' : st==='warn' ? '<span class="uwb-chip warn">⚠ Review</span>'
+    : st==='fail' ? '<span class="uwb-chip fail">✕ Halt</span>' : st==='done' ? '<span class="uwb-chip pass">✓ Done</span>'
+    : st==='now' ? '<span class="uwb-chip warn">⏳ In progress</span>' : '<span class="uwb-chip">○ Queued</span>';
+  /* 1 — decision & rationale */
+  let decision;
+  const d = sess.decision;
+  if (d && d.type === 'approved') {
+    decision = '<b style="color:var(--green);">APPROVED</b> by Master Admin at '+d.time+'. MID <b>'+(d.mid||'requested')+'</b> requested on '+(d.processor||_agentProc(sess))+'; auto-boarding started immediately. All open pends were resolved at approval.';
+  } else if (d && d.type === 'pended') {
+    decision = '<b style="color:var(--amber);">PENDED</b> at '+d.time+' — '+d.items.length+' item'+(d.items.length>1?'s':'')+' requested from '+(sess.m.partner||'partner')+', reply-by <b>'+d.replyBy+'</b>:<ul style="margin:6px 0 0;padding-left:18px;">'+d.items.map(x=>'<li style="margin-bottom:2px;">'+x+'</li>').join('')+'</ul>';
+  } else if (d && d.type === 'escalated') {
+    decision = '<b style="color:var(--red);">ESCALATED</b> to #NY-risk at '+d.time+'. Fraud alert on principal’s consumer report — approve locked pending call-out verification by the risk team. No decision can be recorded until the red check clears.';
+  } else {
+    decision = 'No final decision this session — file remains in the '+(uw?'underwriting':'deployment')+' queue.';
+  }
+  if (uw) decision += '<div style="margin-top:8px;font-size:11px;color:var(--text-secondary);">Verification verdict: '+_agentVerdictLabel(sess.verdict)+'</div>';
+  /* 2 — verification / boarding table */
+  let table;
+  if (uw) {
+    table = '<table><tr><th>Check</th><th>Result</th><th>Detail</th><th>Source</th></tr>' +
+      (sess.uwb.checks||[]).map(c => '<tr><td style="white-space:nowrap;font-weight:600;">'+c.icon+' '+c.name+'</td><td style="white-space:nowrap;">'+chip(c.state)+'</td><td>'+c.val+'</td><td style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">'+c.meta+'</td></tr>').join('') + '</table>';
+  } else {
+    const rail = (sess.dr && sess.dr.deploy && sess.dr.deploy.rail) || [];
+    table = '<table><tr><th>Step</th><th>Status</th><th>Value</th><th>Time</th></tr>' +
+      rail.map(nd => '<tr><td style="font-weight:600;white-space:nowrap;">'+nd.label+'</td><td style="white-space:nowrap;">'+chip(nd.state)+'</td><td style="font-family:var(--font-mono);">'+nd.val+'</td><td style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);">'+nd.time+'</td></tr>').join('') + '</table>';
+  }
+  /* 3 — pends & resolutions */
+  const pends = (sess.dr && sess.dr.pends) || [];
+  const pendRows = pends.length
+    ? '<table><tr><th>Pend</th><th>Status</th><th>Notes</th></tr>' + pends.map(p => {
+        const st = p.status==='resolved' || p.status==='resolved-ai' ? '<span class="uwb-chip pass">✓ Resolved</span>'
+          : p.status==='partial' ? '<span class="uwb-chip warn">◐ Partial</span>' : '<span class="uwb-chip warn">⏳ Open</span>';
+        return '<tr><td style="font-weight:600;">'+p.title+'</td><td style="white-space:nowrap;">'+st+'</td><td>'+(p.resolvedNote||p.partialNote||p.desc||'—')+'</td></tr>';
+      }).join('') + '</table>'
+    : '<div class="agdk-rep-p" style="color:var(--text-muted);">No pends on this file.</div>';
+  /* 4 — partner communications */
+  const comms = (sess.comms||[]);
+  const commRows = comms.length
+    ? '<table><tr><th>Time</th><th>Channel</th><th>Message</th></tr>' + comms.map(c =>
+        '<tr><td style="font-family:var(--font-mono);white-space:nowrap;">'+c.time+'</td><td style="white-space:nowrap;">'+(c.kind==='team'?'<span class="amode int">→ Team</span>':'<span class="amode out">→ Partner</span>')+'</td><td><b>'+c.label+'</b>'+(c.preview?'<div style="color:var(--text-muted);font-size:10px;margin-top:2px;">'+c.preview+'</div>':'')+'</td></tr>').join('') + '</table>'
+    : '<div class="agdk-rep-p" style="color:var(--text-muted);">No partner or team messages this session.</div>';
+  /* 5 — full session log */
+  const log = (sess.log||[]);
+  const logRows = log.length
+    ? log.map(l => '<div style="padding:2px 0;"><span class="lt">'+l.t+'</span><span class="lw">'+l.who+'</span> '+_agdkEscHtml(l.text)+'</div>').join('')
+    : '<div style="color:var(--text-muted);">Empty.</div>';
+  /* assemble */
+  const s = (sess.dr && sess.dr.synopsis) || {}; const b = s.business || {};
+  return '<div class="agdk-rep">' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">Deal</div><div class="agdk-rep-p">' +
+      '<b>'+sess.merchant+'</b> · '+(b.type||'—')+' · '+(b.location||'—')+' · '+(b.monthlyVol||sess.m.potVol||'—')+'/mo · Partner: '+(sess.m.partner||'—')+
+      (uw ? ' · '+(sess.uwb.riskTier||'') : ' · '+((sess.dr&&sess.dr.solutionLabel)||'')) + '</div></div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">1 · Decision &amp; rationale</div><div class="agdk-rep-p">'+decision+'</div></div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">2 · '+(uw?'Verification results':'Boarding rail')+'</div>'+table+'</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">3 · Pends &amp; resolutions</div>'+pendRows+'</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">4 · Partner communications</div>'+commRows+'</div>' +
+    '<div class="agdk-rep-sec"><div class="agdk-rep-h">5 · Full session log</div><div class="agdk-rep-log">'+logRows+'</div></div>' +
+    '<div style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:8px;">Generated by Twill AI · agent session · '+_agdkToday()+' · human decisions by Master Admin</div>' +
+    '</div>';
+}
+
+/* End session (re-declaration of B1 stub) */
+function agentEndSession(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!sess) { agentBackToDesk(); return; }
+  const uw = sess.kind === 'uw';
+  const docName = (uw ? 'UW Review Report — ' : 'Deployment Record — ') + sess.merchant;
+  if (!sess.ended) {
+    sess.ended = true;
+    agentAddSys(sess, '■ Session ended by Master Admin — generating '+(uw?'UW Review Report':'Deployment Record'), 'var(--text-muted)');
+  }
+  const existing = (AGENT_INTERNAL_DOCS[sess.merchant]||[]).find(x => x.name === docName);
+  const doc = existing || sess._reportDoc || { name:docName, type:(uw?'UW Report':'Deployment Record'), badge:'AI session', saved:false };
+  doc.reportHTML = _agentBuildReport(sess);
+  doc.date = _agdkToday();
+  sess._reportDoc = doc;
+  agentRenderQueue();
+  _agentOpenDocModal(doc, sess.merchant);
+}
+
+function _agentOpenDocModal(doc, merchant){
+  const ov = document.getElementById('agent-doc-modal');
+  if (!ov) return;
+  window._agdkDocCtx = { doc, merchant };
+  document.getElementById('agent-doc-title').textContent = doc.name;
+  document.getElementById('agent-doc-meta').textContent = 'Generated by Twill AI · '+doc.date+' · ✦ AI session';
+  document.getElementById('agent-doc-body').innerHTML = doc.reportHTML || '<div class="agdk-rep-p">No content.</div>';
+  const foot = document.getElementById('agent-doc-foot');
+  foot.innerHTML = doc.saved
+    ? '<span class="agdk-ck-done">✓ Saved to '+merchant+'’s record</span>' +
+      '<button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;margin-left:auto;" onclick="agentDocModalClose()">Close</button>'
+    : '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentSaveReport()">💾 Save to merchant record</button>' +
+      '<button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;margin-left:auto;" onclick="agentDocModalClose()">Close</button>';
+  ov.classList.add('open');
+}
+function agentDocModalClose(){
+  const ov = document.getElementById('agent-doc-modal');
+  if (ov) ov.classList.remove('open');
+}
+
+function agentSaveReport(){
+  const ctx = window._agdkDocCtx;
+  if (!ctx) return;
+  const { doc, merchant } = ctx;
+  doc.saved = true;
+  const list = AGENT_INTERNAL_DOCS[merchant] = AGENT_INTERNAL_DOCS[merchant] || [];
+  if (!list.some(x => x.name === doc.name)) list.push(doc);
+  const sess = AGENT_DESK.sessions[merchant];
+  if (sess) {
+    const inSess = sess.docs.find(x => x.name === doc.name);
+    if (inSess) { inSess.reportHTML = doc.reportHTML; inSess.date = doc.date; inSess.badge = 'AI session'; inSess.saved = true; }
+    else sess.docs.push(doc);
+    agentAddSys(sess, '📄 '+doc.name+' saved to merchant record — Internal Documents + Session Board', 'var(--green)');
+    agentRenderRail();
+  }
+  _agentSyncInternalDocs(merchant);
+  agentToast('💾', 'Report saved to <strong>'+merchant+'</strong>’s record');
+  _agentOpenDocModal(doc, merchant);   // refresh foot → saved state
+}
+
+/* saved-doc row click → reopen modal (works from any view) */
+function agentOpenSavedDoc(merchant, docName){
+  const doc = (AGENT_INTERNAL_DOCS[merchant]||[]).find(x => x.name === docName) ||
+    (AGENT_DESK.sessions[merchant] && AGENT_DESK.sessions[merchant].docs.find(x => x.name === docName && x.reportHTML));
+  if (doc) _agentOpenDocModal(doc, merchant);
+}
+
+/* Internal Documents card on merchant detail (first-occurrence view) */
+function _agentSyncInternalDocs(name){
+  const card = document.getElementById('agent-internal-docs-card');
+  const rows = document.getElementById('agent-internal-docs-rows');
+  const count = document.getElementById('agent-internal-docs-count');
+  if (!card || !rows) return;
+  const docs = AGENT_INTERNAL_DOCS[name] || [];
+  if (!docs.length) { card.style.display = 'none'; rows.innerHTML = ''; return; }
+  card.style.display = '';
+  if (count) count.textContent = String(docs.length);
+  rows.innerHTML = docs.map(d =>
+    '<div class="agdk-int-row" onclick="agentOpenSavedDoc(\''+_agdkEsc(name)+'\',\''+_agdkEsc(d.name)+'\')" title="Open report">' +
+    '<span style="font-size:14px;flex-shrink:0;">📄</span>' +
+    '<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+d.name+'</div>' +
+    '<div style="font-size:10px;color:var(--text-muted);">Generated by Twill AI · '+d.date+'</div></div>' +
+    '<span class="p-badge" style="background:var(--blue-dim);color:var(--blue);flex-shrink:0;">'+d.type+'</span>' +
+    '<span class="p-badge" style="background:var(--yellow-dim);color:var(--yellow);flex-shrink:0;">✦ AI session</span>' +
+    '<span style="font-size:10px;color:var(--text-muted);flex-shrink:0;">Open →</span></div>').join('');
+}
+
+/* rail decoration: team chips on comms rows; saved reports clickable in Documents panel */
+function _agentDecorateRail(){
+  const sess = AGENT_DESK.active ? AGENT_DESK.sessions[AGENT_DESK.active] : null;
+  if (!sess) return;
+  const commHost = document.getElementById('agent-rail-comms');
+  if (commHost && sess.comms.length) {
+    const rows = Array.prototype.slice.call(commHost.children, 1);   // skip title
+    rows.forEach((row, i) => {
+      const cm = sess.comms[i];
+      if (cm && cm.kind === 'team') {
+        const chip = row.querySelector('.amode');
+        if (chip) { chip.textContent = '→ Team'; chip.className = 'amode int'; }
+      }
+    });
+  }
+  const docHost = document.getElementById('agent-rail-docs');
+  if (docHost) {
+    const rows = docHost.querySelectorAll('.agdk-doc-row');
+    rows.forEach((row, i) => {
+      const d = sess.docs[i];
+      if (d && d.reportHTML) {
+        row.style.cursor = 'pointer';
+        row.title = 'Open report';
+        row.onclick = () => agentOpenSavedDoc(sess.merchant, d.name);
+      }
+    });
+  }
 }
 /* ===== /AGENT DESK ===== */
 </script>
