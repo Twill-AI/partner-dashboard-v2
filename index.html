@@ -1132,7 +1132,9 @@
 .uw-bench-active #uw-workbench { display:block; }
 .uw-bench-active .sig-uw-body { display:none !important; }
 .uwb-wrap { max-width:1080px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
-.uwb-banner { display:flex; align-items:center; gap:14px; border-radius:10px; padding:13px 18px; border:1px solid; }
+.uwb-banner { display:flex; align-items:center; gap:14px; border-radius:10px; padding:13px 18px; border:1px solid; flex-wrap:wrap; }
+.uwb-banner-text { flex:1; min-width:230px; }
+.uwb-actions { margin-left:auto; }
 .uwb-banner.go { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.28); }
 .uwb-banner.review { background:rgba(245,158,11,.07); border-color:rgba(245,158,11,.3); }
 .uwb-banner.halt { background:rgba(239,68,68,.06); border-color:rgba(239,68,68,.3); }
@@ -13897,7 +13899,7 @@ function renderUWWorkbench(name) {
   host.innerHTML = `<div class="uwb-wrap">
     <div class="uwb-banner ${bannerCls}">
       <div class="uwb-light">${bannerIcon}</div>
-      <div style="flex:1;min-width:0;">
+      <div class="uwb-banner-text">
         <div class="uwb-banner-title">${bannerTitle}</div>
         <div class="uwb-banner-sub">${lookAt.length ? 'Look at: ' + lookAt.join(' · ') : 'Ready for a decision. All verification sources returned clean and no conditions are outstanding.'}</div>
       </div>
