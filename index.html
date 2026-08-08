@@ -11834,7 +11834,7 @@ function nudgeWithDocs() {
 <script>
 /* ── Merchant row click → detail page ─────────── */
 const ACTIVE_STATUSES = new Set(['active']);
-const DEAL_ROOM_STATUSES = new Set(['signature','underwriting','approved','declined','boarding']);
+const DEAL_ROOM_STATUSES = new Set(['signature','underwriting','pended','approved','declined','boarding']);
 let _drCurrentMerchant = null; // track which merchant is open in deal room
 
 /* ── Deal Room data & config ───────────────────── */
@@ -12336,7 +12336,7 @@ function populateDealRoom(m) {
   const dr = DEAL_ROOM_DATA[m.name];
   if (!dr) return;
   _drCurrentMerchant = m.name;
-  const statusLabels = {lead:'Lead',inreview:'In Review',signature:'Out for Signature',underwriting:'Underwriting',approved:'Approved',boarding:'Boarding',active:'Active',declined:'Declined',cancelled:'Cancelled'};
+  const statusLabels = {lead:'Lead',inreview:'In Review',signature:'Out for Signature',underwriting:'Underwriting',pended:'Pended',approved:'Approved',boarding:'Boarding',active:'Active',declined:'Declined',cancelled:'Cancelled'};
 
   // Header
   document.getElementById('dr-name').textContent = m.name;
@@ -13391,7 +13391,7 @@ function navigateToMerchant(name, status) {
   }
 
   // UW — full-screen chat overlay (takes priority over deal room)
-  if (status === 'underwriting') {
+  if (status === 'underwriting' || status === 'pended') {
     _currentSBMerchant = name;
     document.getElementById('md-merchant-name').textContent = name;
     showView('merchant-detail', null);
@@ -14025,7 +14025,7 @@ let currentMerchantView = 'list';
 let activeMerchantTab   = 'all';
 
 /* Column definitions: key → { label, cls, numCls, width, render(m) } */
-const STATUS_LABELS = {lead:'Lead',inreview:'In Review',signature:'Out for Signature',underwriting:'Underwriting',approved:'Approved',boarding:'Boarding',active:'Active',declined:'Declined',cancelled:'Cancelled'};
+const STATUS_LABELS = {lead:'Lead',inreview:'In Review',signature:'Out for Signature',underwriting:'Underwriting',pended:'Pended',approved:'Approved',boarding:'Boarding',active:'Active',declined:'Declined',cancelled:'Cancelled'};
 const M_COLUMNS = {
   biz:     { label:'Business',      cls:'mc-biz',     render: m => `<div class="m-biz"><div class="m-biz-name">${m.name}</div><div class="m-biz-mid">MID: ${m.mid}</div></div>` },
   stat:    { label:'Status',        cls:'mc-stat',    render: m => {
@@ -14056,7 +14056,7 @@ const MERCHANT_MODES = {
   applications: {
     title: 'Applications',
     sub: 'Pipeline · Lead through Underwriting',
-    statuses: ['lead','inreview','signature','underwriting'],
+    statuses: ['lead','inreview','signature','underwriting','pended'],
     defaultCols: ['biz','stat','risk','partner','notes','action','pvol','act','asg','end'],
     tabs: [
       { label: 'All',               key: 'all',        count: () => merchantData.filter(m => MERCHANT_MODES.applications.statuses.includes(m.status)).length },
@@ -14065,7 +14065,7 @@ const MERCHANT_MODES = {
       { label: 'Out for Signature', key: 'signature',   count: () => merchantData.filter(m => m.status === 'signature').length },
       { label: 'Underwriting',      key: 'underwriting',count: () => merchantData.filter(m => m.status === 'underwriting').length },
     ],
-    kbCols: ['lead','inreview','signature','underwriting'],
+    kbCols: ['lead','inreview','signature','underwriting','pended'],
   },
   merchants: {
     title: 'Merchant Portfolio',
@@ -14291,7 +14291,7 @@ function setMerchantView(view) {
 
 function renderMerchantKanbanCols() {
   const cfg = MERCHANT_MODES[currentMerchantMode];
-  const allStages = ['lead','inreview','signature','underwriting','approved','boarding','active','declined','cancelled'];
+  const allStages = ['lead','inreview','signature','underwriting','pended','approved','boarding','active','declined','cancelled'];
   allStages.forEach(stage => {
     const col = document.getElementById('mkb-' + stage + '-col');
     if (col) col.style.display = cfg.kbCols.includes(stage) ? '' : 'none';
@@ -14417,7 +14417,7 @@ const merchantData = [
 
 const mStatusConfig = {
   lead:         { color:'#6B839B' }, inreview:    { color:'#818CF8' },
-  signature:    { color:'#A78BFA' }, underwriting:{ color:'#A67C5B' },
+  signature:    { color:'#A78BFA' }, underwriting:{ color:'#A67C5B' }, pended:{ color:'#D97706' },
   approved:     { color:'#4ADE80' }, boarding:    { color:'#BF3203' },
   active:       { color:'#5B7A5E' }, declined:    { color:'#9B6B5B' },
   cancelled:    { color:'#787774' },
@@ -37335,7 +37335,7 @@ function agentRenderQueue(){
   const host = document.getElementById('agent-desk-queue');
   if (!host) return;
   const uwCards = [], depCards = [];
-  merchantData.filter(m => m.status === 'underwriting').forEach(m => uwCards.push(_agdkQCard(m, 'uw', false)));
+  merchantData.filter(m => m.status === 'underwriting' || m.status === 'pended').forEach(m => uwCards.push(_agdkQCard(m, 'uw', false)));
   AGENT_DESK.extraQueue.forEach(n => {
     const m = merchantData.find(x => x.name === n);
     if (m) uwCards.push(_agdkQCard(m, 'uw', true));
@@ -37849,13 +37849,17 @@ function agentWaivePendConfirm(name, pi){
   agentAddSys(sess, '🔏 Pend waived — "'+p.title+'" · reason logged to the audit trail', 'var(--amber)');
   const uwb = (typeof UW_WORKBENCH_DATA !== 'undefined') && UW_WORKBENCH_DATA[name];
   if (uwb && uwb.audit) uwb.audit.push({ t:'Just now', who:'Master Admin (UW)', what:'Pend waived — "'+p.title+'" · '+reason });
-  agentRenderRail(); agentRenderQueue();
   const remaining = (sess.dr.pends||[]).filter(x => x.status==='open' || x.status==='partial');
+  if (!remaining.length && sess.m && sess.m.status === 'pended') {
+    sess.m.status = 'underwriting';
+    if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  }
+  agentRenderRail(); agentRenderQueue();
   agentAddTyping(sess);
   setTimeout(() => {
     agentRemoveTyping();
     if (!remaining.length && sess.verdict !== 'halt') {
-      agentAddMsg(sess, 'Waiver recorded. <b>No open pends remain</b> — the file is clear to decision. Ready when you are.');
+      agentAddMsg(sess, 'Waiver recorded. <b>No open pends remain</b> — the file is clear to decision'+(sess.m && sess.m._prePendStatus ? ', status returned to Underwriting' : '')+'. Ready when you are.');
       _agentAddNBA(sess, false);
     } else if (remaining.length) {
       agentAddMsg(sess, 'Waiver recorded. <b>'+remaining.length+' pend'+(remaining.length>1?'s':'')+' still open</b> — waive, resolve, or approve with '+(remaining.length>1?'them':'it')+' noted.');
@@ -38466,6 +38470,8 @@ function _agentPendCommit(sess, d, bodyText){
   if (sess.m) {
     if ((sess.m.tags||[]).indexOf('Pended') < 0) (sess.m.tags = sess.m.tags||[]).push('Pended');
     sess.m.actionItem = 'Pended — waiting on partner: '+items.map(x=>x.label).join(', ');
+    /* Pended is a real pipeline status (Mike): UW needs something → the board says so */
+    if (sess.m.status === 'underwriting') { sess.m._prePendStatus = sess.m.status; sess.m.status = 'pended'; }
   }
   if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Twill AI (agent session)',
     what:'Pend sent to partner — '+items.length+' item'+(items.length>1?'s':'')+', reply-by '+replyBy });
@@ -39612,7 +39618,7 @@ function _agentQueueEntries(){
     out.push({ name:m.name, m, kind, sess, isNew:!!isNew, overdue, waitMins, waitLabel,
       urg: overdue ? 3 : isNew ? 2 : 0 });
   };
-  merchantData.filter(m => m.status === 'underwriting').forEach(m => push(m, 'uw', false));
+  merchantData.filter(m => m.status === 'underwriting' || m.status === 'pended').forEach(m => push(m, 'uw', false));
   AGENT_DESK.extraQueue.forEach(n => {
     const m = merchantData.find(x => x.name === n);
     if (m && m.status !== 'underwriting') push(m, 'uw', true);
@@ -39687,7 +39693,7 @@ function _agentRenderPill(entries){
 function _agqRow(e){
   const esc = _agdkEsc(e.name);
   const stageColor = e.kind==='uw' ? mStatusConfig.underwriting.color : (mStatusConfig[e.m.status]||{}).color || '#7C849A';
-  const stageLabel = e.kind==='uw' ? 'Underwriting' : e.kind==='sig' ? 'Signature' : (e.m.status==='approved' ? 'Approved' : 'Boarding');
+  const stageLabel = e.kind==='uw' ? (e.m.status==='pended' ? 'Pended' : 'Underwriting') : e.kind==='sig' ? 'Signature' : (e.m.status==='approved' ? 'Approved' : 'Boarding');
   const waitCls = e.waitMins >= 1440 ? ' red' : e.waitMins >= 120 ? ' amber' : '';
   const st = e.sess
     ? (_agdkDecisionState(e.sess)
@@ -39814,12 +39820,19 @@ function _agentSessionCrumb(){
 /* "Open agent session" button on the merchant record (md-topbar + Deal Room topbar) */
 function _agentSyncOpenBtn(name){
   const m = merchantData.find(x => x.name === name);
-  const eligible = !!m && (m.status === 'underwriting' || m.status === 'signature' || m.status === 'approved' || m.status === 'boarding' ||
+  const eligible = !!m && (m.status === 'underwriting' || m.status === 'pended' || m.status === 'signature' || m.status === 'approved' || m.status === 'boarding' ||
     AGENT_DESK.extraQueue.includes(name));
   window._agdkRecordName = name;
+  /* Stage boundary (Mike): the button names the ONLY session this stage can start.
+     Signature-stage records offer the Signature session — never a UW entry point;
+     UW starts on signed app (extraQueue) or underwriting/pended status. */
+  const label = !m ? '' :
+    (m.status === 'signature' && !AGENT_DESK.extraQueue.includes(name)) ? '✦ Signature session' :
+    (m.status === 'approved' || m.status === 'boarding') ? '✦ Deployment session' :
+    '✦ UW session';
   ['agent-open-session-btn-md','agent-open-session-btn-dr'].forEach(id => {
     const b = document.getElementById(id);
-    if (b) b.style.display = eligible ? '' : 'none';
+    if (b) { b.style.display = eligible ? '' : 'none'; if (eligible) b.textContent = label; }
   });
 }
 function agentOpenFromRecord(){
