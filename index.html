@@ -13017,11 +13017,11 @@ async function nmCreateMerchant() {
     await new Promise(r => setTimeout(r, 800));
   }
 
-  nmProgress(95, 'Matching processor solutions…');
+  nmProgress(95, 'Matching solutions…');
   nmChatMsg('⚙️ Running Solutions Engine — matching to available solutions…', '#6366F1');
   await new Promise(r => setTimeout(r, 1200));
   if (demo) {
-    nmChatAgent('<strong>3 processor matches found:</strong>\n\n' +
+    nmChatAgent('<strong>3 solution matches found:</strong>\n\n' +
       '1. <strong>Summit Lending</strong> — IC+ 0.25% + $0.10 · Best rate for low-risk service businesses\n' +
       '2. <strong>NovaPay</strong> — IC+ 0.30% + $0.10 · Fast approval, next-day funding\n' +
       '3. <strong>Priority Commerce</strong> — IC+ 0.28% + $0.08 · Free PAX A80 terminal with 2-year contract\n\n' +
@@ -13042,7 +13042,7 @@ async function nmCreateMerchant() {
       '• Business info fully populated from SC SOS filings + website\n' +
       '• Services, pricing, and client volume from website analysis\n' +
       '• Processing volume estimated from pricing × client count\n' +
-      '• 3 processor solutions matched and ranked\n' +
+      '• 3 solutions matched and ranked\n' +
       '• Risk assessed as Low — clean SIC, recurring revenue\n\n' : '\n\n') +
     '🤖-marked fields were auto-filled — please review for accuracy.\n\nClick below to open the application.');
 
@@ -14044,7 +14044,7 @@ const M_COLUMNS = {
   pvol:    { label:'Potential Vol.', cls:'mc-pvol',    numCls:'m-num', render: m => m.potVol ? `<span class="m-money" style="color:var(--text-secondary);">${m.potVol}</span>` : '—' },
   vol:     { label:'Volume MTD',    cls:'mc-vol',     numCls:'m-num', render: m => m.volMTD ? `<span class="m-money">${m.volMTD}</span>` : '<span style="color:var(--text-muted);font-family:var(--font-mono);">—</span>' },
   res:     { label:'Residual',      cls:'mc-res',     numCls:'m-num', render: m => m.residual ? `<span class="m-money pos">${m.residual}</span>` : '<span style="color:var(--text-muted);font-family:var(--font-mono);">—</span>' },
-  bat:     { label:'Last Batch',    cls:'mc-bat',     numCls:'m-num', render: m => m.lastBatch ? `<div class="m-batch"><span class="m-batch-amt">${m.lastBatch.amt}</span><span class="m-batch-date">${m.lastBatch.date}</span></div>` : '<span style="color:var(--text-muted);font-size:11px;">No batches</span>' },
+  bat:     { label:'Last Batch',    cls:'mc-bat',     numCls:'m-num', render: m => (m.lastBatch && m.lastBatch.amt) ? `<div class="m-batch"><span class="m-batch-amt">${m.lastBatch.amt}</span><span class="m-batch-date">${m.lastBatch.date}</span></div>` : '<span style="color:var(--text-muted);font-size:11px;">No batches</span>' },
   mca:     { label:'MCA',           cls:'mc-mca',     render: m => m.mca ? `<div style="display:flex;align-items:center;gap:6px;"><div class="m-mca-bar" style="width:60px;"><div class="m-mca-fill" style="width:${m.mca}"></div></div><span style="font-size:12px;color:var(--blue);">${m.mca}</span></div>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>' },
   cre:     { label:'Created',       cls:'mc-cre',     render: m => `<span style="font-size:11px;color:var(--text-muted);">${m.created}</span>` },
   act:     { label:'Last Activity', cls:'mc-act',     render: m => `<span class="m-actcell${m.recent24h ? ' recent m-act-24h' : ''}">${m.lastAct}</span>` },
