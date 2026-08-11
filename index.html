@@ -4506,7 +4506,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               Portfolio Alerts
               <span style="font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(245,158,11,0.12);color:#B45309;padding:3px 8px;border-radius:6px;border:1px solid rgba(245,158,11,0.22);">AI-Powered</span>
             </div>
-            <div class="page-sub" id="alerts-page-sub">9 active · 3 high severity</div>
+            <div class="page-sub" id="alerts-page-sub">10 active · 4 high severity</div>
           </div>
         </div>
         <div class="topbar-right">
@@ -4523,9 +4523,9 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
       <!-- KPI STRIP — neutral, values carry the color -->
       <div class="tkpi-strip">
-        <div class="tkpi"><div class="tkpi-label">Active Alerts</div><div class="tkpi-value" style="color:#D97706;">9</div><div class="tkpi-sub">↑ 2 since yesterday</div></div>
-        <div class="tkpi"><div class="tkpi-label">High Severity</div><div class="tkpi-value" style="color:var(--red);">3</div><div class="tkpi-sub">Needs immediate action</div></div>
-        <div class="tkpi"><div class="tkpi-label">AI Analyzed</div><div class="tkpi-value" style="color:var(--green);">9/9</div><div class="tkpi-sub">All alerts have AI notes</div></div>
+        <div class="tkpi"><div class="tkpi-label">Active Alerts</div><div class="tkpi-value" style="color:#D97706;">10</div><div class="tkpi-sub">↑ 3 since yesterday</div></div>
+        <div class="tkpi"><div class="tkpi-label">High Severity</div><div class="tkpi-value" style="color:var(--red);">4</div><div class="tkpi-sub">Needs immediate action</div></div>
+        <div class="tkpi"><div class="tkpi-label">AI Analyzed</div><div class="tkpi-value" style="color:var(--green);">10/10</div><div class="tkpi-sub">All alerts have AI notes</div></div>
         <div class="tkpi"><div class="tkpi-label">Avg Resolution</div><div class="tkpi-value">2.1h</div><div class="tkpi-sub">↓ 0.4h vs last week</div></div>
         <div class="tkpi"><div class="tkpi-label">Auto-Resolved</div><div class="tkpi-value" style="color:var(--green);">4</div><div class="tkpi-sub">By AI this week</div></div>
       </div>
@@ -4582,13 +4582,13 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
             <input type="text" placeholder="Search alerts…" style="border:none;background:none;outline:none;font-size:12px;color:var(--text-primary);font-family:var(--font-ui);flex:1;" oninput="alertSearchFilter(this.value)">
           </div>
           <div class="tlist-tabs">
-            <div class="ttab active" onclick="alertTabFilter(this,'all')">All <span class="ttab-count">9</span></div>
-            <div class="ttab" onclick="alertTabFilter(this,'high')">High <span class="ttab-count">3</span></div>
-            <div class="ttab" onclick="alertTabFilter(this,'chargeback')">Chargeback <span class="ttab-count">2</span></div>
+            <div class="ttab active" onclick="alertTabFilter(this,'all')">All <span class="ttab-count">10</span></div>
+            <div class="ttab" onclick="alertTabFilter(this,'high')">High <span class="ttab-count">4</span></div>
+            <div class="ttab" onclick="alertTabFilter(this,'chargeback')">Chargeback <span class="ttab-count">3</span></div>
             <div class="ttab" onclick="alertTabFilter(this,'resolved')">Resolved <span class="ttab-count">4</span></div>
           </div>
           <div class="tlist-sort">
-            <span class="tlist-count" id="alert-list-count">9 alerts</span>
+            <span class="tlist-count" id="alert-list-count">10 alerts</span>
             <div class="sort-dropdown">
               <span class="tlist-sort-btn" id="alert-sort-label" onclick="toggleAlertSortMenu(event)">
                 <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
@@ -33675,6 +33675,41 @@ document.addEventListener('click', function(e) {
 
 const alertData = [
   {
+    id: 'ALT-010', type: 'Chargeback', sev: 'high', icon: '⚖️', sevClass: 'sev-high',
+    merchant: 'Fresh Brew Coffee Co.', partner: 'Internal', merchantId: 'MRC-4471',
+    title: 'New dispute — Fresh Brew Coffee Co. · Visa 10.4 (Fraud, Card-Absent) · $164.50',
+    sub: 'AI dispute assistant engaged merchant-side · win likelihood 78% · respond by ~12 days',
+    age: '2m ago', stage: 'open', statusClass: 'badge-warn', status: 'Open',
+    priority: 'High', priColor: 'var(--amber)',
+    merchantData: { vol: '$31K', auth: '97.8%', authColor: 'var(--green)', cb: '0.5%', cbColor: 'var(--amber)', lastBatch: 'Today', initials: 'FB', color: '#A67C5B' },
+    dispute: {
+      id: 'DSP-2041',
+      reasonCode: 'Visa 10.4',
+      reasonTitle: 'Other Fraud — Card-Absent Environment',
+      amount: '$164.50',
+      win: '78%',
+      respondBy: '~12 days',
+      stage: 2,
+      stages: [
+        { label: 'Dispute received',                     sub: 'Visa 10.4 · $164.50 · card-absent' },
+        { label: 'AI analysis complete',                 sub: '78% win likelihood' },
+        { label: 'Evidence',                             sub: 'Waiting on merchant uploads' },
+        { label: 'Response submission',                  sub: 'Not yet submitted' },
+        { label: 'Issuer decision',                      sub: 'Est. 2–4 weeks after submission' },
+      ],
+      evidence: [
+        { item: 'AVS + CVV match records',            st: 'ok'   },
+        { item: 'Order + device fingerprint history', st: 'ok'   },
+        { item: 'Signed pickup confirmation',         st: 'wait' },
+        { item: 'Customer receipt — order #1187',     st: 'wait' },
+      ],
+    },
+    aiOpening: [
+      { role: 'ai', text: "A new dispute just came in for Fresh Brew Coffee Co. — I've already engaged the AI dispute assistant on the merchant side. Here's where it stands:" },
+      { role: 'ai', text: "**Dispute:** Visa 10.4 (Other Fraud — Card-Absent Environment) · $164.50 · online order #1187.\n\n**Win likelihood: 78%.** AVS and CVV both matched at authorization, and the device fingerprint matches 6 prior undisputed orders from the same customer — strong signals this is friendly fraud, not true fraud.\n\n**Respond-by: ~12 days.** The AI assistant is walking the merchant through evidence collection in their portal right now. Still needed from the merchant: signed pickup confirmation and the customer receipt for order #1187.\n\n**Recommended actions:**\n1. Track progress in the Dispute Tracker on the right — I'll advance it automatically as the merchant uploads evidence\n2. Nudge the merchant if uploads stall more than 48 hours\n3. No hold or reserve action needed — single dispute, ratio remains 0.5%" },
+    ]
+  },
+  {
     id: 'ALT-001', type: 'Chargeback', sev: 'high', icon: '⚠️', sevClass: 'sev-high',
     merchant: 'Harbor Bistro', partner: 'Coastal Commerce', merchantId: 'MRC-2291',
     title: 'Chargeback spike — Harbor Bistro exceeding 1.5% threshold',
@@ -34032,6 +34067,31 @@ function renderAlertDetail(idx) {
             <div class="tsb-stat"><div class="tsb-stat-label">CB Ratio</div><div class="tsb-stat-val" style="color:${m.cbColor};">${m.cb}</div></div>
           </div>
         </div>
+        ${a.dispute ? `
+        <div class="tsb-section">
+          <div class="tsb-title">Dispute Tracker · ${a.dispute.id}</div>
+          <div style="display:flex;flex-direction:column;margin-bottom:10px;">
+            ${a.dispute.stages.map((s, si) => {
+              const done = si < a.dispute.stage, cur = si === a.dispute.stage;
+              const ic    = done ? '✓' : (cur ? '●' : (si + 1));
+              const icBg  = done ? 'rgba(34,197,94,.12)' : (cur ? 'rgba(245,158,11,.14)' : 'var(--bg-elevated)');
+              const icCol = done ? 'var(--green)' : (cur ? '#D97706' : 'var(--text-muted)');
+              const lblCol = cur ? '#B45309' : (done ? 'var(--text-primary)' : 'var(--text-muted)');
+              const line = si < a.dispute.stages.length - 1
+                ? '<div style="width:1px;height:10px;background:' + (done ? 'rgba(34,197,94,.4)' : 'var(--border)') + ';margin-left:8px;"></div>'
+                : '';
+              return '<div style="display:flex;align-items:flex-start;gap:8px;">' +
+                  '<span style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:' + icBg + ';color:' + icCol + ';font-size:9px;font-weight:700;">' + ic + '</span>' +
+                  '<div style="min-width:0;"><div style="font-size:11px;font-weight:' + (cur ? '700' : '500') + ';color:' + lblCol + ';">' + s.label + '</div>' +
+                  '<div style="font-size:10px;color:var(--text-muted);">' + s.sub + '</div></div>' +
+                '</div>' + line;
+            }).join('')}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;" onclick="viewDisputeDetail(${idx})">⚖️ View dispute detail</button>
+            <button class="btn btn-ghost" style="font-size:11px;justify-content:flex-start;" onclick="alertMessageMerchant(${idx})">💬 Message merchant</button>
+          </div>
+        </div>` : ''}
         <div class="tsb-section">
           <div class="tsb-title">Quick Actions</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
@@ -34305,6 +34365,53 @@ function openAlertByMerchant(merchantName) {
     });
     if (!matched && rows.length) rows[0].click();
   }, 120);
+}
+
+/* ── Dispute Tracker actions (alerts with a .dispute payload) ───────── */
+/* Expands the reason-code explanation + evidence status inline in the
+   alert thread (same tmsg-ai idiom the AI Analyst uses). */
+function viewDisputeDetail(idx) {
+  const a = (typeof alertData !== 'undefined') ? alertData[idx] : null;
+  if (!a || !a.dispute) return;
+  const msgs = document.getElementById('alert-thread-msgs');
+  if (!msgs) return;
+  const existing = document.getElementById('dispute-detail-msg');
+  if (existing) { existing.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; }
+  const d = a.dispute;
+  const evHtml = (d.evidence || []).map(ev => {
+    const ok = ev.st === 'ok';
+    return '<div style="display:flex;align-items:center;gap:7px;font-size:12px;padding:2px 0;">' +
+      '<span style="color:' + (ok ? 'var(--green)' : 'var(--amber)') + ';font-weight:700;">' + (ok ? '✓' : '⏳') + '</span>' +
+      '<span>' + ev.item + '</span>' +
+      '<span style="margin-left:auto;font-size:10px;color:' + (ok ? 'var(--green)' : '#B45309') + ';">' + (ok ? 'On file' : 'Waiting on merchant') + '</span>' +
+    '</div>';
+  }).join('');
+  msgs.insertAdjacentHTML('beforeend',
+    '<div class="tmsg tmsg-ai" id="dispute-detail-msg">' +
+      '<div class="tmsg-header"><span class="tmsg-sender">AI Analyst</span><span class="tmsg-badge ai-badge">⚡ AI</span><span class="tmsg-time">Just now</span></div>' +
+      '<div class="tmsg-bubble">' +
+        '<strong>' + d.reasonCode + ' — ' + d.reasonTitle + '</strong> · ' + d.amount + '<br><br>' +
+        'The cardholder claims they did not authorize this card-absent transaction. 10.4 is the most common "friendly fraud" reason code — it is winnable when you can show the legitimate cardholder placed the order. Here, AVS and CVV both matched and the device fingerprint matches 6 prior undisputed orders, which is why the model puts win likelihood at <strong>' + d.win + '</strong>.<br><br>' +
+        '<strong>Evidence status:</strong><br>' + evHtml + '<br>' +
+        '<span style="font-size:11px;color:var(--text-muted);">Respond-by window: ' + d.respondBy + ' · The merchant-side AI assistant is collecting the outstanding items.</span>' +
+      '</div>' +
+    '</div>');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* Seeds a merchant-facing reply in the alert reply box (Reply to Merchant tab). */
+function alertMessageMerchant(idx) {
+  const a = (typeof alertData !== 'undefined') ? alertData[idx] : null;
+  if (!a) return;
+  const tabs = document.querySelectorAll('#alert-detail-content .treply-tabs .rtab');
+  const mtab = [...tabs].find(t => t.textContent.includes('Merchant'));
+  if (mtab) mtab.click();
+  const ta = document.getElementById('alert-reply-ta');
+  if (ta) {
+    ta.value = 'Hi Sarah — quick update on the $164.50 Visa dispute (10.4). The AI assistant in your portal still needs two items from you: the signed pickup confirmation and the customer receipt for order #1187. Uploading those today keeps us well ahead of the response deadline. We have a strong case — 78% win likelihood once evidence is in.';
+    ta.focus();
+  }
+  if (typeof agentToast === 'function') agentToast('💬', 'Merchant reply drafted — <strong>' + a.merchant + '</strong> · review &amp; send', 3400);
 }
 
 /* Auto-open first alert when Alerts view becomes visible */
@@ -37259,7 +37366,54 @@ window.twillBC.onmessage = function(e) {
   if (type === 'form_fill_signed') {
     handleFormFillSigned(data);
   }
+
+  if (type === 'dispute_submitted') {
+    handleDisputeSubmitted(data);
+  }
 };
+
+// ═══ DISPUTE SUBMITTED (broadcast from merchant-portal dispute assistant) ═══
+// Contract: {type:'dispute_submitted', data:{merchant, id, amount, reason, winLikelihood}}
+function handleDisputeSubmitted(data) {
+  const d = data || {};
+  const mName = d.merchant || 'Fresh Brew Coffee Co.';
+  const dId   = d.id || 'DSP-2041';
+  const dAmt  = d.amount || '$164.50';
+  const dWin  = d.winLikelihood || '78%';
+
+  if (typeof agentToast === 'function') {
+    agentToast('⚖️', 'Dispute response submitted — <strong>' + mName + '</strong> · ' + dId + ' · ' + dAmt + ' (win likelihood ' + dWin + ')', 5200);
+  }
+
+  // Advance the seeded Portfolio Alert's dispute stepper → "Response submission"
+  if (typeof alertData !== 'undefined') {
+    const a = alertData.find(x => x.dispute && (x.dispute.id === dId || x.merchant === mName));
+    if (a && a.dispute) {
+      a.dispute.stage = 3;
+      a.dispute.stages[2].sub = 'Complete — merchant uploads received';
+      a.dispute.stages[3].sub = 'Submitted — under review';
+      (a.dispute.evidence || []).forEach(ev => ev.st = 'ok');
+      a.sub = 'Response submitted — under review · ' + dAmt + ' · win likelihood ' + dWin;
+      a.status = 'Monitoring';
+      a.statusClass = 'badge-blue';
+      if (document.getElementById('view-alerts')?.classList.contains('active')) {
+        const aIdx = alertData.indexOf(a);
+        if (typeof renderAlertList === 'function') renderAlertList();
+        if (typeof currentAlertIdx !== 'undefined' && currentAlertIdx === aIdx && typeof renderAlertDetail === 'function') renderAlertDetail(aIdx);
+      }
+    }
+  }
+
+  // Mirror on the Command Center work-queue item
+  if (typeof ccQ !== 'undefined') {
+    const it = ccQ.find(i => i.id === 'wq-021');
+    if (it) {
+      it.title  = 'Dispute submitted — under review · Visa 10.4 · ' + dAmt;
+      it.detail = 'Response filed from merchant portal · win likelihood ' + dWin + ' · issuer decision est. 2–4 weeks';
+      if (document.getElementById('view-command-center')?.classList.contains('active') && typeof renderCCWork === 'function') renderCCWork();
+    }
+  }
+}
 
 async function handleMerchantSigned() {
   const inSigUW = document.getElementById('view-merchant-detail') &&
@@ -37588,6 +37742,7 @@ const ccQ = [
   {id:'wq-003',pri:'now',cat:'ticket',merchant:'Harbor Bistro',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Coastal Commerce',processor:'Fiserv',title:'Chargeback ratio at 1.8% — threshold approaching',detail:'4 new disputes this week. Response due Friday.',act:'View Ticket →',fn:'goToTicket(0)',age:'4m',sla:false,done:false,snoozed:false},
 
   // ── TODAY ──
+  {id:'wq-021',pri:'today',cat:'ticket',merchant:'Fresh Brew Coffee Co.',mst:'active',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Internal',processor:'—',title:'Dispute needs evidence — Visa 10.4 · $164.50',detail:'AI engaged in merchant portal · win likelihood 78% · respond-by in 12 days',act:'Track dispute →',fn:"openAlertByMerchant('Fresh Brew Coffee Co.')",age:'2m',sla:false,done:false,snoozed:false},
   {id:'wq-004',pri:'today',cat:'application',merchant:'Maple Street Bakery',mst:'underwriting',assignee:'S. Patel',av:'SP',avc:'#5B7A5E',partner:'Summit Lending',processor:'First Data Omaha',title:'3 documents uploaded overnight — AI analysis ready',detail:'Owner ID + Jan & Feb bank stmts. 1 pend resolved, 1 partial.',act:'Open agent session →',fn:"agentOpenSession('Maple Street Bakery')",age:'2h',sla:false,done:false,snoozed:false},
   {id:'wq-014',pri:'today',cat:'application',merchant:'Sunrise Bakery',mst:'inreview',assignee:'J. Rivera',av:'JR',avc:'#6B839B',partner:'Apex Elite',processor:'TSYS',title:'New application submitted — ready for first review',detail:'Café & bakery · $42K/mo stated. Submitted via Apex Elite.',act:'Start Review →',fn:"navigateToMerchant('Sunrise Bakery','inreview')",age:'18m',sla:false,done:false,snoozed:false},
   {id:'wq-015',pri:'today',cat:'application',merchant:'Urban Salon Collective',mst:'approved',assignee:'M. Wright',av:'MW',avc:'#A09E9A',partner:'Summit Lending',processor:'First Data Omaha',title:'Merchant signed — approved, ready to board',detail:'Agreement executed. Initiate boarding + equipment order.',act:'Open agent session →',fn:"agentOpenSession('Urban Salon Collective')",age:'1h',sla:false,done:false,snoozed:false},
