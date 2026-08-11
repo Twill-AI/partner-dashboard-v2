@@ -14850,7 +14850,8 @@ const _origEnterSigUW = enterSigUWMode;
 enterSigUWMode = function(name, status, options) {
   _origEnterSigUW(name, status, options);
   const toggle = document.getElementById('sig-uw-mode-toggle');
-  const isUW = status === 'underwriting';
+  /* pended files are still UW work — the bench (with its pends) is their surface */
+  const isUW = status === 'underwriting' || status === 'pended';
   if (toggle) toggle.classList.toggle('visible', isUW);
   sigUWSyncSessionBtn(name);
   sigUWSetSurface(isUW ? 'bench' : 'chat');
