@@ -5251,12 +5251,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="m-toolbar">
         <div class="m-search">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
-          <input type="text" placeholder="Search merchants, MID, DBA…">
+          <input type="text" placeholder="Search merchants, MID, DBA…" oninput="mSetSearch(this.value)">
         </div>
         <div class="m-divider"></div>
-        <div class="m-filter">Status ▾</div>
-        <div class="m-filter">Risk ▾</div>
-        <div class="m-filter">Assigned to ▾</div>
+        <div id="m-filters-host" style="display:contents;"></div>
         <!-- Tags filter -->
         <div class="tkt-filter-wrap" id="mfw-tags" style="z-index:200;">
           <div class="m-filter" id="mfb-tags" onclick="toggleMTagDropdown()">
@@ -16136,7 +16134,7 @@ function renderMerchantTable() {
       const numCls = c.numCls ? ' class="' + c.numCls + '"' : '';
       return `<td${numCls}>${c.render(m)}</td>`;
     }).join('');
-    return `<tr data-status="${m.status}" data-tags="${m.tags.join(',')}"${dimmed}>${cells}</tr>`;
+    return `<tr data-status="${m.status}" data-tags="${m.tags.join(',')}" data-risk="${m.risk||''}" data-assignee="${m.assignee||''}" data-partner="${m.partner||''}"${dimmed}>${cells}</tr>`;
   }).join('');
   // bind clicks
   tbody.querySelectorAll('tr').forEach(row => {
@@ -16146,6 +16144,7 @@ function renderMerchantTable() {
     });
   });
   // apply tab/tag filters
+  if (typeof mBuildFilters === 'function') mBuildFilters();
   applyMerchantListFilters();
 }
 
@@ -16256,12 +16255,85 @@ function merchantRowPassesFilter(row) {
   }
   // tag filter
   if (activeMTag && !tags.includes(activeMTag)) return false;
+  // toolbar filters — status / risk / assigned / partner / search
+  if (typeof M_FILTERS !== 'undefined') {
+    const f = M_FILTERS;
+    if (f.status && status !== f.status) return false;
+    if (f.risk && (row.dataset.risk || '') !== f.risk) return false;
+    if (f.assignee && (row.dataset.assignee || '') !== f.assignee) return false;
+    if (f.partner && (row.dataset.partner || '') !== f.partner) return false;
+    if (f.search && !row.textContent.toLowerCase().includes(f.search)) return false;
+  }
   return true;
 }
 function applyMerchantListFilters() {
+  let shown = 0, total = 0;
   document.querySelectorAll('#m-tbody tr').forEach(row => {
-    row.style.display = merchantRowPassesFilter(row) ? '' : 'none';
+    const ok = merchantRowPassesFilter(row);
+    row.style.display = ok ? '' : 'none';
+    total++; if (ok) shown++;
   });
+  const foot = document.querySelector('#view-merchants .m-foot-info');
+  if (foot) {
+    const f = M_FILTERS;
+    const n = ['status','risk','assignee','partner','search'].filter(k => f[k]).length +
+      (activeMTag ? 1 : 0) + (activeMerchantTab !== 'all' ? 1 : 0);
+    const noun = currentMerchantMode === 'applications' ? 'applications' : 'merchants';
+    foot.innerHTML = 'Showing <strong>' + shown + '</strong> of <strong>' + total + '</strong> ' + noun +
+      ' &nbsp;\u00b7&nbsp; ' + (n ? n + ' filter' + (n > 1 ? 's' : '') + ' active' : 'no filters');
+  }
+}
+
+/* ── Toolbar filters — Status / Risk / Assigned to / Partner, live search.
+   One system for both tables (the Applications table is this table in
+   'applications' mode). ── */
+const M_FILTERS = { search:'', status:'', risk:'', assignee:'', partner:'' };
+const M_FILTER_DEFS = [
+  { key:'status',   label:'Status',      opts: () => (MERCHANT_MODES[currentMerchantMode].statuses || [])
+      .map(st => [st, (typeof STATUS_LABELS !== 'undefined' && STATUS_LABELS[st]) || (st.charAt(0).toUpperCase() + st.slice(1))]) },
+  { key:'risk',     label:'Risk',        opts: () => [['Low','Low'],['Medium','Medium'],['High','High']] },
+  { key:'assignee', label:'Assigned to', opts: () => [...new Set(merchantData.map(m => m.assignee).filter(Boolean))].sort().map(a => [a, a]) },
+  { key:'partner',  label:'Partner',     opts: () => [...new Set(merchantData.map(m => m.partner).filter(Boolean))].sort().map(p => [p, p]) },
+];
+function mBuildFilters(){
+  const host = document.getElementById('m-filters-host');
+  if (!host) return;
+  if (M_FILTERS.status && !(MERCHANT_MODES[currentMerchantMode].statuses || []).includes(M_FILTERS.status)) M_FILTERS.status = '';
+  host.innerHTML = M_FILTER_DEFS.map(d => {
+    const active = M_FILTERS[d.key];
+    const activeLabel = active && d.key === 'status'
+      ? ((typeof STATUS_LABELS !== 'undefined' && STATUS_LABELS[active]) || active) : active;
+    const lbl = active ? activeLabel + ' \u2715' : d.label + ' \u25be';
+    return '<div class="tkt-filter-wrap" style="z-index:200;">' +
+      '<div class="m-filter' + (active ? ' active' : '') + '" onclick="mToggleFilterDD(this)">' + lbl + '</div>' +
+      '<div class="tkt-dropdown" style="min-width:170px;">' +
+        '<div class="tkt-dd-opt' + (!active ? ' active' : '') + '" onclick="mSetFilter(\'' + d.key + '\',\'\')">All</div><div class="tkt-dd-sep"></div>' +
+        d.opts().map(o => '<div class="tkt-dd-opt' + (active === o[0] ? ' active' : '') + '" onclick="mSetFilter(\'' + d.key + '\',\'' + String(o[0]).replace(/'/g, "\\'") + '\')">' + o[1] + '</div>').join('') +
+      '</div></div>';
+  }).join('');
+}
+function mToggleFilterDD(chip){
+  const dd = chip.parentElement.querySelector('.tkt-dropdown');
+  document.querySelectorAll('#m-filters-host .tkt-dropdown.open').forEach(x => { if (x !== dd) x.classList.remove('open'); });
+  const tags = document.getElementById('mdd-tags');
+  if (tags) tags.classList.remove('open');
+  dd.classList.toggle('open');
+}
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.tkt-filter-wrap')) {
+    document.querySelectorAll('#m-filters-host .tkt-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+});
+function mSetFilter(key, val){
+  M_FILTERS[key] = val;
+  mBuildFilters();
+  applyMerchantListFilters();
+  if (currentMerchantView === 'board') renderMerchantKanban();
+}
+function mSetSearch(v){
+  M_FILTERS.search = (v || '').trim().toLowerCase();
+  applyMerchantListFilters();
+  if (currentMerchantView === 'board') renderMerchantKanban();
 }
 
 /* ── Merchant data (shared by table + kanban) ──── */
@@ -16341,6 +16413,12 @@ function renderMerchantKanban() {
     }
     // tag filter
     if (activeMTag && !m.tags.includes(activeMTag)) return;
+    // toolbar filters
+    if (M_FILTERS.status && m.status !== M_FILTERS.status) return;
+    if (M_FILTERS.risk && m.risk !== M_FILTERS.risk) return;
+    if (M_FILTERS.assignee && m.assignee !== M_FILTERS.assignee) return;
+    if (M_FILTERS.partner && m.partner !== M_FILTERS.partner) return;
+    if (M_FILTERS.search && !((m.name + ' ' + (m.mid||'') + ' ' + (m.partner||'')).toLowerCase().includes(M_FILTERS.search))) return;
     cols[m.status].push(m);
   });
   stages.forEach(stage => {
