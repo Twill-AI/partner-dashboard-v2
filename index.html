@@ -5470,7 +5470,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
               <div class="cftab active" onclick="cfSwitch(this)">All</div>
               <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
               <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-              <div class="cftab" onclick="cfSwitch(this)">UW</div>
+              <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
               <div class="cfsp"></div>
               <span class="cfct" id="sig-uw-event-count">0 events</span>
             </div>
@@ -7314,7 +7314,7 @@ function nudgeWithDocs() {
             <div class="cftab active" onclick="cfSwitch(this)">All</div>
             <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
             <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-            <div class="cftab" onclick="cfSwitch(this)">UW</div>
+            <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
             <div class="cfsp"></div>
           </div>
           <div class="ch-thread" id="drActivityThread"></div>
@@ -11366,7 +11366,7 @@ function nudgeWithDocs() {
             <div class="cftab active" onclick="cfSwitch(this)">All</div>
             <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
             <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-            <div class="cftab" onclick="cfSwitch(this)">UW</div>
+            <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
             <div class="cfsp"></div>
           </div>
           <div class="ch-thread" id="drActivityThread"></div>
@@ -17814,15 +17814,21 @@ function cfSwitch(el) {
   el.classList.add('active');
   /* real channel filtering — Merchant = partner/merchant-visible, Internal = ops notes, UW = UW-team-scoped */
   const tab = el.textContent.trim().toLowerCase();
-  const th = el.closest('.sig-uw-chat')?.querySelector('.ch-thread');
+  /* find the thread this tab group controls — nearest ancestor that holds one */
+  let host = el.closest('.cf'), th = null;
+  while (host && !th) { host = host.parentElement; th = host ? host.querySelector('.ch-thread') : null; }
   if (!th) return;
   th.querySelectorAll('.act').forEach(a => {
     if (tab === 'all') { a.style.display = ''; return; }
     const m = a.querySelector('.amode');
     const cls = m ? m.className : '';
-    const vis = tab === 'merchant' ? /\b(out|ptr)\b/.test(cls)
+    const label = m ? m.textContent.trim().toLowerCase() : '';
+    const isUW = /\buw\b/.test(cls) || a.classList.contains('ch-uw') || label === 'uw' || label === 'uw team';
+    const isDep = /\bdep\b/.test(cls) || a.classList.contains('ch-dep') || label === 'deployment';
+    const vis = tab === 'merchant' ? /\b(out|ptr|inc)\b/.test(cls)
       : tab === 'internal' ? /\bint\b/.test(cls)
-      : tab === 'uw' ? /\buw\b/.test(cls)
+      : tab === 'uw' ? isUW
+      : tab === 'deployment' ? isDep
       : true;
     a.style.display = vis ? '' : 'none';
   });
@@ -24196,7 +24202,7 @@ function initResCharts() {
             <div class="cftab active" onclick="cfSwitch(this)">All</div>
             <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
             <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-            <div class="cftab" onclick="cfSwitch(this)">UW</div>
+            <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
             <div class="cfsp"></div>
           </div>
           <div class="ch-thread" id="drActivityThread"></div>
@@ -27054,7 +27060,7 @@ function initResCharts() {
             <div class="cftab active" onclick="cfSwitch(this)">All</div>
             <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
             <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-            <div class="cftab" onclick="cfSwitch(this)">UW</div>
+            <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
             <div class="cfsp"></div>
           </div>
           <div class="ch-thread" id="drActivityThread"></div>
@@ -29913,7 +29919,7 @@ function initResCharts() {
             <div class="cftab active" onclick="cfSwitch(this)">All</div>
             <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
             <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-            <div class="cftab" onclick="cfSwitch(this)">UW</div>
+            <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
             <div class="cfsp"></div>
           </div>
           <div class="ch-thread" id="drActivityThread"></div>
@@ -32771,7 +32777,7 @@ function initResCharts() {
             <div class="cftab active" onclick="cfSwitch(this)">All</div>
             <div class="cftab" onclick="cfSwitch(this)">Merchant</div>
             <div class="cftab" onclick="cfSwitch(this)">Internal</div>
-            <div class="cftab" onclick="cfSwitch(this)">UW</div>
+            <div class="cftab" onclick="cfSwitch(this)">UW</div><div class="cftab" onclick="cfSwitch(this)">Deployment</div>
             <div class="cfsp"></div>
           </div>
           <div class="ch-thread" id="drActivityThread"></div>
@@ -42999,6 +43005,10 @@ function _mtSessionDress(sess, html){
   return String(html)
     .replace(/class="amode int">(Agent|Internal)</g, 'class="amode ' + ch + '">' + lab + '<')
     .replace(/class="abub int">/g, 'class="abub ' + ch + '">')
+    /* channel-stamp every entry — sys lines and run tiles carry no .amode,
+       so the chat's UW/Deployment filters key off ch-* classes instead */
+    .replace(/class="act sys"/g, 'class="act sys ch-' + ch + '"')
+    .replace(/class="act"/g, 'class="act ch-' + ch + '"')
     /* mirrored copies are viewing snapshots — never getElementById targets.
        Neutralizing ids keeps live run-tiles (lgt-*) pointing at the session DOM. */
     .replace(/ id="/g, ' data-mtid="');
