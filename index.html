@@ -42928,6 +42928,199 @@ _agentAddDeployNBA = function(sess){
 /* ===== /AGENT DESK ===== */
 </script>
 
+<script>
+/* ===== AGENT DESK ===== */
+/* UNIFIED THREAD — one merchant, one conversation.
+   MERCHANT_THREAD is the persistent transcript store behind BOTH surfaces:
+   the record's full-screen chat (#sig-uw-thread) and the agent session
+   (#agent-thread). Record-side writers persist + mirror into the session
+   transcript; session finals mirror into the store (and the record DOM when
+   it's on screen); rebuilding either surface replays the store. A session is
+   therefore a full-screen MODE of the merchant's one thread, not a second
+   conversation. */
+const MERCHANT_THREAD = {};        // name -> [{html, src:'record'|'session'}]
+let _mtSeeding = false;            // replay guard — no re-record, no re-mirror
+
+function _mtRecord(name, html, src){
+  if (_mtSeeding || !name || !html) return;
+  (MERCHANT_THREAD[name] = MERCHANT_THREAD[name] || []).push({ html, src });
+  if (src === 'record') {
+    /* record-side activity lands in this merchant's session transcript too */
+    const sess = AGENT_DESK.sessions && AGENT_DESK.sessions[name];
+    if (sess && !sess.ended) {
+      sess.threadHTML += html;
+      if (AGENT_DESK.active === name) {
+        const t = document.getElementById('agent-thread');
+        const v = document.getElementById('view-agent-session');
+        if (t && v && v.classList.contains('active')) {
+          t.insertAdjacentHTML('beforeend', html); t.scrollTop = t.scrollHeight;
+        }
+      }
+    }
+  } else {
+    /* session finals surface live in the record chat when it's on screen */
+    const on = typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant === name;
+    const th = on ? document.getElementById('sig-uw-thread') : null;
+    const v = document.getElementById('view-merchant-detail');
+    if (th && v && v.classList.contains('active')) {
+      th.insertAdjacentHTML('beforeend', html);
+      th.scrollTop = th.scrollHeight;
+      if (typeof _sigUWUpdateCount === 'function') _sigUWUpdateCount();
+    }
+  }
+}
+
+/* session AI/internal chrome → record-channel dress (team-visibility badges) */
+function _mtSessionDress(sess, html){
+  const ch = sess.kind === 'deploy' ? 'dep' : 'uw';
+  const lab = ch === 'dep' ? 'Deployment' : 'UW team';
+  return String(html)
+    .replace(/class="amode int">(Agent|Internal)</g, 'class="amode ' + ch + '">' + lab + '<')
+    .replace(/class="abub int">/g, 'class="abub ' + ch + '">');
+}
+
+/* 1 ▸ every session final lands in the store (dressed for the record view) */
+(function(){
+  const _fin = _agentFinal;
+  _agentFinal = function(sess, html){
+    _fin(sess, html);
+    if (sess && sess.merchant) _mtRecord(sess.merchant, _mtSessionDress(sess, html), 'session');
+  };
+})();
+
+/* 2 ▸ workbench/record echoes persist even when the record chat is off screen */
+(function(){
+  uwbChatEcho = function(name, html, mode){
+    mode = mode || 'uw';
+    const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+    const lab = mode === 'ptr' ? '&#x2192; Partner' : mode === 'dep' ? 'Deployment' : 'UW team';
+    const badge = mode === 'uw' ? '<div style="font-size:9px;color:var(--text-muted);margin-top:5px;">&#x1F512; Only UW team members can see this</div>'
+      : mode === 'dep' ? '<div style="font-size:9px;color:var(--text-muted);margin-top:5px;">&#x1F512; Only deployment team members can see this</div>' : '';
+    const act = '<div class="act"><div class="ah"><div class="aav" style="background:var(--navy);color:#fff;">&#x2736;</div><span class="aname">Twill AI</span>' +
+      '<span class="amode ' + mode + '">' + lab + '</span><span class="atime">' + time + '</span></div>' +
+      '<div class="abub ' + mode + '">' + html + badge + '</div></div>';
+    if (!(typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant && _currentSBMerchant !== name)) {
+      const th = document.getElementById('sig-uw-thread');
+      if (th) {
+        th.insertAdjacentHTML('beforeend', act);
+        th.scrollTop = th.scrollHeight;
+        if (typeof _sigUWUpdateCount === 'function') _sigUWUpdateCount();
+      }
+    }
+    _mtRecord(name, act, 'record');
+  };
+})();
+
+/* 3 ▸ record-chat messages (AI, underwriter, merchant) persist + mirror */
+(function(){
+  const _sam = sigUWAddMessage;
+  sigUWAddMessage = function(role, html){
+    _sam(role, html);
+    const name = (typeof _currentSBMerchant !== 'undefined') && _currentSBMerchant;
+    const th = document.getElementById('sig-uw-thread');
+    if (name && th && th.lastElementChild && !th.lastElementChild.classList.contains('typing-act')) {
+      _mtRecord(name, th.lastElementChild.outerHTML, 'record');
+    }
+  };
+})();
+
+/* 4 ▸ rebuilding the record chat replays everything that happened since */
+(function(){
+  const _pop = populateSigUWThread;
+  populateSigUWThread = function(){
+    _pop.apply(this, arguments);
+    const name = (typeof _currentSBMerchant !== 'undefined') && _currentSBMerchant;
+    const rec = name && MERCHANT_THREAD[name];
+    const th = document.getElementById('sig-uw-thread');
+    if (!th || !rec || !rec.length) return;
+    _mtSeeding = true;
+    try {
+      th.insertAdjacentHTML('beforeend',
+        '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--blue);"></div>' +
+        '<div class="syst">Live activity — everything below happened in this conversation</div></div></div>' +
+        rec.map(e => e.html).join(''));
+    } finally { _mtSeeding = false; }
+    th.scrollTop = th.scrollHeight;
+    if (typeof _sigUWUpdateCount === 'function') _sigUWUpdateCount();
+  };
+})();
+
+/* 5 ▸ a fresh session opens mid-conversation, not at zero — it seeds the
+   record history so UW picks up where signature left off, and deployment
+   picks up where UW left off */
+(function(){
+  const _create = _agentCreateSession;
+  _agentCreateSession = function(name){
+    const sess = _create(name);
+    const rec = MERCHANT_THREAD[name];
+    if (sess && rec && rec.length) {
+      const seed = rec.map(e => e.html).join('');
+      sess.threadHTML =
+        '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--blue);"></div>' +
+        '<div class="syst">Earlier on this record — the conversation so far</div></div></div>' +
+        seed +
+        '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--navy);"></div>' +
+        '<div class="syst">Session opens here</div></div></div>' +
+        sess.threadHTML;
+    }
+    return sess;
+  };
+})();
+
+/* ── AUTO DOCUMENT TRAIL — the session report files itself at decision time;
+   End session just reopens it. ── */
+function _agentAutoFileReport(sess){
+  if (!sess || typeof _agentBuildReport !== 'function') return;
+  const uw = sess.kind === 'uw';
+  const docName = (uw ? 'UW Review Report — ' : 'Deployment Record — ') + sess.merchant;
+  const list = AGENT_INTERNAL_DOCS[sess.merchant] = AGENT_INTERNAL_DOCS[sess.merchant] || [];
+  let doc = list.find(x => x.name === docName) || sess._reportDoc;
+  const fresh = !doc;
+  if (!doc) doc = { name:docName, type:(uw ? 'UW Report' : 'Deployment Record'), badge:'AI session' };
+  doc.reportHTML = _agentBuildReport(sess);
+  doc.date = _agdkToday();
+  doc.saved = true;
+  sess._reportDoc = doc;
+  if (!list.some(x => x.name === doc.name)) list.push(doc);
+  const inSess = (sess.docs = sess.docs || []).find(x => x.name === doc.name);
+  if (inSess) Object.assign(inSess, { reportHTML:doc.reportHTML, date:doc.date, badge:'AI session', saved:true });
+  else sess.docs.push(doc);
+  const esc = sess.merchant.replace(/'/g, "\\'");
+  const escDoc = docName.replace(/'/g, "\\'");
+  if (fresh) agentAddSys(sess, '📄 ' + docName + ' auto-filed to the merchant record — ' +
+    '<span style="text-decoration:underline;cursor:pointer;" onclick="agentOpenSavedDoc(\'' + esc + '\',\'' + escDoc + '\')">view the report</span>', 'var(--green)');
+  else agentAddSys(sess, '📄 ' + docName + ' updated on the merchant record', 'var(--text-muted)');
+  _agentSyncInternalDocs(sess.merchant);
+  try { agentRenderRail(); } catch(e) {}
+}
+
+/* decision commits → file the trail (approve / escalate-final / deploy done) */
+(function(){
+  const _appr = agentApproveConfirm;
+  agentApproveConfirm = function(name){
+    _appr.apply(this, arguments);
+    const sess = AGENT_DESK.sessions[name];
+    if (sess && sess.decision && sess.decision.type === 'approved') setTimeout(() => _agentAutoFileReport(sess), 600);
+  };
+  const _team = _agentTeamCommit;
+  _agentTeamCommit = function(sess, d, bodyText){
+    _team.apply(this, arguments);
+    if (sess && sess.decision && sess.decision.type === 'escalated') setTimeout(() => _agentAutoFileReport(sess), 600);
+  };
+  const _depesc = _agentDepEscCommit;
+  _agentDepEscCommit = function(sess, d, bodyText){
+    _depesc.apply(this, arguments);
+    if (sess && sess.decision) setTimeout(() => _agentAutoFileReport(sess), 600);
+  };
+  const _fin2 = _lgFinish;
+  _lgFinish = function(sess){
+    _fin2.apply(this, arguments);
+    if (sess) setTimeout(() => _agentAutoFileReport(sess), 1200);
+  };
+})();
+/* ===== /AGENT DESK ===== */
+</script>
+
 <style>
 /* ── LIBRARY: ROUTING RULES PANEL (klbr-*) ── */
 body.persona-rep #klb-rt-toggle, body.persona-rep #klb-routing { display:none !important; }
