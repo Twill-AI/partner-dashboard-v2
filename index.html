@@ -16380,7 +16380,7 @@ const PARTNER_DATA = {
     stages: { lead:9, inreview:6, approved:5, boarding:4, active:218 },
     types: { labels:['Retail','Restaurant','E-commerce','Healthcare','Other'], data:[38,24,18,12,8], colors:['#6B839B','#5B7A5E','#8C7A5E','#A67C5B','#4B4B6B'] },
     scheduleA: { payout:'Net 30', revShare:{low:'80% Pass Through',med:'65% Pass Through',high:'50% Pass Through'}, monthlyMin:{low:'$0.00',med:'$50.00',high:'$50.00'}, annualFee:{low:'$0.00',med:'$25.00',high:'$50.00'},
-      equipFees:[ {device:'PAX A920 Pro', type:'One-time', amount:'$299.00'}, {device:'PAX A920 Pro', type:'Monthly', amount:'$12.00'} ] },
+      equipFees:[ {device:'PAX A920 Pro', type:'One-time', scope:'Per merchant', amount:'$299.00'}, {device:'PAX A920 Pro', type:'Monthly', scope:'Per merchant', amount:'$12.00'} ] },
     team: [
       { name:'James Harmon',   role:'Director',         initials:'JH', color:'#6B839B', email:'jharmon@apexelite.com' },
       { name:'Sara Delgado',   role:'Account Manager',  initials:'SD', color:'#8C7A5E', email:'sdelgado@apexelite.com' },
@@ -16404,7 +16404,7 @@ const PARTNER_DATA = {
     stages: { lead:5, inreview:4, approved:3, boarding:2, active:157 },
     types: { labels:['Restaurant','Retail','Hospitality','E-commerce','Other'], data:[42,28,14,10,6], colors:['#5B7A5E','#6B839B','#A67C5B','#8C7A5E','#4B4B6B'] },
     scheduleA: { payout:'Net 30', revShare:{low:'78% Pass Through',med:'63% Pass Through',high:'48% Pass Through'}, monthlyMin:{low:'$0.00',med:'$50.00',high:'$50.00'}, annualFee:{low:'$0.00',med:'$25.00',high:'$50.00'},
-      equipFees:[ {device:'PAX A77', type:'Monthly', amount:'$9.00'} ] },
+      equipFees:[ {device:'PAX A77', type:'Monthly', scope:'Per merchant', amount:'$9.00'} ] },
     team: [
       { name:'Maria Gutierrez', role:'CEO',              initials:'MG', color:'#5B7A5E', email:'mgutierrez@novapay.io' },
       { name:'David Park',      role:'ISO Manager',      initials:'DP', color:'#6B839B', email:'dpark@novapay.io' },
@@ -16521,21 +16521,24 @@ const EQUIP_FEE_TYPES = ['One-time', 'Monthly', 'Annual', 'Per transaction', 'Pe
 function _eqDevOptions(sel){
   const inv = (typeof INVENTORY_DATA !== 'undefined' ? INVENTORY_DATA : []);
   return inv.map(i => '<option value="' + i.device.replace(/"/g,'&quot;') + '"' + (i.device === sel ? ' selected' : '') + '>' +
-    i.device + ' — $' + i.cost + ' cost</option>').join('');
+    i.device + '</option>').join('');
 }
 function _eqTypeOptions(sel){
   return EQUIP_FEE_TYPES.map(t => '<option' + (t === sel ? ' selected' : '') + '>' + t + '</option>').join('');
 }
-function _eqAddRow(hostId, dev, type, amt){
+function _eqAddRow(hostId, dev, type, amt, scope){
   const host = document.getElementById(hostId);
   if (!host) return;
   const sel = 'background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:6px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-ui);outline:none;width:100%;';
   const div = document.createElement('div');
   div.className = 'sa-eq-row';
-  div.style.cssText = 'display:grid;grid-template-columns:minmax(0,1fr) 150px 110px 22px;gap:8px;align-items:center;margin-bottom:7px;';
+  div.style.cssText = 'display:grid;grid-template-columns:minmax(0,1fr) 140px 125px 100px 22px;gap:8px;align-items:center;margin-bottom:7px;';
   div.innerHTML =
     '<select class="eq-dev" style="' + sel + '">' + _eqDevOptions(dev) + '</select>' +
     '<select class="eq-type" style="' + sel + '">' + _eqTypeOptions(type) + '</select>' +
+    '<select class="eq-scope" style="' + sel + '">' +
+      '<option' + (scope === 'Per merchant' || !scope ? ' selected' : '') + '>Per merchant</option>' +
+      '<option' + (scope === 'One time' ? ' selected' : '') + '>One time</option></select>' +
     '<input class="eq-amt" placeholder="$0.00" value="' + String(amt || '').replace(/"/g,'&quot;') + '" style="' + sel + 'font-family:var(--font-mono);text-align:right;">' +
     '<span style="cursor:pointer;color:var(--text-muted);font-size:13px;text-align:center;" title="Remove" onclick="this.parentElement.remove()">&#10005;</span>';
   host.appendChild(div);
@@ -16546,6 +16549,7 @@ function _eqCollect(hostId){
   return [...host.querySelectorAll('.sa-eq-row')].map(r => ({
     device: r.querySelector('.eq-dev').value,
     type: r.querySelector('.eq-type').value,
+    scope: r.querySelector('.eq-scope').value,
     amount: (r.querySelector('.eq-amt').value || '').trim() || '$0.00',
   })).filter(f => f.device);
 }
@@ -16559,8 +16563,8 @@ function _eqEditBlock(hostId){
 function _eqReadTable(fees){
   let h = '<div style="margin-top:16px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Equipment fees</div>';
   if (!fees || !fees.length) return h + '<div style="font-size:12px;color:var(--text-muted);">No equipment-specific fees on this program.</div></div>';
-  h += '<table class="sa-table"><thead><tr><th style="text-align:left;">Equipment</th><th style="text-align:left;">Fee type</th><th>Amount</th></tr></thead><tbody>';
-  fees.forEach(f => { h += '<tr><td>' + f.device + '</td><td style="text-align:left;">' + f.type + '</td><td>' + f.amount + '</td></tr>'; });
+  h += '<table class="sa-table"><thead><tr><th style="text-align:left;">Equipment</th><th style="text-align:left;">Fee type</th><th style="text-align:left;">Applies</th><th>Amount</th></tr></thead><tbody>';
+  fees.forEach(f => { h += '<tr><td>' + f.device + '</td><td style="text-align:left;">' + f.type + '</td><td style="text-align:left;">' + (f.scope || 'Per merchant') + '</td><td>' + f.amount + '</td></tr>'; });
   return h + '</tbody></table></div>';
 }
 
@@ -16619,7 +16623,7 @@ function renderScheduleA(partnerName, editMode) {
   if (editMode) rows += _eqEditBlock('pd-eqfees-rows');
   else rows += _eqReadTable(sa.equipFees);
   schedEl.innerHTML = rows;
-  if (editMode) (sa.equipFees || []).forEach(f => _eqAddRow('pd-eqfees-rows', f.device, f.type, f.amount));
+  if (editMode) (sa.equipFees || []).forEach(f => _eqAddRow('pd-eqfees-rows', f.device, f.type, f.amount, f.scope));
 
   // Update action buttons
   if (actionsEl) {
