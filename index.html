@@ -39255,6 +39255,13 @@ body.persona-rep #klb-rt-toggle, body.persona-rep #klb-routing { display:none !i
 .klbr-spec td:first-child { font-size:10px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); white-space:nowrap; }
 .klbr-json { font-family:var(--font-mono); font-size:10.5px; background:var(--bg-base); border:1px solid var(--border); border-radius:6px; padding:9px 12px; margin-top:8px; white-space:pre-wrap; color:var(--text-secondary); }
 .klbr-foot { padding:10px 18px 14px; font-size:11px; color:var(--text-muted); }
+.klbr-acts { display:none; gap:6px; margin-left:auto; flex-shrink:0; align-self:center; }
+.klbr-rule:hover .klbr-acts { display:inline-flex; }
+.klbr-act { font-size:11px; font-family:var(--font-ui); font-weight:600; color:var(--text-muted); border:1px solid var(--border-strong); border-radius:5px; padding:2px 9px; cursor:pointer; background:var(--bg-elevated); white-space:nowrap; }
+.klbr-act:hover { color:var(--text-primary); }
+.klbr-act.danger:hover { color:var(--red); border-color:rgba(239,68,68,.35); }
+.klbr-edit-wrap { flex:1; }
+.klbr-edited { font-size:9px; font-weight:800; font-family:var(--font-ui); background:var(--bg-elevated); border:1px solid var(--border-strong); color:var(--text-muted); border-radius:4px; padding:1px 6px; letter-spacing:.05em; }
 </style>
 <script>
 /* ── LIBRARY ROUTING RULES — eligibility grid + rules + NL rule composer ── */
@@ -39271,13 +39278,13 @@ const KLBR_GRID = [
   { name:'E-commerce / gateway only', sub:'', cells:['Review','Review','Native','Native'] },
 ];
 const KLBR_RULES = [
-  { id:'R-01', kind:'block', label:'Hard block', text:'Clover hardware → <b>North FSP only</b>. Deal is forced — routes itself, rule logged.' },
-  { id:'R-02', kind:'block', label:'Hard block', text:'Split funding selected → <b>TSYS only</b> (4-account split supported on TSYS platform).' },
-  { id:'R-04', kind:'warn', label:'Warning', text:'Dual pricing on VPC → auto-attach cash discount attestation addendum to the signature package.' },
-  { id:'R-07', kind:'weight', label:'Weight +25', text:'Platform behind monthly commitment pace → prefer it when eligibility ties. <span style="font-family:var(--font-mono)">TSYS currently +25</span>.' },
-  { id:'R-09', kind:'warn', label:'Warning', text:'Stated volume > <span style="font-family:var(--font-mono)">$150K/mo</span> → flag for concurrence queue before boarding (any platform).' },
+  { id:'R-01', kind:'block', label:'Hard block', raw:'Any deal with Clover hardware must go to North FSP only', text:'Clover hardware → <b>North FSP only</b>. Deal is forced — routes itself, rule logged.' },
+  { id:'R-02', kind:'block', label:'Hard block', raw:'Split funding deals must go to TSYS only', text:'Split funding selected → <b>TSYS only</b> (4-account split supported on TSYS platform).' },
+  { id:'R-04', kind:'warn', label:'Warning', raw:'Dual pricing on VPC — attach the cash discount attestation addendum', text:'Dual pricing on VPC → auto-attach cash discount attestation addendum to the signature package.' },
+  { id:'R-07', kind:'weight', label:'Weight +25', raw:'Prefer the platform behind monthly commitment pace, TSYS +25', text:'Platform behind monthly commitment pace → prefer it when eligibility ties. <span style="font-family:var(--font-mono)">TSYS currently +25</span>.' },
+  { id:'R-09', kind:'warn', label:'Warning', raw:'Flag deals over $150k/mo for the concurrence queue', text:'Stated volume > <span style="font-family:var(--font-mono)">$150K/mo</span> → flag for concurrence queue before boarding (any platform).' },
 ];
-let _klbrNextId = 10, _klbrDraft = null;
+let _klbrNextId = 10, _klbrDraft = null, _klbrEditId = null, _klbrEditDraft = null, _klbrRemoveId = null;
 
 function klbLibTab(tab) {
   const routing = document.getElementById('klb-routing');
@@ -39342,10 +39349,51 @@ function klbrCompose() {
 function klbrAddRule() {
   if (!_klbrDraft) return;
   const s = _klbrDraft.spec;
-  KLBR_RULES.push({ id:'R-'+_klbrNextId, kind:s.kind, label:s.label, text: s.trigger + ' → <b>' + s.action + '</b>. <span style="font-size:11px;color:var(--text-muted)">(“' + _klbrDraft.raw.replace(/</g,'&lt;') + '”)</span>', isNew:true });
+  KLBR_RULES.push({ id:'R-'+_klbrNextId, kind:s.kind, label:s.label, raw:_klbrDraft.raw, text: s.trigger + ' → <b>' + s.action + '</b>. <span style="font-size:11px;color:var(--text-muted)">(“' + _klbrDraft.raw.replace(/</g,'&lt;') + '”)</span>', isNew:true });
   _klbrNextId++; _klbrDraft = null;
   klbrRender();
   const inp = document.getElementById('klbr-input'); if (inp) inp.value='';
+}
+
+function klbrEditRule(id) { _klbrEditId = id; _klbrEditDraft = null; _klbrRemoveId = null; klbrRender();
+  setTimeout(() => { const i = document.getElementById('klbr-edit-input'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 50); }
+
+function klbrEditCompose(id) {
+  const inp = document.getElementById('klbr-edit-input');
+  const txt = (inp?.value||'').trim();
+  if (!txt) return;
+  const host = document.getElementById('klbr-edit-preview');
+  host.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 2px;">🤖 Recompiling ' + id + ' against the eligibility grid + processor program docs…</div>';
+  setTimeout(() => {
+    const spec = klbrParse(txt);
+    _klbrEditDraft = { spec, raw: txt };
+    const json = JSON.stringify({ id:id, type:spec.kind, trigger:spec.condition, platforms:spec.platforms, action:spec.action, evaluate_at:spec.evalAt }, null, 2);
+    host.innerHTML = `<div class="klbr-spec">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">Recompiled specification</span>${klbrRuleChip({kind:spec.kind,label:spec.label})}<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">${id} (edit)</span></div>
+      <table><tr><td>Trigger</td><td>${spec.trigger}</td></tr><tr><td>Condition</td><td>${spec.condition}</td></tr><tr><td>Action</td><td>${spec.action}</td></tr><tr><td>Platforms</td><td>${spec.platforms.join(' · ')}</td></tr><tr><td>Evaluated</td><td>at ${spec.evalAt}</td></tr></table>
+      <div class="klbr-json">${json.replace(/</g,'&lt;')}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="klbrSaveEdit('${id}')">✓ Save changes</button><button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_klbrEditId=null;_klbrEditDraft=null;klbrRender();">✕ Cancel</button></div>
+    </div>`;
+  }, 700);
+}
+
+function klbrSaveEdit(id) {
+  if (!_klbrEditDraft) return;
+  const r = KLBR_RULES.find(x => x.id === id);
+  if (!r) return;
+  const s = _klbrEditDraft.spec;
+  r.kind = s.kind; r.label = s.label; r.raw = _klbrEditDraft.raw; r.isNew = false; r.edited = true;
+  r.text = s.trigger + ' → <b>' + s.action + '</b>. <span style="font-size:11px;color:var(--text-muted)">(“' + _klbrEditDraft.raw.replace(/</g,'&lt;') + '”)</span>';
+  _klbrEditId = null; _klbrEditDraft = null;
+  klbrRender();
+}
+
+function klbrRemoveAsk(id) { _klbrRemoveId = id; _klbrEditId = null; klbrRender(); }
+function klbrRemove(id) {
+  const i = KLBR_RULES.findIndex(x => x.id === id);
+  if (i >= 0) KLBR_RULES.splice(i, 1);
+  _klbrRemoveId = null;
+  klbrRender();
 }
 
 function klbrRender() {
@@ -39366,7 +39414,14 @@ function klbrRender() {
       <div style="display:flex;gap:8px;"><input id="klbr-input" placeholder='e.g. "Any deal with a Clover device must go to North FSP" or "Prefer VPC when we&apos;re behind on minimums"' onkeydown="if(event.key==='Enter')klbrCompose()"><button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="klbrCompose()">Create rule</button></div>
       <div id="klbr-preview"></div>
     </div>
-    ${KLBR_RULES.map(r=>`<div class="klbr-rule"><span class="rid">${r.id}</span>${klbrRuleChip(r)}<span style="flex:1;">${r.text}</span>${r.isNew?'<span class="klbr-new">NEW</span>':''}</div>`).join('')}
+    ${KLBR_RULES.map(r => {
+      if (_klbrEditId === r.id) return `<div class="klbr-rule" style="border-color:rgba(59,130,246,.35);"><span class="rid">${r.id}</span><div class="klbr-edit-wrap">
+        <div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">✎ Restate the rule in plain language — Twill AI recompiles it</div>
+        <div style="display:flex;gap:8px;"><input id="klbr-edit-input" style="flex:1;border:1px solid var(--border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:var(--font-data);background:var(--bg-elevated);color:var(--text-primary);" value="${(r.raw||'').replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')klbrEditCompose('${r.id}')"><button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="klbrEditCompose('${r.id}')">Recompile</button><button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="_klbrEditId=null;_klbrEditDraft=null;klbrRender();">✕</button></div>
+        <div id="klbr-edit-preview"></div></div></div>`;
+      if (_klbrRemoveId === r.id) return `<div class="klbr-rule" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);"><span class="rid">${r.id}</span>${klbrRuleChip(r)}<span style="flex:1;">Remove this rule? Deals it currently forces become open (suggest-first) at next evaluation.</span><span style="display:inline-flex;gap:6px;"><button class="btn btn-danger" style="font-size:11px;padding:4px 12px;" onclick="klbrRemove('${r.id}')">Remove</button><button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="_klbrRemoveId=null;klbrRender();">Cancel</button></span></div>`;
+      return `<div class="klbr-rule"><span class="rid">${r.id}</span>${klbrRuleChip(r)}<span style="flex:1;">${r.text}</span>${r.isNew?'<span class="klbr-new">NEW</span>':''}${r.edited?'<span class="klbr-edited">EDITED</span>':''}<span class="klbr-acts"><span class="klbr-act" onclick="klbrEditRule('${r.id}')">✎ Edit</span><span class="klbr-act danger" onclick="klbrRemoveAsk('${r.id}')">🗑 Remove</span></span></div>`;
+    }).join('')}
     <div class="klbr-rule" style="border-style:dashed;"><span class="rid">MODE</span><span class="klbr-chip g">Suggest-first</span><span>Open deals wait for one ops click today. Per-rule auto-route unlocks once a rule’s accept rate proves out (e.g. <span style="font-family:var(--font-mono)">95% over 60 days</span>).</span></div>
     <div class="klbr-foot">All merchants and figures are illustrative sample data. Weights, commitments and the grid are ops configuration, never hard-coded — and none of this screen exists in the rep view.</div>
   </div>`;
