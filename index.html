@@ -42559,7 +42559,7 @@ const AGENT_WELCOME_TEMPLATES = {
   'Restaurant quick-start': 'Hi {owner},\n\nYour {device} ships {eta} — here is the 10-minute restaurant setup:\n\n  1. Plug in at the counter (power + wifi)\n  2. Tips are pre-configured at 18/20/25%\n  3. Your menu syncs automatically on first boot\n  4. Run one test card and you are taking payments\n\nGateway credentials follow within 24h. Reply here for anything.\n\n— The {partner} team',
   'Short & sweet': 'Hi {owner} — your {device} ships {eta}. Plug it in, run a test card, you are live. Credentials follow by email. Reply with any questions.\n\n— The {partner} team',
 };
-const LG_STEPS_TOTAL = 7;
+const LG_STEPS_TOTAL = 8;
 function _lgTid(sess, key){ return 'lgt-' + _agdkSlug(sess.merchant) + '-' + key; }
 
 /* a step tile: header (step n/7 + state) · interactive body · optional-note foot */
@@ -42697,7 +42697,7 @@ function _lgStepSerial(sess){
   if (!e) {
     sess._lg.n = (sess._lg.n || 0) + 1;
     sess._lg.dec.serial = (d.equipment[0]||{}).serial;
-    return _lgStepPay(sess);
+    return _lgStepTcfg(sess);
   }
   const n = _agdkEsc(sess.merchant);
   _lgTile(sess, 'serial', '🔢', 'Terminal serial', '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Pull which unit for the <b>' + e.device + '</b>?</div><div class="agdk-pick-row">' +
@@ -42712,7 +42712,7 @@ function agentLgSerialPick(name, i){
   _agentDrActivity(sess, 'var(--green)', '🔢 Serial ' + st.sn + ' assigned via deployment run');
   _lgDone(sess, 'serial', '<b>S/N ' + st.sn + '</b> · ' + st.note + ' — pulled from inventory');
   agentRenderRail();
-  _lgStepPay(sess);
+  _lgStepTcfg(sess);
 }
 
 /* STEP 3 — payment: who pays for the device? Never skipped — a boarding
@@ -42759,7 +42759,7 @@ function _lgStepProv(sess){
     sess._lg.dec.prov = e.device + ' provisioned';
     const vr = (d.rail||[]).find(r => /VAR/i.test(r.label));
     if (vr) { vr.state = 'done'; vr.val = varId + ' — built'; vr.time = 'Just now'; }
-    _lgDone(sess, 'prov', '<b>' + e.device + ' provisioned</b> · <b style="color:var(--green);">ready to ship</b> — ' + varId + ' built, MID/TID bound',
+    _lgDone(sess, 'prov', '<b>' + e.device + ' provisioned</b> · <b style="color:var(--green);">ready to ship</b> — ' + varId + ' built, MID/TID bound' + (sess._lg.dec.tcfgSummary ? ' · setup profile applied' : ''),
       '<div style="margin-top:6px;"><button class="agdk-chip" style="font-size:9px;padding:2px 9px;" onclick="agentLgVarToggle(\'' + n + '\')">📄 View VAR</button></div>' +
       '<div id="lgvar-' + _agdkSlug(sess.merchant) + '" style="display:none;margin-top:8px;">' + _lgVarPaperHtml(sess) + '</div>');
     _agentDrActivity(sess, 'var(--green)', '🖥 ' + e.device + ' provisioned — VAR ' + varId + ' built, unit ready to ship');
@@ -42917,7 +42917,7 @@ function _lgFinish(sess){
     '  • Equipment: ' + (g.dec.eq || '—') + '\n' +
     '  • Serial: ' + (g.dec.serial || '—') + ' (pulled from inventory)\n' +
     '  • Payment: ' + (g.dec.pay || '—') + '\n' +
-    '  • Provisioned: yes — VAR ' + (g.dec.varId || '—') + ' built, terminal configured\n' +
+    '  • Provisioned: yes — VAR ' + (g.dec.varId || '—') + ' built · setup: ' + (g.dec.tcfgSummary || 'standard profile') + '\n' +
     '  • Shipping: FedEx ' + (g.dec.tracking || '—') + ' · ' + ((g.dec.speed||{}).eta || '') + ' · to the ' + (g.dec.dest||'merchant site').toLowerCase() + '\n' +
     '  • Welcome email: ' + (g.dec.welcome || '—') + ' — queues with live tracking\n' +
     '  • ' + (g.dec.call || '') + '\n' +
@@ -43299,6 +43299,82 @@ function agentQueueOpenRecord(name){
     } catch(e) {}
   };
 })();
+
+/* ── TERMINAL SETUP QUESTIONNAIRE — drops in after the serial pick; the
+   answers become the provisioning profile the VAR build applies. ── */
+const AGENT_TCFG_QS = [
+  { k:'net', q:'Connectivity — how does the terminal reach us at the site?', opts:[
+    { i:'&#x1F4F6;', l:'WiFi', n:'joins the store network at install' },
+    { i:'&#x1F4E1;', l:'Cellular', n:'SIM included — live day one' },
+    { i:'&#x1F50C;', l:'Ethernet', n:'hardline at the counter' } ] },
+  { k:'batch', q:'Auto-batch time — when does the day close?', opts:[
+    { i:'&#x1F319;', l:'10:30 PM auto', n:'standard after-close' },
+    { i:'&#x1F558;', l:'9:00 PM auto', n:'early close' },
+    { i:'&#x270B;', l:'Manual batch', n:'merchant closes the day themselves' } ] },
+  { k:'tips', q:'Tips on this terminal?', opts:[
+    { i:'&#x1F4B5;', l:'On-screen prompts', n:'18 / 20 / 25%' },
+    { i:'&#x1F9FE;', l:'Tip line on receipt', n:'adjust at batch' },
+    { i:'&#x1F6AB;', l:'No tips', n:'retail profile' } ] },
+  { k:'rcpt', q:'Receipts?', opts:[
+    { i:'&#x1F5A8;', l:'Print + digital', n:'paper plus SMS/email' },
+    { i:'&#x1F4F1;', l:'Digital only', n:'SMS/email — saves paper' } ] },
+];
+function _lgTcfgBodyHtml(sess){
+  const n = _agdkEsc(sess.merchant);
+  const a = (sess._lg && sess._lg.dec.tcfg) || {};
+  let html = '';
+  AGENT_TCFG_QS.forEach(q => {
+    if (a[q.k]) html += '<div style="font-size:11px;padding:2px 0;color:var(--text-secondary);">&#x2713; <b style="color:var(--text-primary);">' +
+      q.q.split(' — ')[0].replace('?','') + ':</b> ' + a[q.k] + '</div>';
+  });
+  const next = AGENT_TCFG_QS.find(q => !a[q.k]);
+  if (next) {
+    const qi = AGENT_TCFG_QS.indexOf(next);
+    html += '<div style="font-size:11px;color:var(--text-secondary);margin:7px 0 5px;">' + next.q + '</div><div class="agdk-pick-row">' +
+      next.opts.map((o, oi) => '<button class="agdk-chip" onclick="agentLgTcfgPick(\'' + n + '\',' + qi + ',' + oi + ')">' +
+        o.i + ' ' + o.l + ' <span style="font-size:9px;color:var(--text-muted);">' + o.n + '</span></button>').join('') + '</div>';
+  }
+  return html;
+}
+function _lgStepTcfg(sess){
+  sess._lg.dec.tcfg = sess._lg.dec.tcfg || {};
+  _lgTile(sess, 'tcfg', '&#x1F6E0;', 'Terminal setup — provisioning profile', _lgTcfgBodyHtml(sess));
+}
+function agentLgTcfgPick(name, qi, oi){
+  const sess = AGENT_DESK.sessions[name]; if (!sess || !sess._lg) return;
+  const q = AGENT_TCFG_QS[qi]; const o = q && q.opts[oi]; if (!o) return;
+  (sess._lg.dec.tcfg = sess._lg.dec.tcfg || {})[q.k] = o.l;
+  if (AGENT_TCFG_QS.some(x => !sess._lg.dec.tcfg[x.k])) {
+    const b = _lgBody(sess, 'tcfg'); if (b) b.innerHTML = _lgTcfgBodyHtml(sess);
+    return;
+  }
+  const summary = AGENT_TCFG_QS.map(x => sess._lg.dec.tcfg[x.k]).join(' · ');
+  sess._lg.dec.tcfgSummary = summary;
+  /* all answered — offer the injection push before the run moves on */
+  const b = _lgBody(sess, 'tcfg');
+  if (b) b.innerHTML = _lgTcfgBodyHtml(sess) +
+    '<div style="margin-top:8px;padding-top:7px;border-top:1px dashed var(--border);">' +
+    '<button class="agdk-chip approve" onclick="agentLgTcfgInject(\'' + _agdkEsc(name) + '\')">&#x26A1; Inject terminal — push profile + VAR params to the device</button>' +
+    '<span style="font-size:9px;color:var(--text-muted);margin-left:6px;">remote parameter download &middot; no site visit</span></div>';
+}
+function agentLgTcfgInject(name){
+  const sess = AGENT_DESK.sessions[name]; if (!sess || !sess._lg) return;
+  const d = _agentDeploy(sess);
+  const sn = sess._lg.dec.serial || ((d && d.equipment[0]) || {}).serial || 'the terminal';
+  const summary = sess._lg.dec.tcfgSummary || '';
+  const b = _lgBody(sess, 'tcfg');
+  if (b) b.innerHTML = _lgTcfgBodyHtml(sess) + '<div style="font-size:11px;color:var(--amber);margin-top:7px;">&#x23F3; pushing parameter file to <b>' + sn + '</b>…</div>';
+  setTimeout(() => {
+    const b2 = _lgBody(sess, 'tcfg');
+    if (b2) b2.innerHTML = _lgTcfgBodyHtml(sess) + '<div style="font-size:11px;color:var(--amber);margin-top:7px;">&#x23F3; injecting profile + encryption params — terminal acknowledging…</div>';
+  }, 900);
+  setTimeout(() => {
+    sess._lg.dec.tcfgInjected = true;
+    _agentDrActivity(sess, 'var(--green)', '&#x26A1; Terminal ' + sn + ' injected — profile live on the device (' + summary + ')');
+    _lgDone(sess, 'tcfg', '<b>Profile injected to ' + sn + '</b> — ' + summary + ' · live on the device, VAR build picks it up');
+    _lgStepPay(sess);
+  }, 2000);
+}
 
 /* ── UW ESCALATION — the route past a red check: pick the right person,
    they dig in, run the call-out, clear the check, and the file unlocks. ── */
