@@ -2206,8 +2206,30 @@ Owner, Fresh Brew Coffee Co.</textarea>
 // ═══ BROADCASTCHANNEL — CROSS-TAB SYNC ═══
 const bc = new BroadcastChannel('twill-demo');
 
+function addPartnerMessage(data) {
+  const thread = document.querySelector('.ch-thread');
+  if (!thread) return;
+  const act = document.createElement('div');
+  act.className = 'act';
+  const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  const esc = String(data.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  act.innerHTML = '<div class="ah">' +
+    '<div class="aav" style="background:#A67C5B;color:#fff;">' + (data.av || 'MW') + '</div>' +
+    '<span class="aname">' + (data.from || 'Mike') + ' &middot; Suede team</span>' +
+    '<span class="atime">' + time + '</span></div>' +
+    '<div class="abub" style="border-color:rgba(189,48,3,.28);background:rgba(189,48,3,.05);">' + esc + '</div>';
+  thread.appendChild(act);
+  thread.scrollTop = thread.scrollHeight;
+  if (typeof mpPing === 'function') mpPing();
+}
+
 bc.onmessage = function(e) {
   const {type, data} = e.data;
+
+  if (type === 'partner_message') {
+    /* live message from the partner team — this portal is Fresh Brew's */
+    if (!data || !data.merchant || /fresh brew/i.test(data.merchant)) addPartnerMessage(data || {});
+  }
 
   if (type === 'signature_sent') {
     // Partner sent the signature request — show notification in chat
@@ -2717,6 +2739,7 @@ async function handleFormFillSend() {
   if (!msg) return;
   if (!window.formFill.sessionId) {
     addMessage('user', escapeHtml(msg), {userMsg: true});
+    try { bc.postMessage({ type:'merchant_chat', data:{ merchant:'Fresh Brew Coffee Co.', text: msg, timestamp: Date.now() } }); } catch(e) {}
     ta.value = '';
     mpFreeformReply(msg); // AI concierge — keyword-routed canned answers (defined in the view-system script)
     return;

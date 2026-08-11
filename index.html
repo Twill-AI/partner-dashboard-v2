@@ -17889,6 +17889,15 @@ function sendChatMessage(taId, threadId, intBtnId) {
   thread.insertAdjacentHTML('beforeend', msgHTML);
   thread.scrollTop = thread.scrollHeight;
 
+  /* merchant-directed → the merchant portal sees it live (BroadcastChannel) */
+  if (!isInternal && window.twillBC) {
+    const _bcDealRoom = document.getElementById('view-deal-room')?.classList.contains('active');
+    const _bcActive = document.getElementById('view-merchant-active')?.classList.contains('active');
+    const _bcNameEl = document.getElementById(_bcDealRoom ? 'dr-name' : _bcActive ? 'ma-merchant-name' : 'md-merchant-name');
+    const _bcName = (_bcNameEl && _bcNameEl.textContent.trim()) || (typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant) || '';
+    window.twillBC.postMessage({ type:'partner_message', data:{ merchant:_bcName, text, from:'Mike', av:'MW', timestamp:Date.now() } });
+  }
+
   // Clear input
   ta.value = '';
   ta.style.height = '';
@@ -18344,6 +18353,13 @@ function sendSigUWMessage() {
     '<div class="abub ' + mode + '">' + text + '</div>';
   thread.appendChild(d);
   thread.scrollTop = thread.scrollHeight;
+  if (typeof _mtRecord === 'function' && typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant) {
+    _mtRecord(_currentSBMerchant, d.outerHTML, 'record');
+  }
+  /* merchant-directed → the merchant portal sees it live (BroadcastChannel) */
+  if (mode === 'out' && window.twillBC && typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant) {
+    window.twillBC.postMessage({ type:'partner_message', data:{ merchant:_currentSBMerchant, text, from:'Mike', av:'MW', timestamp:Date.now() } });
+  }
   // update event count + mirror into the docked Activity panel
   const ct = document.getElementById('sig-uw-event-count');
   if (ct) ct.textContent = thread.querySelectorAll('.act,.syse').length + ' events';
@@ -37349,6 +37365,24 @@ window.twillBC = new BroadcastChannel('twill-demo');
 
 window.twillBC.onmessage = function(e) {
   const {type, data} = e.data;
+
+  if (type === 'merchant_chat') {
+    try {
+      const mcName = (data && data.merchant) || 'Fresh Brew Coffee Co.';
+      const safe = String((data && data.text) || '').replace(/</g,'&lt;');
+      const mcTime = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+      const onRecord = typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant === mcName &&
+        document.getElementById('view-merchant-detail')?.classList.contains('active');
+      if (onRecord && typeof sigUWAddMessage === 'function') {
+        sigUWAddMessage('merchant', safe);
+      } else if (typeof _mtRecord === 'function') {
+        _mtRecord(mcName, '<div class="act"><div class="ah"><div class="aav" style="background:var(--green);color:#fff;">SC</div>' +
+          '<span class="aname">Sarah Chen</span><span class="amode out">Merchant</span><span class="atime">' + mcTime + '</span></div>' +
+          '<div class="abub out">' + safe + '</div></div>', 'record');
+      }
+      if (typeof agentToast === 'function') agentToast('&#x1F4AC;', '<strong>Sarah Chen</strong> (Fresh Brew) replied from the merchant portal');
+    } catch(err) {}
+  }
 
   if (type === 'merchant_signed') {
     // Merchant signed the agreement!
