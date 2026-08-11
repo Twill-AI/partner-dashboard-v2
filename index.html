@@ -15227,6 +15227,8 @@ const KB_USERS = [
   { id:'u-nader',  name:'Nader H.',      email:'nader@twillpayments.com', role:'admin',  av:'NH', avColor:'#8C7A5E' },
   { id:'u-sara',   name:'Sara Patel',    email:'sara@twillpayments.com',  role:'uw',     av:'SP', avColor:'#5B7A5E' },
   { id:'u-jordan', name:'Jordan Rivera', email:'jordan@twillpayments.com',role:'uw',     av:'JR', avColor:'#6B839B' },
+  { id:'u-alvarez',name:'R. Alvarez',    email:'r.alvarez@twillpayments.com', role:'uw', av:'RA', avColor:'#8358A8' },
+  { id:'u-osei',   name:'N. Osei',       email:'n.osei@twillpayments.com',    role:'uw', av:'NO', avColor:'#4E7A8A' },
   { id:'u-dan',    name:'Dan Mercer',    email:'dan.m@summitlending.com', role:'partner',av:'DM', avColor:'#A67C5B' },
   { id:'u-tara',   name:'Tara Price',    email:'tara.p@rivermark.com',    role:'partner',av:'TP', avColor:'#9B6B5B' },
   { id:'u-alex',   name:'Alex Kim',      email:'alex@twillpayments.com',  role:'deploy', av:'AK', avColor:'#7C6FA0' },
@@ -15263,7 +15265,7 @@ function assignPerson(merchantName, user, role, source){
     if (uwb) uwb.underwriter = { id:user.id, name:user.name, av:user.av, avColor:user.avColor };
   }
   const roleLabel = role === 'deploy' ? 'Deployment owner' : 'Underwriter';
-  if (uwb && uwb.audit) uwb.audit.push({ t:'Just now', who: source === 'mention' ? 'Chat @mention' : 'You',
+  if (uwb && uwb.audit) uwb.audit.push({ t:'Just now', who: source === 'mention' ? 'Chat @mention' : source === 'escalation' ? 'Escalation' : 'You',
     what: roleLabel + ' assigned — ' + user.name + ' · added to the account and notified (' + user.email + ')' });
   try { if (typeof drNotifyPartner === 'function' && role !== 'uw') drNotifyPartner(merchantName, '👤 ' + roleLabel + ' assigned — ' + user.name + ' now owns this rollout.'); } catch(e) {}
   const sess = (typeof AGENT_DESK !== 'undefined' && AGENT_DESK.sessions) ? AGENT_DESK.sessions[merchantName] : null;
@@ -43358,6 +43360,11 @@ _agentTeamCommit = function(sess, d, bodyText){
     what:'Escalated to ' + t.label + ' — call-out verification requested' });
   agentAddSys(sess, '👥 ' + (t.key === 'channel' ? 'Posted to #NY-risk — 3 risk analysts notified' : 'Routed to ' + t.label + ' — acknowledged, it’s on their queue') + ' · approve stays locked pending verification', 'var(--red)');
   agentToast('👥', 'Escalated to <strong>' + t.label + '</strong> — ' + sess.merchant);
+  /* the escalated-to person joins the file — same assign flow as @-tagging */
+  if (t.key !== 'channel' && typeof assignPerson === 'function' && typeof KB_USERS !== 'undefined') {
+    const ku = KB_USERS.find(u => u.name === t.person);
+    if (ku) assignPerson(sess.merchant, ku, 'uw', 'escalation');
+  }
   agentRenderRail(); agentRenderQueue();
   setTimeout(() => { _agentRefreshUWNBA(sess, { say:'Escalation is with ' + (t.key === 'channel' ? 'the risk team' : t.person) + ' — I’ll surface the verdict here the moment it lands. Meanwhile:' }); }, 400);
   setTimeout(() => _agentAutoFileReport(sess), 700);
