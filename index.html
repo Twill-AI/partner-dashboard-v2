@@ -2795,10 +2795,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
     <div class="sidebar-section">
       <div class="sidebar-label">Portfolio</div>
-      <div class="nav-item" id="nav-partners" onclick="showView('partners', this)">
-        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M9 2H5a1 1 0 00-1 1v10a1 1 0 001 1h6a1 1 0 001-1V6l-3-4zm1 4.5V3.5L13 7h-3z" opacity=".8"/></svg>
-        Partners
-      </div>
       <div class="nav-item" id="nav-applications" onclick="switchMerchantMode('applications', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M5 2a1 1 0 00-1 1v10a1 1 0 001 1h6a1 1 0 001-1V3a1 1 0 00-1-1H5zm1 3h4v1H6V5zm0 2h4v1H6V7zm0 2h2v1H6V9z" opacity=".8"/></svg>
         Applications
@@ -2815,7 +2811,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       </div>
       <div class="nav-item" id="nav-library" onclick="showView('library', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c-3.3 0-6 .95-6 2.12v8.76c0 1.17 2.7 2.12 6 2.12s6-.95 6-2.12V3.62c0-1.17-2.7-2.12-6-2.12zm0 1.2c2.87 0 4.8.66 4.8.92s-1.93.92-4.8.92-4.8-.66-4.8-.92 1.93-.92 4.8-.92zM3.2 5.15c1.1.5 2.86.81 4.8.81s3.7-.31 4.8-.81v2.03c0 .26-1.93.92-4.8.92s-4.8-.66-4.8-.92V5.15zm0 3.55c1.1.5 2.86.81 4.8.81s3.7-.31 4.8-.81v2.03c0 .26-1.93.92-4.8.92s-4.8-.66-4.8-.92V8.7zm0 3.55c1.1.5 2.86.81 4.8.81s3.7-.31 4.8-.81v.13c0 .26-1.93.92-4.8.92s-4.8-.66-4.8-.92v-.13z" opacity=".8"/></svg>
-        Library
+        Knowledge base
       </div>
     </div>
 
@@ -2833,6 +2829,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
     <div class="sidebar-section">
       <div class="sidebar-label">Team</div>
+      <div class="nav-item" id="nav-partners" onclick="showView('partners', this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M9 2H5a1 1 0 00-1 1v10a1 1 0 001 1h6a1 1 0 001-1V6l-3-4zm1 4.5V3.5L13 7h-3z" opacity=".8"/></svg>
+        Partners
+      </div>
       <div class="nav-item" id="nav-users" onclick="showView('users', this)">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M5 4a3 3 0 116 0 3 3 0 01-6 0zm-3 9a5 5 0 0110 0H2z" opacity=".85"/></svg>
         Users
@@ -5122,11 +5122,12 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="topbar">
         <div class="topbar-left">
           <div>
-            <div class="page-title">Library</div>
+            <div class="page-title">Knowledge base</div>
             <div class="page-sub">Manage files and folders for AI-powered knowledge retrieval</div>
           </div>
           <div class="sig-uw-mode-toggle visible" id="klb-rt-toggle" style="margin-left:16px;">
-            <div class="sig-uw-mode-btn on" id="klb-tab-files" onclick="klbLibTab('files')">📁 Files</div>
+            <div class="sig-uw-mode-btn on" id="klb-tab-knowledge" onclick="klbLibTab('knowledge')">✦ Knowledge</div>
+            <div class="sig-uw-mode-btn" id="klb-tab-files" onclick="klbLibTab('files')">📁 Library</div>
             <div class="sig-uw-mode-btn" id="klb-tab-routing" onclick="klbLibTab('routing')">🧭 Routing Rules</div>
           </div>
         </div>
@@ -5136,6 +5137,25 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       </div>
       <div style="flex:1;display:flex;overflow:hidden;position:relative;background:var(--bg-surface);">
         <div style="flex:1;overflow:auto;padding:20px 24px;min-width:0;">
+          <div id="klb-knowledge" style="max-width:820px;margin:0 auto;display:flex;flex-direction:column;min-height:calc(100% - 8px);">
+            <div id="klb-know-thread" style="flex:1;">
+              <div style="text-align:center;padding:44px 20px 26px;">
+                <div style="width:44px;height:44px;border-radius:50%;background:var(--navy);color:var(--brand-on-dark);display:inline-flex;align-items:center;justify-content:center;font-size:19px;">✦</div>
+                <div style="font-size:19px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);margin-top:12px;">Ask your Knowledge base anything</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:5px;">Merchants, policy, routing, equipment — answers are grounded in the shared Library, with sources.</div>
+              </div>
+              <div id="klb-know-suggest" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;max-width:640px;margin:0 auto;">
+                <button class="klb-chipq" onclick="klbKnowSend(this.textContent)">I've got a full-service restaurant doing ~$60K/mo — what should I offer them?</button>
+                <button class="klb-chipq" onclick="klbKnowSend(this.textContent)">Can I place a CBD merchant?</button>
+                <button class="klb-chipq" onclick="klbKnowSend(this.textContent)">What's included with the PAX A920 Pro, and what does it cost?</button>
+                <button class="klb-chipq" onclick="klbKnowSend(this.textContent)">What documents will underwriting ask a high-risk merchant for?</button>
+              </div>
+            </div>
+            <div style="position:sticky;bottom:0;background:var(--bg-surface);padding:14px 0 4px;display:flex;gap:8px;">
+              <input id="klb-know-input" class="klb-search" style="margin:0;flex:1;padding:11px 14px;font-size:13px;border-radius:10px;" placeholder="Describe a merchant and I\u2019ll tell you what to offer — or ask about policy, products, docs…" onkeydown="if(event.key==='Enter')klbKnowSend()">
+              <button class="btn btn-primary" style="font-size:13px;padding:10px 18px;border-radius:10px;" onclick="klbKnowSend()">↑</button>
+            </div>
+          </div>
           <div id="klb-routing" style="display:none;max-width:1080px;"></div>
           <div class="klb-layout">
             <div class="klb-aside">
@@ -13354,8 +13374,8 @@ function nmOpenApplication(name) {
   mdViewNM?.classList.remove('sig-uw-active','uw-bench-active');
   document.getElementById('sig-uw-mode-toggle')?.classList.remove('visible');
   showView('merchant-detail', null);
-  // Reset wizard to the default landing step so we don't inherit the last app's step
-  if (typeof goStep === 'function') { try { goStep(6); } catch(e){} }
+  // Land on Business Info so the rep reviews what the AI populated, top to bottom
+  if (typeof goStep === 'function') { try { goStep(1); } catch(e){} }
 
   const e = window._nmEnrichedMerchant;
   if (!e) return;
@@ -15834,6 +15854,7 @@ function klbStream(el, text, done) {
 function renderLibraryView() { klbRenderAll(); }
 function klbOpenLibrary(folderId) {
   showView('library', document.getElementById('nav-library'));
+  if (typeof klbLibTab === 'function') klbLibTab('files');
   if (folderId && klbFolder(folderId)) { KB_DATA.selected = folderId; klbRenderAll(); }
 }
 
@@ -33405,7 +33426,7 @@ function showView(name, clickedNav) {
   if (name === 'analytics' && !analyticsReady) { analyticsReady = true; initAnalyticsCharts(); }
   if (name === 'merchant-active') { setTimeout(initMaOverviewCharts, 50); }
   if (name === 'inventory' && typeof renderInventoryView === 'function') { renderInventoryView(); }
-  if (name === 'library' && typeof renderLibraryView === 'function') { renderLibraryView(); }
+  if (name === 'library' && typeof renderLibraryView === 'function') { renderLibraryView(); if (typeof klbLibTab === 'function') klbLibTab('knowledge'); }
   if (name === 'tickets' && typeof initTicketDashboard === 'function') { setTimeout(initTicketDashboard, 30); }
   if (name === 'residuals' && !resChartsReady) { resChartsReady = true; setTimeout(initResCharts, 50); }
   if (name === 'alerts') {
@@ -43919,9 +43940,111 @@ let _klbrNextId = 10, _klbrDraft = null, _klbrEditId = null, _klbrEditDraft = nu
 function klbLibTab(tab) {
   const routing = document.getElementById('klb-routing');
   const files = document.querySelector('#view-library .klb-layout');
-  const bF = document.getElementById('klb-tab-files'), bR = document.getElementById('klb-tab-routing');
-  if (tab === 'routing') { routing.style.display='block'; if (files) files.style.display='none'; bR.classList.add('on'); bF.classList.remove('on'); klbrRender(); }
-  else { routing.style.display='none'; if (files) files.style.display=''; bF.classList.add('on'); bR.classList.remove('on'); }
+  const know = document.getElementById('klb-knowledge');
+  const bK = document.getElementById('klb-tab-knowledge'), bF = document.getElementById('klb-tab-files'), bR = document.getElementById('klb-tab-routing');
+  [bK,bF,bR].forEach(b => b && b.classList.remove('on'));
+  if (know) know.style.display='none';
+  routing.style.display='none';
+  if (files) files.style.display='none';
+  if (tab === 'routing') { routing.style.display='block'; bR && bR.classList.add('on'); klbrRender(); }
+  else if (tab === 'files') { if (files) files.style.display=''; bF && bF.classList.add('on'); }
+  else { if (know) know.style.display='flex'; bK && bK.classList.add('on'); }
+}
+
+/* ═══ KNOWLEDGE TAB — free-text Q&A grounded in the shared Library ═══ */
+/* Per-document knowledge — what the AI actually reads so answers are complete
+   in-chat and the user never has to open the source documents themselves. */
+const KLB_DOC_CONTENT = {
+  'd-plat':  'Twill platform overview: one application feeds every sponsor program — destination (platform + BIN) is chosen at underwriting, not at app handout. Boarding is automatic on approval: MID request, VAR build, gateway credentials, welcome kit. Merchants activate on their first settled batch.',
+  'd-onb':   'Onboarding playbook: rep submits the application → verification package runs six sources (MATCH, OFAC, TIN, GIACT, credit soft pull, KYB/SOS) → routing options compile from the eligibility grid + platform minimums → decision → auto-boarding. Standard file target: decision inside 24-48h. Pends pause the clock; the partner is notified in their portal.',
+  'd-gwset': 'Gateway setup: NMI is the default gateway across programs. Credentials are provisioned automatically within ~24h of approval and emailed separately from the welcome kit. E-commerce merchants get plugin instructions (WooCommerce/Shopify); card-present terminals arrive pre-bound to the gateway via the VAR file.',
+  'd-ocref': 'Order Counter POS: restaurant-first cloud-hybrid POS (est. 2010, Louisville KY). Payments-agnostic — integrates third-party gateways rather than locking processing. Best fit: full-service restaurants (coursing, kitchen ticket routing, table management) and QSR (speed-of-service, KDS, modifier depth). Moderate fit for bars (no pour-level inventory), not ideal for retail. Standard Android + PAX hardware.',
+  'd-ocan':  'Order Counter analysis: vs closed-loop competitors (Toast, Square) it keeps processing portable — merchants can be repriced or re-platformed without changing POS. Deployment is cloud-hybrid with local resilience: terminals keep taking orders through internet outages.',
+  'd-mx':    'POS integration matrix: which POS/gateway combinations are certified per platform. Order Counter integrates via NMI on all four platforms. Closed-loop systems (Toast, Square) are replacement targets, not integration paths.',
+  'd-mcc':   'High-Risk MCC sheet (Priority): SIC/MCC 5912 and CBD-adjacent verticals are gray-area — boardable ONLY with sponsor-bank pre-vet cleared before decision (Esquire is the on-file high-risk sponsor, via the TSYS Esquire BIN). Requirements: e-commerce-only preferred, active state licensing verified, 12 consecutive months of bank statements, 10% rolling reserve for 180 days, Risk Committee co-sign on approval. Fully-prohibited list: unlicensed gaming, crypto exchange, adult content, firearms without FFL. Airsoft/replica >10% of inventory routes to First Data, not TSYS.',
+  'd-buy':   'Priority buy rates 2026: IC+ floors by tier — T-1 Swipe 0.20% + $0.08, T-2 Card Present 0.25% + $0.10, T-3/ecom 0.35% + $0.15, high-risk from 0.45% + $0.20. Gateway $10/mo standard. Equipment margin guidance: A920 Pro list $299, floor $249.',
+  'd-kurv':  'Kurv gateway boarding: EMS-family program; boarding packet needs voided check, signed MPA, and processing statements for switchers. Kurv supports split funding up to 4 accounts on TSYS placements only.',
+  'd-luq':   'Luqra program guide: Luqra placements suit low-risk retail and service MCCs up to $100K/mo; no high-risk verticals; next-day funding standard, same-day available on request with 6.30 PM ET cutoff.',
+  'd-lum':   'Lumino onboarding checklist: Lumino requires site photos for card-present retail, itemized equipment list on the MPA, and a completed PCI SAQ-A or SAQ-B before activation.',
+  'd-min':   'BIN minimums tracker: monthly transaction-count commitments per platform — TSYS 12,000 (met, 104%), North FSP 9,000 (74% MTD at day 26, at risk — projected 88%), VPC 6,500 (61%, behind — projected 73%), Fiserv 8,000 (88%, on pace — projected 105%). Deals that close a gap steer to the at-risk platform; the router weights fit% with these numbers. Hard blocks always win — a deal never routes somewhere it is not certified.',
+  'd-fdic':  'FD Omaha IC+ rate tables: interchange-plus schedules for First Data Omaha placements; standard markup floors match the 2026 buy-rate sheet; enterprise volume (> $1M/mo) must use the FD Enterprise BIN per routing rule.',
+  'd-ecnp':  'Enterprise CNP program & reserve policy: card-not-present volume above $250K/mo requires enhanced due diligence — 12-month processing history, chargeback ratio under 0.9% by count, and a reserve set by risk tier (5% standard, 10% high-risk, 180-day rolling). Virtual site inspections are acceptable for pure e-commerce.',
+  'd-tsys':  'TSYS BIN 10 program guide (EMS): general-purpose placement for low/medium-risk card-present; supports split funding (up to 4 accounts); the Esquire-sponsored high-risk BIN rides the same rails but requires bank pre-vet before decision.',
+  'd-pend':  'UW pend playbook: pends are structured requests to the partner — blocking (red, decision-gating) or non-blocking (amber). Standard bank-statement pend: 3 months for standard files, 12 for high-risk. Owner ID required at ≥25% ownership on every processor. Pends may be marked forwardable so the partner can pass the request straight to the merchant. Waivers need a logged reason and are audit-retained.',
+  'd-risk':  'Risk category definitions: T-1 Swipe (low-risk card-present, single-underwriter), T-2 Card Present (standard retail/food, single-underwriter under $100K/mo), T-3 E-comm (CNP standard), T-4 Enterprise (volume > $1M/mo, senior co-sign), T-5 High-Risk E-comm (gray-area verticals — sponsor pre-vet + Risk Committee co-sign mandatory). Concurrence threshold: projected volume over $100K/mo requires senior co-approval regardless of tier.',
+  'd-pax':   'PAX A920 Pro slick: Android smart terminal — 5-inch touchscreen, built-in thermal printer, NFC contactless (Apple Pay / Google Pay), chip + swipe, 4G + wifi, all-day battery with charging base. List $299 or $12/mo. Auto-batches nightly (default 10:30 PM local). Certified: TSYS + VPC native, North FSP via VAR swap, Fiserv under review.',
+  'd-lane':  'Ingenico Lane 3000 slick: PIN pad companion for integrated POS lanes — $149, chip/swipe/contactless, no standalone mode; pairs with counter POS systems, not a terminal replacement.',
+};
+function _klbKnowCtx(){
+  const files = KB_DATA.files.map(f => ({ name:f.name, folder:(klbFolder(f.folderId)||{}).name || '', kind:f.kind,
+    content: (typeof KLB_DOC_CONTENT !== 'undefined' && KLB_DOC_CONTENT[f.id]) || undefined }));
+  const strip = h => String(h||'').replace(/<[^>]+>/g,'');
+  const excerpts = (typeof KLB_SCRIPTS !== 'undefined' ? KLB_SCRIPTS : []).map(s2 => ({ q:s2.q, a:strip(s2.a), sources:s2.sources||[] }));
+  const minimums = (typeof KLBR_MINIMUMS !== 'undefined' ? KLBR_MINIMUMS : []).map(m => m.platform + ': ' + m.mtd.toLocaleString() + ' of ' + m.commit.toLocaleString() + ' txns MTD (day ' + (typeof KLBR_MIN_DAY !== 'undefined' ? KLBR_MIN_DAY : 26) + ' of 31)');
+  const rules = (typeof KLBR_RULES !== 'undefined' ? KLBR_RULES : []).map(r => r.id + ': ' + strip(r.text));
+  const grid = (typeof KLBR_GRID !== 'undefined' && typeof KLBR_PLATFORMS !== 'undefined')
+    ? KLBR_GRID.map(row => row.name + ' — ' + row.cells.map((c,i) => KLBR_PLATFORMS[i] + ':' + c).join(', ')) : [];
+  const merchants = (typeof merchantData !== 'undefined' ? merchantData : []).slice(0, 24)
+    .map(m => m.name + ' · ' + (m.status||'') + (m.subStage ? '/'+m.subStage : '') + ' · ' + (m.partner||'') + ' · risk ' + (m.risk||'—') + (m.actionItem ? ' · next: ' + m.actionItem : ''));
+  const uw = (typeof UW_WORKBENCH_DATA !== 'undefined') ? Object.keys(UW_WORKBENCH_DATA).map(n => {
+    const u = UW_WORKBENCH_DATA[n];
+    const flags = (u.checks||[]).filter(c => c.state !== 'pass').map(c => c.name + ' ' + c.state);
+    return n + ': tier ' + (u.riskTier||'—') + (flags.length ? ' · flags: ' + flags.join(', ') : ' · checks clean')
+      + (u.underwriter ? ' · UW: ' + u.underwriter.name : '') + (u.bankPreVet ? ' · pre-vet: ' + u.bankPreVet.state : '');
+  }) : [];
+  return { libraryFiles:files, knowledgeExcerpts:excerpts, platformMinimums:minimums, routingRules:rules, eligibilityGrid:grid, merchants, underwritingFiles:uw };
+}
+function _klbKnowBubble(who, html){
+  const th = document.getElementById('klb-know-thread');
+  const sug = document.getElementById('klb-know-suggest');
+  if (sug) sug.remove();
+  const hero = th.querySelector('div[style*="text-align:center"]');
+  if (hero) hero.style.display = 'none';
+  const d = document.createElement('div');
+  d.className = 'klb-msg' + (who === 'user' ? ' user' : '');
+  d.innerHTML = '<div class="who">' + (who === 'user' ? 'You' : 'Knowledge base') + '</div><div class="klb-bub">' + html + '</div>';
+  th.appendChild(d);
+  th.scrollIntoView === undefined || d.scrollIntoView({ block:'nearest' });
+  return d;
+}
+function _klbKnowSources(replyText){
+  const hits = [];
+  KB_DATA.files.forEach(f => {
+    if (replyText.toLowerCase().includes(f.name.toLowerCase().replace(/\.(pdf|xlsx|docx)$/,'')) || replyText.toLowerCase().includes(f.name.toLowerCase()))
+      hits.push('<button class="klb-cite" onclick="klbOpenDoc(\'' + f.id + '\')">📚 ' + f.name + '</button>');
+  });
+  if (/routing rule|eligibility grid|platform minimum|minimums/i.test(replyText))
+    hits.push('<button class="klb-cite" onclick="klbLibTab(\'routing\')">🧭 Routing Rules & Minimums</button>');
+  return hits.length ? '<div class="klb-src" style="margin-top:9px;"><div class="klb-src-title">Sources</div>' + hits.join(' ') + '</div>' : '';
+}
+async function klbKnowSend(preset){
+  const inp = document.getElementById('klb-know-input');
+  const q = (preset || (inp && inp.value) || '').trim();
+  if (!q) return;
+  if (inp) inp.value = '';
+  _klbKnowBubble('user', q.replace(/</g,'&lt;'));
+  const typing = _klbKnowBubble('ai', '<span class="klb-cursor"></span>');
+  window._klbKnowLog = window._klbKnowLog || [];
+  window._klbKnowLog.push({ role:'user', text:q.slice(0,800) });
+  let reply = null;
+  try {
+    const res = await fetch('/api/agent/chat', { method:'POST', headers:{ 'content-type':'application/json' },
+      body: JSON.stringify({ token: window.AGENT_CHAT_TOKEN || undefined, sessionType:'knowledge',
+        merchant:{ surface:'Suede Partner OS — Knowledge base' }, board:_klbKnowCtx(),
+        transcript: window._klbKnowLog.slice(-10), message:q }) });
+    if (res.ok) { const j = await res.json(); if (j && j.text) reply = j.text; }
+  } catch(e) {}
+  if (reply) {
+    window._klbKnowLog.push({ role:'agent', text:reply.slice(0,800) });
+    const safe = reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+    typing.querySelector('.klb-bub').innerHTML = safe + _klbKnowSources(reply);
+    return;
+  }
+  /* fallback — scripted library answers */
+  const s2 = (typeof KLB_SCRIPTS !== 'undefined' ? KLB_SCRIPTS : []).find(x => q.toLowerCase().split(/\s+/).filter(w => w.length > 4).some(w => x.q.toLowerCase().includes(w)));
+  const a = s2 ? s2.a : 'I answer from the ' + KB_DATA.files.length + ' documents in the shared Library plus live merchant and routing data. Try one of the suggested questions, or open the Library tab to browse what I know.';
+  const srcs = s2 && s2.sources ? s2.sources.map(n => { const f = KB_DATA.files.find(x => x.name.toLowerCase().includes(String(n).toLowerCase().slice(0,14))); return f ? '<button class="klb-cite" onclick="klbOpenDoc(\'' + f.id + '\')">📚 ' + f.name + '</button>' : ''; }).join(' ') : '';
+  typing.querySelector('.klb-bub').innerHTML = a + (srcs ? '<div class="klb-src" style="margin-top:9px;"><div class="klb-src-title">Sources</div>' + srcs + '</div>' : '');
 }
 
 function klbrCycle(ri, ci) {
