@@ -42203,7 +42203,7 @@ function _agentNextInQueue(exclude){
       agentAddMsg(sess, 'That wraps <b>'+_agdkEscHtml(sess.merchant)+'</b>. Next in queue: <b>'+_agdkEscHtml(nxt.name)+'</b> — waiting '+nxt.waitLabel+'.' +
         '<div style="margin-top:9px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
         '<button class="btn btn-primary" style="font-size:12px;padding:8px 14px;" onclick="agentOpenSession(\''+_agdkEsc(nxt.name)+'\')">▶ Start — '+_agdkEscHtml(nxt.name)+'</button>' +
-        '<span style="font-size:11px;color:var(--text-muted);">'+(nxt.kind==='uw' ? 'UW session' : 'Deployment session')+' · '+_agdkEscHtml(_agqReason(nxt))+'</span></div>');
+        '<span style="font-size:11px;color:var(--text-muted);">'+(nxt.kind==='uw' ? 'UW session' : nxt.kind==='sig' ? 'Record chat — signature stage' : 'Deployment session')+' · '+_agdkEscHtml(_agqReason(nxt))+'</span></div>');
     } else {
       agentAddMsg(sess, 'That wraps <b>'+_agdkEscHtml(sess.merchant)+'</b> — and the queue is clear. Nothing else waiting on a human right now.');
     }
@@ -42976,7 +42976,10 @@ function _mtSessionDress(sess, html){
   const lab = ch === 'dep' ? 'Deployment' : 'UW team';
   return String(html)
     .replace(/class="amode int">(Agent|Internal)</g, 'class="amode ' + ch + '">' + lab + '<')
-    .replace(/class="abub int">/g, 'class="abub ' + ch + '">');
+    .replace(/class="abub int">/g, 'class="abub ' + ch + '">')
+    /* mirrored copies are viewing snapshots — never getElementById targets.
+       Neutralizing ids keeps live run-tiles (lgt-*) pointing at the session DOM. */
+    .replace(/ id="/g, ' data-mtid="');
 }
 
 /* 1 ▸ every session final lands in the store (dressed for the record view) */
@@ -43030,15 +43033,30 @@ function _mtSessionDress(sess, html){
   populateSigUWThread = function(){
     _pop.apply(this, arguments);
     const name = (typeof _currentSBMerchant !== 'undefined') && _currentSBMerchant;
-    const rec = name && MERCHANT_THREAD[name];
+    if (!name) return;
     const th = document.getElementById('sig-uw-thread');
-    if (!th || !rec || !rec.length) return;
+    if (!th) return;
+    const sess = AGENT_DESK.sessions && AGENT_DESK.sessions[name];
+    let replay = '';
+    if (sess && sess.threadHTML) {
+      /* the session transcript already interleaves the record mirrors in true
+         order AND tracks tile state — pull the freshest DOM first if the
+         session pane currently shows this merchant */
+      if (AGENT_DESK.active === name && typeof _agentSnapshot === 'function') {
+        try { _agentSnapshot(sess); } catch(e) {}
+      }
+      replay = _mtSessionDress(sess, sess.threadHTML);
+    } else {
+      const rec = MERCHANT_THREAD[name];
+      if (rec && rec.length) replay = rec.map(e => e.html).join('');
+    }
+    if (!replay) return;
     _mtSeeding = true;
     try {
       th.insertAdjacentHTML('beforeend',
         '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--blue);"></div>' +
         '<div class="syst">Live activity — everything below happened in this conversation</div></div></div>' +
-        rec.map(e => e.html).join(''));
+        replay);
     } finally { _mtSeeding = false; }
     th.scrollTop = th.scrollHeight;
     if (typeof _sigUWUpdateCount === 'function') _sigUWUpdateCount();
@@ -43118,6 +43136,93 @@ function _agentAutoFileReport(sess){
     if (sess) setTimeout(() => _agentAutoFileReport(sess), 1200);
   };
 })();
+
+/* ── SIGNATURE MERCHANTS IN THE QUEUE — still work items (envelopes expire),
+   but their surface is the record chat, never a session ── */
+function agentQueueOpenRecord(name){
+  if (typeof agentQueueClose === 'function') { try { agentQueueClose(); } catch(e) {} }
+  const m = merchantData.find(x => x.name === name);
+  navigateToMerchant(name, m ? m.status : 'signature');
+}
+
+(function(){
+  /* stage-boundary guard — any path that tries to open a session on an
+     unsigned deal routes to the record chat instead (the Neon beat's
+     extraQueue promotion is the one sanctioned exception) */
+  const _open = agentOpenSession;
+  agentOpenSession = function(name){
+    const m = merchantData.find(x => x.name === name);
+    if (m && m.status === 'signature' && !AGENT_DESK.extraQueue.includes(name) && !AGENT_DESK.sessions[name]) {
+      agentQueueOpenRecord(name);
+      return;
+    }
+    _open.apply(this, arguments);
+  };
+
+  const _entries = _agentQueueEntries;
+  _agentQueueEntries = function(){
+    const out = _entries();
+    merchantData.filter(m => m.status === 'signature' && !AGENT_DESK.extraQueue.includes(m.name))
+      .forEach(m => {
+        const overdue = (m.tags||[]).includes('Activation Overdue');
+        out.push({ name:m.name, m, kind:'sig', sess:null, isNew:false, overdue,
+          waitMins:_agqMins(m.lastAct), waitLabel:(m.lastAct||'—').replace(/\s*ago\s*$/,''), urg: overdue ? 3 : 0 });
+      });
+    return out.sort(_agqSort);
+  };
+
+  const _reason = _agqReason;
+  _agqReason = function(e){
+    if (e.kind !== 'sig') return _reason(e);
+    if (typeof ccQ !== 'undefined') {
+      const it = ccQ.find(i => i.merchant === e.name && !i.done && !i.snoozed);
+      if (it) return it.title;
+    }
+    return (e.m && e.m.actionItem) || 'package out — awaiting signatures';
+  };
+
+  const _row = _agqRow;
+  _agqRow = function(e){
+    if (e.kind !== 'sig') return _row(e);
+    const esc = _agdkEsc(e.name);
+    const stageColor = (typeof mStatusConfig !== 'undefined' && mStatusConfig.signature && mStatusConfig.signature.color) || '#7C849A';
+    const waitCls = e.waitMins >= 1440 ? ' red' : e.waitMins >= 120 ? ' amber' : '';
+    return '<div class="agq-row" onclick="agentQueueOpenRecord(\''+esc+'\')" title="Open the record chat">' +
+      '<div class="agq-row-top">' +
+        '<span class="p-badge" style="flex-shrink:0;background:'+stageColor+'22;color:'+stageColor+';border:1px solid '+stageColor+'40;">Signature</span>' +
+        '<span class="agq-name">'+_agdkEscHtml(e.name)+'</span>' +
+        '<span class="agq-wait'+waitCls+'">&#x23F1; '+e.waitLabel+'</span>' +
+      '</div>' +
+      '<div class="agq-reason">'+_agqReason(e)+'</div>' +
+      '<div class="agq-chips"><span class="p-badge" style="background:var(--bg-elevated);color:var(--text-muted);border:1px solid var(--border-strong);">Opens the record chat</span></div>' +
+      '</div>';
+  };
+
+  const _pill = _agentRenderPill;
+  _agentRenderPill = function(entries){
+    _pill(entries);
+    const counts = document.getElementById('agent-queue-counts');
+    if (!counts) return;
+    const uw = entries.filter(e => e.kind === 'uw').length;
+    const sig = entries.filter(e => e.kind === 'sig').length;
+    const dep = entries.length - uw - sig;
+    counts.textContent = 'UW ' + uw + (sig ? ' \u00b7 Sig ' + sig : '') + ' \u00b7 Deploy ' + dep;
+  };
+
+  const _fly = _agentRenderFlyout;
+  _agentRenderFlyout = function(entries){
+    _fly(entries);
+    const sig = (entries||[]).filter(e => e.kind === 'sig');
+    if (!sig.length) return;
+    const list = document.getElementById('agent-queue-list');
+    if (!list) return;
+    list.insertAdjacentHTML('beforeend',
+      '<div class="agq-group">Signature <span class="agdk-count">'+sig.length+'</span></div>' + sig.map(_agqRow).join(''));
+  };
+})();
+
+/* re-render so the boot pass (which ran before these wrappers) picks them up */
+agentRenderQueue();
 /* ===== /AGENT DESK ===== */
 </script>
 
