@@ -39838,6 +39838,7 @@ function _agentRefreshUWNBA(sess, opts){
   else chips += '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\''+n+'\')">📄 View documents</button>';
   chips += '<button class="agdk-chip" data-hook="agent-nba-message" onclick="agentNBA(\'message\',\''+n+'\')">✉ Message partner</button>';
   chips += '<button class="agdk-chip" data-hook="agent-nba-team" onclick="agentNBA(\'team\',\''+n+'\')">👥 Ask the team</button>';
+  chips += '<button class="agdk-chip" data-hook="agent-nba-escalate" onclick="agentNBA(\'escalate\',\''+n+'\')">⤴ Escalate</button>';
   if (!(sess.uwb && sess.uwb.underwriter)) chips += '<button class="agdk-chip" data-hook="agent-nba-assign" onclick="uwbAssignOpen(\''+n+'\',\'uw\')">👤 Assign underwriter</button>';
   _agentFinal(sess, '<div class="act"><div class="agdk-nba" id="agdk-nba-'+_agdkSlug(sess.merchant)+'">' + chips + '</div></div>');
 }
@@ -39850,6 +39851,7 @@ function _agentAddNBA(sess, locked){
     '<button class="agdk-chip" data-hook="agent-nba-route" onclick="agentNBA(\'route\',\''+n+'\')">🧭 BIN routing</button>' +
     '<button class="agdk-chip" data-hook="agent-nba-message" onclick="agentNBA(\'message\',\''+n+'\')">✉ Message partner</button>' +
     '<button class="agdk-chip" data-hook="agent-nba-team" onclick="agentNBA(\'team\',\''+n+'\')">👥 Ask the team</button>' +
+    '<button class="agdk-chip" data-hook="agent-nba-escalate" onclick="agentNBA(\'escalate\',\''+n+'\')">⤴ Escalate</button>' +
     '<button class="agdk-chip" data-hook="agent-nba-docs" onclick="agentNBA(\'docs\',\''+n+'\')">📄 View documents</button>' +
     '</div></div>');
 }
@@ -40800,7 +40802,7 @@ function agentFlowApprove(sess){
       const fail = (sess.uwb.checks||[]).find(c => c.state === 'fail');
       agentAddMsg(sess, '<b>Approve is locked.</b> '+(fail ? fail.name+' came back red — '+fail.val : 'A red check is open.')+
         ' I can’t clear this one myself: call-out verification has to be run by a human on the risk team.' +
-        '<div style="margin-top:8px;"><button class="agdk-chip" onclick="agentNBA(\'team\',\''+_agdkEsc(sess.merchant)+'\')">👥 Ask the team — I\u2019ll draft the #NY-risk escalation</button></div>');
+        '<div style="margin-top:8px;"><button class="agdk-chip" onclick="agentNBA(\'escalate\',\''+_agdkEsc(sess.merchant)+'\')">⤴ Escalate — route it to the right person</button></div>');
     }, 650);
     return;
   }
@@ -42705,19 +42707,31 @@ function agentLgSerialPick(name, i){
   _lgStepPay(sess);
 }
 
-/* STEP 3 — payment (gates shipping) */
+/* STEP 3 — payment: who pays for the device? Never skipped — a boarding
+   decision the run always surfaces, even when a route is already on file */
 function _lgStepPay(sess){
   const d = _agentDeploy(sess);
-  const e = d.equipment.find(x => x.pay === 'due');
-  if (!e) { sess._lg.n = (sess._lg.n || 0) + 1; sess._lg.dec.pay = (d.equipment[0]||{}).payNote || 'settled'; return _lgStepProv(sess); }
   const n = _agdkEsc(sess.merchant);
-  _lgTile(sess, 'pay', '💳', 'Payment — gates shipping', '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Nothing ships until this is set. Pick the route:</div><div class="agdk-pick-row">' +
+  const due = d.equipment.some(x => x.pay === 'due');
+  const onFile = (d.equipment[0]||{}).payNote;
+  const intro = due
+    ? '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Who pays for the device? Nothing ships until this is set:</div>'
+    : '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Who pays for the device? On file: <b>' + (onFile || 'settled') + '</b> — confirm it or reroute:</div>';
+  _lgTile(sess, 'pay', '💳', 'Payment — who pays for the device?', intro + '<div class="agdk-pick-row">' +
+    (due ? '' : '<button class="agdk-chip approve" onclick="agentLgPayKeep(\'' + n + '\')">✓ Keep as-is</button>') +
     AGENT_PAY_OPTS.map((o,i) => '<button class="agdk-chip pend" onclick="agentLgPayPick(\'' + n + '\',' + i + ')">' + o.icon + ' ' + o.label + '</button>').join('') + '</div>');
+}
+function agentLgPayKeep(name){
+  const sess = AGENT_DESK.sessions[name]; const d = _agentDeploy(sess); if (!sess || !d) return;
+  sess._lg.dec.pay = (d.equipment[0]||{}).payNote || 'settled';
+  _lgDone(sess, 'pay', '<b>' + sess._lg.dec.pay + '</b> — confirmed, no change');
+  _lgStepProv(sess);
 }
 function agentLgPayPick(name, i){
   const sess = AGENT_DESK.sessions[name]; const d = _agentDeploy(sess);
   const o = AGENT_PAY_OPTS[i]; if (!sess || !o) return;
-  d.equipment.forEach((e, ei) => { if (e.pay === 'due') { if (typeof drdSetPay === 'function') drdSetPay(name, ei, o.label); e.pay = 'paid'; e.payNote = o.payNote; } });
+  const anyDue = d.equipment.some(e => e.pay === 'due');
+  d.equipment.forEach((e, ei) => { if (e.pay === 'due' || !anyDue) { if (typeof drdSetPay === 'function') drdSetPay(name, ei, o.label); e.pay = 'paid'; e.payNote = o.payNote; } });
   sess._lg.dec.pay = o.label;
   _agentDrActivity(sess, 'var(--green)', '💳 ' + o.done + ' — via deployment run');
   _lgDone(sess, 'pay', '<b>' + o.label + '</b> — shipping unlocked');
@@ -42966,6 +42980,14 @@ function _mtRecord(name, html, src){
       th.insertAdjacentHTML('beforeend', html);
       th.scrollTop = th.scrollHeight;
       if (typeof _sigUWUpdateCount === 'function') _sigUWUpdateCount();
+    }
+    /* …and in the Deal Room chat for approved/boarding merchants */
+    const drV = document.getElementById('view-deal-room');
+    const drTh = document.getElementById('drActivityThread');
+    if (drTh && drV && drV.classList.contains('active') &&
+        typeof _drCurrentMerchant !== 'undefined' && _drCurrentMerchant === name) {
+      drTh.insertAdjacentHTML('beforeend', html);
+      drTh.scrollTop = drTh.scrollHeight;
     }
   }
 }
@@ -43220,6 +43242,152 @@ function agentQueueOpenRecord(name){
       '<div class="agq-group">Signature <span class="agdk-count">'+sig.length+'</span></div>' + sig.map(_agqRow).join(''));
   };
 })();
+
+/* 6 ▸ the Deal Room chat is the same thread — rebuilding it replays the
+   session story (approved/boarding merchants' general chat) */
+(function(){
+  const _pdr = populateDealRoom;
+  populateDealRoom = function(m){
+    _pdr.apply(this, arguments);
+    const name = m && m.name; if (!name) return;
+    const th = document.getElementById('drActivityThread'); if (!th) return;
+    const sess = AGENT_DESK.sessions && AGENT_DESK.sessions[name];
+    let replay = '';
+    if (sess && sess.threadHTML) {
+      if (AGENT_DESK.active === name && typeof _agentSnapshot === 'function') { try { _agentSnapshot(sess); } catch(e) {} }
+      replay = _mtSessionDress(sess, sess.threadHTML);
+    } else {
+      const rec = MERCHANT_THREAD[name];
+      if (rec && rec.length) replay = rec.map(e => e.html).join('');
+    }
+    if (!replay) return;
+    _mtSeeding = true;
+    try {
+      th.insertAdjacentHTML('beforeend',
+        '<div class="act sys"><div class="syse"><div class="sysd" style="background:var(--blue);"></div>' +
+        '<div class="syst">Live session activity — the full conversation, one thread</div></div></div>' + replay);
+    } finally { _mtSeeding = false; }
+    setTimeout(() => th.scrollTop = th.scrollHeight, 60);
+  };
+})();
+
+/* 7 ▸ chat typed into the Deal Room (or the record chat) persists + mirrors */
+(function(){
+  const _send = sendChatMessage;
+  sendChatMessage = function(taId, threadId, intBtnId){
+    _send.apply(this, arguments);
+    try {
+      const th = document.getElementById(threadId);
+      const last = th && th.lastElementChild;
+      if (!last || !last.classList.contains('act')) return;
+      let name = null;
+      if (threadId === 'drActivityThread' && typeof _drCurrentMerchant !== 'undefined') name = _drCurrentMerchant;
+      else if (threadId === 'sig-uw-thread' && typeof _currentSBMerchant !== 'undefined') name = _currentSBMerchant;
+      if (name) _mtRecord(name, last.outerHTML, 'record');
+    } catch(e) {}
+  };
+})();
+
+/* ── UW ESCALATION — the route past a red check: pick the right person,
+   they dig in, run the call-out, clear the check, and the file unlocks. ── */
+const AGENT_ESC_TARGETS = {
+  alvarez: { key:'alvarez', person:'R. Alvarez', role:'Senior UW', label:'R. Alvarez (Senior UW)', email:'r.alvarez@twillpayments.com', av:'RA', avc:'#8358A8',
+             does:'tier overrides, concurrence co-sign' },
+  osei:    { key:'osei', person:'N. Osei', role:'Risk', label:'N. Osei (Risk)', email:'n.osei@twillpayments.com', av:'NO', avc:'#4E7A8A',
+             does:'call-out verification, fraud alerts' },
+  channel: { key:'channel', person:'#NY-risk', role:'Risk channel', label:'#NY-risk', email:'risk-ny@twillpayments.com', av:'#', avc:'#7C849A',
+             does:'whole risk channel — first responder picks it up' },
+};
+
+(function(){
+  const _esc = agentFlowEscalate;
+  agentFlowEscalate = function(sess){
+    if (sess.kind !== 'uw') return _esc.apply(this, arguments);
+    if (sess.decision && sess.decision.type === 'escalated') { agentAddSys(sess, 'Already escalated — waiting on the verdict', 'var(--text-muted)'); return; }
+    if (_agentDecided(sess)) return;
+    agentAddUserMsg(sess, '⤴ Escalate.');
+    agentAddTyping(sess);
+    setTimeout(() => {
+      agentRemoveTyping();
+      const n = _agdkEsc(sess.merchant);
+      const fail = (sess.uwb && (sess.uwb.checks||[]).find(c => c.state === 'fail'));
+      const why = fail ? '<b>' + fail.name + '</b> is red — ' + fail.val : 'Senior review requested on this file.';
+      const rows = Object.values(AGENT_ESC_TARGETS).map(t =>
+        '<button class="agdk-chip" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin-top:6px;" onclick="agentUWEscalateTo(\'' + n + '\',\'' + t.key + '\')">' +
+        '<span class="aav" style="width:20px;height:20px;font-size:9px;background:' + t.avc + ';color:#fff;flex-shrink:0;">' + t.av + '</span>' +
+        '<span><b>' + t.label + '</b> — ' + t.does + '</span></button>').join('');
+      agentAddMsg(sess, why + '<br><b>Who should take it?</b>' + rows);
+    }, 650);
+  };
+})();
+
+function agentUWEscalateTo(name, key){
+  const sess = AGENT_DESK.sessions[name]; if (!sess) return;
+  const t = AGENT_ESC_TARGETS[key] || AGENT_ESC_TARGETS.channel;
+  sess._escTarget = t;
+  const fail = (sess.uwb && (sess.uwb.checks||[]).find(c => c.state === 'fail'));
+  const vol = ((sess.dr && sess.dr.synopsis && sess.dr.synopsis.business && sess.dr.synopsis.business.monthlyVol) || sess.m.potVol || '—');
+  const body = (key === 'channel' ? '@NY-risk' : t.person) + ' — ' + sess.merchant + ' (' + vol + '/mo · ' + (sess.m.partner||'—') + '):\n\n' +
+    (fail ? fail.val : 'Requesting senior review on this file.') + '\n\nThe file is locked in UW — approve is disabled until this clears. ' +
+    (fail ? 'Can you run the call-out verification today? ' : '') + 'Session transcript is attached; everything is logged.';
+  _agentDraftCard(sess, {
+    kind:'team', channel:'team',
+    to: t.label, email: t.email,
+    subject:(fail ? 'Fraud alert — ' : 'Senior review — ') + sess.merchant + ' (UW halt)',
+    body,
+    intro:'Escalation drafted for ' + t.label + ' — edit if needed, then post. Approve stays locked until they clear it.',
+  });
+}
+
+/* target-aware commit (supersedes the earlier wrapper — auto-file included) */
+_agentTeamCommit = function(sess, d, bodyText){
+  const t = sess._escTarget || AGENT_ESC_TARGETS.channel;
+  sess.comms.push({ time:_agdkTime(), kind:'team', label:'Escalation → ' + t.label, preview:_agdkStrip(bodyText).slice(0,110) });
+  sess.decision = { type:'escalated', time:_agdkTime(), to:t.label };
+  if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:'Twill AI (agent session)',
+    what:'Escalated to ' + t.label + ' — call-out verification requested' });
+  agentAddSys(sess, '👥 ' + (t.key === 'channel' ? 'Posted to #NY-risk — 3 risk analysts notified' : 'Routed to ' + t.label + ' — acknowledged, it’s on their queue') + ' · approve stays locked pending verification', 'var(--red)');
+  agentToast('👥', 'Escalated to <strong>' + t.label + '</strong> — ' + sess.merchant);
+  agentRenderRail(); agentRenderQueue();
+  setTimeout(() => { _agentRefreshUWNBA(sess, { say:'Escalation is with ' + (t.key === 'channel' ? 'the risk team' : t.person) + ' — I’ll surface the verdict here the moment it lands. Meanwhile:' }); }, 400);
+  setTimeout(() => _agentAutoFileReport(sess), 700);
+  _agentScheduleEscReturn(sess);
+};
+
+/* the correct person digs in — verdict returns, check clears, file unlocks */
+function _agentScheduleEscReturn(sess){
+  if (sess._escReturnArmed) return;
+  const fail = (sess.uwb && (sess.uwb.checks||[]).find(c => c.state === 'fail'));
+  if (!fail) return;
+  sess._escReturnArmed = true;
+  setTimeout(() => _agentEscReturn(sess, fail), 14000);
+}
+function _agentEscReturn(sess, fail){
+  const t = (sess._escTarget && sess._escTarget.key !== 'channel') ? sess._escTarget : AGENT_ESC_TARGETS.osei;
+  agentAddTyping(sess);
+  setTimeout(() => {
+    agentRemoveTyping();
+    const owner = ((sess.m && sess.m.owner) || 'the principal').replace(/\s*\(.*$/, '');
+    _agentFinal(sess, '<div class="act"><div class="ah"><div class="aav" style="background:' + t.avc + ';color:#fff;">' + t.av + '</div>' +
+      '<span class="aname">' + t.person + ' · ' + t.role + '</span><span class="amode uw">UW team</span><span class="atime">' + _agdkTime() + '</span></div>' +
+      '<div class="abub uw">Took the call-out on <b>' + sess.merchant + '</b>. Reached ' + owner + ' on the number from the Experian file header — identity verified, application intent confirmed. ' +
+      'The alert is a <b>stale credit-freeze artifact</b> from the 2024 retail breach, not an active dispute. Clearing the check — the file is yours again.' +
+      '<div style="margin-top:6px;font-size:11px;color:var(--text-secondary);">✓ Call-out verification logged · Experian ref attached to the record</div>' +
+      '<div style="font-size:9px;color:var(--text-muted);margin-top:5px;">&#x1F512; Only UW team members can see this</div></div></div>');
+    fail.state = 'warn';
+    fail.val = 'Cleared by call-out — stale credit-freeze artifact, identity verified (' + t.person + ', ' + t.role + ')';
+    if (sess.uwb && sess.uwb.audit) sess.uwb.audit.push({ t:'Just now', who:t.person + ' (' + t.role + ')',
+      what:'Call-out verification completed — fraud alert cleared, red check lifted' });
+    sess.verdict = 'review';
+    sess.decision = null;
+    sess._escTarget = null;
+    sess._apprOpen = false;   // an approve aborted pre-verdict must not dead-end the unlocked file
+    agentAddSys(sess, '🟢 Red check cleared by ' + t.person + ' — approve is unlocked', 'var(--green)');
+    try { if (typeof renderUWWorkbench === 'function' && typeof _currentSBMerchant !== 'undefined' && _currentSBMerchant === sess.merchant) renderUWWorkbench(sess.merchant); } catch(e) {}
+    agentRenderRail(); agentRenderQueue();
+    setTimeout(() => { _agentRefreshUWNBA(sess, { say:'That clears the block. No red checks remain — the file is ready for a decision:' }); }, 600);
+  }, 1400);
+}
 
 /* re-render so the boot pass (which ran before these wrappers) picks them up */
 agentRenderQueue();
