@@ -16379,7 +16379,8 @@ const PARTNER_DATA = {
   'Apex Elite':       { id:'PTR-0042', initials:'AE', color:'#6B839B', type:'ISO',   onboarded:'Jan 8, 2025',    age:'14 months ago', users:7,  active:218, pipeline:14, atRisk:3,  total:235, avg:'16.8', churn:'2.1%', vol:'$921K', txn:'14,382', cb:'0.8%', auth:'96.4%',
     stages: { lead:9, inreview:6, approved:5, boarding:4, active:218 },
     types: { labels:['Retail','Restaurant','E-commerce','Healthcare','Other'], data:[38,24,18,12,8], colors:['#6B839B','#5B7A5E','#8C7A5E','#A67C5B','#4B4B6B'] },
-    scheduleA: { payout:'Net 30', revShare:{low:'80% Pass Through',med:'65% Pass Through',high:'50% Pass Through'}, monthlyMin:{low:'$0.00',med:'$50.00',high:'$50.00'}, annualFee:{low:'$0.00',med:'$25.00',high:'$50.00'} },
+    scheduleA: { payout:'Net 30', revShare:{low:'80% Pass Through',med:'65% Pass Through',high:'50% Pass Through'}, monthlyMin:{low:'$0.00',med:'$50.00',high:'$50.00'}, annualFee:{low:'$0.00',med:'$25.00',high:'$50.00'},
+      equipFees:[ {device:'PAX A920 Pro', type:'One-time', amount:'$299.00'}, {device:'PAX A920 Pro', type:'Monthly', amount:'$12.00'} ] },
     team: [
       { name:'James Harmon',   role:'Director',         initials:'JH', color:'#6B839B', email:'jharmon@apexelite.com' },
       { name:'Sara Delgado',   role:'Account Manager',  initials:'SD', color:'#8C7A5E', email:'sdelgado@apexelite.com' },
@@ -16402,7 +16403,8 @@ const PARTNER_DATA = {
   'NovaPay':          { id:'PTR-0038', initials:'NV', color:'#5B7A5E', type:'ISO',   onboarded:'Mar 15, 2025',   age:'12 months ago', users:5,  active:157, pipeline:9,  atRisk:5,  total:171, avg:'13.1', churn:'3.2%', vol:'$641K', txn:'9,840',  cb:'1.1%', auth:'95.2%',
     stages: { lead:5, inreview:4, approved:3, boarding:2, active:157 },
     types: { labels:['Restaurant','Retail','Hospitality','E-commerce','Other'], data:[42,28,14,10,6], colors:['#5B7A5E','#6B839B','#A67C5B','#8C7A5E','#4B4B6B'] },
-    scheduleA: { payout:'Net 30', revShare:{low:'78% Pass Through',med:'63% Pass Through',high:'48% Pass Through'}, monthlyMin:{low:'$0.00',med:'$50.00',high:'$50.00'}, annualFee:{low:'$0.00',med:'$25.00',high:'$50.00'} },
+    scheduleA: { payout:'Net 30', revShare:{low:'78% Pass Through',med:'63% Pass Through',high:'48% Pass Through'}, monthlyMin:{low:'$0.00',med:'$50.00',high:'$50.00'}, annualFee:{low:'$0.00',med:'$25.00',high:'$50.00'},
+      equipFees:[ {device:'PAX A77', type:'Monthly', amount:'$9.00'} ] },
     team: [
       { name:'Maria Gutierrez', role:'CEO',              initials:'MG', color:'#5B7A5E', email:'mgutierrez@novapay.io' },
       { name:'David Park',      role:'ISO Manager',      initials:'DP', color:'#6B839B', email:'dpark@novapay.io' },
@@ -16514,6 +16516,54 @@ const SCHEDULE_A_ROWS = [
 let _pdTypesChart = null;
 let _currentPartner = null;
 
+/* ── Equipment fees (Schedule A) — device list pulls live from Inventory ── */
+const EQUIP_FEE_TYPES = ['One-time', 'Monthly', 'Annual', 'Per transaction', 'Per deployment'];
+function _eqDevOptions(sel){
+  const inv = (typeof INVENTORY_DATA !== 'undefined' ? INVENTORY_DATA : []);
+  return inv.map(i => '<option value="' + i.device.replace(/"/g,'&quot;') + '"' + (i.device === sel ? ' selected' : '') + '>' +
+    i.device + ' — $' + i.cost + ' cost</option>').join('');
+}
+function _eqTypeOptions(sel){
+  return EQUIP_FEE_TYPES.map(t => '<option' + (t === sel ? ' selected' : '') + '>' + t + '</option>').join('');
+}
+function _eqAddRow(hostId, dev, type, amt){
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  const sel = 'background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:5px;padding:6px 8px;color:var(--text-primary);font-size:12px;font-family:var(--font-ui);outline:none;width:100%;';
+  const div = document.createElement('div');
+  div.className = 'sa-eq-row';
+  div.style.cssText = 'display:grid;grid-template-columns:minmax(0,1fr) 150px 110px 22px;gap:8px;align-items:center;margin-bottom:7px;';
+  div.innerHTML =
+    '<select class="eq-dev" style="' + sel + '">' + _eqDevOptions(dev) + '</select>' +
+    '<select class="eq-type" style="' + sel + '">' + _eqTypeOptions(type) + '</select>' +
+    '<input class="eq-amt" placeholder="$0.00" value="' + String(amt || '').replace(/"/g,'&quot;') + '" style="' + sel + 'font-family:var(--font-mono);text-align:right;">' +
+    '<span style="cursor:pointer;color:var(--text-muted);font-size:13px;text-align:center;" title="Remove" onclick="this.parentElement.remove()">&#10005;</span>';
+  host.appendChild(div);
+}
+function _eqCollect(hostId){
+  const host = document.getElementById(hostId);
+  if (!host) return [];
+  return [...host.querySelectorAll('.sa-eq-row')].map(r => ({
+    device: r.querySelector('.eq-dev').value,
+    type: r.querySelector('.eq-type').value,
+    amount: (r.querySelector('.eq-amt').value || '').trim() || '$0.00',
+  })).filter(f => f.device);
+}
+function _eqEditBlock(hostId){
+  return '<div style="margin-top:16px;">' +
+    '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Equipment fees</div>' +
+    '<div id="' + hostId + '"></div>' +
+    '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="_eqAddRow(\'' + hostId + '\')">+ Add equipment fee</button>' +
+    '<span style="font-size:10px;color:var(--text-muted);margin-left:8px;">device list pulls live from Inventory</span></div>';
+}
+function _eqReadTable(fees){
+  let h = '<div style="margin-top:16px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Equipment fees</div>';
+  if (!fees || !fees.length) return h + '<div style="font-size:12px;color:var(--text-muted);">No equipment-specific fees on this program.</div></div>';
+  h += '<table class="sa-table"><thead><tr><th style="text-align:left;">Equipment</th><th style="text-align:left;">Fee type</th><th>Amount</th></tr></thead><tbody>';
+  fees.forEach(f => { h += '<tr><td>' + f.device + '</td><td style="text-align:left;">' + f.type + '</td><td>' + f.amount + '</td></tr>'; });
+  return h + '</tbody></table></div>';
+}
+
 function renderScheduleA(partnerName, editMode) {
   const p = PARTNER_DATA[partnerName];
   if (!p || !p.scheduleA) return;
@@ -16566,7 +16616,10 @@ function renderScheduleA(partnerName, editMode) {
     }
   });
   rows += '</tbody></table>';
+  if (editMode) rows += _eqEditBlock('pd-eqfees-rows');
+  else rows += _eqReadTable(sa.equipFees);
   schedEl.innerHTML = rows;
+  if (editMode) (sa.equipFees || []).forEach(f => _eqAddRow('pd-eqfees-rows', f.device, f.type, f.amount));
 
   // Update action buttons
   if (actionsEl) {
@@ -16613,6 +16666,7 @@ function openAddPartnerDrawer() {
       }
     });
     html += '</tbody></table>';
+    html += _eqEditBlock('ap-eqfees-rows');
     tbl.innerHTML = html;
   }
   ['ap-name','ap-email','ap-wl-name','ap-wl-url'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
@@ -16655,6 +16709,7 @@ function submitAddPartner() {
   if (feeRows['Revenue Share']) sa.revShare = feeRows['Revenue Share'];
   if (feeRows['Monthly Minimum']) sa.monthlyMin = feeRows['Monthly Minimum'];
   if (feeRows['Annual Fee']) sa.annualFee = feeRows['Annual Fee'];
+  sa.equipFees = _eqCollect('ap-eqfees-rows');
 
   PARTNER_DATA[name] = {
     id: ptrid, initials, color, type, onboarded: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
@@ -16702,6 +16757,7 @@ function saveScheduleA(partnerName) {
     const col = inp.getAttribute('data-col');
     if (p.scheduleA.rows[lbl]) p.scheduleA.rows[lbl][col] = inp.value;
   });
+  p.scheduleA.equipFees = _eqCollect('pd-eqfees-rows');
   renderScheduleA(partnerName, false);
 }
 
