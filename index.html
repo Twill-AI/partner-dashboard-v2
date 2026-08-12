@@ -6474,6 +6474,442 @@ function nudgeWithDocs() {
 
 
         <!-- ═══ STEP 7: REVIEW ═══ -->
+        <!-- ═══ STEP 7: UW REVIEW ═══ -->
+        <div class="step-panel" id="step-7">
+          <div class="step-hdr">
+            <span class="step-chip" style="background:var(--yellow-dim);color:var(--yellow);">Step 7 · UW Review</span>
+            <span class="step-hdr-title">Underwriting Analysis</span>
+            <span class="p-badge ba" style="margin-left:4px;">Confidence 68% — 2 docs missing</span>
+          </div>
+
+          <!-- ── SCORE ROW ── -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+            <!-- Risk Score -->
+            <div style="background:var(--bg-surface);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Risk Score</div>
+              <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--amber);letter-spacing:-2px;line-height:1;">71</div>
+              <div style="font-size:12px;color:var(--amber);font-weight:600;">Medium Risk</div>
+              <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
+                <div style="height:100%;width:71%;background:linear-gradient(90deg,var(--green),var(--amber));border-radius:4px;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:var(--text-muted);">
+                <span>0 High</span><span>100 Low</span>
+              </div>
+            </div>
+            <!-- Confidence -->
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Confidence</div>
+              <div style="font-size:42px;font-weight:800;font-family:var(--font-mono);color:var(--blue);letter-spacing:-2px;line-height:1;">68<span style="font-size:20px;">%</span></div>
+              <div style="font-size:13px;color:var(--text-secondary);">Based on available data</div>
+              <div style="width:100%;height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;margin-top:4px;">
+                <div style="height:100%;width:68%;background:var(--blue);border-radius:4px;"></div>
+              </div>
+              <div style="font-size:9px;color:var(--red);">+18% with missing docs</div>
+            </div>
+            <!-- Approval Outlook -->
+            <div style="background:var(--bg-surface);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Approval Outlook</div>
+              <div style="font-size:20px;margin:4px 0;">🟢</div>
+              <div style="font-size:13px;font-weight:700;color:var(--green);">Likely Approved</div>
+              <div style="font-size:13px;color:var(--text-secondary);text-align:center;">Once missing docs received</div>
+              <span class="p-badge bg" style="margin-top:4px;">3 processors matched</span>
+            </div>
+            <!-- Data Coverage -->
+            <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Data Coverage</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Business Info</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Complete</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Bank Analysis</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ 3 months</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Identity Verify</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Processing Hist.</span><span style="font-size:12px;font-weight:600;color:var(--red);">✗ Missing</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text-secondary);">Website</span><span style="font-size:12px;font-weight:600;color:var(--green);">✓ Analyzed</span></div>
+            </div>
+          </div>
+
+          <!-- ── AI SUMMARY ── -->
+          <div style="background:linear-gradient(135deg,rgba(var(--accent-rgb),0.06),rgba(59,130,246,0.05));border:1px solid rgba(var(--accent-rgb),0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;">
+            <div style="font-size:20px;flex-shrink:0;">✦</div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">AI Assessment</div>
+              <div style="font-size:13px;color:var(--text-secondary);line-height:1.65;">
+                Pacific Coast Retail LLC presents as a <strong style="color:var(--text-primary);">low-to-medium risk retail merchant</strong> (MCC 5941) with 4 years of operating history, two physical locations, and consistent bank statement activity reflecting seasonal sporting goods patterns. Bank balances are healthy with zero overdrafts. Primary concern is the <strong style="color:var(--amber);">absence of identity verification</strong> for Sarah Chen (60% ownership) and a <strong style="color:var(--amber);">missing prior processing statement</strong> — both of which are required by First Data and TSYS for standard approval. Once received, this application should clear underwriting without conditioning.
+              </div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="p-badge bg">✓ Clean bank history</span>
+                <span class="p-badge bg">✓ MCC low-risk</span>
+                <span class="p-badge bg">✓ Established business</span>
+                <span class="p-badge ba">⚠ ID unverified</span>
+                <span class="p-badge ba">⚠ No prior stmt</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ROW 1: Bank Statement Analysis + Processing Statement Analysis ── -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+            <!-- BANK STATEMENT ANALYSIS -->
+            <div class="sc blue">
+              <div class="sc-hdr blue">
+                <div class="sc-hdr-left"><span class="sc-icon">🏦</span><div><div class="sc-title">Bank Statement Analysis</div><div class="sc-desc">Wells Fargo ••4821 · Uploaded Mar 5, 2026</div></div></div>
+                <span class="p-badge bg">✓ Analyzed</span>
+              </div>
+
+              <!-- COVERAGE BLOCK -->
+              <div style="padding:10px 16px 0;border-bottom:1px solid rgba(0,0,0,0.05);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Statement Coverage</div>
+                  <span style="font-size:12px;font-weight:600;color:var(--green);background:var(--green-dim);padding:2px 8px;border-radius:10px;">3 of 3 months</span>
+                </div>
+                <!-- Month pills -->
+                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="padding:4px 10px;background:var(--green-dim);border:1px solid rgba(34,197,94,.25);border-radius:5px;font-size:11px;font-weight:600;color:var(--green);">Dec 2025</div>
+                    <div style="font-size:9px;color:var(--text-muted);">Month 1</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="padding:4px 10px;background:var(--green-dim);border:1px solid rgba(34,197,94,.25);border-radius:5px;font-size:11px;font-weight:600;color:var(--green);">Jan 2026</div>
+                    <div style="font-size:9px;color:var(--text-muted);">Month 2</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="padding:4px 10px;background:var(--green-dim);border:1px solid rgba(34,197,94,.3);border-radius:5px;font-size:11px;font-weight:700;color:var(--green);">Feb 2026</div>
+                    <div style="font-size:9px;color:var(--green);">Most recent ✓</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <div style="padding:4px 10px;background:var(--bg-elevated);border:1px dashed var(--border-strong);border-radius:5px;font-size:11px;color:var(--text-muted);">Mar 2026</div>
+                    <div style="font-size:9px;color:var(--text-muted);">In progress</div>
+                  </div>
+                </div>
+                <!-- Recency check -->
+                <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--green-dim);border-radius:6px;margin-bottom:10px;">
+                  <span style="color:var(--green);font-size:11px;font-weight:700;">✓</span>
+                  <span style="font-size:11px;color:var(--text-secondary);">Statements are current — most recent complete month (Feb 2026) included</span>
+                  <span style="margin-left:auto;font-size:9px;color:var(--text-muted);">Reviewed Mar 10</span>
+                </div>
+              </div>
+
+              <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div style="background:var(--bg-elevated);border-radius:6px;padding:10px;">
+                  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:3px;">Avg Monthly Balance</div>
+                  <div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--green);">$24,840</div>
+                </div>
+                <div style="background:var(--bg-elevated);border-radius:6px;padding:10px;">
+                  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:3px;">Lowest Balance</div>
+                  <div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--amber);">$8,210</div>
+                  <div style="font-size:9px;color:var(--text-muted);">Oct 14, 2025</div>
+                </div>
+                <div style="background:var(--bg-elevated);border-radius:6px;padding:10px;">
+                  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:3px;">Avg Monthly Revenue</div>
+                  <div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);">$91,400</div>
+                </div>
+                <div style="background:var(--bg-elevated);border-radius:6px;padding:10px;">
+                  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:3px;">Revenue Trend</div>
+                  <div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--green);">+14%</div>
+                  <div style="font-size:9px;color:var(--green);">3-month growth</div>
+                </div>
+              </div>
+              <div style="padding:0 16px 12px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg-elevated);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Overdrafts / NSFs</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">0 — Clean</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg-elevated);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Existing MSP Deposits</span>
+                  <span style="font-size:11px;font-weight:600;color:var(--amber);">Square · avg $28K/mo</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg-elevated);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Loan / BNPL Payments</span>
+                  <span style="font-size:11px;font-weight:600;color:var(--text-muted);">None identified</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg-elevated);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Large Unexplained Debits</span>
+                  <span style="font-size:11px;font-weight:600;color:var(--text-muted);">None flagged</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.2);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">⚠ Note</span>
+                  <span style="font-size:11px;font-weight:500;color:var(--amber);">Square volume ($28K) below stated $85K</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROCESSING STATEMENT ANALYSIS -->
+            <div class="sc" style="border-color:rgba(239,68,68,.2);">
+              <div class="sc-hdr" style="background:rgba(239,68,68,.06);border-bottom:1px solid rgba(239,68,68,.18);">
+                <div class="sc-hdr-left"><span class="sc-icon">💳</span><div><div class="sc-title">Processing Statement Analysis</div><div class="sc-desc">Prior processor history</div></div></div>
+                <span class="p-badge br">Not uploaded</span>
+              </div>
+
+              <!-- COVERAGE BLOCK — empty state -->
+              <div style="padding:10px 16px 0;border-bottom:1px solid rgba(0,0,0,0.05);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Statement Coverage</div>
+                  <span style="font-size:12px;font-weight:600;color:var(--red);background:var(--red-dim);padding:2px 8px;border-radius:10px;">0 of 3 months</span>
+                </div>
+                <!-- Empty month pills -->
+                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;">
+                    <div style="padding:4px 10px;background:var(--bg-elevated);border:1px dashed var(--border-strong);border-radius:5px;font-size:11px;color:var(--text-muted);">Month 1</div>
+                    <div style="font-size:9px;color:var(--text-muted);">Missing</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;">
+                    <div style="padding:4px 10px;background:var(--bg-elevated);border:1px dashed var(--border-strong);border-radius:5px;font-size:11px;color:var(--text-muted);">Month 2</div>
+                    <div style="font-size:9px;color:var(--text-muted);">Missing</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.35;">
+                    <div style="padding:4px 10px;background:var(--bg-elevated);border:1px dashed var(--border-strong);border-radius:5px;font-size:11px;color:var(--text-muted);">Month 3</div>
+                    <div style="font-size:9px;color:var(--text-muted);">Missing</div>
+                  </div>
+                </div>
+                <!-- What coverage check will look like once uploaded -->
+                <div style="font-size:9px;font-weight:600;color:var(--text-muted);margin-bottom:5px;padding-left:2px;">Once uploaded, recency will be validated:</div>
+                <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px;">
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;opacity:.5;">
+                    <span style="font-size:12px;">📅</span>
+                    <span style="font-size:13px;color:var(--text-secondary);">Most recent complete month included?</span>
+                    <span style="margin-left:auto;font-size:13px;color:var(--text-secondary);">——</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;opacity:.5;">
+                    <span style="font-size:12px;">🔢</span>
+                    <span style="font-size:13px;color:var(--text-secondary);">Consecutive months (no gaps)?</span>
+                    <span style="margin-left:auto;font-size:13px;color:var(--text-secondary);">——</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;opacity:.5;">
+                    <span style="font-size:12px;">⏱</span>
+                    <span style="font-size:13px;color:var(--text-secondary);">Statement older than 4 months?</span>
+                    <span style="margin-left:auto;font-size:13px;color:var(--text-secondary);">——</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Missing state upload CTA -->
+              <div style="padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:var(--bg-elevated);margin:12px 16px 8px;border-radius:8px;border:1px dashed rgba(239,68,68,.3);">
+                <div style="font-size:22px;opacity:.4;">📂</div>
+                <div style="font-size:12px;font-weight:600;color:var(--red);">Processing statement not yet uploaded</div>
+                <div style="font-size:11px;color:var(--text-muted);">Upload most recent 3 months from their prior processor. Required by First Data and TSYS.</div>
+                <button style="padding:6px 14px;background:var(--red);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-ui);">↑ Upload Statement</button>
+              </div>
+
+              <!-- Fields unlocked after upload -->
+              <div style="padding:4px 16px 4px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px;">Fields unlocked after upload</div>
+                <div style="display:flex;flex-direction:column;gap:5px;opacity:.45;">
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Previous Processor</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Avg Monthly Processing Vol</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Chargeback Rate</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Refund / Void Rate</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Authorization Rate</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Card Mix (Visa/MC/Amex)</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Effective Rate Paid</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:5px 10px;background:var(--bg-elevated);border-radius:5px;"><span style="font-size:11px;color:var(--text-secondary);">Month-over-Month Trend</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);">——</span></div>
+                </div>
+              </div>
+
+              <!-- Stale statement example flag (shown when statement IS uploaded but stale) -->
+              <div style="margin:6px 16px 0;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:6px;">Example: stale statement flag</div>
+                <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.2);border-radius:5px;margin-bottom:4px;">
+                  <span style="color:var(--amber);font-weight:700;font-size:11px;">⚠</span>
+                  <span style="font-size:11px;color:var(--text-secondary);">Uploaded statement ends <strong style="color:var(--amber);">Sep 2025</strong> — 5 months stale. Most recent complete month (Feb 2026) is missing.</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);border-radius:5px;">
+                  <span style="color:var(--green);font-weight:700;font-size:11px;">✓</span>
+                  <span style="font-size:11px;color:var(--text-secondary);">If mid-month (day 1–14): current month statement not expected — Dec–Feb would still pass recency check.</span>
+                </div>
+              </div>
+
+              <div style="padding:10px 16px 14px;">
+                <div style="padding:8px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.2);border-radius:6px;font-size:11px;color:var(--amber);">⚠ Confidence score will increase +6% once statement is uploaded. Volume delta between stated $85K and bank deposits ($28K Square) will also be resolved.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── QUESTIONS TO ASK — full width ── -->
+          <div class="sc gray" style="margin-bottom:14px;">
+            <div class="sc-hdr gray">
+              <div class="sc-hdr-left"><span class="sc-icon">❓</span><div><div class="sc-title">Questions to Ask</div><div class="sc-desc">Prioritized by underwriting impact — send directly to merchant or use as call script</div></div></div>
+              <button style="padding:5px 14px;background:var(--yellow);border:none;border-radius:5px;color:#09091A;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui);">📣 Send All to Merchant</button>
+            </div>
+            <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+              <!-- Critical -->
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:2px;">Critical — 2</div>
+                <div style="padding:9px 12px;background:var(--red-dim);border:1px solid rgba(239,68,68,.15);border-radius:7px;flex:1;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">"Can you export 3 months of payout summaries from your Square dashboard?"</div>
+                  <div style="font-size:13px;color:var(--text-secondary);">Satisfies processing history req + resolves bank deposit delta</div>
+                </div>
+                <div style="padding:9px 12px;background:var(--red-dim);border:1px solid rgba(239,68,68,.15);border-radius:7px;flex:1;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">"Sarah, can you upload a driver's license or passport through the portal?"</div>
+                  <div style="font-size:13px;color:var(--text-secondary);">Required for KYC/BSA by all matched processors; hard block</div>
+                </div>
+              </div>
+              <!-- Important -->
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--amber);margin-bottom:2px;">Important — 2</div>
+                <div style="padding:9px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:7px;flex:1;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">"What portion of your $85K monthly volume is in-store vs. online orders?"</div>
+                  <div style="font-size:13px;color:var(--text-secondary);">Online &gt;20% may require ecom addendum; affects Heartland eligibility</div>
+                </div>
+                <div style="padding:9px 12px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.15);border-radius:7px;flex:1;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">"What percentage of your inventory is airsoft / replica firearms?"</div>
+                  <div style="font-size:13px;color:var(--text-secondary);">TSYS and Heartland may require addendum if &gt;10% of product mix</div>
+                </div>
+              </div>
+              <!-- Nice to have -->
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:2px;">Nice to Have — 2</div>
+                <div style="padding:9px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:7px;flex:1;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">"Do you have any chargeback history from your time with Square?"</div>
+                  <div style="font-size:13px;color:var(--text-secondary);">Low impact if no stmt; helps validate clean processing history</div>
+                </div>
+                <div style="padding:9px 12px;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:7px;flex:1;">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:4px;">"Are you planning to expand to a 3rd location or add new product lines in the next 12 months?"</div>
+                  <div style="font-size:13px;color:var(--text-secondary);">Helps set appropriate volume ceiling with processor</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ROW 2: Website Analysis + Approval Recommendations ── -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+            <!-- WEBSITE ANALYSIS -->
+            <div class="sc green">
+              <div class="sc-hdr green">
+                <div class="sc-hdr-left"><span class="sc-icon">🌐</span><div><div class="sc-title">Website Analysis</div><div class="sc-desc">pacificcoastretail.com · Analyzed Mar 10</div></div></div>
+                <span class="p-badge bg">✓ Verified</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">MCC Match (5941)</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">✓ Confirmed — Sporting Goods</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Physical Locations Listed</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">✓ 2 San Diego locations</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Return / Refund Policy</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">✓ 30-day policy visible</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Google Reviews</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">✓ 4.7★ · 312 reviews</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Years Operating (web signals)</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">✓ Est. 2020 (4 yrs)</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Restricted Products</span>
+                  <span style="font-size:11px;font-weight:700;color:var(--green);">✓ None detected</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--blue-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Product Categories</span>
+                  <span style="font-size:11px;color:var(--blue);">Surf, Skate, Outdoor, Apparel</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--blue-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">Ecommerce Component</span>
+                  <span style="font-size:11px;color:var(--blue);">Online store present (~20% est.)</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--amber-dim);border-radius:6px;">
+                  <span style="font-size:11px;color:var(--text-secondary);">⚠ Firearms / Ammo</span>
+                  <span style="font-size:11px;color:var(--amber);">Airsoft listed — confirm processor eligibility</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- APPROVAL RECOMMENDATIONS -->
+            <div class="sc" style="border-color:rgba(var(--accent-rgb),.2);">
+              <div class="sc-hdr" style="background:rgba(var(--accent-rgb),.06);border-bottom:1px solid rgba(var(--accent-rgb),.18);">
+                <div class="sc-hdr-left"><span class="sc-icon">✦</span><div><div class="sc-title">Approval Recommendations</div><div class="sc-desc">Steps to maximize approval speed and terms</div></div></div>
+              </div>
+              <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg-elevated);border-radius:7px;border-left:3px solid var(--red);">
+                  <div style="width:20px;height:20px;border-radius:50%;background:rgba(155,107,91,0.12);color:#9B6B5B;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">1</div>
+                  <div><div style="font-size:12px;font-weight:600;margin-bottom:2px;">Collect Owner ID immediately</div><div style="font-size:11px;color:var(--text-muted);">Call Sarah Chen directly — don't rely on portal nudge alone. Hard block for all processors. Offer to accept a photo via text/WhatsApp if portal is a barrier.</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg-elevated);border-radius:7px;border-left:3px solid var(--red);">
+                  <div style="width:20px;height:20px;border-radius:50%;background:rgba(155,107,91,0.12);color:#9B6B5B;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
+                  <div><div style="font-size:12px;font-weight:600;margin-bottom:2px;">Request Square payout export</div><div style="font-size:11px;color:var(--text-muted);">Square dashboard → Transfers → Export CSV. Satisfies First Data's processing history req and resolves the volume delta simultaneously.</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg-elevated);border-radius:7px;border-left:3px solid var(--amber);">
+                  <div style="width:20px;height:20px;border-radius:50%;background:rgba(166,124,91,0.12);color:#A67C5B;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">3</div>
+                  <div><div style="font-size:12px;font-weight:600;margin-bottom:2px;">Clarify airsoft inventory share before TSYS</div><div style="font-size:11px;color:var(--text-muted);">If under 10%, document it proactively. If over 10%, route First Data first — no addendum required there.</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg-elevated);border-radius:7px;border-left:3px solid var(--blue);">
+                  <div style="width:20px;height:20px;border-radius:50%;background:rgba(107,131,155,0.12);color:#6B839B;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;">4</div>
+                  <div><div style="font-size:12px;font-weight:600;margin-bottom:2px;">Submit First Data as primary, TSYS as backup</div><div style="font-size:11px;color:var(--text-muted);">First Data at 88% is the clear lead. Submit both simultaneously to cut time-to-approval. If First Data declines, TSYS is already queued.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── RISK FLAGS — full width ── -->
+          <div class="sc gray" style="margin-bottom:14px;">
+            <div class="sc-hdr gray"><div class="sc-hdr-left"><span class="sc-icon">🚦</span><div><div class="sc-title">Risk Flags</div><div class="sc-desc">Identified from all available application data</div></div></div></div>
+            <div style="padding:10px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <!-- Favorable -->
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--green);letter-spacing:.07em;margin-bottom:2px;">Favorable — 4</div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="color:var(--green);font-size:12px;flex-shrink:0;margin-top:1px;">✓</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">Zero overdrafts / NSFs</div><div style="font-size:13px;color:var(--text-secondary);">3 months clean bank history</div></div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="color:var(--green);font-size:12px;flex-shrink:0;margin-top:1px;">✓</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">MCC 5941 — low-risk</div><div style="font-size:13px;color:var(--text-secondary);">Standard retail, no high-risk classification</div></div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="color:var(--green);font-size:12px;flex-shrink:0;margin-top:1px;">✓</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">4-year operating history</div><div style="font-size:13px;color:var(--text-secondary);">Est. 2020 · 2 physical locations</div></div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--green-dim);border-radius:6px;">
+                  <span style="color:var(--green);font-size:12px;flex-shrink:0;margin-top:1px;">✓</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">100% ownership accounted</div><div style="font-size:13px;color:var(--text-secondary);">Chen 60% + Park 40%</div></div>
+                </div>
+              </div>
+              <!-- Caution -->
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--amber);letter-spacing:.07em;margin-bottom:2px;">Caution — 3</div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--amber-dim);border-radius:6px;">
+                  <span style="color:var(--amber);font-size:12px;flex-shrink:0;margin-top:1px;">⚠</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">Stated vol. vs. bank gap</div><div style="font-size:13px;color:var(--text-secondary);">$85K stated; Square deposits avg $28K</div></div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--amber-dim);border-radius:6px;">
+                  <span style="color:var(--amber);font-size:12px;flex-shrink:0;margin-top:1px;">⚠</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">Airsoft product category</div><div style="font-size:13px;color:var(--text-secondary);">Some processors require written addendum</div></div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--amber-dim);border-radius:6px;">
+                  <span style="color:var(--amber);font-size:12px;flex-shrink:0;margin-top:1px;">⚠</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">Owner ID not yet verified</div><div style="font-size:13px;color:var(--text-secondary);">Sarah Chen (60%) — required before submission</div></div>
+                </div>
+              </div>
+              <!-- Blockers -->
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--red);letter-spacing:.07em;margin-bottom:2px;">Blockers — 1</div>
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:var(--red-dim);border-radius:6px;">
+                  <span style="color:var(--red);font-size:12px;flex-shrink:0;margin-top:1px;">✗</span>
+                  <div><div style="font-size:11px;font-weight:600;color:var(--text-primary);">No prior processing statement</div><div style="font-size:13px;color:var(--text-secondary);">Required by First Data & TSYS — request Square export as substitute</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── DOCUMENT ANALYSIS GAP ── -->
+          <div class="alert amber" style="margin-bottom:14px;">
+            <div class="alert-icon">📈</div>
+            <div>
+              <div class="alert-title amber">Confidence will increase to ~86% once missing docs are uploaded</div>
+              <div class="alert-body">Owner ID (+12%) and processing statement (+6%) are the two remaining data gaps. Upload both to unlock full analysis and enable submission.</div>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-ghost" onclick="goStep(4)">← Processing</button>
+            <div class="fnr">
+              <button class="btn btn-amber">📣 Send All Questions to Merchant</button>
+              <button class="btn btn-primary" onclick="goStep(6)">Documents →</button>
+            </div>
+          </div>
+        </div>
 
         <!-- ═══ STEP 8: SOLUTIONS ═══ -->
         <div class="step-panel" id="step-5">
@@ -14975,11 +15411,52 @@ function drdOverdueAct(name, idx, btn) {
   if (DEAL_ROOM_DATA[name].activity) DEAL_ROOM_DATA[name].activity.push({ type:'sys', time:'Today · now', color:'var(--green)', text: done });
 }
 
+/* ── Status reversal: Approved/Boarding → back to underwriting ──
+   Ported from mike/uw-deployment-flow. Reuses Suede's existing uwmOpen/uwmClose. ── */
+function drdRepend(name) {
+  const nEsc = name.replace(/'/g,"\\'");
+  uwmOpen(
+    `<span style="font-size:13px;font-weight:700;font-family:var(--font-ui);color:var(--text-primary);">↩ Re-pend ${name}</span>`,
+    `<div style="font-size:12px;color:var(--text-secondary);line-height:1.55;margin-bottom:10px;">This reverses the approval and puts the application back in the underwriting queue. Boarding automation pauses, the partner is notified, and the reversal is written to the immutable audit trail with your reason.</div>
+     <textarea id="uwm-repend-reason" placeholder="Reason for the reversal — required, goes to the audit log verbatim" style="width:100%;min-height:72px;resize:vertical;font-family:var(--font-data);font-size:12px;color:var(--text-primary);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;line-height:1.5;" oninput="const b=document.getElementById('uwm-repend-confirm'); if(b) b.disabled=!this.value.trim();"></textarea>
+     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+       <button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;" onclick="uwmClose()">Cancel</button>
+       <button id="uwm-repend-confirm" class="btn btn-danger" style="font-size:11px;padding:6px 14px;" disabled onclick="drdRependConfirm('${nEsc}')">Confirm Re-pend</button>
+     </div>`
+  );
+}
+function drdRependConfirm(name) {
+  const reason = (document.getElementById('uwm-repend-reason')?.value || '').trim();
+  if (!reason) return;
+  const m = merchantData.find(x => x.name === name);
+  if (!m) return;
+  const uwb = _uwbData(name);
+  m.status = 'underwriting';
+  m.tags = m.tags || [];
+  if (!m.tags.includes('Action Required')) m.tags.push('Action Required');
+  m.actionItem = 'Re-pended to underwriting — ' + reason;
+  const dr = (typeof DEAL_ROOM_DATA !== 'undefined') && DEAL_ROOM_DATA[name];
+  if (dr) {
+    dr.currentStep = 2;
+    dr.activity = dr.activity || [];
+    dr.activity.push({ type:'sys', time:'Today · now', color:'var(--amber)', text:'↩ Approval reversed — re-pended to underwriting: ' + reason });
+    if (dr.synopsis && dr.synopsis.uw) dr.synopsis.uw.status = 'Re-pended — approval reversed, back in UW review';
+  }
+  uwb.audit.push({ t:'Just now', who:'You (UW)', what:'Status changed Approved → Pended', note:reason, flag:'Reversal' });
+  uwb.uwNotes.push({ t:'Just now', who:'You (UW)', text:'Approval reversed — application re-pended to underwriting. Reason: ' + reason });
+  try { if (typeof drNotifyPartner === 'function') drNotifyPartner(name, '↩ ' + name + ' was re-pended to underwriting — ' + reason); } catch(e) {}
+  if (typeof renderMerchantKanban === 'function') try { renderMerchantKanban(); } catch(e) {}
+  uwmClose();
+  navigateToMerchant(name, 'underwriting');
+}
+
+
 function renderDrDeploy(m, dr) {
   const host = document.getElementById('dr-deploy');
   if (!host) return;
   const dep = dr && dr.deploy;
   if (!dep || !['approved','boarding'].includes(m.status)) { host.style.display='none'; host.innerHTML=''; return; }
+  const rep = document.body.classList.contains('persona-rep');
 
   const railHTML = dep.rail.map(n => `
     <div class="drd-node ${n.state==='done'?'done':n.state==='now'?'now':''}">
@@ -15043,7 +15520,7 @@ function renderDrDeploy(m, dr) {
       </div>
     </div>
     <div class="drd-sec">
-      <div class="drd-sec-hdr">⚙️ Processor Boarding — Automated <span style="margin-left:auto;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">runs on approval · no re-keying</span></div>
+      <div class="drd-sec-hdr">⚙️ Processor Boarding — Automated <span style="margin-left:auto;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">runs on approval · no re-keying</span>${rep ? '' : `<button class="btn btn-ghost" style="font-size:10px;padding:3px 10px;text-transform:none;letter-spacing:0;" onclick="drdRepend('${nmEsc}')">↩ Re-pend to underwriting</button>`}</div>
       <div class="drd-sec-body"><div class="drd-rail">${railHTML}</div></div>
     </div>
     <div class="drd-sec">
@@ -44154,5 +44631,57 @@ function klbrRender() {
 /* ===== /SUEDE BRAND ===== */
 </style>
 <!-- ===== /SUEDE BRAND ===== -->
+<!-- ═══ VIEW-AS PERSONA TOGGLE (ported from mike/uw-deployment-flow) ═══ -->
+<style>
+.persona-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:99px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-secondary); font-family:var(--font-ui); font-size:10px; font-weight:700; letter-spacing:.03em; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.persona-pill:hover { background:var(--bg-hover); }
+.persona-pill .pp-dot { width:7px; height:7px; border-radius:50%; background:var(--navy); flex-shrink:0; }
+body.persona-rep .persona-pill { border-color:rgba(166,124,91,.45); background:rgba(166,124,91,.08); color:var(--amber); }
+body.persona-rep .persona-pill .pp-dot { background:var(--amber); }
+body.persona-rep #klb-rt-toggle, body.persona-rep #klb-routing { display:none !important; }
+</style>
+<script>
+/* VIEW-AS TOGGLE — Ops ⇄ Sales Rep. body.persona-rep drives everything;
+   state survives view switches, resets on reload. */
+function personaApplySigRail() {
+  const rep = document.body.classList.contains('persona-rep');
+  document.querySelectorAll('#view-merchant-detail .sig-uw-detail-row').forEach(r => {
+    const k = r.querySelector('span');
+    if (k && k.textContent.trim() === 'Processor') r.style.display = rep ? 'none' : '';
+  });
+}
+function personaToggle() {
+  const rep = document.body.classList.toggle('persona-rep');
+  document.querySelectorAll('.persona-pill .pp-label').forEach(l => l.textContent = rep ? 'Viewing as: Sales Rep' : 'Viewing as: Ops · Master Admin');
+  personaApplySigRail();
+  if (typeof klbRenderAll === 'function' && document.getElementById('klb-tree')) { if (typeof klbClosePop === 'function') klbClosePop(); klbRenderAll(); }
+  const mdView = document.getElementById('view-merchant-detail');
+  if (mdView && mdView.classList.contains('sig-uw-active')) {
+    const toggle = document.getElementById('sig-uw-mode-toggle');
+    const badge = document.getElementById('sig-uw-status-badge');
+    const isUWStage = badge && /Underwriting/i.test(badge.textContent);
+    if (rep) { toggle?.classList.remove('visible'); if (typeof sigUWSetSurface === 'function') sigUWSetSurface('chat'); }
+    else if (isUWStage) { toggle?.classList.add('visible'); if (typeof sigUWSetSurface === 'function') sigUWSetSurface('bench'); }
+  }
+  if (document.getElementById('view-deal-room')?.classList.contains('active') && typeof _drCurrentMerchant !== 'undefined' && _drCurrentMerchant) {
+    const m = merchantData.find(x => x.name === _drCurrentMerchant);
+    if (m && typeof DEAL_ROOM_DATA !== 'undefined' && DEAL_ROOM_DATA[m.name]) { try { renderDrDeploy(m, DEAL_ROOM_DATA[m.name]); } catch (err) {} }
+  }
+}
+(function personaInstall() {
+  document.querySelectorAll('.topbar').forEach(tb => {
+    if (tb.querySelector('.persona-pill')) return;
+    const host = tb.querySelector('.topbar-right') || tb;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'persona-pill';
+    b.title = 'Toggle persona — preview exactly what a sales rep sees';
+    b.onclick = personaToggle;
+    b.innerHTML = '<span class="pp-dot"></span><span class="pp-label">Viewing as: Ops · Master Admin</span>';
+    host.insertBefore(b, host.firstChild);
+  });
+})();
+</script>
+
 </body>
 </html>
