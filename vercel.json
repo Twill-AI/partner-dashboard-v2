@@ -1,0 +1,9 @@
+{
+  "routes": [
+    { "src": "/login", "dest": "/login.html" },
+    { "src": "/api/login", "dest": "/api/login.js" },
+    { "src": "/(.*\\.(png|svg|jpg|jpeg|gif|ico|css|js|woff|woff2|ttf))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/api/gate.js" }
+  ],
+  "framework": null
+}
