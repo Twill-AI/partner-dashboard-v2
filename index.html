@@ -3135,146 +3135,129 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
     <!-- ── VIEW: AI COMMAND CENTER ────────────────────── -->
     <style id="aic-style">
-      /* AI Command Center — contrast pass 2026-08-17: raised warm surfaces (the token
-         set's bg-elevated is DARKER than bg-base, so cards need their own raised tier),
-         ink one step darker everywhere, type up ~1.5px, visible borders. */
-      #view-ai-command { --aic-raised:#FBFAF7; --aic-line:rgba(0,0,0,0.11); --aic-line-strong:rgba(0,0,0,0.16); --aic-ink:#141414; --aic-ink2:#3D3D3D; --aic-ink3:#5C5C5C; }
+      /* AI Command Center — assembled from the portal's own components:
+         cc-wrow queue rows, card shells, session-chat bubbles, .btn controls.
+         This block carries layout + a few calm surfaces only. */
       body:has(#view-ai-command.active) #agent-queue-pill { display:none; }
       #view-ai-command .aic-wrap { padding:0 24px 24px; }
-      .aic-cmdbar { display:flex; align-items:center; gap:10px; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:11px; padding:5px 14px; margin-top:4px; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
-      .aic-spark { color:var(--gold); font-size:15px; flex:none; }
-      .aic-cmdin { flex:1; background:transparent; border:none; outline:none; font-family:var(--font-ui); font-size:13.5px; color:var(--aic-ink); padding:9px 0; }
-      .aic-cmdin::placeholder { color:var(--aic-ink3); }
-      .aic-hint { font-size:10.5px; color:var(--aic-ink3); background:var(--bg-surface); border:1px solid var(--aic-line); border-radius:5px; padding:3px 7px; font-family:var(--font-mono); flex:none; }
-      .aic-digest { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:13px 0 0; }
-      .aic-dg-label { font-size:10.5px; font-weight:800; letter-spacing:.7px; text-transform:uppercase; color:var(--aic-ink2); }
-      .aic-chip { display:inline-flex; align-items:center; gap:7px; background:var(--aic-raised); border:1px solid var(--aic-line); border-radius:20px; padding:6px 13px 6px 8px; font-size:12.5px; color:var(--aic-ink2); cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
-      .aic-chip:hover { border-color:var(--aic-line-strong); background:#fffef9; }
-      .aic-chip b { color:var(--aic-ink); font-weight:700; }
-      .aic-chip .n { min-width:19px; height:19px; border-radius:10px; background:var(--navy); color:#fff; font-size:10.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; padding:0 5px; }
-      .aic-chip.warn .n { background:#A33A1F; }
-      .aic-panes { display:grid; grid-template-columns:330px minmax(0,1fr); gap:16px; margin-top:15px; align-items:start; }
-      @media (max-width:1100px) { .aic-panes { grid-template-columns:1fr; } }
-      .aic-lane { font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--aic-ink); margin:14px 2px 7px; display:flex; align-items:center; gap:7px; }
-      .aic-lane:first-child { margin-top:0; }
-      .aic-lane .ct { background:var(--bg-selected); border-radius:8px; padding:1px 7px; font-size:10px; color:var(--aic-ink2); }
-      .aic-lane.hot .ct { background:rgba(163,58,31,0.14); color:#8F3115; }
-      .aic-card { background:var(--aic-raised); border:1px solid var(--aic-line); border-radius:10px; padding:11px 13px; margin-bottom:8px; cursor:pointer; position:relative; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
-      .aic-card:hover { border-color:var(--aic-line-strong); }
-      .aic-card.sel { border:2px solid var(--gold); background:#FFFDF2; padding:10px 12px; box-shadow:0 1px 6px rgba(201,168,0,0.18); }
-      .aic-card-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-      .aic-mava { width:22px; height:22px; border-radius:6px; font-size:10px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; flex:none; }
-      .aic-card-m { font-size:13.5px; font-weight:800; color:var(--aic-ink); }
-      .aic-sla { margin-left:auto; font-size:10.5px; font-weight:800; color:#8F3115; background:rgba(163,58,31,0.12); border:1px solid rgba(163,58,31,0.25); border-radius:5px; padding:2px 7px; }
-      .aic-age { margin-left:auto; font-size:11px; font-weight:600; color:var(--aic-ink3); }
-      .aic-hops { display:none; margin-left:auto; gap:4px; }
-      .aic-hops button { font-size:11px; border:1px solid var(--aic-line-strong); background:var(--aic-raised); border-radius:5px; padding:2px 7px; cursor:pointer; color:var(--aic-ink); }
-      .aic-card:hover .aic-age { display:none; }
-      .aic-card:hover .aic-hops { display:flex; }
-      .aic-card-t { font-size:12.5px; color:var(--aic-ink2); line-height:1.5; }
-      .aic-prop { margin-top:8px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
-      .aic-prop-chip { font-size:11px; font-weight:800; color:#5C4A00; background:rgba(255,222,0,0.28); border:1px solid rgba(180,150,0,0.35); border-radius:6px; padding:3px 9px; }
-      .aic-mini { font-size:11px; font-weight:700; border-radius:6px; padding:4px 11px; border:1px solid var(--aic-line-strong); background:var(--aic-raised); color:var(--aic-ink); cursor:pointer; font-family:var(--font-ui); }
-      .aic-mini.go { background:var(--navy); border-color:var(--navy); color:#fff; }
-      .aic-slim { display:flex; align-items:center; gap:8px; background:var(--aic-raised); border:1px solid var(--aic-line); border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:12px; font-weight:600; color:var(--aic-ink2); cursor:pointer; }
-      .aic-slim:hover { border-color:var(--aic-line-strong); }
-      .aic-slim .zz { font-size:10.5px; font-weight:600; color:var(--aic-ink3); margin-left:auto; white-space:nowrap; }
-      .aic-focus { margin-top:12px; text-align:center; font-size:12px; color:var(--aic-ink3); }
-      .aic-focus b { color:var(--navy); font-weight:700; }
-      .aic-ws { background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:12px; overflow:visible; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
-      .aic-ws-hd { display:flex; align-items:center; gap:9px; padding:13px 16px; border-bottom:1px solid var(--aic-line); flex-wrap:wrap; }
-      .aic-ws-ttl { font-size:15px; font-weight:800; color:var(--aic-ink); }
-      .aic-st { font-size:10.5px; font-weight:800; color:#7A4A1F; background:rgba(166,124,91,0.16); border:1px solid rgba(166,124,91,0.3); padding:2px 8px; border-radius:5px; white-space:nowrap; }
-      .aic-ws-hd .right { margin-left:auto; display:flex; gap:6px; align-items:center; position:relative; }
-      .aic-linky { font-size:12px; font-weight:700; color:#3E5E80; cursor:pointer; background:none; border:none; font-family:var(--font-ui); white-space:nowrap; padding:0; }
-      .aic-linky:hover { text-decoration:underline; }
-      .aic-gbtn { font-size:12px; font-weight:600; color:var(--aic-ink); border:1px solid var(--aic-line-strong); background:var(--aic-raised); border-radius:8px; padding:6px 11px; cursor:pointer; font-family:var(--font-ui); white-space:nowrap; }
-      .aic-gbtn:hover { background:var(--bg-hover); }
-      .aic-menu { display:none; position:absolute; top:36px; right:0; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:9px; padding:5px; min-width:200px; z-index:60; box-shadow:0 8px 22px rgba(0,0,0,0.13); }
+      .aic-sm { font-size:12px !important; padding:5px 10px !important; }
+      .aic-cmdbar { display:flex; align-items:center; gap:10px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:9px; padding:3px 13px; margin-top:2px; }
+      .aic-cmdbar:focus-within { border-color:rgba(0,0,0,0.28); }
+      .aic-spark { color:var(--gold); font-size:14px; flex:none; }
+      .aic-cmdin { flex:1; background:transparent; border:none; outline:none; font-family:var(--font-ui); font-size:13px; color:var(--text-primary); padding:9px 0; }
+      .aic-cmdin::placeholder { color:var(--text-muted); }
+      .aic-hint { font-size:10px; color:var(--text-muted); background:var(--bg-base); border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-family:var(--font-mono); flex:none; }
+      .aic-digest { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0 0; }
+      .aic-dg-label { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-secondary); }
+      .aic-chip { display:inline-flex; align-items:center; gap:7px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:16px; padding:4px 11px 4px 6px; font-size:12px; color:var(--text-secondary); cursor:pointer; }
+      .aic-chip:hover { background:var(--bg-hover); }
+      .aic-chip b { color:var(--text-primary); font-weight:600; }
+      .aic-chip .n { min-width:18px; height:18px; border-radius:9px; background:var(--navy); color:#fff; font-size:10px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; padding:0 5px; }
+      .aic-chip.warn .n { background:var(--red); }
+      .aic-panes { display:grid; grid-template-columns:390px minmax(0,1fr); gap:16px; margin-top:14px; align-items:start; }
+      @media (max-width:1180px) { .aic-panes { grid-template-columns:1fr; } }
+      .aic-qcard { overflow:hidden; }
+      .aic-lanehdr { display:flex; align-items:center; gap:7px; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-secondary); background:var(--bg-surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:6px 16px; }
+      .aic-lanehdr span { background:var(--bg-selected); border-radius:8px; padding:0 7px; font-size:9.5px; color:var(--text-secondary); }
+      .aic-lanehdr.hot { color:var(--text-primary); }
+      .aic-lanehdr.hot span { background:rgba(239,68,68,.1); color:var(--red); }
+      .aic-lanehdr:first-of-type { border-top:none; }
+      .aic-lanempty { padding:10px 16px; font-size:11.5px; color:var(--text-muted); }
+      .aic-row { align-items:flex-start; }
+      .aic-row .cc-kind { min-width:0; margin-top:2px; }
+      .aic-row .cc-wrow-top { flex-wrap:wrap; row-gap:2px; }
+      .aic-row:not(.thin) .cc-wrow-desc { flex-basis:100%; white-space:normal; overflow:visible; text-overflow:clip; line-height:1.45; max-width:none; }
+      .aic-row.thin .cc-wrow-desc { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:150px; }
+      .aic-row .cc-wrow-age { white-space:nowrap; font-size:10px; }
+      .aic-row .cc-wrow-meta { flex-shrink:0; }
+      .aic-row.thin { padding:9px 16px; }
+      .aic-row.aic-sel { background:var(--bg-selected); border-left:3px solid var(--navy); }
+      .aic-row.aic-sel:hover { background:var(--bg-selected); }
+      .aic-proprow { display:flex; gap:6px; margin-top:2px; }
+      .aic-act-chip { font-size:10.5px; font-weight:600; color:#6B5900; background:var(--yellow-dim); border:1px solid rgba(180,150,0,.28); border-radius:4px; padding:2px 8px; }
+      .aic-focus { padding:10px 16px; text-align:center; font-size:11.5px; color:var(--text-muted); border-top:1px solid var(--border); }
+      .aic-focus b { color:var(--navy); font-weight:600; }
+      /* Workspace card: capped to the viewport, sticky beside a long queue.
+         The THREAD is the scroll region — the composer never leaves view. */
+      .aic-wscard { display:flex; flex-direction:column; max-height:calc(100vh - 210px); min-height:340px; position:sticky; top:14px; overflow:visible; }
+      .aic-ws-hd, .aic-ctx, .aic-composer { flex:0 0 auto; }
+      .aic-ws-hd { display:flex; align-items:center; gap:9px; padding:12px 16px; border-bottom:1px solid rgba(0,0,0,0.06); flex-wrap:wrap; }
+      .aic-ws-ttl { font-size:14px; font-weight:700; color:var(--text-primary); font-family:var(--font-ui); }
+      .aic-stchip { background:rgba(166,124,91,.14); color:#7A4A1F; font-size:10px; padding:2px 7px; }
+      .aic-ws-hd .right { margin-left:auto; display:flex; gap:6px; align-items:center; position:relative; flex-wrap:wrap; }
+      .aic-menu { display:none; position:absolute; top:34px; right:0; background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:8px; padding:5px; min-width:196px; z-index:60; box-shadow:0 8px 22px rgba(0,0,0,0.12); }
       .aic-menu.open { display:block; }
-      .aic-menu div { font-size:12.5px; font-weight:500; color:var(--aic-ink); padding:7px 10px; border-radius:6px; cursor:pointer; }
+      .aic-menu div { font-size:12.5px; color:var(--text-primary); padding:7px 10px; border-radius:6px; cursor:pointer; }
       .aic-menu div:hover { background:var(--bg-hover); }
-      .aic-menu .hd { font-size:10px; font-weight:800; letter-spacing:.7px; text-transform:uppercase; color:var(--aic-ink3); cursor:default; }
+      .aic-menu .hd { font-size:9.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); cursor:default; }
       .aic-menu .hd:hover { background:none; }
-      .aic-ctx { display:none; border-bottom:1px solid var(--aic-line); background:var(--bg-surface); padding:11px 16px; }
+      .aic-ctx { display:none; border-bottom:1px solid var(--border); background:var(--bg-surface); padding:11px 16px; }
       .aic-ctx.open { display:flex; gap:28px; flex-wrap:wrap; }
-      .aic-kv { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--aic-ink3); }
-      .aic-kv b { display:block; font-size:12.5px; color:var(--aic-ink); font-weight:700; margin-top:2px; text-transform:none; letter-spacing:0; }
-      .aic-thread { padding:16px; display:flex; flex-direction:column; gap:12px; }
-      .aic-brief { border:1px solid var(--aic-line); border-left:4px solid var(--gold); background:#FFFEFA; border-radius:0 9px 9px 0; padding:11px 15px; }
-      .aic-brief.read { border-left-color:#3E5E80; }
-      .aic-brow { display:grid; grid-template-columns:86px 1fr; gap:10px; font-size:12.5px; padding:4.5px 0; }
-      .aic-bk { font-weight:800; color:var(--aic-ink3); font-size:10.5px; letter-spacing:.6px; text-transform:uppercase; padding-top:2px; }
-      .aic-bv { color:var(--aic-ink); line-height:1.55; }
+      .aic-kv { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); }
+      .aic-kv b { display:block; font-size:12.5px; color:var(--text-primary); font-weight:600; margin-top:2px; text-transform:none; letter-spacing:0; }
+      .aic-thread { padding:14px 16px; display:flex; flex-direction:column; gap:10px; flex:1 1 auto; min-height:160px; overflow-y:auto; }
+      .aic-act { padding:2px 0; }
+      .aic-act .ah { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
+      .aic-act .atime { font-size:10px; color:var(--text-muted); margin-left:auto; }
+      .aic-act .abub { margin-left:27px; font-size:12.5px; color:var(--text-primary); }
+      .aic-brief { border:1px solid rgba(0,0,0,0.09); background:var(--bg-base); border-radius:8px; padding:10px 14px; }
+      .aic-brief.read { background:var(--bg-base); }
+      .aic-brow { display:grid; grid-template-columns:82px 1fr; gap:10px; font-size:12.5px; padding:4px 0; }
+      .aic-bk { font-weight:700; color:var(--text-muted); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; padding-top:3px; }
+      .aic-bv { color:var(--text-primary); line-height:1.55; }
       .aic-bv b { font-weight:700; }
-      .aic-ok { color:#2E6B3F; font-weight:800; }
-      .aic-warn { color:#A33A1F; font-weight:800; }
-      .aic-docs { display:flex; gap:8px; flex-wrap:wrap; }
-      .aic-doc { display:inline-flex; align-items:center; gap:8px; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:8px; padding:7px 11px; font-size:12px; cursor:pointer; font-family:var(--font-ui); text-align:left; color:var(--aic-ink); box-shadow:0 1px 2px rgba(0,0,0,0.04); }
-      .aic-doc:hover { border-color:rgba(0,0,0,0.25); }
-      .aic-doc.active { border-color:var(--gold); background:#FFFCEE; box-shadow:0 1px 4px rgba(201,168,0,0.2); }
-      .aic-doc .ic { width:24px; height:29px; border-radius:3px; background:var(--navy); color:#fff; font-size:8px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; }
-      .aic-doc b { font-weight:700; display:block; font-size:12px; color:var(--aic-ink); }
-      .aic-doc span.sub { display:block; font-size:10.5px; font-weight:500; color:var(--aic-ink3); margin-top:1px; }
-      .aic-dpv { display:none; margin-top:8px; border:1px solid var(--aic-line-strong); border-radius:9px; background:var(--bg-surface); padding:11px 14px; }
+      .aic-ok { color:#2E6B3F; font-weight:700; }
+      .aic-warn { color:#A33A1F; font-weight:700; }
+      .aic-docs { display:flex; gap:7px; flex-wrap:wrap; }
+      .aic-doc { display:inline-flex; align-items:center; gap:8px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:7px; padding:6px 10px; font-size:12px; cursor:pointer; font-family:var(--font-ui); text-align:left; color:var(--text-primary); }
+      .aic-doc:hover { border-color:rgba(0,0,0,0.28); }
+      .aic-doc.active { border-color:var(--navy); background:var(--bg-selected); }
+      .aic-doc .ic { width:22px; height:27px; border-radius:3px; background:var(--navy); color:#fff; font-size:7.5px; font-weight:700; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; }
+      .aic-doc b { font-weight:600; display:block; font-size:11.5px; color:var(--text-primary); }
+      .aic-doc span.sub { display:block; font-size:10px; color:var(--text-secondary); margin-top:1px; }
+      .aic-dpv { display:none; margin-top:8px; border:1px solid var(--border-strong); border-radius:8px; background:var(--bg-elevated); padding:10px 13px; }
       .aic-dpv.open { display:block; }
-      .aic-dpv-hd { display:flex; align-items:center; font-size:12px; font-weight:800; margin-bottom:7px; color:var(--aic-ink); }
+      .aic-dpv-hd { display:flex; align-items:center; font-size:11.5px; font-weight:700; margin-bottom:6px; color:var(--text-primary); }
       .aic-dpv-hd .aic-linky { margin-left:auto; }
-      .aic-dpl { display:flex; justify-content:space-between; font-size:11px; font-family:var(--font-mono); color:var(--aic-ink); padding:3px 0; border-bottom:1px dashed var(--aic-line); }
+      .aic-linky { font-size:11.5px; font-weight:600; color:var(--blue); cursor:pointer; background:none; border:none; font-family:var(--font-ui); white-space:nowrap; padding:0; }
+      .aic-linky:hover { text-decoration:underline; }
+      .aic-dpl { display:flex; justify-content:space-between; font-size:11px; font-family:var(--font-mono); color:var(--text-primary); padding:3px 0; border-bottom:1px dashed var(--border); }
       .aic-dpl:last-of-type { border:none; }
-      .aic-dpn { font-size:10.5px; color:var(--aic-ink3); margin-top:6px; }
-      .aic-note { display:flex; gap:10px; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:10px; padding:12px 14px; }
-      .aic-note .brd { width:4px; border-radius:2px; background:var(--navy); opacity:.25; flex:none; }
-      .aic-note-who { font-size:11.5px; font-weight:800; margin-bottom:4px; color:var(--aic-ink); }
-      .aic-note-who span { color:var(--aic-ink3); font-weight:500; }
-      .aic-note-t { font-size:13px; color:var(--aic-ink); line-height:1.65; font-style:italic; }
-      .aic-showwork { font-size:11.5px; color:#3E5E80; font-weight:700; cursor:pointer; background:none; border:none; font-family:var(--font-ui); padding:4px 0 0; }
+      .aic-dpn { font-size:10px; color:var(--text-muted); margin-top:5px; }
+      .aic-note { display:flex; gap:10px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:8px; padding:11px 13px; }
+      .aic-note .brd { width:3px; border-radius:2px; background:var(--navy); opacity:.3; flex:none; }
+      .aic-note-who { font-size:11px; font-weight:700; margin-bottom:3px; color:var(--text-primary); }
+      .aic-note-who span { color:var(--text-muted); font-weight:500; }
+      .aic-note-t { font-size:12.5px; color:var(--text-primary); line-height:1.6; font-style:italic; }
+      .aic-showwork { font-size:11px; color:var(--blue); font-weight:600; cursor:pointer; background:none; border:none; font-family:var(--font-ui); padding:4px 0 0; }
       .aic-showwork:hover { text-decoration:underline; }
-      .aic-work { display:none; font-size:11.5px; color:var(--aic-ink2); line-height:1.6; border-top:1px dashed var(--aic-line-strong); margin-top:7px; padding-top:7px; }
+      .aic-work { display:none; font-size:11.5px; color:var(--text-secondary); line-height:1.6; border-top:1px dashed var(--border-strong); margin-top:7px; padding-top:7px; }
       .aic-work.open { display:block; }
-      .aic-pb { font-size:10.5px; font-weight:600; color:var(--aic-ink3); margin-top:7px; }
-      .aic-pb b { color:var(--navy); font-weight:800; }
-      .aic-decide { border:1.5px solid var(--aic-line-strong); border-radius:10px; background:var(--aic-raised); box-shadow:0 1px 3px rgba(0,0,0,0.05); }
-      .aic-dhd { font-size:12px; font-weight:800; letter-spacing:.3px; padding:11px 14px; border-bottom:1px solid var(--aic-line); color:var(--aic-ink); background:var(--bg-surface); border-radius:9px 9px 0 0; }
+      .aic-pb { font-size:10px; font-weight:600; color:var(--text-muted); margin-top:6px; }
+      .aic-pb b { color:var(--navy); font-weight:700; }
+      .aic-decide { border:1px solid rgba(0,0,0,0.12); border-radius:8px; background:var(--bg-base); overflow:hidden; }
+      .aic-dhd { font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:9px 14px; border-bottom:1px solid var(--border); color:var(--text-secondary); background:var(--bg-surface); }
       .aic-route { padding:11px 14px; }
-      .aic-route + .aic-route { border-top:1px solid var(--aic-line); }
-      .aic-rtop { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800; color:var(--aic-ink); }
-      .aic-rtop.alt { font-weight:700; color:var(--aic-ink2); }
-      .aic-rec { font-size:9.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#5C4A00; background:rgba(255,222,0,0.32); border:1px solid rgba(180,150,0,0.4); padding:2px 7px; border-radius:4px; }
-      .aic-draft { font-size:12.5px; color:var(--aic-ink); line-height:1.6; margin:8px 0 9px; padding:9px 12px; background:var(--bg-surface); border:1px dashed rgba(0,0,0,0.2); border-radius:8px; }
-      .aic-draft[contenteditable="true"] { border-style:solid; border-color:var(--gold); outline:none; background:#FFFDF2; }
+      .aic-route + .aic-route { border-top:1px solid var(--border); }
+      .aic-rtop { display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--text-primary); }
+      .aic-rtop.alt { font-weight:600; color:var(--text-secondary); }
+      .aic-rec { font-size:9px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#6B5900; background:var(--yellow-dim); border:1px solid rgba(180,150,0,.3); padding:2px 6px; border-radius:3px; }
+      .aic-draft { font-size:12.5px; color:var(--text-primary); line-height:1.6; margin:8px 0 9px; padding:9px 12px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:7px; }
+      .aic-draft[contenteditable="true"] { border-color:var(--navy); outline:none; background:var(--bg-base); }
       .aic-ract { display:flex; align-items:flex-start; gap:10px; margin-top:8px; }
-      .aic-abtn { font-size:12px; font-weight:800; border-radius:7px; padding:7px 14px; cursor:pointer; border:1px solid var(--aic-line-strong); background:var(--aic-raised); color:var(--aic-ink); font-family:var(--font-ui); white-space:nowrap; }
-      .aic-abtn:hover { background:var(--bg-hover); }
-      .aic-abtn.primary { background:var(--navy); color:#fff; border-color:var(--navy); }
-      .aic-abtn.primary:hover { background:var(--navy-dark); }
-      .aic-abtn.primary .k { opacity:.6; font-weight:500; font-size:10.5px; margin-left:5px; }
-      .aic-then { font-size:11px; color:var(--aic-ink3); line-height:1.5; padding-top:4px; }
-      .aic-then b { color:var(--aic-ink); font-weight:700; }
-      .aic-bub { max-width:76%; font-size:13px; line-height:1.6; padding:10px 14px; border-radius:11px; }
-      .aic-bub.user { align-self:flex-end; background:var(--navy); color:#fff; border-bottom-right-radius:3px; }
-      .aic-bub.ai { align-self:flex-start; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-bottom-left-radius:3px; color:var(--aic-ink); }
-      .aic-bub.out { align-self:flex-end; background:rgba(91,122,94,0.14); border:1px solid rgba(46,107,63,0.3); color:var(--aic-ink); border-bottom-right-radius:3px; }
-      .aic-bub .who { font-size:9.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; opacity:.65; display:block; margin-bottom:4px; }
-      .aic-sys { align-self:center; font-size:11.5px; font-weight:500; color:var(--aic-ink2); text-align:center; line-height:1.55; max-width:88%; }
-      .aic-sys b { color:var(--aic-ink); font-weight:700; }
-      .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid var(--aic-line); padding:12px 14px; background:var(--bg-surface); border-radius:0 0 11px 11px; }
-      .aic-in { flex:1; font-size:13px; color:var(--aic-ink); background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:9px; padding:10px 13px; font-family:var(--font-ui); outline:none; }
-      .aic-in:focus { border-color:var(--gold); }
-      .aic-in::placeholder { color:var(--aic-ink3); }
-      .aic-send { width:34px; height:34px; border-radius:8px; background:var(--navy); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px; border:none; cursor:pointer; }
-      .aic-send:hover { background:var(--navy-dark); }
-      .aic-role { display:flex; align-items:center; gap:6px; background:var(--navy); color:#fff; font-size:12px; padding:7px 13px; border-radius:8px; font-weight:700; border:none; cursor:pointer; font-family:var(--font-ui); }
-      .aic-role span { color:rgba(255,255,255,.6); font-weight:500; }
+      .aic-then { font-size:11px; color:var(--text-secondary); line-height:1.5; padding-top:4px; }
+      .aic-then b { color:var(--text-primary); font-weight:700; }
+      .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid rgba(0,0,0,0.06); padding:11px 14px; }
+      .aic-in { flex:1; font-size:13px; color:var(--text-primary); background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:7px; padding:8px 12px; font-family:var(--font-ui); outline:none; }
+      .aic-in:focus { border-color:rgba(0,0,0,0.3); }
+      .aic-in::placeholder { color:var(--text-muted); }
       .aic-role-wrap { position:relative; }
-      .aic-typing { align-self:flex-start; font-size:11.5px; font-weight:600; color:var(--aic-ink3); padding:2px 4px; }
-      .aic-newbtn { display:flex; align-items:center; gap:6px; background:var(--gold); color:#141414; font-size:12px; padding:7px 13px; border-radius:8px; font-weight:800; border:none; cursor:pointer; font-family:var(--font-ui); }
-      .aic-newbtn:hover { background:var(--yellow); }
-      .aic-rep-wrap { border:1px solid var(--aic-line-strong); border-radius:10px; overflow:auto; max-height:360px; background:var(--aic-raised); }
+      .aic-typing { font-size:11px; color:var(--text-muted); padding:2px 0 2px 27px; }
+      .aic-rep-wrap { border:1px solid var(--border-strong); border-radius:8px; overflow:auto; max-height:360px; background:var(--bg-base); }
       .aic-rep-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-      .aic-rep-table th { position:sticky; top:0; background:var(--bg-surface); text-align:left; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--aic-ink2); border-bottom:1.5px solid var(--aic-line-strong); padding:8px 11px; white-space:nowrap; }
-      .aic-rep-table td { padding:8px 11px; border-bottom:1px solid var(--aic-line); color:var(--aic-ink); font-weight:500; }
-      .aic-rep-table td:first-child { font-weight:700; }
+      .aic-rep-table th { position:sticky; top:0; background:var(--bg-surface); text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-secondary); border-bottom:1px solid var(--border-strong); padding:8px 12px; white-space:nowrap; }
+      .aic-rep-table td { padding:8px 12px; border-bottom:1px solid var(--border); color:var(--text-primary); }
+      .aic-rep-table td:first-child { font-weight:600; }
       .aic-rep-table tbody tr { cursor:pointer; }
       .aic-rep-table tbody tr:hover td { background:var(--bg-hover); }
     </style>
@@ -3287,9 +3270,9 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
         </div>
         <div class="topbar-right">
-          <button class="aic-newbtn" onclick="aicNewTask()">＋ New task</button>
+          <button class="btn btn-primary" style="font-size:12px;padding:7px 13px;" onclick="aicNewTask()">＋ New task</button>
           <div class="aic-role-wrap">
-            <button class="aic-role" onclick="aicMenuToggle(event,'aicRoleMenu')"><span>Role</span> <b id="aicRoleName">Underwriting / Ops</b> &#x25BE;</button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:7px 12px;gap:6px;" onclick="aicMenuToggle(event,'aicRoleMenu')"><span style="color:var(--text-muted);font-weight:500;">Lens</span> <b id="aicRoleName">Underwriting / Ops</b> &#x25BE;</button>
             <div class="aic-menu" id="aicRoleMenu" style="min-width:150px;">
               <div onclick="aicSetRole('uw')">Underwriting / Ops</div>
               <div onclick="aicSetRole('sales')">Sales</div>
@@ -44895,7 +44878,7 @@ const AIC_ROLES = {
 const AIC_TASKS = {
 
   't-pcr': {
-    id:'t-pcr', merchant:'Pacific Coast Retail', contact:'Sarah Chen',
+    kind:'pend', id:'t-pcr', merchant:'Pacific Coast Retail', contact:'Sarah Chen',
     av:'PC', avc:'#6B839B', lane:'needs', state:'open', stage:0, sla:'SLA 4h', age:'12m',
     title:'Pacific Coast Retail', sub:'Merchant responded to pend — 2 docs + a note',
     chip:'✦ Reviewed — 1 gap found', status:'UW · Pended 5d', playbook:'UW response review',
@@ -44920,7 +44903,7 @@ const AIC_TASKS = {
   },
 
   't-marina': {
-    id:'t-marina', merchant:null, contact:'Tony Marina',
+    kind:'call', id:'t-marina', merchant:null, contact:'Tony Marina',
     av:'MD', avc:'#5B7A5E', lane:'needs', state:'open', stage:0, sla:null, age:'32m',
     title:'Call · Marina Deli', sub:'New call transcript — no merchant record found. Looks like a new merchant.',
     chip:'✦ Create lead?', status:'No record', playbook:'Lead detect from call',
@@ -44939,7 +44922,7 @@ const AIC_TASKS = {
   },
 
   't-harbor': {
-    id:'t-harbor', merchant:'Harbor Bistro', contact:'Harbor Bistro',
+    kind:'invest', id:'t-harbor', merchant:'Harbor Bistro', contact:'Harbor Bistro',
     av:'HB', avc:'#9B6B5B', lane:'needs', state:'open', stage:0, sla:null, age:'4m',
     title:'Harbor Bistro', sub:'Chargeback ratio 1.8% — investigated, pattern found',
     chip:'✦ Conclusion — ticket proposed', status:'Active · CB watch', playbook:'Anomaly investigation',
@@ -44957,20 +44940,20 @@ const AIC_TASKS = {
     transcript:[{role:'agent', text:'Investigated Harbor Bistro’s chargeback spike (0.4% → 1.8% in 3 weeks). All 4 new disputes are reason 10.4 CNP on web orders via the online-ordering plugin launched Jul 28; AVS/CVV not transmitted on those auths; zero card-present disputes in 90 days. Conclusion: gateway config gap. Proposed: ticket to deployment (enable AVS/CVV), assign Alex Kim; optional merchant heads-up.'}]
   },
 
-  't-metro':    { id:'t-metro', merchant:'Metro Print Shop', contact:'Metro Print Shop', av:'MP', avc:'#8C7A5E', lane:'waiting', state:'waiting', stage:0, age:'2d',
+  't-metro':    { id:'t-metro', kind:'sig', merchant:'Metro Print Shop', contact:'Metro Print Shop', av:'MP', avc:'#8C7A5E', lane:'waiting', state:'waiting', stage:0, age:'2d',
     title:'Metro Print Shop', sub:'DocuSign nudge sent', chip:null, waitLabel:'resurfaces 8pm', status:'Signature · 2d', playbook:'Signature chase',
     simple:{ rows:[['Where it stands','DocuSign sent 2 days ago — no open event. A nudge went out this morning at 8:02.'],['Watching for','envelope-open or signature webhook'],['Resurfaces','tonight 8pm if still unopened — the expiry is at midnight']], route:{ label:'Nudge again now', then:'a second reminder goes out → stays in Waiting · resurfaces 8pm' } },
     deflect:['The nudge went out at 8:02 this morning and the envelope expires at midnight — that’s why the resurface is set for 8pm, enough time to re-send or call before expiry. Want it earlier?'],
     transcript:[{role:'agent', text:'Metro Print Shop: DocuSign unopened for 2 days, expiry midnight. Morning nudge sent. Waiting; resurfaces 8pm.'}] },
 
-  't-coastal':  { id:'t-coastal', merchant:'Coastal Spa & Salon', contact:'Coastal Spa & Salon', av:'CS', avc:'#A67C5B', lane:'waiting', state:'waiting', stage:0, age:'5d',
+  't-coastal':  { id:'t-coastal', kind:'docs', merchant:'Coastal Spa & Salon', contact:'Coastal Spa & Salon', av:'CS', avc:'#A67C5B', lane:'waiting', state:'waiting', stage:0, age:'5d',
     title:'Coastal Spa & Salon', sub:'Docs requested Tue', chip:null, waitLabel:'auto-follow Thu', status:'UW · Docs requested', playbook:'UW document chase',
     ctx:{ partner:'Coastal Commerce', processor:'Fiserv', vol:'$38K stated', assignee:'J. Rivera', status:'Underwriting' },
     simple:{ rows:[['Where it stands','YTD P&L + last tax return requested Tuesday. No upload yet.'],['Watching for','document upload on the merchant link'],['Resurfaces','Thursday 9am with a follow-up already drafted']], route:{ label:'Send the follow-up now', then:'the drafted reminder goes out → stays in Waiting · next check Monday' } },
     deflect:['Requested Tuesday, typical turnaround on doc requests for this partner is 2–3 business days — Thursday 9am is the right check-in. I can pull it earlier if the file is time-sensitive.'],
     transcript:[{role:'agent', text:'Coastal Spa & Salon: YTD P&L + tax return requested Tuesday, no upload yet. Waiting; auto-follow Thursday 9am.'}] },
 
-  't-pinnacle': { id:'t-pinnacle', merchant:'Pinnacle Fitness', contact:'Pinnacle Fitness', av:'PF', avc:'#7C6FA0', lane:'fyi', state:'open', stage:0, age:'6h',
+  't-pinnacle': { id:'t-pinnacle', kind:'fyi', merchant:'Pinnacle Fitness', contact:'Pinnacle Fitness', av:'PF', avc:'#7C6FA0', lane:'fyi', state:'open', stage:0, age:'6h',
     title:'Pinnacle Fitness', sub:'Auto-submitted to UW — score 91', chip:null, waitLabel:'no action', status:'Signature → UW', playbook:'FYI',
     simple:{ rows:[['What happened','Signed packet came in overnight. Package score 91/100 — auto-submitted to underwriting.'],['Who has it','UW queue · J. Rivera'],['You need to do','nothing — this is informational']], route:null },
     deflect:['Nothing needed from you — the packet scored 91 and went straight to underwriting. It’ll surface here only if UW pends it.'],
@@ -44979,7 +44962,7 @@ const AIC_TASKS = {
   't-resid':    { id:'t-resid', merchant:null, contact:null, av:'∑', avc:'#8358A8', lane:'fyi', state:'open', stage:0, age:'1d',
     title:'March residuals posted', sub:'', chip:null, waitLabel:'view ↗', status:'', playbook:'', gotoView:'residuals' },
 
-  't-harborlight': { id:'t-harborlight', merchant:null, contact:'Tara Price',
+  't-harborlight': { id:'t-harborlight', kind:'ref', merchant:null, contact:'Tara Price',
     av:'HD', avc:'#6B839B', lane:'needs', state:'open', stage:0, sla:null, age:'2h',
     title:'Referral · Harborlight Dental', sub:'Warm intro from Tara Price (Rivermark) — outreach drafted',
     chip:'✦ Reply drafted', status:'New referral', playbook:'Referral outreach',
@@ -44989,7 +44972,7 @@ const AIC_TASKS = {
     deflect:['The draft leads with the statement review offer — no pricing claims, per the burned-twice warning. If you send it now I’ll resurface Friday 9am if the office manager hasn’t replied — intro momentum fades after about three days — or tell me when.'],
     transcript:[{role:'agent', text:'Referral from Tara Price (Rivermark): Harborlight Dental group, ~$80K/mo, rate-hike pain, burned by two processors. Drafted a soft statement-review reply. Proposed: approve & send, resurface Friday if quiet.'}] },
 
-  't-lakeview': { id:'t-lakeview', merchant:'Lakeview Dental', contact:'Lakeview Dental',
+  't-lakeview': { id:'t-lakeview', kind:'fu', merchant:'Lakeview Dental', contact:'Lakeview Dental',
     av:'LD', avc:'#5B7A5E', lane:'needs', state:'open', stage:0, sla:null, age:'due',
     title:'Lakeview Dental', sub:'Terminal upgrade quote — follow-up due today (snoozed last week)',
     chip:'✦ Follow-up drafted', status:'Active', playbook:'Quote follow-up',
@@ -45081,36 +45064,49 @@ function aicRenderDigest(){
   document.getElementById('aicDigest').innerHTML = h;
 }
 function aicRenderQueue(){
-  var h = '';
   var needs = aicLaneIds('needs'), waiting = aicLaneIds('waiting'), fyi = aicLaneIds('fyi');
-  h += '<div class="aic-lane hot">Needs you <span class="ct">' + needs.length + '</span></div>';
-  if (!needs.length) h += '<div class="aic-slim">Queue clear — nothing needs you<span class="zz">✓</span></div>';
-  needs.forEach(function(id){
+  function kindChip(t){
+    var map = { pend:['Pend reply','#7C6FA0'], call:['New call','#5B7A5E'], invest:['Investigate','#9B6B5B'], report:['Report','#3E5E80'], user:['Your task','#8358A8'], ref:['Referral','#6B839B'], fu:['Follow-up','#A67C5B'], sig:['Signature','#8C7A5E'], docs:['Docs','#6B839B'], fyi:['FYI','#737373'] };
+    var k = t.kind || (t.report ? 'report' : (t.userCreated || t.adhoc) ? 'user' : 'fyi');
+    var c = map[k] || map.fyi;
+    return '<span class="cc-kind" style="color:' + c[1] + ';">' + c[0] + '</span>';
+  }
+  function row(id, thin){
     var t = AIC_TASKS[id];
-    h += '<div class="aic-card' + (AIC_STATE.open === id ? ' sel' : '') + '" onclick="aicOpenTask(\'' + id + '\')">' +
-      '<div class="aic-card-top"><span class="aic-mava" style="background:' + t.avc + '">' + t.av + '</span><span class="aic-card-m">' + t.title + '</span>' +
-      (t.sla ? '<span class="aic-sla">' + t.sla + '</span>' : '<span class="aic-age">' + t.age + '</span><span class="aic-hops"><button title="Mark done" onclick="event.stopPropagation();aicDone(\'' + id + '\')">✓</button><button title="Snooze to tomorrow 9am" onclick="event.stopPropagation();aicSnooze(\'' + id + '\',\'tomorrow 9am\')">⏰</button></span>') +
-      '</div><div class="aic-card-t">' + t.sub + '</div>' +
-      (t.chip ? '<div class="aic-prop"><span class="aic-prop-chip">' + t.chip + '</span>' +
-        (id === 't-marina' && t.stage === 0 ? '<button class="aic-mini go" onclick="event.stopPropagation();aicOpenTask(\'t-marina\');aicRoute(\'t-marina\',\'create\')">Create</button><button class="aic-mini" onclick="event.stopPropagation();aicRoute(\'t-marina\',\'ignore\')">Ignore</button>' : '') +
-        '</div>' : '') +
-      '</div>';
-  });
-  h += '<div class="aic-lane">Waiting <span class="ct">' + waiting.length + '</span></div>';
-  if (!waiting.length) h += '<div class="aic-slim" style="cursor:default;">Nothing parked<span class="zz">—</span></div>';
-  waiting.forEach(function(id){
-    var t = AIC_TASKS[id];
-    h += '<div class="aic-slim" onclick="aicOpenTask(\'' + id + '\')">' + t.title + ' — ' + (t.sub || '') + '<span class="zz">' + (t.waitLabel || '') + '</span></div>';
-  });
-  h += '<div class="aic-lane">FYI <span class="ct">' + fyi.length + '</span></div>';
-  fyi.forEach(function(id){
-    var t = AIC_TASKS[id];
-    h += '<div class="aic-slim" onclick="' + (t.gotoView ? 'showView(\'' + t.gotoView + '\', null)' : 'aicOpenTask(\'' + id + '\')') + '">' + t.title + (t.sub ? ' — ' + t.sub : '') + '<span class="zz">' + (t.waitLabel || '') + '</span></div>';
-  });
-  h += '<div class="aic-focus">▸ <b>Focus mode</b> — one task at a time (coming with build 2)</div>';
+    var sel = AIC_STATE.open === id;
+    var isMarina = (id === 't-marina' && t.stage === 0);
+    var h = '<div class="cc-wrow aic-row' + (thin ? ' thin' : '') + (sel ? ' aic-sel' : '') + (t.sla ? ' pri-now' : '') + '" onclick="' + (t.gotoView ? "showView('" + t.gotoView + "', null)" : "aicOpenTask('" + id + "')") + '">' +
+      kindChip(t) +
+      '<div class="cc-wrow-main"><div class="cc-wrow-top">' +
+        (t.sla ? '<span class="cc-now-pill">\u26A1 ' + t.sla + '</span>' : '') +
+        '<span class="cc-wrow-name">' + t.title + '</span>' +
+        '<span class="cc-wrow-desc">' + (t.sub || '') + '</span>' +
+      '</div>' +
+      ((!thin && t.chip) ? '<div class="aic-proprow"><span class="aic-act-chip">' + t.chip + '</span></div>' : '') +
+      '</div>' +
+      '<div class="cc-wrow-meta">' +
+        (thin ? '<span class="cc-wrow-age">' + (t.waitLabel || t.age || '') + '</span>'
+              : '<span class="cc-wrow-age">' + (t.age || '') + '</span>' +
+                (isMarina ? '<button class="cc-wrow-act" onclick="event.stopPropagation();aicOpenTask(\'t-marina\');aicRoute(\'t-marina\',\'create\')">Create lead \u2192</button>' : '') +
+                '<div class="cc-wrow-hover">' +
+                  '<button class="cc-whbtn" title="Snooze to tomorrow 9am" onclick="event.stopPropagation();aicSnooze(\'' + id + '\',\'tomorrow 9am\')">\u{1F4A4}</button>' +
+                  '<button class="cc-whbtn done" title="Mark done" onclick="event.stopPropagation();aicDone(\'' + id + '\')">\u2713</button>' +
+                '</div>') +
+      '</div></div>';
+    return h;
+  }
+  var h = '<div class="card aic-qcard">' +
+    '<div class="card-header"><span class="card-title">Your queue</span><span class="card-sub">' + (needs.length + waiting.length + fyi.length) + ' open</span></div>' +
+    '<div class="aic-lanehdr hot">Needs you<span>' + needs.length + '</span></div>' +
+    (needs.length ? needs.map(function(id){ return row(id, false); }).join('') : '<div class="cc-work-empty"><div class="cc-work-empty-ic">\u2728</div>All clear.</div>') +
+    '<div class="aic-lanehdr">Waiting<span>' + waiting.length + '</span></div>' +
+    (waiting.length ? waiting.map(function(id){ return row(id, true); }).join('') : '<div class="aic-lanempty">Nothing parked</div>') +
+    '<div class="aic-lanehdr">FYI<span>' + fyi.length + '</span></div>' +
+    fyi.map(function(id){ return row(id, true); }).join('') +
+    '<div class="aic-focus">\u25B8 <b>Focus mode</b> \u2014 one task at a time (build 2)</div>' +
+    '</div>';
   document.getElementById('aicQueue').innerHTML = h;
 }
-
 /* ── workspace ───────────────────────────────────────────────────── */
 function aicOpenTask(id){
   var t = AIC_TASKS[id]; if (!t) return;
@@ -45121,31 +45117,34 @@ function aicOpenTask(id){
 function aicRenderWs(){
   var t = aicTask();
   var ws = document.getElementById('aicWs');
-  if (!t) { ws.innerHTML = '<div class="aic-thread"><div class="aic-sys" style="padding:30px 0;">Queue clear. ✦ Ask anything above, or switch lens with the Role pill.</div></div>'; return; }
+  if (!t) { ws.innerHTML = '<div class="card"><div class="cc-work-empty"><div class="cc-work-empty-ic">\u2728</div>Queue clear. Ask anything above, or switch lens with the Role control.</div></div>'; return; }
   var m = aicMerchantRow(t.merchant);
   var redact = aicRole().redactProcessor;
-  var h = '<div class="aic-ws-hd"><span class="aic-ws-ttl">' + t.title + '</span>' +
-    (t.status ? '<span class="aic-st">' + t.status + '</span>' : '') +
+  var h = '<div class="card aic-wscard"><div class="aic-ws-hd">' +
+    '<span class="aic-ws-ttl">' + t.title + '</span>' +
+    (t.status ? '<span class="cc-wrow-sch aic-stchip">' + t.status + '</span>' : '') +
     '<div class="right">' +
-      (m || t.merchant ? '<button class="aic-linky" data-aic-menu onclick="aicMenuToggle(event,\'aicCtxMenuNone\');aicToggleCtx(this)">Details ▾</button>' : '') +
-      (m ? '<button class="aic-linky" onclick="aicOpenRecord()">Open record ↗</button>' : '') +
-      '<button class="aic-gbtn" title="Close this task — files summary + transcript to the merchant timeline" onclick="aicDone(\'' + t.id + '\')">✓ Done</button>' +
-      '<span style="position:relative;"><button class="aic-gbtn" data-aic-menu onclick="aicMenuToggle(event,\'aicSnzMenu\')">⏰ Snooze ▾</button>' +
+      (m || t.merchant ? '<button class="btn btn-ghost aic-sm" onclick="aicToggleCtx(this)">Details \u25BE</button>' : '') +
+      (m ? '<button class="btn btn-ghost aic-sm" onclick="aicOpenRecord()">Open record \u2197</button>' : '') +
+      '<button class="btn btn-ghost aic-sm" title="Close this task \u2014 files summary + transcript to the merchant timeline" onclick="aicDone(\'' + t.id + '\')">\u2713 Done</button>' +
+      '<span style="position:relative;"><button class="btn btn-ghost aic-sm" data-aic-menu onclick="aicMenuToggle(event,\'aicSnzMenu\')">Snooze \u25BE</button>' +
         '<div class="aic-menu" id="aicSnzMenu"><div class="hd">Resurface</div>' +
-        '<div onclick="aicSnooze(\'' + t.id + '\',\'later today · 6pm\')">Later today</div>' +
+        '<div onclick="aicSnooze(\'' + t.id + '\',\'later today \u00B7 6pm\')">Later today</div>' +
         '<div onclick="aicSnooze(\'' + t.id + '\',\'tomorrow 9am\')">Tomorrow 9am</div>' +
         (t.contact ? '<div onclick="aicSnooze(\'' + t.id + '\',\'when ' + aicEsc(t.contact) + ' replies\')">When ' + aicEsc(t.contact) + ' replies</div>' : '') +
-        '<div onclick="aicSnoozeCustom(\'' + t.id + '\')">Custom — ask the agent…</div></div></span>' +
-      '<span style="position:relative;"><button class="aic-gbtn" data-aic-menu style="padding:5px 8px;" onclick="aicMenuToggle(event,\'aicKebabMenu\')">⋯</button>' +
+        '<div onclick="aicSnoozeCustom(\'' + t.id + '\')">Custom \u2014 ask the agent\u2026</div></div></span>' +
+      '<span style="position:relative;"><button class="btn btn-ghost aic-sm" data-aic-menu style="padding:5px 8px;" onclick="aicMenuToggle(event,\'aicKebabMenu\')">\u22EF</button>' +
         '<div class="aic-menu" id="aicKebabMenu"><div class="hd">This task</div>' + aicTeamMenuHTML(t) +
-        '<div onclick="aicKebabAct(\'handoff\')">⇄ Hand off ownership</div>' +
+        '<div onclick="aicKebabAct(\'handoff\')">\u21C4 Hand off ownership</div>' +
         '<div onclick="aicKebabAct(\'ticket\')">\u{1F3AB} Convert to ticket</div>' +
         '<div onclick="aicDone(\'' + t.id + '\')">\u{1F5C4} Archive task</div></div></span>' +
     '</div></div>';
   h += '<div class="aic-ctx" id="aicCtx">' + aicCtxHTML(t, m, redact) + '</div>';
   h += '<div class="aic-thread" id="aicThread">' + aicSectionsHTML(t) + (t.msgs || []).map(aicMsgHTML).join('') + '</div>';
-  h += '<div class="aic-composer"><input class="aic-in" id="aicChatInput" placeholder="Reply — or type / for a playbook…" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="aic-send" onclick="aicChatSend()">↑</button></div>';
+  h += '<div class="aic-composer"><input class="aic-in" id="aicChatInput" placeholder="Reply \u2014 or type / for a playbook\u2026" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
   ws.innerHTML = h;
+  var th = document.getElementById('aicThread');
+  if (th) th.scrollTop = th.scrollHeight;
 }
 function aicToggleCtx(btn){
   var el = document.getElementById('aicCtx'); if (!el) return;
@@ -45209,7 +45208,7 @@ function aicRouteHTML(t, key, opts){
   var r = opts;
   return '<div class="aic-route"><div class="aic-rtop' + (r.rec ? '' : ' alt') + '">' + (r.rec ? '<span class="aic-rec">Recommended</span>' : '') + r.title + '</div>' +
     (r.draft ? '<div class="aic-draft" id="aic-draft-' + key + '">' + r.draft + ' <button class="aic-linky" onclick="aicEditDraft(\'' + key + '\', this)">✎ Edit</button></div>' : '') +
-    '<div class="aic-ract"><button class="aic-abtn' + (r.rec ? ' primary' : '') + '" onclick="aicRoute(\'' + t.id + '\',\'' + key + '\')">' + r.btn + '</button>' +
+    '<div class="aic-ract"><button class="btn ' + (r.rec ? 'btn-primary' : 'btn-ghost') + ' aic-sm" onclick="aicRoute(\'' + t.id + '\',\'' + key + '\')">' + r.btn + '</button>' +
     '<span class="aic-then"><b>Then:</b> ' + r.then + '</span></div></div>';
 }
 function aicEditDraft(key, btn){
@@ -45288,7 +45287,7 @@ function aicSectionsHTML(t){
     h += '<div class="aic-rep-wrap"><table class="aic-rep-table"><thead><tr>' + r.cols.map(function(c){ return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
       r.rows.map(function(row){ return '<tr data-m="' + aicEsc(row[0]) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))">' + row.map(function(c, i){ return '<td' + (i === 1 ? ' style="text-transform:capitalize;"' : '') + '>' + aicEsc(String(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
       '</tbody></table></div>';
-    h += '<div class="aic-ract" style="margin-top:2px;"><button class="aic-abtn" onclick="aicRepCsv(\'' + t.id + '\')">⬇ Download CSV</button><span class="aic-then">Ask below to slice or explain it — the agent reads this table. <b>Stays in your queue until you mark it Done.</b></span></div>';
+    h += '<div class="aic-ract" style="margin-top:2px;"><button class="btn btn-ghost aic-sm" onclick="aicRepCsv(\'' + t.id + '\')">⬇ Download CSV</button><span class="aic-then">Ask below to slice or explain it — the agent reads this table. <b>Stays in your queue until you mark it Done.</b></span></div>';
   }
   else if (t.simple) {
     h += '<div class="aic-brief">' + t.simple.rows.map(function(r){
@@ -45329,10 +45328,14 @@ function aicToggleWork(btn){
 
 /* ── messages ────────────────────────────────────────────────────── */
 function aicMsgHTML(msg){
-  if (msg.kind === 'sys') return '<div class="aic-sys">' + msg.html + '</div>';
-  if (msg.kind === 'out') return '<div class="aic-bub out"><span class="who">Sent → ' + (msg.to || 'recipient') + '</span>' + msg.html + '</div>';
-  if (msg.kind === 'user') return '<div class="aic-bub user"><span class="who">Mike</span>' + msg.html + '</div>';
-  return '<div class="aic-bub ai"><span class="who">✦ Twill AI' + (msg.live ? ' · live' : '') + '</span>' + msg.html + '</div>';
+  if (msg.kind === 'sys') return '<div class="syse" style="padding:3px 0;"><span class="sysd"></span><span class="syst">' + msg.html + '</span></div>';
+  var av, avc, name, mode, modeLab;
+  if (msg.kind === 'out') { av = '\u2191'; avc = 'var(--green)'; name = 'Sent'; mode = 'out'; modeLab = '\u2192 ' + (msg.to || 'Recipient'); }
+  else if (msg.kind === 'user') { av = 'MW'; avc = '#A09E9A'; name = 'Mike'; mode = ''; modeLab = ''; }
+  else { av = '\u2726'; avc = 'var(--navy)'; name = 'Twill AI'; mode = 'int'; modeLab = (msg.live ? 'Live' : 'Agent'); }
+  return '<div class="act aic-act"><div class="ah"><div class="aav" style="background:' + avc + ';color:#fff;">' + av + '</div>' +
+    '<span class="aname">' + name + '</span>' + (modeLab ? '<span class="amode ' + mode + '">' + modeLab + '</span>' : '') +
+    '<span class="atime">now</span></div><div class="abub ' + mode + '">' + msg.html + '</div></div>';
 }
 function aicPush(t, msg){ (t.msgs = t.msgs || []).push(msg); if (AIC_STATE.open === t.id) { var th = document.getElementById('aicThread'); if (th) { th.insertAdjacentHTML('beforeend', aicMsgHTML(msg)); th.scrollTop = th.scrollHeight; } } }
 
@@ -45510,7 +45513,7 @@ function aicOpenRecord(){
 function aicBoard(t){
   var routes = [];
   document.querySelectorAll('#aicThread .aic-route').forEach(function(r){
-    var b = r.querySelector('.aic-abtn'), th = r.querySelector('.aic-then');
+    var b = r.querySelector('.aic-ract .btn'), th = r.querySelector('.aic-then');
     if (b) routes.push({ label:b.textContent.trim(), then:(th ? th.textContent.replace(/^Then:\s*/, '').trim() : '') });
   });
   var docs = {};
