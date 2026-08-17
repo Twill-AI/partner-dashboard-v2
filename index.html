@@ -3135,129 +3135,148 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
     <!-- ── VIEW: AI COMMAND CENTER ────────────────────── -->
     <style id="aic-style">
-      /* The AIC queue replaces the floating session-queue pill on this view —
-         and the pill's z-index 900 footprint sits exactly over the composer send button. */
+      /* AI Command Center — contrast pass 2026-08-17: raised warm surfaces (the token
+         set's bg-elevated is DARKER than bg-base, so cards need their own raised tier),
+         ink one step darker everywhere, type up ~1.5px, visible borders. */
+      #view-ai-command { --aic-raised:#FBFAF7; --aic-line:rgba(0,0,0,0.11); --aic-line-strong:rgba(0,0,0,0.16); --aic-ink:#141414; --aic-ink2:#3D3D3D; --aic-ink3:#5C5C5C; }
       body:has(#view-ai-command.active) #agent-queue-pill { display:none; }
       #view-ai-command .aic-wrap { padding:0 24px 24px; }
-      .aic-cmdbar { display:flex; align-items:center; gap:10px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:11px; padding:4px 14px; margin-top:4px; }
-      .aic-spark { color:var(--gold); font-size:14px; flex:none; }
-      .aic-cmdin { flex:1; background:transparent; border:none; outline:none; font-family:var(--font-ui); font-size:12.5px; color:var(--text-primary); padding:8px 0; }
-      .aic-cmdin::placeholder { color:var(--text-muted); }
-      .aic-hint { font-size:10px; color:var(--text-muted); background:var(--bg-base); border:1px solid var(--border); border-radius:5px; padding:3px 7px; font-family:var(--font-mono); flex:none; }
-      .aic-digest { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0 0; }
-      .aic-dg-label { font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--text-muted); }
-      .aic-chip { display:inline-flex; align-items:center; gap:7px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px; padding:5px 12px 5px 7px; font-size:11.5px; color:var(--text-secondary); cursor:pointer; }
-      .aic-chip:hover { background:var(--bg-hover); }
-      .aic-chip b { color:var(--text-primary); font-weight:600; }
-      .aic-chip .n { min-width:18px; height:18px; border-radius:9px; background:var(--navy); color:#fff; font-size:10px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; padding:0 5px; }
-      .aic-chip.warn .n { background:var(--red); }
-      .aic-panes { display:grid; grid-template-columns:322px minmax(0,1fr); gap:14px; margin-top:14px; align-items:start; }
+      .aic-cmdbar { display:flex; align-items:center; gap:10px; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:11px; padding:5px 14px; margin-top:4px; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+      .aic-spark { color:var(--gold); font-size:15px; flex:none; }
+      .aic-cmdin { flex:1; background:transparent; border:none; outline:none; font-family:var(--font-ui); font-size:13.5px; color:var(--aic-ink); padding:9px 0; }
+      .aic-cmdin::placeholder { color:var(--aic-ink3); }
+      .aic-hint { font-size:10.5px; color:var(--aic-ink3); background:var(--bg-surface); border:1px solid var(--aic-line); border-radius:5px; padding:3px 7px; font-family:var(--font-mono); flex:none; }
+      .aic-digest { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:13px 0 0; }
+      .aic-dg-label { font-size:10.5px; font-weight:800; letter-spacing:.7px; text-transform:uppercase; color:var(--aic-ink2); }
+      .aic-chip { display:inline-flex; align-items:center; gap:7px; background:var(--aic-raised); border:1px solid var(--aic-line); border-radius:20px; padding:6px 13px 6px 8px; font-size:12.5px; color:var(--aic-ink2); cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+      .aic-chip:hover { border-color:var(--aic-line-strong); background:#fffef9; }
+      .aic-chip b { color:var(--aic-ink); font-weight:700; }
+      .aic-chip .n { min-width:19px; height:19px; border-radius:10px; background:var(--navy); color:#fff; font-size:10.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; padding:0 5px; }
+      .aic-chip.warn .n { background:#A33A1F; }
+      .aic-panes { display:grid; grid-template-columns:330px minmax(0,1fr); gap:16px; margin-top:15px; align-items:start; }
       @media (max-width:1100px) { .aic-panes { grid-template-columns:1fr; } }
-      .aic-lane { font-size:9.5px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--text-muted); margin:12px 2px 6px; display:flex; align-items:center; gap:6px; }
+      .aic-lane { font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--aic-ink); margin:14px 2px 7px; display:flex; align-items:center; gap:7px; }
       .aic-lane:first-child { margin-top:0; }
-      .aic-lane .ct { background:var(--bg-selected); border-radius:8px; padding:1px 6px; font-size:9px; }
-      .aic-lane.hot .ct { background:var(--red-dim); color:var(--red); }
-      .aic-card { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:7px; cursor:pointer; }
-      .aic-card:hover { background:var(--bg-hover); }
-      .aic-card.sel { border:1.5px solid var(--gold); background:var(--bg-selected); }
-      .aic-card-top { display:flex; align-items:center; gap:7px; margin-bottom:3px; }
-      .aic-mava { width:20px; height:20px; border-radius:6px; font-size:9px; font-weight:700; color:#fff; display:flex; align-items:center; justify-content:center; flex:none; }
-      .aic-card-m { font-size:12px; font-weight:700; color:var(--text-primary); }
-      .aic-sla { margin-left:auto; font-size:9.5px; font-weight:700; color:var(--red); background:var(--red-dim); border-radius:5px; padding:2px 6px; }
-      .aic-age { margin-left:auto; font-size:9.5px; color:var(--text-muted); }
+      .aic-lane .ct { background:var(--bg-selected); border-radius:8px; padding:1px 7px; font-size:10px; color:var(--aic-ink2); }
+      .aic-lane.hot .ct { background:rgba(163,58,31,0.14); color:#8F3115; }
+      .aic-card { background:var(--aic-raised); border:1px solid var(--aic-line); border-radius:10px; padding:11px 13px; margin-bottom:8px; cursor:pointer; position:relative; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+      .aic-card:hover { border-color:var(--aic-line-strong); }
+      .aic-card.sel { border:2px solid var(--gold); background:#FFFDF2; padding:10px 12px; box-shadow:0 1px 6px rgba(201,168,0,0.18); }
+      .aic-card-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+      .aic-mava { width:22px; height:22px; border-radius:6px; font-size:10px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; flex:none; }
+      .aic-card-m { font-size:13.5px; font-weight:800; color:var(--aic-ink); }
+      .aic-sla { margin-left:auto; font-size:10.5px; font-weight:800; color:#8F3115; background:rgba(163,58,31,0.12); border:1px solid rgba(163,58,31,0.25); border-radius:5px; padding:2px 7px; }
+      .aic-age { margin-left:auto; font-size:11px; font-weight:600; color:var(--aic-ink3); }
       .aic-hops { display:none; margin-left:auto; gap:4px; }
-      .aic-hops button { font-size:10px; border:1px solid var(--border-strong); background:var(--bg-base); border-radius:5px; padding:1px 6px; cursor:pointer; color:var(--text-secondary); }
+      .aic-hops button { font-size:11px; border:1px solid var(--aic-line-strong); background:var(--aic-raised); border-radius:5px; padding:2px 7px; cursor:pointer; color:var(--aic-ink); }
       .aic-card:hover .aic-age { display:none; }
       .aic-card:hover .aic-hops { display:flex; }
-      .aic-card-t { font-size:11.5px; color:var(--text-secondary); line-height:1.45; }
-      .aic-prop { margin-top:6px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-      .aic-prop-chip { font-size:10px; font-weight:600; color:#7A6A00; background:var(--yellow-dim); border-radius:6px; padding:3px 8px; }
-      .aic-mini { font-size:10px; font-weight:600; border-radius:6px; padding:3px 10px; border:1px solid var(--border-strong); background:var(--bg-base); color:var(--text-secondary); cursor:pointer; font-family:var(--font-ui); }
+      .aic-card-t { font-size:12.5px; color:var(--aic-ink2); line-height:1.5; }
+      .aic-prop { margin-top:8px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+      .aic-prop-chip { font-size:11px; font-weight:800; color:#5C4A00; background:rgba(255,222,0,0.28); border:1px solid rgba(180,150,0,0.35); border-radius:6px; padding:3px 9px; }
+      .aic-mini { font-size:11px; font-weight:700; border-radius:6px; padding:4px 11px; border:1px solid var(--aic-line-strong); background:var(--aic-raised); color:var(--aic-ink); cursor:pointer; font-family:var(--font-ui); }
       .aic-mini.go { background:var(--navy); border-color:var(--navy); color:#fff; }
-      .aic-slim { display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:8px; padding:6px 11px; margin-bottom:5px; font-size:11px; color:var(--text-secondary); cursor:pointer; }
-      .aic-slim:hover { background:var(--bg-hover); }
-      .aic-slim .zz { font-size:9.5px; color:var(--text-muted); margin-left:auto; white-space:nowrap; }
-      .aic-focus { margin-top:10px; text-align:center; font-size:11px; color:var(--text-muted); }
-      .aic-focus b { color:var(--navy); font-weight:600; }
-      .aic-ws { background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; overflow:visible; }
-      .aic-ws-hd { display:flex; align-items:center; gap:9px; padding:11px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
-      .aic-ws-ttl { font-size:13px; font-weight:700; color:var(--text-primary); }
-      .aic-st { font-size:9.5px; font-weight:700; color:var(--amber); background:var(--amber-dim); padding:2px 7px; border-radius:5px; white-space:nowrap; }
+      .aic-slim { display:flex; align-items:center; gap:8px; background:var(--aic-raised); border:1px solid var(--aic-line); border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:12px; font-weight:600; color:var(--aic-ink2); cursor:pointer; }
+      .aic-slim:hover { border-color:var(--aic-line-strong); }
+      .aic-slim .zz { font-size:10.5px; font-weight:600; color:var(--aic-ink3); margin-left:auto; white-space:nowrap; }
+      .aic-focus { margin-top:12px; text-align:center; font-size:12px; color:var(--aic-ink3); }
+      .aic-focus b { color:var(--navy); font-weight:700; }
+      .aic-ws { background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:12px; overflow:visible; box-shadow:0 1px 4px rgba(0,0,0,0.05); }
+      .aic-ws-hd { display:flex; align-items:center; gap:9px; padding:13px 16px; border-bottom:1px solid var(--aic-line); flex-wrap:wrap; }
+      .aic-ws-ttl { font-size:15px; font-weight:800; color:var(--aic-ink); }
+      .aic-st { font-size:10.5px; font-weight:800; color:#7A4A1F; background:rgba(166,124,91,0.16); border:1px solid rgba(166,124,91,0.3); padding:2px 8px; border-radius:5px; white-space:nowrap; }
       .aic-ws-hd .right { margin-left:auto; display:flex; gap:6px; align-items:center; position:relative; }
-      .aic-linky { font-size:11px; font-weight:600; color:var(--blue); cursor:pointer; background:none; border:none; font-family:var(--font-ui); white-space:nowrap; padding:0; }
-      .aic-gbtn { font-size:11px; color:var(--text-secondary); border:1px solid var(--border-strong); background:transparent; border-radius:8px; padding:5px 10px; cursor:pointer; font-family:var(--font-ui); white-space:nowrap; }
+      .aic-linky { font-size:12px; font-weight:700; color:#3E5E80; cursor:pointer; background:none; border:none; font-family:var(--font-ui); white-space:nowrap; padding:0; }
+      .aic-linky:hover { text-decoration:underline; }
+      .aic-gbtn { font-size:12px; font-weight:600; color:var(--aic-ink); border:1px solid var(--aic-line-strong); background:var(--aic-raised); border-radius:8px; padding:6px 11px; cursor:pointer; font-family:var(--font-ui); white-space:nowrap; }
       .aic-gbtn:hover { background:var(--bg-hover); }
-      .aic-menu { display:none; position:absolute; top:34px; right:0; background:var(--bg-base); border:1px solid var(--border-strong); border-radius:9px; padding:5px; min-width:190px; z-index:60; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+      .aic-menu { display:none; position:absolute; top:36px; right:0; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:9px; padding:5px; min-width:200px; z-index:60; box-shadow:0 8px 22px rgba(0,0,0,0.13); }
       .aic-menu.open { display:block; }
-      .aic-menu div { font-size:11px; color:var(--text-secondary); padding:6px 9px; border-radius:6px; cursor:pointer; }
+      .aic-menu div { font-size:12.5px; font-weight:500; color:var(--aic-ink); padding:7px 10px; border-radius:6px; cursor:pointer; }
       .aic-menu div:hover { background:var(--bg-hover); }
-      .aic-menu .hd { font-size:9px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--text-muted); cursor:default; }
+      .aic-menu .hd { font-size:10px; font-weight:800; letter-spacing:.7px; text-transform:uppercase; color:var(--aic-ink3); cursor:default; }
       .aic-menu .hd:hover { background:none; }
-      .aic-ctx { display:none; border-bottom:1px solid var(--border); background:var(--bg-base); padding:10px 16px; }
-      .aic-ctx.open { display:flex; gap:26px; flex-wrap:wrap; }
-      .aic-kv { font-size:10.5px; color:var(--text-muted); }
-      .aic-kv b { display:block; font-size:11.5px; color:var(--text-primary); font-weight:600; margin-top:1px; }
-      .aic-thread { padding:16px; display:flex; flex-direction:column; gap:11px; }
-      .aic-brief { border-left:3px solid var(--gold); background:var(--bg-base); border-radius:0 9px 9px 0; padding:10px 14px; }
-      .aic-brief.read { border-left-color:var(--blue); }
-      .aic-brow { display:grid; grid-template-columns:80px 1fr; gap:8px; font-size:11.5px; padding:4px 0; }
-      .aic-bk { font-weight:700; color:var(--text-muted); font-size:10px; letter-spacing:.5px; text-transform:uppercase; padding-top:2px; }
-      .aic-bv { color:var(--text-secondary); line-height:1.5; }
-      .aic-ok { color:var(--green); font-weight:700; }
-      .aic-warn { color:var(--red); font-weight:700; }
-      .aic-docs { display:flex; gap:7px; flex-wrap:wrap; }
-      .aic-doc { display:inline-flex; align-items:center; gap:7px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:8px; padding:6px 10px; font-size:11px; cursor:pointer; font-family:var(--font-ui); text-align:left; color:var(--text-primary); }
-      .aic-doc:hover { background:var(--bg-hover); }
-      .aic-doc.active { border-color:var(--gold); background:var(--yellow-dim); }
-      .aic-doc .ic { width:22px; height:26px; border-radius:3px; background:var(--navy); color:#fff; font-size:7px; font-weight:700; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; }
-      .aic-doc b { font-weight:600; display:block; font-size:11px; }
-      .aic-doc span.sub { display:block; font-size:9.5px; color:var(--text-muted); }
-      .aic-dpv { display:none; margin-top:7px; border:1px solid var(--border-strong); border-radius:9px; background:var(--bg-elevated); padding:10px 13px; }
+      .aic-ctx { display:none; border-bottom:1px solid var(--aic-line); background:var(--bg-surface); padding:11px 16px; }
+      .aic-ctx.open { display:flex; gap:28px; flex-wrap:wrap; }
+      .aic-kv { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--aic-ink3); }
+      .aic-kv b { display:block; font-size:12.5px; color:var(--aic-ink); font-weight:700; margin-top:2px; text-transform:none; letter-spacing:0; }
+      .aic-thread { padding:16px; display:flex; flex-direction:column; gap:12px; }
+      .aic-brief { border:1px solid var(--aic-line); border-left:4px solid var(--gold); background:#FFFEFA; border-radius:0 9px 9px 0; padding:11px 15px; }
+      .aic-brief.read { border-left-color:#3E5E80; }
+      .aic-brow { display:grid; grid-template-columns:86px 1fr; gap:10px; font-size:12.5px; padding:4.5px 0; }
+      .aic-bk { font-weight:800; color:var(--aic-ink3); font-size:10.5px; letter-spacing:.6px; text-transform:uppercase; padding-top:2px; }
+      .aic-bv { color:var(--aic-ink); line-height:1.55; }
+      .aic-bv b { font-weight:700; }
+      .aic-ok { color:#2E6B3F; font-weight:800; }
+      .aic-warn { color:#A33A1F; font-weight:800; }
+      .aic-docs { display:flex; gap:8px; flex-wrap:wrap; }
+      .aic-doc { display:inline-flex; align-items:center; gap:8px; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:8px; padding:7px 11px; font-size:12px; cursor:pointer; font-family:var(--font-ui); text-align:left; color:var(--aic-ink); box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+      .aic-doc:hover { border-color:rgba(0,0,0,0.25); }
+      .aic-doc.active { border-color:var(--gold); background:#FFFCEE; box-shadow:0 1px 4px rgba(201,168,0,0.2); }
+      .aic-doc .ic { width:24px; height:29px; border-radius:3px; background:var(--navy); color:#fff; font-size:8px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; }
+      .aic-doc b { font-weight:700; display:block; font-size:12px; color:var(--aic-ink); }
+      .aic-doc span.sub { display:block; font-size:10.5px; font-weight:500; color:var(--aic-ink3); margin-top:1px; }
+      .aic-dpv { display:none; margin-top:8px; border:1px solid var(--aic-line-strong); border-radius:9px; background:var(--bg-surface); padding:11px 14px; }
       .aic-dpv.open { display:block; }
-      .aic-dpv-hd { display:flex; align-items:center; font-size:10.5px; font-weight:700; margin-bottom:6px; color:var(--text-primary); }
+      .aic-dpv-hd { display:flex; align-items:center; font-size:12px; font-weight:800; margin-bottom:7px; color:var(--aic-ink); }
       .aic-dpv-hd .aic-linky { margin-left:auto; }
-      .aic-dpl { display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); color:var(--text-secondary); padding:2.5px 0; border-bottom:1px dashed var(--border); }
+      .aic-dpl { display:flex; justify-content:space-between; font-size:11px; font-family:var(--font-mono); color:var(--aic-ink); padding:3px 0; border-bottom:1px dashed var(--aic-line); }
       .aic-dpl:last-of-type { border:none; }
-      .aic-dpn { font-size:9.5px; color:var(--text-muted); margin-top:5px; }
-      .aic-note { display:flex; gap:9px; background:var(--bg-base); border:1px solid var(--border-strong); border-radius:10px; padding:11px 13px; }
-      .aic-note .brd { width:3px; border-radius:2px; background:var(--bg-selected); flex:none; }
-      .aic-note-who { font-size:10px; font-weight:700; margin-bottom:3px; color:var(--text-primary); }
-      .aic-note-who span { color:var(--text-muted); font-weight:400; }
-      .aic-note-t { font-size:12px; color:var(--text-secondary); line-height:1.6; font-style:italic; }
-      .aic-showwork { font-size:10.5px; color:var(--blue); font-weight:600; cursor:pointer; background:none; border:none; font-family:var(--font-ui); padding:3px 0 0; }
-      .aic-work { display:none; font-size:10.5px; color:var(--text-muted); line-height:1.55; border-top:1px dashed var(--border-strong); margin-top:6px; padding-top:6px; }
+      .aic-dpn { font-size:10.5px; color:var(--aic-ink3); margin-top:6px; }
+      .aic-note { display:flex; gap:10px; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:10px; padding:12px 14px; }
+      .aic-note .brd { width:4px; border-radius:2px; background:var(--navy); opacity:.25; flex:none; }
+      .aic-note-who { font-size:11.5px; font-weight:800; margin-bottom:4px; color:var(--aic-ink); }
+      .aic-note-who span { color:var(--aic-ink3); font-weight:500; }
+      .aic-note-t { font-size:13px; color:var(--aic-ink); line-height:1.65; font-style:italic; }
+      .aic-showwork { font-size:11.5px; color:#3E5E80; font-weight:700; cursor:pointer; background:none; border:none; font-family:var(--font-ui); padding:4px 0 0; }
+      .aic-showwork:hover { text-decoration:underline; }
+      .aic-work { display:none; font-size:11.5px; color:var(--aic-ink2); line-height:1.6; border-top:1px dashed var(--aic-line-strong); margin-top:7px; padding-top:7px; }
       .aic-work.open { display:block; }
-      .aic-pb { font-size:9.5px; color:var(--text-muted); margin-top:6px; }
-      .aic-pb b { color:var(--navy); }
-      .aic-decide { border:1px solid var(--border-strong); border-radius:10px; background:var(--bg-base); }
-      .aic-dhd { font-size:11px; font-weight:700; padding:10px 13px; border-bottom:1px solid var(--border); color:var(--text-primary); }
-      .aic-route { padding:10px 13px; }
-      .aic-route + .aic-route { border-top:1px solid var(--border); }
-      .aic-rtop { display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:700; color:var(--text-primary); }
-      .aic-rtop.alt { font-weight:600; color:var(--text-secondary); }
-      .aic-rec { font-size:9px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:#7A6A00; background:var(--yellow-dim); padding:2px 6px; border-radius:4px; }
-      .aic-draft { font-size:11.5px; color:var(--text-secondary); line-height:1.55; margin:7px 0 8px; padding:8px 11px; background:var(--bg-elevated); border:1px dashed var(--border-strong); border-radius:8px; }
-      .aic-draft[contenteditable="true"] { border-style:solid; border-color:var(--gold); outline:none; background:var(--bg-base); }
-      .aic-ract { display:flex; align-items:flex-start; gap:8px; margin-top:7px; }
-      .aic-abtn { font-size:11px; font-weight:700; border-radius:7px; padding:6px 13px; cursor:pointer; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-secondary); font-family:var(--font-ui); white-space:nowrap; }
+      .aic-pb { font-size:10.5px; font-weight:600; color:var(--aic-ink3); margin-top:7px; }
+      .aic-pb b { color:var(--navy); font-weight:800; }
+      .aic-decide { border:1.5px solid var(--aic-line-strong); border-radius:10px; background:var(--aic-raised); box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+      .aic-dhd { font-size:12px; font-weight:800; letter-spacing:.3px; padding:11px 14px; border-bottom:1px solid var(--aic-line); color:var(--aic-ink); background:var(--bg-surface); border-radius:9px 9px 0 0; }
+      .aic-route { padding:11px 14px; }
+      .aic-route + .aic-route { border-top:1px solid var(--aic-line); }
+      .aic-rtop { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800; color:var(--aic-ink); }
+      .aic-rtop.alt { font-weight:700; color:var(--aic-ink2); }
+      .aic-rec { font-size:9.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#5C4A00; background:rgba(255,222,0,0.32); border:1px solid rgba(180,150,0,0.4); padding:2px 7px; border-radius:4px; }
+      .aic-draft { font-size:12.5px; color:var(--aic-ink); line-height:1.6; margin:8px 0 9px; padding:9px 12px; background:var(--bg-surface); border:1px dashed rgba(0,0,0,0.2); border-radius:8px; }
+      .aic-draft[contenteditable="true"] { border-style:solid; border-color:var(--gold); outline:none; background:#FFFDF2; }
+      .aic-ract { display:flex; align-items:flex-start; gap:10px; margin-top:8px; }
+      .aic-abtn { font-size:12px; font-weight:800; border-radius:7px; padding:7px 14px; cursor:pointer; border:1px solid var(--aic-line-strong); background:var(--aic-raised); color:var(--aic-ink); font-family:var(--font-ui); white-space:nowrap; }
+      .aic-abtn:hover { background:var(--bg-hover); }
       .aic-abtn.primary { background:var(--navy); color:#fff; border-color:var(--navy); }
-      .aic-then { font-size:10px; color:var(--text-muted); line-height:1.4; padding-top:3px; }
-      .aic-then b { color:var(--text-secondary); font-weight:600; }
-      .aic-bub { max-width:76%; font-size:12px; line-height:1.55; padding:9px 13px; border-radius:11px; }
+      .aic-abtn.primary:hover { background:var(--navy-dark); }
+      .aic-abtn.primary .k { opacity:.6; font-weight:500; font-size:10.5px; margin-left:5px; }
+      .aic-then { font-size:11px; color:var(--aic-ink3); line-height:1.5; padding-top:4px; }
+      .aic-then b { color:var(--aic-ink); font-weight:700; }
+      .aic-bub { max-width:76%; font-size:13px; line-height:1.6; padding:10px 14px; border-radius:11px; }
       .aic-bub.user { align-self:flex-end; background:var(--navy); color:#fff; border-bottom-right-radius:3px; }
-      .aic-bub.ai { align-self:flex-start; background:var(--bg-base); border:1px solid var(--border); border-bottom-left-radius:3px; color:var(--text-secondary); }
-      .aic-bub.out { align-self:flex-end; background:var(--green-dim); border:1px solid var(--border); color:var(--text-secondary); border-bottom-right-radius:3px; }
-      .aic-bub .who { font-size:9px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; opacity:.55; display:block; margin-bottom:3px; }
-      .aic-sys { align-self:center; font-size:10.5px; color:var(--text-muted); text-align:center; line-height:1.5; }
-      .aic-sys b { color:var(--text-secondary); }
-      .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid var(--border); padding:11px 14px; }
-      .aic-in { flex:1; font-size:12px; color:var(--text-primary); background:var(--bg-base); border:1px solid var(--border-strong); border-radius:9px; padding:9px 13px; font-family:var(--font-ui); outline:none; }
-      .aic-in::placeholder { color:var(--text-muted); }
-      .aic-send { width:32px; height:32px; border-radius:8px; background:var(--yellow); color:var(--navy-dark); font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px; border:none; cursor:pointer; }
-      .aic-role { display:flex; align-items:center; gap:6px; background:var(--navy); color:#fff; font-size:11.5px; padding:6px 12px; border-radius:8px; font-weight:600; border:none; cursor:pointer; font-family:var(--font-ui); }
-      .aic-role span { color:rgba(255,255,255,.55); font-weight:400; }
+      .aic-bub.ai { align-self:flex-start; background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-bottom-left-radius:3px; color:var(--aic-ink); }
+      .aic-bub.out { align-self:flex-end; background:rgba(91,122,94,0.14); border:1px solid rgba(46,107,63,0.3); color:var(--aic-ink); border-bottom-right-radius:3px; }
+      .aic-bub .who { font-size:9.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; opacity:.65; display:block; margin-bottom:4px; }
+      .aic-sys { align-self:center; font-size:11.5px; font-weight:500; color:var(--aic-ink2); text-align:center; line-height:1.55; max-width:88%; }
+      .aic-sys b { color:var(--aic-ink); font-weight:700; }
+      .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid var(--aic-line); padding:12px 14px; background:var(--bg-surface); border-radius:0 0 11px 11px; }
+      .aic-in { flex:1; font-size:13px; color:var(--aic-ink); background:var(--aic-raised); border:1px solid var(--aic-line-strong); border-radius:9px; padding:10px 13px; font-family:var(--font-ui); outline:none; }
+      .aic-in:focus { border-color:var(--gold); }
+      .aic-in::placeholder { color:var(--aic-ink3); }
+      .aic-send { width:34px; height:34px; border-radius:8px; background:var(--navy); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px; border:none; cursor:pointer; }
+      .aic-send:hover { background:var(--navy-dark); }
+      .aic-role { display:flex; align-items:center; gap:6px; background:var(--navy); color:#fff; font-size:12px; padding:7px 13px; border-radius:8px; font-weight:700; border:none; cursor:pointer; font-family:var(--font-ui); }
+      .aic-role span { color:rgba(255,255,255,.6); font-weight:500; }
       .aic-role-wrap { position:relative; }
-      .aic-typing { align-self:flex-start; font-size:10.5px; color:var(--text-muted); padding:2px 4px; }
+      .aic-typing { align-self:flex-start; font-size:11.5px; font-weight:600; color:var(--aic-ink3); padding:2px 4px; }
+      .aic-newbtn { display:flex; align-items:center; gap:6px; background:var(--gold); color:#141414; font-size:12px; padding:7px 13px; border-radius:8px; font-weight:800; border:none; cursor:pointer; font-family:var(--font-ui); }
+      .aic-newbtn:hover { background:var(--yellow); }
+      .aic-rep-wrap { border:1px solid var(--aic-line-strong); border-radius:10px; overflow:auto; max-height:360px; background:var(--aic-raised); }
+      .aic-rep-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+      .aic-rep-table th { position:sticky; top:0; background:var(--bg-surface); text-align:left; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--aic-ink2); border-bottom:1.5px solid var(--aic-line-strong); padding:8px 11px; white-space:nowrap; }
+      .aic-rep-table td { padding:8px 11px; border-bottom:1px solid var(--aic-line); color:var(--aic-ink); font-weight:500; }
+      .aic-rep-table td:first-child { font-weight:700; }
+      .aic-rep-table tbody tr { cursor:pointer; }
+      .aic-rep-table tbody tr:hover td { background:var(--bg-hover); }
     </style>
     <div class="view" id="view-ai-command">
       <div class="topbar">
@@ -3268,6 +3287,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           </div>
         </div>
         <div class="topbar-right">
+          <button class="aic-newbtn" onclick="aicNewTask()">＋ New task</button>
           <div class="aic-role-wrap">
             <button class="aic-role" onclick="aicMenuToggle(event,'aicRoleMenu')"><span>Role</span> <b id="aicRoleName">Underwriting / Ops</b> &#x25BE;</button>
             <div class="aic-menu" id="aicRoleMenu" style="min-width:150px;">
@@ -3281,8 +3301,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="aic-wrap">
         <div class="aic-cmdbar">
           <span class="aic-spark">&#x2726;</span>
-          <input id="aicCmdInput" class="aic-cmdin" placeholder="Ask or act — anything on your book. @merchant for context, / for playbooks" onkeydown="aicCmdKey(event)">
-          <span class="aic-hint">@ merchant</span><span class="aic-hint">/ playbook</span>
+          <input id="aicCmdInput" class="aic-cmdin" placeholder="Ask, act, or run a report — @merchant for context, &quot;report: my underwriting files&quot; for a table" onkeydown="aicCmdKey(event)">
+          <span class="aic-hint">@ merchant</span><span class="aic-hint">/ playbook</span><span class="aic-hint">report:</span>
         </div>
         <div class="aic-digest" id="aicDigest"></div>
         <div class="aic-panes">
@@ -45017,8 +45037,12 @@ function aicInit(){
 }
 function aicRole(){ return AIC_ROLES[AIC_STATE.role]; }
 function aicLaneIds(lane){
-  return aicRole()[lane === 'needs' ? 'needs' : lane === 'waiting' ? 'waiting' : 'fyi']
-    .concat(lane === 'waiting' ? aicRole().needs : [])
+  var cfg = aicRole();
+  var base = cfg[lane === 'needs' ? 'needs' : lane === 'waiting' ? 'waiting' : 'fyi']
+    .concat(lane === 'waiting' ? cfg.needs : []);
+  /* user-created / ad-hoc / report tasks live in every role's queue */
+  var dyn = Object.keys(AIC_TASKS).filter(function(id){ return AIC_TASKS[id].dynamic; });
+  return (lane === 'fyi' ? base : dyn.concat(base))
     .filter(function(id){
       var t = AIC_TASKS[id]; if (!t) return false;
       if (lane === 'needs')   return t.state === 'open' && t.lane === 'needs';
@@ -45198,7 +45222,7 @@ function aicEditDraft(key, btn){
 function aicSectionsHTML(t){
   var h = '';
   if (t.id === 't-pcr') {
-    h += '<div class="aic-brief"><div class="aic-brow"><span class="aic-bk">Asked</span><span class="aic-bv">January + February bank statements <span style="color:var(--text-muted)">(pend #2 · opened Aug 11 · processor waiting 5 days)</span></span></div>' +
+    h += '<div class="aic-brief"><div class="aic-brow"><span class="aic-bk">Asked</span><span class="aic-bv">January + February bank statements <span style="color:var(--aic-ink3);font-weight:600;">(pend #2 · opened Aug 11 · processor waiting 5 days)</span></span></div>' +
          '<div class="aic-brow"><span class="aic-bk">Provided</span><span class="aic-bv">' + aicDocChipsHTML(t) + '</span></div></div>';
     h += aicNoteHTML(t.note);
     if (t.stage === 0) {
@@ -45256,6 +45280,15 @@ function aicSectionsHTML(t){
       aicRouteHTML(t, 'headsup', { rec:false, title:'Also: send Harbor Bistro a heads-up',
         draft:'“Quick heads-up — we spotted a spike in online-order disputes and traced it to a security setting in your web ordering setup. We’re fixing it on our side today; no action needed from you. We’re also contesting the four disputes with the order records.”',
         btn:'✓ Approve & send', then:'message goes to the merchant → this task stays open until the ticket is filed' }) + '</div>';
+  }
+  else if (t.report) {
+    var r = t.report;
+    h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">Report</span><span class="aic-bv">' + aicEsc(r.q) + '</span></div>' +
+      '<div class="aic-brow"><span class="aic-bk">Result</span><span class="aic-bv"><b>' + aicEsc(r.summary) + '</b> · sorted by volume · click a row to open the record</span></div></div>';
+    h += '<div class="aic-rep-wrap"><table class="aic-rep-table"><thead><tr>' + r.cols.map(function(c){ return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      r.rows.map(function(row){ return '<tr data-m="' + aicEsc(row[0]) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))">' + row.map(function(c, i){ return '<td' + (i === 1 ? ' style="text-transform:capitalize;"' : '') + '>' + aicEsc(String(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
+      '</tbody></table></div>';
+    h += '<div class="aic-ract" style="margin-top:2px;"><button class="aic-abtn" onclick="aicRepCsv(\'' + t.id + '\')">⬇ Download CSV</button><span class="aic-then">Ask below to slice or explain it — the agent reads this table. <b>Stays in your queue until you mark it Done.</b></span></div>';
   }
   else if (t.simple) {
     h += '<div class="aic-brief">' + t.simple.rows.map(function(r){
@@ -45487,6 +45520,7 @@ function aicBoard(t){
     docs: docs,
     note: t.note ? (t.note.who + ' (' + t.note.when + '): ' + t.note.text) : null,
     routes: routes,
+    report: t.report ? { query:t.report.q, summary:t.report.summary, cols:t.report.cols, rows:t.report.rows.slice(0, 30) } : undefined,
     role: aicRole().label,
     queue: t.adhoc ? aicVisibleIds().map(function(id){ var x = AIC_TASKS[id]; return x.title + ' — ' + (x.sub || '') + ' [' + x.state + ']'; }) : undefined,
     followupPolicy: 'Always propose a resurface time with reasoning and offer a custom time.'
@@ -45497,6 +45531,13 @@ function aicChatSend(){
   var q = (input ? input.value : '').trim(); if (!q) return;
   input.value = '';
   var t = aicTask(); if (!t) return;
+  if (t.userCreated && t.title === 'New task') {
+    t.title = q.slice(0, 40) + (q.length > 40 ? '…' : '');
+    t.sub = 'Your task'; t.chip = '✦ Working';
+    var hit = (typeof merchantData !== 'undefined') ? merchantData.find(function(x){ return q.toLowerCase().indexOf(x.name.toLowerCase()) !== -1; }) : null;
+    if (hit) t.merchant = hit.name;
+    aicRenderQueue();
+  }
   aicPush(t, { kind:'user', html:aicEsc(q) });
   t.transcript.push({ role:'user', text:q });
   if (q.startsWith('/')) {
@@ -45531,19 +45572,71 @@ function aicChatSend(){
   });
 }
 
-/* ── command bar (ad-hoc sessions) ───────────────────────────────── */
+/* ── new task / reports / command bar ────────────────────────────── */
+function aicNewTask(){
+  var id = 't-new-' + (++AIC_STATE.adhocSeq);
+  AIC_TASKS[id] = { id:id, dynamic:true, userCreated:true, merchant:null, contact:null, av:'＋', avc:'#8358A8', lane:'needs', state:'open', stage:0, age:'now',
+    title:'New task', sub:'Describe it below — the agent pulls context and proposes a route', chip:'✦ Draft', status:'', playbook:'Freeform',
+    deflect:['Tell me what you want to get done — name a merchant, a partner, or a problem, and I\\u2019ll pull what we hold on it and propose a route. If it ends up waiting on someone, I\\u2019ll suggest a resurface time you can adjust.'],
+    transcript:[{ role:'agent', text:'User created a blank task. First message defines it; pull relevant context and propose a route with a follow-up time if anything is left waiting.' }],
+    msgs:[{ kind:'sys', html:'✦ New task — describe what you need in the composer. Mention a merchant by name and I\\u2019ll pull their record in.' }] };
+  AIC_STATE.open = id;
+  aicRenderQueue(); aicSubLine(); aicRenderWs();
+  var chat = document.getElementById('aicChatInput');
+  if (chat) chat.focus();
+}
+function aicReportIntent(q){
+  return /^report[:\s]/i.test(q) || /\b(report|table) (of|on|for)?\b/i.test(q) || /\b(list|show) (me )?(all|my)\b/i.test(q) || /\bpipeline report\b/i.test(q);
+}
+function aicRunReport(q){
+  var ql = q.toLowerCase();
+  var all = (typeof merchantData !== 'undefined') ? merchantData.slice() : [];
+  var rows = all, applied = [];
+  var statuses = ['underwriting','pended','signature','boarding','inreview','lead','approved','declined','cancelled','active'];
+  var wanted = statuses.filter(function(s){ return ql.indexOf(s) !== -1 || (s === 'inreview' && /\bin review\b/.test(ql)); });
+  if (wanted.length) { rows = rows.filter(function(m){ return wanted.indexOf(m.status) !== -1; }); applied.push('status: ' + wanted.join(', ')); }
+  if (/\b(my|mine)\b/.test(ql)) { rows = rows.filter(function(m){ return m.assignee === 'M. Wright'; }); applied.push('assigned to you'); }
+  var partnerSet = {};
+  all.forEach(function(m){ if (m.partner) partnerSet[m.partner] = true; });
+  Object.keys(partnerSet).forEach(function(p){ if (ql.indexOf(p.toLowerCase()) !== -1) { rows = rows.filter(function(m){ return m.partner === p; }); applied.push('partner: ' + p); } });
+  var vol = function(m){ return parseFloat(String(m.volMTD || m.potVol || '').replace(/[^0-9.]/g, '')) || 0; };
+  rows.sort(function(a, b){ return vol(b) - vol(a); });
+  var id = 't-rep-' + (++AIC_STATE.adhocSeq);
+  AIC_TASKS[id] = { id:id, dynamic:true, merchant:null, contact:null, av:'▦', avc:'#3E5E80', lane:'needs', state:'open', stage:0, age:'now',
+    title:'Report · ' + q.replace(/^report[:\s]+/i, '').slice(0, 30), sub:rows.length + ' rows · ' + (applied.length ? applied.join(' · ') : 'whole book'), chip:'▦ Report', status:'', playbook:'Report',
+    report:{ q:q, cols:['Merchant','Status','Partner','Volume','Assigned'], summary:rows.length + ' merchants' + (applied.length ? ' · ' + applied.join(' · ') : ' · whole book'),
+      rows: rows.map(function(m){ return [m.name, m.status || '—', m.partner || '—', m.volMTD || m.potVol || '—', m.assignee || '—']; }) },
+    deflect:['This table is generated from the live book — ' + rows.length + ' rows. Ask me to slice it (by partner, status, volume) or open any row.'],
+    transcript:[{ role:'agent', text:'Generated report for "' + q + '": ' + rows.length + ' rows' + (applied.length ? ', filters ' + applied.join('; ') : '') + '. Columns: merchant, status, partner, volume, assigned.' }], msgs:[] };
+  aicOpenTask(id); aicSubLine();
+  aicToastSafe('▦', 'Report generated — <strong>' + rows.length + ' rows</strong>');
+}
+function aicRepOpen(name){
+  var m = aicMerchantRow(name);
+  if (m && typeof navigateToMerchant === 'function') navigateToMerchant(m.name, m.status);
+}
+function aicRepCsv(taskId){
+  var t = AIC_TASKS[taskId]; if (!t || !t.report) return;
+  var csv = [t.report.cols.join(',')].concat(t.report.rows.map(function(r){ return r.map(function(c){ return '"' + String(c).replace(/"/g, '""') + '"'; }).join(','); })).join('\\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+  a.download = 'twill-report.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  aicToastSafe('⬇', 'Report downloaded — twill-report.csv');
+}
 function aicCmdKey(ev){
   if (ev.key !== 'Enter') return;
   var input = document.getElementById('aicCmdInput');
   var q = (input ? input.value : '').trim(); if (!q) return;
   input.value = '';
+  if (aicReportIntent(q)) { aicRunReport(q); return; }
   var id = 't-adhoc-' + (++AIC_STATE.adhocSeq);
   var mName = null;
   if (typeof merchantData !== 'undefined') {
     var hit = merchantData.find(function(x){ return q.toLowerCase().includes(x.name.toLowerCase()) || (q.includes('@') && x.name.toLowerCase().startsWith(q.split('@')[1].split(/[,.?]| and /)[0].trim().toLowerCase().slice(0, 6))); });
     if (hit) mName = hit.name;
   }
-  AIC_TASKS[id] = { id:id, adhoc:true, merchant:mName, contact:null, av:'✦', avc:'#8358A8', lane:'needs', state:'open', stage:0, age:'now',
+  AIC_TASKS[id] = { id:id, adhoc:true, dynamic:true, merchant:mName, contact:null, av:'✦', avc:'#8358A8', lane:'needs', state:'open', stage:0, age:'now',
     title:'Ad-hoc · ' + (mName || q.slice(0, 28) + (q.length > 28 ? '…' : '')), sub:q.slice(0, 60), chip:null, status:'', playbook:'Freeform',
     deflect:['Live AI isn’t reachable right now — on the deployed portal this is a grounded answer about ' + (mName || 'your book') + '.'],
     transcript:[{ role:'agent', text:'Ad-hoc session opened' + (mName ? ' with ' + mName + '’s record as context.' : ' over the queue and book.') }], msgs:[] };
