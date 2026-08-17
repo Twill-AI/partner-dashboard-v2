@@ -3215,8 +3215,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-doc .ic { width:22px; height:27px; border-radius:3px; background:var(--navy); color:#fff; font-size:7.5px; font-weight:700; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; }
       .aic-doc b { font-weight:600; display:block; font-size:11.5px; color:var(--text-primary); }
       .aic-doc span.sub { display:block; font-size:10px; color:var(--text-secondary); margin-top:1px; }
-      .aic-dpv { display:none; margin-top:8px; border:1px solid var(--border-strong); border-radius:8px; background:var(--bg-elevated); padding:10px 13px; }
-      .aic-dpv.open { display:block; }
       .aic-dpv-hd { display:flex; align-items:center; font-size:11.5px; font-weight:700; margin-bottom:6px; color:var(--text-primary); }
       .aic-dpv-hd .aic-linky { margin-left:auto; }
       .aic-linky { font-size:11.5px; font-weight:600; color:var(--blue); cursor:pointer; background:none; border:none; font-family:var(--font-ui); white-space:nowrap; padding:0; }
@@ -3235,8 +3233,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-work.open { display:block; }
       .aic-pb { font-size:10px; font-weight:600; color:var(--text-muted); margin-top:6px; }
       .aic-pb b { color:var(--navy); font-weight:700; }
-      .aic-decide { border:1px solid rgba(0,0,0,0.12); border-radius:8px; background:var(--bg-base); overflow:hidden; }
-      .aic-dhd { font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:9px 14px; border-bottom:1px solid var(--border); color:var(--text-secondary); background:var(--bg-surface); }
+      .aic-decide { border:1px solid rgba(0,0,0,0.14); border-radius:9px; background:var(--bg-base); overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
       .aic-route { padding:11px 14px; }
       .aic-route + .aic-route { border-top:1px solid var(--border); }
       .aic-rtop { display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--text-primary); }
@@ -3247,6 +3244,35 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-ract { display:flex; align-items:flex-start; gap:10px; margin-top:8px; }
       .aic-then { font-size:11px; color:var(--text-secondary); line-height:1.5; padding-top:4px; }
       .aic-then b { color:var(--text-primary); font-weight:700; }
+      .aic-agent { padding:2px 0; }
+      .aic-byline { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+      .aic-byline .aname { font-size:11px; font-weight:700; }
+      .aic-agent .aic-prose, .aic-typing { margin-left:27px; }
+      .aic-prose { font-size:13px; line-height:1.68; color:var(--text-primary); }
+      .aic-prose p { margin:0 0 9px; }
+      .aic-prose p:last-child { margin-bottom:0; }
+      .aic-prose ul { margin:2px 0 9px 18px; padding:0; }
+      .aic-prose li { margin:0 0 4px; }
+      .aic-prose i { color:var(--text-secondary); }
+      .aic-lbl { font-weight:700; }
+      .aic-quote { border-left:3px solid rgba(0,0,0,0.16); margin:2px 0 10px; padding:2px 2px 2px 13px; color:var(--text-secondary); font-style:italic; font-size:12.5px; line-height:1.62; }
+      .aic-quote .who { display:block; font-style:normal; font-size:11px; font-weight:700; color:var(--text-primary); margin-top:5px; }
+      .aic-user { align-self:flex-end; max-width:72%; background:var(--bg-selected); border-radius:10px; border-bottom-right-radius:3px; padding:8px 13px; font-size:12.5px; line-height:1.55; color:var(--text-primary); }
+      .aic-sent { font-size:12px; color:var(--text-secondary); margin-left:27px; line-height:1.5; }
+      .aic-sent b { color:var(--text-primary); }
+      .aic-doc-mini { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; color:var(--text-primary); background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:5px; padding:2px 8px; cursor:pointer; font-family:var(--font-ui); vertical-align:1px; margin:0 2px 2px 0; }
+      .aic-doc-mini:hover { border-color:rgba(0,0,0,0.28); }
+      .aic-doc-mini.active { border-color:var(--navy); background:var(--bg-selected); }
+      .aic-alt { margin-top:9px; padding-top:9px; border-top:1px dashed var(--border); font-size:12px; color:var(--text-secondary); }
+      .aic-dpv { display:none; margin-top:8px; }
+      .aic-dpv.open { display:block; border:1px solid var(--border-strong); border-radius:8px; background:var(--bg-elevated); padding:10px 13px; }
+      .aic-anchor { flex:0 0 auto; padding:7px 16px 8px; border-bottom:1px solid var(--border); background:var(--bg-surface); }
+      .anch-row { display:flex; align-items:center; gap:9px; flex-wrap:wrap; font-size:11.5px; color:var(--text-secondary); }
+      .anch-fact { font-weight:600; color:var(--text-primary); }
+      .anch-docs { display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; }
+      .anch-pb { margin-left:auto; font-size:10.5px; color:var(--text-muted); white-space:nowrap; }
+      .anch-pb b { color:var(--navy); font-weight:700; }
+      .aic-anchor .aic-dpv.open { margin-top:7px; max-height:190px; overflow-y:auto; }
       .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid rgba(0,0,0,0.06); padding:11px 14px; }
       .aic-in { flex:1; font-size:13px; color:var(--text-primary); background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:7px; padding:8px 12px; font-family:var(--font-ui); outline:none; }
       .aic-in:focus { border-color:rgba(0,0,0,0.3); }
@@ -44877,7 +44903,7 @@ const AIC_ROLES = {
 
 const AIC_TASKS = {
 
-  't-pcr': {
+  't-pcr': { anchor:'Pend #2 \u00B7 opened Aug 11 \u00B7 First Data waiting 5d',
     kind:'pend', id:'t-pcr', merchant:'Pacific Coast Retail', contact:'Sarah Chen',
     av:'PC', avc:'#6B839B', lane:'needs', state:'open', stage:0, sla:'SLA 4h', age:'12m',
     title:'Pacific Coast Retail', sub:'Merchant responded to pend — 2 docs + a note',
@@ -44902,7 +44928,7 @@ const AIC_TASKS = {
     transcript:[{role:'agent', text:'Reviewed Sarah Chen’s pend response: Jan statement full and clean ($44.8K deposits vs $45K stated). Feb covers only through the 19th — they switched banks to First Interstate on Feb 20. Gap: Feb 20–28. Recommended route: ask Sarah for the First Interstate partial. Alternative: submit as-is with a coverage memo (re-pend risk).'}]
   },
 
-  't-marina': {
+  't-marina': { anchor:'14-min call \u00B7 today 9:04am \u00B7 no record match',
     kind:'call', id:'t-marina', merchant:null, contact:'Tony Marina',
     av:'MD', avc:'#5B7A5E', lane:'needs', state:'open', stage:0, sla:null, age:'32m',
     title:'Call · Marina Deli', sub:'New call transcript — no merchant record found. Looks like a new merchant.',
@@ -44921,7 +44947,7 @@ const AIC_TASKS = {
     transcript:[{role:'agent', text:'Detected a 14-minute call with Tony Marina (Marina Deli). No merchant or lead record matches the name or callback number. Extracted: deli & catering, ~$38K/mo, on Clover via their bank, pain = ~4% effective cost + T+2 settlement, wants to switch before Labor Day. Proposed: create a lead.'}]
   },
 
-  't-harbor': {
+  't-harbor': { anchor:'CB ratio 1.8% \u00B7 threshold 2% \u00B7 4 open disputes',
     kind:'invest', id:'t-harbor', merchant:'Harbor Bistro', contact:'Harbor Bistro',
     av:'HB', avc:'#9B6B5B', lane:'needs', state:'open', stage:0, sla:null, age:'4m',
     title:'Harbor Bistro', sub:'Chargeback ratio 1.8% — investigated, pattern found',
@@ -44940,20 +44966,20 @@ const AIC_TASKS = {
     transcript:[{role:'agent', text:'Investigated Harbor Bistro’s chargeback spike (0.4% → 1.8% in 3 weeks). All 4 new disputes are reason 10.4 CNP on web orders via the online-ordering plugin launched Jul 28; AVS/CVV not transmitted on those auths; zero card-present disputes in 90 days. Conclusion: gateway config gap. Proposed: ticket to deployment (enable AVS/CVV), assign Alex Kim; optional merchant heads-up.'}]
   },
 
-  't-metro':    { id:'t-metro', kind:'sig', merchant:'Metro Print Shop', contact:'Metro Print Shop', av:'MP', avc:'#8C7A5E', lane:'waiting', state:'waiting', stage:0, age:'2d',
+  't-metro':    { anchor:'DocuSign unopened 2d \u00B7 expires midnight', id:'t-metro', kind:'sig', merchant:'Metro Print Shop', contact:'Metro Print Shop', av:'MP', avc:'#8C7A5E', lane:'waiting', state:'waiting', stage:0, age:'2d',
     title:'Metro Print Shop', sub:'DocuSign nudge sent', chip:null, waitLabel:'resurfaces 8pm', status:'Signature · 2d', playbook:'Signature chase',
     simple:{ rows:[['Where it stands','DocuSign sent 2 days ago — no open event. A nudge went out this morning at 8:02.'],['Watching for','envelope-open or signature webhook'],['Resurfaces','tonight 8pm if still unopened — the expiry is at midnight']], route:{ label:'Nudge again now', then:'a second reminder goes out → stays in Waiting · resurfaces 8pm' } },
     deflect:['The nudge went out at 8:02 this morning and the envelope expires at midnight — that’s why the resurface is set for 8pm, enough time to re-send or call before expiry. Want it earlier?'],
     transcript:[{role:'agent', text:'Metro Print Shop: DocuSign unopened for 2 days, expiry midnight. Morning nudge sent. Waiting; resurfaces 8pm.'}] },
 
-  't-coastal':  { id:'t-coastal', kind:'docs', merchant:'Coastal Spa & Salon', contact:'Coastal Spa & Salon', av:'CS', avc:'#A67C5B', lane:'waiting', state:'waiting', stage:0, age:'5d',
+  't-coastal':  { anchor:'YTD P&L + tax return \u00B7 requested Tue', id:'t-coastal', kind:'docs', merchant:'Coastal Spa & Salon', contact:'Coastal Spa & Salon', av:'CS', avc:'#A67C5B', lane:'waiting', state:'waiting', stage:0, age:'5d',
     title:'Coastal Spa & Salon', sub:'Docs requested Tue', chip:null, waitLabel:'auto-follow Thu', status:'UW · Docs requested', playbook:'UW document chase',
     ctx:{ partner:'Coastal Commerce', processor:'Fiserv', vol:'$38K stated', assignee:'J. Rivera', status:'Underwriting' },
     simple:{ rows:[['Where it stands','YTD P&L + last tax return requested Tuesday. No upload yet.'],['Watching for','document upload on the merchant link'],['Resurfaces','Thursday 9am with a follow-up already drafted']], route:{ label:'Send the follow-up now', then:'the drafted reminder goes out → stays in Waiting · next check Monday' } },
     deflect:['Requested Tuesday, typical turnaround on doc requests for this partner is 2–3 business days — Thursday 9am is the right check-in. I can pull it earlier if the file is time-sensitive.'],
     transcript:[{role:'agent', text:'Coastal Spa & Salon: YTD P&L + tax return requested Tuesday, no upload yet. Waiting; auto-follow Thursday 9am.'}] },
 
-  't-pinnacle': { id:'t-pinnacle', kind:'fyi', merchant:'Pinnacle Fitness', contact:'Pinnacle Fitness', av:'PF', avc:'#7C6FA0', lane:'fyi', state:'open', stage:0, age:'6h',
+  't-pinnacle': { anchor:'Package score 91 \u00B7 auto-submitted to UW', id:'t-pinnacle', kind:'fyi', merchant:'Pinnacle Fitness', contact:'Pinnacle Fitness', av:'PF', avc:'#7C6FA0', lane:'fyi', state:'open', stage:0, age:'6h',
     title:'Pinnacle Fitness', sub:'Auto-submitted to UW — score 91', chip:null, waitLabel:'no action', status:'Signature → UW', playbook:'FYI',
     simple:{ rows:[['What happened','Signed packet came in overnight. Package score 91/100 — auto-submitted to underwriting.'],['Who has it','UW queue · J. Rivera'],['You need to do','nothing — this is informational']], route:null },
     deflect:['Nothing needed from you — the packet scored 91 and went straight to underwriting. It’ll surface here only if UW pends it.'],
@@ -44962,7 +44988,7 @@ const AIC_TASKS = {
   't-resid':    { id:'t-resid', merchant:null, contact:null, av:'∑', avc:'#8358A8', lane:'fyi', state:'open', stage:0, age:'1d',
     title:'March residuals posted', sub:'', chip:null, waitLabel:'view ↗', status:'', playbook:'', gotoView:'residuals' },
 
-  't-harborlight': { id:'t-harborlight', kind:'ref', merchant:null, contact:'Tara Price',
+  't-harborlight': { anchor:'Referral \u00B7 Tara Price (Rivermark) \u00B7 ~$80K/mo', id:'t-harborlight', kind:'ref', merchant:null, contact:'Tara Price',
     av:'HD', avc:'#6B839B', lane:'needs', state:'open', stage:0, sla:null, age:'2h',
     title:'Referral · Harborlight Dental', sub:'Warm intro from Tara Price (Rivermark) — outreach drafted',
     chip:'✦ Reply drafted', status:'New referral', playbook:'Referral outreach',
@@ -44972,7 +44998,7 @@ const AIC_TASKS = {
     deflect:['The draft leads with the statement review offer — no pricing claims, per the burned-twice warning. If you send it now I’ll resurface Friday 9am if the office manager hasn’t replied — intro momentum fades after about three days — or tell me when.'],
     transcript:[{role:'agent', text:'Referral from Tara Price (Rivermark): Harborlight Dental group, ~$80K/mo, rate-hike pain, burned by two processors. Drafted a soft statement-review reply. Proposed: approve & send, resurface Friday if quiet.'}] },
 
-  't-lakeview': { id:'t-lakeview', kind:'fu', merchant:'Lakeview Dental', contact:'Lakeview Dental',
+  't-lakeview': { anchor:'A920 quote sent last Tue \u00B7 snoozed 1 week', id:'t-lakeview', kind:'fu', merchant:'Lakeview Dental', contact:'Lakeview Dental',
     av:'LD', avc:'#5B7A5E', lane:'needs', state:'open', stage:0, sla:null, age:'due',
     title:'Lakeview Dental', sub:'Terminal upgrade quote — follow-up due today (snoozed last week)',
     chip:'✦ Follow-up drafted', status:'Active', playbook:'Quote follow-up',
@@ -44986,6 +45012,19 @@ const AIC_TASKS = {
 /* ── helpers ─────────────────────────────────────────────────────── */
 function aicEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function aicTask(){ return AIC_TASKS[AIC_STATE.open] || null; }
+function aicFmt(text){
+  var esc = aicEsc(text);
+  var blocks = esc.split(/\n\n+/).map(function(b){
+    var lines = b.split('\n');
+    if (lines.length > 1 && lines.filter(function(l){ return /^\s*-\s+/.test(l); }).length >= 2) {
+      var lead = [], items = [];
+      lines.forEach(function(l){ if (/^\s*-\s+/.test(l)) items.push('<li>' + l.replace(/^\s*-\s+/, '') + '</li>'); else lead.push(l); });
+      return (lead.length ? '<p>' + lead.join('<br>') + '</p>' : '') + '<ul>' + items.join('') + '</ul>';
+    }
+    return '<p>' + b.replace(/\n/g, '<br>') + '</p>';
+  });
+  return blocks.join('');
+}
 function aicToastSafe(icon, html){ if (typeof agentToast === 'function') agentToast(icon, html); }
 function aicTimeline(merchant, text){
   if (!merchant) return;
@@ -45139,12 +45178,23 @@ function aicRenderWs(){
         '<div onclick="aicKebabAct(\'ticket\')">\u{1F3AB} Convert to ticket</div>' +
         '<div onclick="aicDone(\'' + t.id + '\')">\u{1F5C4} Archive task</div></div></span>' +
     '</div></div>';
+  h += aicAnchorHTML(t);
   h += '<div class="aic-ctx" id="aicCtx">' + aicCtxHTML(t, m, redact) + '</div>';
   h += '<div class="aic-thread" id="aicThread">' + aicSectionsHTML(t) + (t.msgs || []).map(aicMsgHTML).join('') + '</div>';
   h += '<div class="aic-composer"><input class="aic-in" id="aicChatInput" placeholder="Reply \u2014 or type / for a playbook\u2026" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
   ws.innerHTML = h;
   var th = document.getElementById('aicThread');
   if (th) th.scrollTop = th.scrollHeight;
+}
+function aicAnchorHTML(t){
+  var bits = [];
+  if (t.anchor) bits.push('<span class="anch-fact">' + t.anchor + '</span>');
+  if (t.report) bits.push('<span class="anch-fact">' + aicEsc(t.report.summary) + '</span>');
+  var docs = aicDocChipsHTML(t);
+  return '<div class="aic-anchor"><div class="anch-row">' + bits.join('') +
+    (docs ? '<span class="anch-docs">' + docs + '</span>' : '') +
+    (t.playbook && t.playbook !== 'FYI' && t.playbook !== 'Freeform' && t.playbook !== 'Report' ? '<span class="anch-pb">Playbook <b>' + t.playbook + '</b></span>' : '') +
+  '</div></div>';
 }
 function aicToggleCtx(btn){
   var el = document.getElementById('aicCtx'); if (!el) return;
@@ -45179,18 +45229,18 @@ function aicTeamMenuHTML(t){
 /* ── section templates per task/stage ────────────────────────────── */
 function aicDocChipsHTML(t){
   if (!t.docs) return '';
-  var h = '<span class="aic-docs">';
+  var h = '';
   Object.keys(t.docs).forEach(function(k){
     var d = t.docs[k]; if (d.hidden) return;
-    h += '<button type="button" class="aic-doc" id="aic-doc-' + k + '" onclick="aicDocPrev(\'' + k + '\')"><span class="ic">' + (k === 'call' ? 'TXT' : 'PDF') + '</span><span><b>' + d.label + ' <span class="' + (d.mark === 'ok' ? 'aic-ok' : 'aic-warn') + '">' + (d.mark === 'ok' ? '✓' : '⚠') + '</span></b><span class="sub">' + d.sub + '</span></span></button>';
+    h += '<button type="button" class="aic-doc-mini" id="aic-doc-' + k + '" onclick="aicDocPrev(\'' + k + '\')">\u{1F4C4} ' + d.label + ' <span class="' + (d.mark === 'ok' ? 'aic-ok' : 'aic-warn') + '">' + (d.mark === 'ok' ? '\u2713' : '\u26A0') + '</span></button> ';
   });
-  h += '</span><span class="aic-dpv" id="aicDpv"><span class="aic-dpv-hd" style="display:flex;"><span id="aicDpvTtl"></span><button class="aic-linky" onclick="aicOpenRecord()">Open in document viewer ↗</button></span><span id="aicDpvBody"></span></span>';
+  h += '<span class="aic-dpv" id="aicDpv"><span class="aic-dpv-hd" style="display:flex;"><span id="aicDpvTtl"></span><button class="aic-linky" onclick="aicOpenRecord()">Open in document viewer \u2197</button></span><span id="aicDpvBody"></span></span>';
   return h;
 }
 function aicDocPrev(key){
   var t = aicTask(); if (!t || !t.docs || !t.docs[key]) return;
   var pv = document.getElementById('aicDpv');
-  document.querySelectorAll('.aic-doc').forEach(function(d){ d.classList.remove('active'); });
+  document.querySelectorAll('.aic-doc-mini').forEach(function(d){ d.classList.remove('active'); });
   if (AIC_STATE.lastDoc === key && pv.classList.contains('open')) { pv.classList.remove('open'); AIC_STATE.lastDoc = null; return; }
   AIC_STATE.lastDoc = key;
   var chip = document.getElementById('aic-doc-' + key); if (chip) chip.classList.add('active');
@@ -45219,104 +45269,107 @@ function aicEditDraft(key, btn){
   if (!on) d.focus();
 }
 function aicSectionsHTML(t){
+  function agent(inner){ return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span></div><div class="aic-prose">' + inner + '</div></div>'; }
+  function quote(n){ return n ? '<div class="aic-quote">' + n.text + '<span class="who">\u2014 ' + n.who + ' \u00B7 ' + n.when + '</span></div>' : ''; }
   var h = '';
   if (t.id === 't-pcr') {
-    h += '<div class="aic-brief"><div class="aic-brow"><span class="aic-bk">Asked</span><span class="aic-bv">January + February bank statements <span style="color:var(--aic-ink3);font-weight:600;">(pend #2 · opened Aug 11 · processor waiting 5 days)</span></span></div>' +
-         '<div class="aic-brow"><span class="aic-bk">Provided</span><span class="aic-bv">' + aicDocChipsHTML(t) + '</span></div></div>';
-    h += aicNoteHTML(t.note);
     if (t.stage === 0) {
-      h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">My read</span><span class="aic-bv">Jan is clean — deposits $44,820 vs $45K stated <span class="aic-ok">✓</span>. Feb has a gap: the 20th–28th lives at First Interstate and isn’t in the file. The pend asks for two <i>full</i> months.</span></div>' +
-        '<button class="aic-showwork" onclick="aicToggleWork(this)">Show what I checked ▾</button>' +
-        '<div class="aic-work">Compared upload coverage against the pend language (“two most recent full months”). Jan: full month, avg daily balance $11.4K, NSF 0. Feb: ends the 19th — 68% of the month. Sarah’s note names the new account and offers to pull from it. On similar partial-month responses, this processor re-pended 3 of the last 4 files.</div>' +
-        '<div class="aic-pb">Playbook <b>UW response review</b> · Knowledge base</div></div>';
-      h += '<div class="aic-decide"><div class="aic-dhd">Close pend #2 — pick a route</div>' +
-        aicRouteHTML(t, 'ask', { rec:true, title:'Ask Sarah for the First Interstate statement, Feb 20–28',
-          draft:'“Thanks Sarah — both statements came through and January is fully cleared. One last piece: a statement or transaction printout from the First Interstate account covering Feb 20–28, so underwriting sees the complete month. Everything else on your file is done.”',
-          btn:'✓ Approve & send', then:'message goes to Sarah → task moves to <b>Waiting</b> · resurfaces on reply or Thu 9am' }) +
-        aicRouteHTML(t, 'asis', { rec:false, title:'Or: submit the response to UW as-is',
-          btn:'↑ Submit to UW', then:'packages Jan + partial Feb + Sarah’s note with a coverage memo → pend marked responded → task <b>Done</b>, filed to the merchant timeline. Risk: re-pend (3 of last 4 partials).' }) +
-        '</div>';
+      h += agent(
+        '<p>Sarah came back this morning \u2014 both statements, plus this:</p>' +
+        quote(t.note) +
+        '<p>January\u2019s clean: <b>$44,820 in deposits</b> against $45K stated. February stops at the 19th because of the bank switch \u2014 the missing week lives at <b>First Interstate</b>, and this pend asks for two <i>full</i> months. First Data has re-pended <b>3 of the last 4</b> partials, so I\u2019d close the gap now rather than argue it later. Draft\u2019s ready below.</p>' +
+        '<button class="aic-showwork" onclick="aicToggleWork(this)">Show what I checked \u25BE</button>' +
+        '<div class="aic-work">Compared upload coverage against the pend language (\u201Ctwo most recent full months\u201D). Jan: full month, avg daily balance $11.4K, NSF 0. Feb: ends the 19th \u2014 68% of the month. Sarah\u2019s note names the new account and offers to pull from it.</div>');
+      h += '<div class="aic-decide"><div class="aic-route">' +
+        '<div class="aic-rtop"><span class="aic-rec">Recommended</span>Ask Sarah for the First Interstate statement, Feb 20\u201328</div>' +
+        '<div class="aic-draft" id="aic-draft-ask">\u201CThanks Sarah \u2014 both statements came through and January is fully cleared. One last piece: a statement or transaction printout from the First Interstate account covering Feb 20\u201328, so underwriting sees the complete month. Everything else on your file is done.\u201D <button class="aic-linky" onclick="aicEditDraft(\'ask\', this)">\u270E Edit</button></div>' +
+        '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-pcr\',\'ask\')">\u2713 Approve &amp; send</button>' +
+        '<span class="aic-then"><b>Then:</b> task moves to <b>Waiting</b> \u00B7 resurfaces on reply or Thu 9am</span></div>' +
+        '<div class="aic-ract aic-alt">or: <button class="btn btn-ghost aic-sm" onclick="aicRoute(\'t-pcr\',\'asis\')">\u2191 Submit to UW as-is</button><span class="aic-then">pend responded \u2192 task <b>Done</b> \u00B7 risk: re-pend (3 of last 4 partials)</span></div>' +
+        '</div></div>';
     } else {
-      h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">Update</span><span class="aic-bv">Sarah sent the First Interstate statement for Feb 20–28 <span class="aic-ok">✓</span> — coverage is now complete across both months. Deposits reconcile with stated volume. Nothing else is open on this pend.</span></div>' +
-        '<div class="aic-pb">Playbook <b>UW response review</b> · Knowledge base</div></div>';
-      h += '<div class="aic-decide"><div class="aic-dhd">Coverage complete — close it out</div>' +
-        aicRouteHTML(t, 'submit-full', { rec:true, title:'Submit the complete response to UW',
-          btn:'↑ Submit to UW', then:'full package (Jan + Feb + Feb 20–28) goes to underwriting → pend marked responded → task <b>Done</b>, filed to the merchant timeline' }) + '</div>';
+      h += agent(
+        '<p>Sarah\u2019s back already:</p>' + quote(t.note) +
+        '<p>The First Interstate statement covers <b>Feb 20\u201328</b> \u2014 coverage is complete across both months and deposits reconcile with stated volume. Nothing else is open on this pend.</p>');
+      h += '<div class="aic-decide"><div class="aic-route">' +
+        '<div class="aic-rtop"><span class="aic-rec">Recommended</span>Submit the complete response to UW</div>' +
+        '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-pcr\',\'submit-full\')">\u2191 Submit to UW</button>' +
+        '<span class="aic-then"><b>Then:</b> pend marked responded \u2192 task <b>Done</b>, filed to the merchant timeline</span></div>' +
+        '</div></div>';
     }
   }
   else if (t.id === 't-marina') {
-    h += '<div class="aic-brief"><div class="aic-brow"><span class="aic-bk">What happened</span><span class="aic-bv">14-minute call captured this morning. No merchant, lead, or application matches “Marina Deli” or the callback number — this looks like a brand-new merchant.</span></div>' +
-         '<div class="aic-brow"><span class="aic-bk">From the call</span><span class="aic-bv">' + aicDocChipsHTML(t) + '</span></div></div>';
-    h += aicNoteHTML(t.note);
     if (t.stage === 0) {
-      h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">My read</span><span class="aic-bv">Clean fit: single-location deli, ~$38K/mo, motivated by price opacity and T+2 settlement, hard deadline before Labor Day. Nothing goes out to Tony until you approve it.</span></div>' +
-        '<div class="aic-pb">Playbook <b>Lead detect from call</b> · Knowledge base</div></div>';
-      h += '<div class="aic-decide"><div class="aic-dhd">This looks like a new merchant — want me to create a lead?</div>' +
-        aicRouteHTML(t, 'create', { rec:true, title:'Create the lead from the call extract',
-          btn:'＋ Create lead', then:'lead record starts with the extracted details → I prefill the application next · nothing is sent yet' }) +
-        aicRouteHTML(t, 'ignore', { rec:false, title:'Or: not a fit — log and dismiss',
-          btn:'Ignore', then:'call logged for reference → task <b>Done</b> · no record created' }) + '</div>';
+      h += agent(
+        '<p>New call this morning and <b>no record matches</b> the name or number \u2014 this looks like a brand-new merchant. The short version of what Tony said:</p>' +
+        quote(t.note) +
+        '<p>Single-location deli around <b>$38K a month</b>, motivated by price opacity and slow settlement, and he wants it done <b>before Labor Day</b>. Nothing goes out until you approve it.</p>');
+      h += '<div class="aic-decide"><div class="aic-route">' +
+        '<div class="aic-rtop"><span class="aic-rec">Recommended</span>This looks like a new merchant \u2014 create the lead?</div>' +
+        '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-marina\',\'create\')">\uFF0B Create lead</button>' +
+        '<span class="aic-then"><b>Then:</b> record starts from the call extract \u2192 I prefill the application next \u00B7 nothing is sent yet</span></div>' +
+        '<div class="aic-ract aic-alt">or: <button class="btn btn-ghost aic-sm" onclick="aicRoute(\'t-marina\',\'ignore\')">Log &amp; dismiss</button><span class="aic-then">call logged \u2192 task <b>Done</b> \u00B7 no record created</span></div>' +
+        '</div></div>';
     } else {
-      h += '<div class="aic-sys">✓ <b>Lead created — Marina Deli</b> · from the call extract · today</div>';
-      h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">Application</span><span class="aic-bv">Prefilled <b>18 of 24 fields</b> from the call — business profile, volume, contact, current setup. Still needed from Tony: <b>EIN, owner DOB, voided check</b>. The application link collects exactly those three.</span></div>' +
-        '<div class="aic-pb">Playbook <b>Lead detect from call</b> → <b>Application send</b> · Knowledge base</div></div>';
-      h += '<div class="aic-decide"><div class="aic-dhd">Send the application?</div>' +
-        aicRouteHTML(t, 'sendapp', { rec:true, title:'Send the prefilled application to Tony',
-          draft:'“Tony — great talking this morning. Here’s your application, already filled from our call: takes about 3 minutes to finish (we just need your EIN, DOB, and a voided check). Clean interchange pricing and next-day funding, like we discussed — in place well before Labor Day.”',
-          btn:'✓ Approve & send', then:'application link goes to Tony → task moves to <b>Waiting</b> · resurfaces when he opens it or tomorrow 9am (he said mornings)' }) + '</div>';
+      h += agent(
+        '<p><b>Lead created.</b> The application is prefilled from the call \u2014 <b>18 of 24 fields</b>. The link collects the three things only Tony has: <b>EIN, owner DOB, voided check</b>.</p>');
+      h += '<div class="aic-decide"><div class="aic-route">' +
+        '<div class="aic-rtop"><span class="aic-rec">Recommended</span>Send the prefilled application to Tony</div>' +
+        '<div class="aic-draft" id="aic-draft-sendapp">\u201CTony \u2014 great talking this morning. Here\u2019s your application, already filled from our call: takes about 3 minutes to finish (we just need your EIN, DOB, and a voided check). Clean interchange pricing and next-day funding, like we discussed \u2014 in place well before Labor Day.\u201D <button class="aic-linky" onclick="aicEditDraft(\'sendapp\', this)">\u270E Edit</button></div>' +
+        '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-marina\',\'sendapp\')">\u2713 Approve &amp; send</button>' +
+        '<span class="aic-then"><b>Then:</b> task <b>Waiting</b> \u00B7 resurfaces when he opens it or tomorrow 9am (he said mornings)</span></div>' +
+        '</div></div>';
     }
   }
   else if (t.id === 't-harbor') {
-    h += '<div class="aic-brief"><div class="aic-brow"><span class="aic-bk">What happened</span><span class="aic-bv">Chargeback ratio jumped 0.4% → <b>1.8%</b> in three weeks — 4 new disputes. Processor threshold is 2%.</span></div>' +
-         '<div class="aic-brow"><span class="aic-bk">Evidence</span><span class="aic-bv">' + aicDocChipsHTML(t) + '</span></div></div>';
-    h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">Conclusion</span><span class="aic-bv">All four are CNP fraud on <b>web orders</b> through the online-ordering plugin launched Jul 28 — and those auths are going out <b>without AVS/CVV</b>. Card-present is spotless (0 disputes in 90 days). This is a gateway configuration gap, not a merchant problem.</span></div>' +
-      '<button class="aic-showwork" onclick="aicToggleWork(this)">Show what I checked ▾</button>' +
-      '<div class="aic-work">Pulled the 4 disputes from the processor feed — every one reason 10.4, every one a web order, all post-Jul-28. Auth logs on those transactions show AVS and CVV fields not transmitted. 90-day terminal history: zero disputes. Ratio math: 4 on ~220 monthly transactions = 1.8%. The 4 open cases are winnable with order + device evidence already on file.</div>' +
-      '<div class="aic-pb">Playbook <b>Anomaly investigation</b> · Knowledge base</div></div>';
-    h += '<div class="aic-decide"><div class="aic-dhd">Fix the cause, work the cases</div>' +
-      aicRouteHTML(t, 'ticket', { rec:true, title:'Create the ticket — enable AVS/CVV on the web-order gateway · assign Alex Kim (Deploy)',
-        btn:'\u{1F3AB} Create & assign', then:'ticket filed with the findings + dispute list → assigned to Alex Kim → task <b>Done</b>, filed to the merchant timeline' }) +
-      aicRouteHTML(t, 'headsup', { rec:false, title:'Also: send Harbor Bistro a heads-up',
-        draft:'“Quick heads-up — we spotted a spike in online-order disputes and traced it to a security setting in your web ordering setup. We’re fixing it on our side today; no action needed from you. We’re also contesting the four disputes with the order records.”',
-        btn:'✓ Approve & send', then:'message goes to the merchant → this task stays open until the ticket is filed' }) + '</div>';
+    h += agent(
+      '<p>The ratio spike is real but it\u2019s not the merchant. All four new disputes are <b>CNP fraud on web orders</b> through the ordering plugin launched Jul 28, and those auths go out <b>without AVS/CVV</b>. Card-present is spotless \u2014 zero disputes in 90 days.</p>' +
+      '<p><b>This is a gateway configuration gap.</b> Fix the setting, and the four open cases are winnable with the order and device evidence we already hold.</p>' +
+      '<button class="aic-showwork" onclick="aicToggleWork(this)">Show what I checked \u25BE</button>' +
+      '<div class="aic-work">Auth logs on the four disputed transactions show AVS and CVV fields not transmitted. 90-day terminal history: zero disputes. Ratio math: 4 on ~220 monthly transactions = 1.8%.</div>');
+    h += '<div class="aic-decide"><div class="aic-route">' +
+      '<div class="aic-rtop"><span class="aic-rec">Recommended</span>Create the ticket \u2014 enable AVS/CVV on the web-order gateway \u00B7 assign Alex Kim</div>' +
+      '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-harbor\',\'ticket\')">\u{1F3AB} Create &amp; assign</button>' +
+      '<span class="aic-then"><b>Then:</b> findings + dispute list attached \u2192 Alex Kim \u2192 task <b>Done</b>, filed to the timeline</span></div>' +
+      '<div class="aic-ract aic-alt">also: <button class="btn btn-ghost aic-sm" onclick="aicRoute(\'t-harbor\',\'headsup\')">Send the merchant a heads-up</button><span class="aic-then" id="aic-draft-headsup" style="display:none;">Quick heads-up \u2014 we spotted a spike in online-order disputes and traced it to a security setting in your web ordering setup. We\u2019re fixing it on our side today; no action needed from you. We\u2019re also contesting the four disputes with the order records.</span><span class="aic-then">drafted \u00B7 sends on approve \u00B7 task stays open until the ticket is filed</span></div>' +
+      '</div></div>';
   }
   else if (t.report) {
     var r = t.report;
-    h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">Report</span><span class="aic-bv">' + aicEsc(r.q) + '</span></div>' +
-      '<div class="aic-brow"><span class="aic-bk">Result</span><span class="aic-bv"><b>' + aicEsc(r.summary) + '</b> · sorted by volume · click a row to open the record</span></div></div>';
+    h += agent('<p>Here\u2019s the table for \u201C<b>' + aicEsc(r.q) + '</b>\u201D \u2014 sorted by volume. Click a row to open the record, or ask me to slice it.</p>');
     h += '<div class="aic-rep-wrap"><table class="aic-rep-table"><thead><tr>' + r.cols.map(function(c){ return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
       r.rows.map(function(row){ return '<tr data-m="' + aicEsc(row[0]) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))">' + row.map(function(c, i){ return '<td' + (i === 1 ? ' style="text-transform:capitalize;"' : '') + '>' + aicEsc(String(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
       '</tbody></table></div>';
-    h += '<div class="aic-ract" style="margin-top:2px;"><button class="btn btn-ghost aic-sm" onclick="aicRepCsv(\'' + t.id + '\')">⬇ Download CSV</button><span class="aic-then">Ask below to slice or explain it — the agent reads this table. <b>Stays in your queue until you mark it Done.</b></span></div>';
+    h += '<div class="aic-ract"><button class="btn btn-ghost aic-sm" onclick="aicRepCsv(\'' + t.id + '\')">\u2B07 Download CSV</button><span class="aic-then">Stays in your queue until you mark it <b>Done</b>.</span></div>';
   }
   else if (t.simple) {
-    h += '<div class="aic-brief">' + t.simple.rows.map(function(r){
-      return '<div class="aic-brow"><span class="aic-bk">' + r[0] + '</span><span class="aic-bv">' + r[1] + '</span></div>';
-    }).join('') + (t.playbook && t.playbook !== 'FYI' ? '<div class="aic-pb">Playbook <b>' + t.playbook + '</b> · Knowledge base</div>' : '') + '</div>';
+    h += agent(t.simple.rows.map(function(r){ return '<p><span class="aic-lbl">' + r[0] + ':</span> ' + r[1] + '</p>'; }).join(''));
     if (t.simple.route && t.state !== 'done') {
-      h += '<div class="aic-decide">' + aicRouteHTML(t, 'simple', { rec:false, title:t.simple.route.label, btn:t.simple.route.label, then:t.simple.route.then }) + '</div>';
+      h += '<div class="aic-ract"><button class="btn btn-ghost aic-sm" onclick="aicRoute(\'' + t.id + '\',\'simple\')">' + t.simple.route.label + '</button><span class="aic-then"><b>Then:</b> ' + t.simple.route.then + '</span></div>';
     }
   }
   else if (t.id === 't-harborlight') {
-    h += aicNoteHTML(t.note);
-    h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">My read</span><span class="aic-bv">Warm intro, real volume (~$80K/mo), price-hike pain — but burned twice, so the draft leads with a free statement review and makes zero pricing claims.</span></div>' +
-      '<div class="aic-pb">Playbook <b>Referral outreach</b> · Knowledge base</div></div>';
-    h += '<div class="aic-decide"><div class="aic-dhd">Reply to the intro</div>' +
-      aicRouteHTML(t, 'send-intro', { rec:true, title:'Send the reply — statement review offer',
-        draft:'“Thanks Tara — happy to help. Hi Dr. Patel’s team: no pitch here. Send over one recent processing statement and we’ll map exactly what you’re paying and where it’s going — takes us a day, costs nothing, and you’ll have the map either way.”',
-        btn:'✓ Approve & send', then:'reply goes to the office manager (Tara cc’d) → task moves to <b>Waiting</b> · resurfaces Friday 9am if quiet' }) + '</div>';
+    h += agent(quote(t.note) +
+      '<p>Real volume, real pain \u2014 but they\u2019ve been <b>burned twice</b>, so the draft leads with a free statement review and makes zero pricing claims.</p>');
+    h += '<div class="aic-decide"><div class="aic-route">' +
+      '<div class="aic-rtop"><span class="aic-rec">Recommended</span>Send the reply \u2014 statement review offer</div>' +
+      '<div class="aic-draft" id="aic-draft-send-intro">\u201CThanks Tara \u2014 happy to help. Hi Dr. Patel\u2019s team: no pitch here. Send over one recent processing statement and we\u2019ll map exactly what you\u2019re paying and where it\u2019s going \u2014 takes us a day, costs nothing, and you\u2019ll have the map either way.\u201D <button class="aic-linky" onclick="aicEditDraft(\'send-intro\', this)">\u270E Edit</button></div>' +
+      '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-harborlight\',\'send-intro\')">\u2713 Approve &amp; send</button>' +
+      '<span class="aic-then"><b>Then:</b> reply goes out (Tara cc\u2019d) \u2192 task <b>Waiting</b> \u00B7 resurfaces Friday 9am if quiet</span></div>' +
+      '</div></div>';
   }
   else if (t.id === 't-lakeview') {
-    h += aicNoteHTML(t.note);
-    h += '<div class="aic-brief read"><div class="aic-brow"><span class="aic-bk">My read</span><span class="aic-bv">Their partner meeting was this weekend — that’s why this resurfaced today. The draft references last week’s A920 quote and asks for a simple yes/no.</span></div>' +
-      '<div class="aic-pb">Playbook <b>Quote follow-up</b> · Knowledge base</div></div>';
-    h += '<div class="aic-decide"><div class="aic-dhd">Follow up on the quote</div>' +
-      aicRouteHTML(t, 'send-fu', { rec:true, title:'Send the follow-up',
-        draft:'“Hi — following up on the A920 upgrade quote from last week now that your partner meeting’s behind you. Same pricing holds through Friday. Want me to schedule the swap, or should we revisit next quarter?”',
-        btn:'✓ Approve & send', then:'message goes to Lakeview Dental → task moves to <b>Waiting</b> · resurfaces Thu, then one last touch' }) + '</div>';
+    h += agent(quote(t.note) +
+      '<p>Their partner meeting was this weekend \u2014 that\u2019s why this resurfaced today. The draft asks for a simple yes/no on last week\u2019s quote.</p>');
+    h += '<div class="aic-decide"><div class="aic-route">' +
+      '<div class="aic-rtop"><span class="aic-rec">Recommended</span>Send the follow-up</div>' +
+      '<div class="aic-draft" id="aic-draft-send-fu">\u201CHi \u2014 following up on the A920 upgrade quote from last week now that your partner meeting\u2019s behind you. Same pricing holds through Friday. Want me to schedule the swap, or should we revisit next quarter?\u201D <button class="aic-linky" onclick="aicEditDraft(\'send-fu\', this)">\u270E Edit</button></div>' +
+      '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicRoute(\'t-lakeview\',\'send-fu\')">\u2713 Approve &amp; send</button>' +
+      '<span class="aic-then"><b>Then:</b> task <b>Waiting</b> \u00B7 resurfaces Thursday, then one last touch</span></div>' +
+      '</div></div>';
   }
   else if (t.adhoc) {
-    h += '<div class="aic-sys">✦ Ad-hoc session — grounded in your queue and book. Ask away.</div>';
+    h += '<div class="syse" style="padding:2px 0;"><span class="sysd"></span><span class="syst">\u2726 Ad-hoc session \u2014 grounded in your queue and book. Ask away.</span></div>';
   }
   return h;
 }
@@ -45328,14 +45381,14 @@ function aicToggleWork(btn){
 
 /* ── messages ────────────────────────────────────────────────────── */
 function aicMsgHTML(msg){
-  if (msg.kind === 'sys') return '<div class="syse" style="padding:3px 0;"><span class="sysd"></span><span class="syst">' + msg.html + '</span></div>';
-  var av, avc, name, mode, modeLab;
-  if (msg.kind === 'out') { av = '\u2191'; avc = 'var(--green)'; name = 'Sent'; mode = 'out'; modeLab = '\u2192 ' + (msg.to || 'Recipient'); }
-  else if (msg.kind === 'user') { av = 'MW'; avc = '#A09E9A'; name = 'Mike'; mode = ''; modeLab = ''; }
-  else { av = '\u2726'; avc = 'var(--navy)'; name = 'Twill AI'; mode = 'int'; modeLab = (msg.live ? 'Live' : 'Agent'); }
-  return '<div class="act aic-act"><div class="ah"><div class="aav" style="background:' + avc + ';color:#fff;">' + av + '</div>' +
-    '<span class="aname">' + name + '</span>' + (modeLab ? '<span class="amode ' + mode + '">' + modeLab + '</span>' : '') +
-    '<span class="atime">now</span></div><div class="abub ' + mode + '">' + msg.html + '</div></div>';
+  if (msg.kind === 'sys') return '<div class="syse" style="padding:2px 0;"><span class="sysd"></span><span class="syst">' + msg.html + '</span></div>';
+  if (msg.kind === 'out') {
+    var prev = String(msg.html).replace(/<[^>]*>/g, '');
+    if (prev.length > 150) prev = prev.slice(0, 150) + '\u2026';
+    return '<div class="aic-sent"><span class="aic-ok">\u2713</span> Sent \u2192 <b>' + (msg.to || 'recipient') + '</b> \u00B7 \u201C' + prev + '\u201D</div>';
+  }
+  if (msg.kind === 'user') return '<div class="aic-user">' + msg.html + '</div>';
+  return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span>' + (msg.live ? '<span class="amode int">Live</span>' : '') + '</div><div class="aic-prose">' + (msg.fmt ? msg.html : '<p>' + msg.html + '</p>') + '</div></div>';
 }
 function aicPush(t, msg){ (t.msgs = t.msgs || []).push(msg); if (AIC_STATE.open === t.id) { var th = document.getElementById('aicThread'); if (th) { th.insertAdjacentHTML('beforeend', aicMsgHTML(msg)); th.scrollTop = th.scrollHeight; } } }
 
@@ -45561,7 +45614,7 @@ function aicChatSend(){
   .then(function(d){
     var el = document.getElementById('aicTyping'); if (el) el.remove();
     if (!d || !d.text) throw new Error('empty');
-    aicPush(t, { kind:'ai', live:true, html:aicEsc(d.text).replace(/\n/g, '<br>') });
+    aicPush(t, { kind:'ai', live:true, fmt:true, html:aicFmt(d.text) });
     t.transcript.push({ role:'agent', text:d.text });
   })
   .catch(function(){
