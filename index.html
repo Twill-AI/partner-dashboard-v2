@@ -3300,6 +3300,8 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-people .aic-menu { min-width:230px; top:28px; right:auto; left:0; }
       .aic-mlink { display:inline; background:none; border:none; padding:0; font:inherit; font-weight:700; color:#3E5E80; cursor:pointer; }
       .aic-mlink:hover { text-decoration:underline; }
+      .aic-doneban { display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--border); background:rgba(91,122,94,0.10); font-size:12.5px; color:var(--text-primary); flex:0 0 auto; flex-wrap:wrap; }
+      .aic-thread.done .aic-decide, .aic-thread.done > .aic-ract { display:none; }
       .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid rgba(0,0,0,0.06); padding:11px 14px; }
       .aic-in { flex:1; font-size:13px; color:var(--text-primary); background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:7px; padding:8px 12px; font-family:var(--font-ui); outline:none; }
       .aic-in:focus { border-color:rgba(0,0,0,0.3); }
@@ -45212,7 +45214,11 @@ function aicRenderWs(){
     '</div></div>';
   h += aicAnchorHTML(t);
   h += '<div class="aic-ctx" id="aicCtx">' + aicCtxHTML(t, m, redact) + '</div>';
-  h += '<div class="aic-thread" id="aicThread">' + aicSectionsHTML(t) + (t.msgs || []).map(aicMsgHTML).join('') + '</div>';
+  var doneBan = '';
+  if (t.state === 'done') {
+    doneBan = '<div class="aic-doneban">\u2713 <b>Task complete</b> \u2014 summary + transcript filed' + (t.merchant ? ' to the merchant timeline \u00B7 <button class="aic-linky" onclick="aicOpenRecord()">Verify on the record \u2197</button>' : '') + '<button class="btn btn-primary aic-sm" style="margin-left:auto;" onclick="aicNextTask()">Next task \u2192</button></div>';
+  }
+  h += doneBan + '<div class="aic-thread' + (t.state === 'done' ? ' done' : '') + '" id="aicThread">' + aicSectionsHTML(t) + (t.msgs || []).map(aicMsgHTML).join('') + '</div>';
   var ph = ((t.userCreated || t.adhoc) && !t.merchant) ? 'Search your book or describe the task \u2014 name, MID, partner, or status\u2026' : 'Reply \u2014 or type / for a playbook\u2026';
   h += '<div class="aic-composer" style="position:relative;"><div class="aic-menu aic-sugg" id="aicSugg"></div><input class="aic-in" id="aicChatInput" placeholder="' + ph + '" oninput="aicComposerInput()" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
   ws.innerHTML = h;
@@ -45454,7 +45460,7 @@ function aicRoute(taskId, key){
     aicTimeline(t.merchant, 'Pend #2 response submitted to UW as-is (Jan full + Feb 1–19 + merchant note, coverage memo attached).');
     aicToastSafe('↑', 'Pend response submitted to UW — <strong>Pacific Coast Retail</strong>');
     aicPush(t, { kind:'ai', html:'Submitted with the coverage memo. Heads-up: this processor re-pended 3 of the last 4 partial-month files — I’ll resurface this in 3 business days to check the verdict, or tell me when.' });
-    aicDone(taskId, true);
+    aicDone(taskId, true, true);
   }
   if (taskId === 't-pcr' && key === 'submit-full') {
     aicPush(t, { kind:'sys', html:'↑ Complete response submitted to UW — Jan + Feb + Feb 20–28 · pend #2 marked <b>responded</b>, coverage complete' });
@@ -45487,13 +45493,11 @@ function aicRoute(taskId, key){
   }
 
   if (taskId === 't-harbor' && key === 'ticket') {
-    aicPush(t, { kind:'sys', html:'\u{1F3AB} Ticket created — <b>Enable AVS/CVV on web-order gateway — Harbor Bistro</b> · findings + 4-dispute list attached · assigned to <b>Alex Kim</b> (Deploy) · <button class="aic-linky" onclick="goToTicket(0)">View ticket ↗</button>' });
-    t.transcript.push({ role:'agent', text:'Ticket created and assigned to Alex Kim: enable AVS/CVV on the web-order gateway; findings and dispute list attached.' });
-    aicTimeline(t.merchant, 'CB investigation concluded: web-order gateway missing AVS/CVV since Jul 28 plugin launch. Ticket filed and assigned to Alex Kim (Deploy).');
-    try { if (typeof assignPerson === 'function' && typeof KB_USERS !== 'undefined') { var ak = KB_USERS.find(function(u){ return u.id === 'u-alex'; }); if (ak) assignPerson(t.merchant, ak, 'deploy', 'aic'); } } catch(e) {}
-    aicToastSafe('\u{1F3AB}', 'Ticket assigned to <strong>Alex Kim</strong> — Harbor Bistro gateway fix');
-    aicPush(t, { kind:'ai', html:'Filed and assigned. I’ll resurface this Friday to verify AVS/CVV is live before the next dispute window — chargeback cycles run about 30 days, so end-of-week is safe. Or tell me when.' });
-    aicDone(taskId, true);
+    aicHandleAction(t, { type:'create_ticket', completesTask:true,
+      title:'Enable AVS/CVV on web-order gateway \u2014 Harbor Bistro',
+      assignee:'Alex Kim',
+      body:'Chargeback spike traced to the online-ordering plugin (live Jul 28): all 4 new disputes are CNP fraud on web orders and the auths transmit no AVS/CVV. Card-present is clean (0 disputes / 90 days). Action: enable AVS + CVV enforcement on the web-order gateway. The 4 open disputes (DSP-3311/3314/3319/3322) are winnable with order + device evidence \u2014 rep them once the gateway change lands.' });
+    aicPush(t, { kind:'sys', html:'Review the ticket below \u2014 edit anything, then Create &amp; assign.' });
   }
   if (taskId === 't-harbor' && key === 'headsup') {
     aicPush(t, { kind:'out', to:'Harbor Bistro', html:aicEsc(aicDraftText('headsup')).slice(0, 400) });
@@ -45545,18 +45549,23 @@ function aicPcrReplyBeat(){
 }
 
 /* ── done / snooze / kebab ───────────────────────────────────────── */
-function aicDone(id, quiet){
+function aicDone(id, quiet, stay){
   var t = AIC_TASKS[id]; if (!t) return;
   t.state = 'done';
   if (!quiet) {
-    aicTimeline(t.merchant, 'Task archived: ' + t.title + (t.sub ? ' — ' + t.sub : '') + '. Summary + transcript filed.');
-    aicToastSafe('\u{1F5C4}', 'Task archived — <strong>' + t.title + '</strong>' + (t.merchant ? ' · filed to the merchant timeline' : ''));
-  } else if (t.merchant) {
-    /* route-driven closes already wrote their own timeline entries */
+    aicTimeline(t.merchant, 'Task archived: ' + t.title + (t.sub ? ' \u2014 ' + t.sub : '') + '. Summary + transcript filed.');
+    aicToastSafe('\u{1F5C4}', 'Task archived \u2014 <strong>' + t.title + '</strong>' + (t.merchant ? ' \u00B7 filed to the merchant timeline' : ''));
   }
+  aicRenderQueue(); aicSubLine();
+  if (stay) { AIC_STATE.open = id; aicRenderWs(); return; }
   var next = aicLaneIds('needs').filter(function(x){ return x !== id; })[0];
   AIC_STATE.open = null;
-  aicRenderQueue(); aicSubLine();
+  if (next) aicOpenTask(next); else aicRenderWs();
+}
+function aicNextTask(){
+  var next = aicLaneIds('needs')[0];
+  AIC_STATE.open = null;
+  aicRenderQueue();
   if (next) aicOpenTask(next); else aicRenderWs();
 }
 function aicSnooze(id, label){
@@ -45726,10 +45735,17 @@ function aicActionCardHTML(msg){
     then = 'application link goes out \u2192 task <b>Waiting</b> \u00B7 resurfaces ' + (a.resurface || 'on open or tomorrow 9am');
     draft = a.note || '';
   } else if (a.type === 'create_ticket') {
-    title = 'Ticket \u2014 ' + (a.title || 'untitled') + (a.assignee ? ' \u00B7 assign <b>' + a.assignee + '</b>' : '');
+    title = 'Ticket' + (a.assignee ? ' \u00B7 assign <b>' + a.assignee + '</b>' : '');
     btn = '\u{1F3AB} Create &amp; assign';
-    then = 'ticket filed with this thread attached' + (a.assignee ? ' \u2192 ' + a.assignee : '');
+    then = 'ticket filed with this thread attached' + (a.assignee ? ' \u2192 ' + a.assignee : '') + ' \u00B7 you confirm before anything is created';
     draft = a.body || '';
+    var tEd = '<div class="aic-draft" id="aic-atitle-' + msg.aid + '" style="font-weight:700;">' + aicEsc(a.title || 'Untitled ticket') + ' <button class="aic-linky" onclick="aicEditDraft(\'atitle-' + msg.aid + '\', this)">\u270E Edit</button></div>';
+    return '<div class="aic-decide"><div class="aic-route">' +
+      '<div class="aic-rtop"><span class="aic-rec">Agent action</span>' + title + '</div>' + tEd +
+      (draft ? '<div class="aic-draft" id="aic-adraft-' + msg.aid + '">' + aicEsc(draft) + ' <button class="aic-linky" onclick="aicEditDraft(\'a-' + msg.aid + '\', this)">\u270E Edit</button></div>' : '') +
+      '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicExecAction(\'' + msg.tid + '\',\'' + msg.aid + '\')">' + btn + '</button>' +
+      '<button class="btn btn-ghost aic-sm" onclick="aicDismissAction(\'' + msg.tid + '\',\'' + msg.aid + '\')">Dismiss</button>' +
+      '<span class="aic-then"><b>Then:</b> ' + then + '</span></div></div></div>';
   } else if (a.type === 'create_lead') {
     title = 'Create lead \u2014 ' + (a.name || 'new merchant');
     btn = '\uFF0B Create lead';
@@ -45755,19 +45771,22 @@ function aicExecAction(taskId, aid){
   if (a.type === 'message') {
     aicPush(t, { kind:'out', to:a.to || 'recipient', html:aicEsc(body).slice(0, 400) });
     t.state = 'waiting'; t.waitLabel = a.resurface || 'reply or 9am'; t.lane = t.lane === 'fyi' ? t.lane : 'needs';
-    msg.exec = true; msg.execLabel = 'Sent to ' + (a.to || 'recipient') + ' \u2014 task moved to Waiting \u00B7 resurfaces ' + (a.resurface || 'on reply or tomorrow 9am');
+    msg.exec = true; msg.execLabel = 'Sent to <b>' + (a.to || 'recipient') + '</b> \u2014 task moved to Waiting \u00B7 resurfaces ' + (a.resurface || 'on reply or tomorrow 9am') + (aicMerchantRow(t.merchant) ? ' \u00B7 <button class="aic-linky" onclick="aicOpenRecord()">Verify on the record \u2197</button>' : '');
     aicTimeline(t.merchant, 'Message sent to ' + (a.to || 'contact') + (a.subject ? ' \u2014 ' + a.subject : '') + '. Watching for the reply.');
     aicToastSafe('\u2709', 'Sent \u2014 <strong>' + (a.to || 'recipient') + '</strong>');
     t.transcript.push({ role:'agent', text:'Message approved and sent to ' + (a.to || 'recipient') + '. Task waiting; resurfaces ' + (a.resurface || 'tomorrow 9am') + '.' });
   } else if (a.type === 'send_app') {
     aicPush(t, { kind:'out', to:a.to || 'contact', html:aicEsc(body || 'Application link').slice(0, 400) });
     t.state = 'waiting'; t.waitLabel = a.resurface || 'open event or 9am';
-    msg.exec = true; msg.execLabel = 'Application sent to ' + (a.to || 'contact') + ' \u2014 task moved to Waiting';
+    msg.exec = true; msg.execLabel = 'Application sent to <b>' + (a.to || 'contact') + '</b> \u2014 task moved to Waiting' + (aicMerchantRow(t.merchant) ? ' \u00B7 <button class="aic-linky" onclick="aicOpenRecord()">Verify on the record \u2197</button>' : '');
     aicTimeline(t.merchant, 'Application sent to ' + (a.to || 'contact') + '.');
     aicToastSafe('\u2709', 'Application sent \u2014 <strong>' + (a.to || 'contact') + '</strong>');
     t.transcript.push({ role:'agent', text:'Application sent to ' + (a.to || 'contact') + '.' });
   } else if (a.type === 'create_ticket') {
-    msg.exec = true; msg.execLabel = 'Ticket created \u2014 ' + (a.title || '') + (a.assignee ? ' \u00B7 assigned to ' + a.assignee : '');
+    var titleEl = document.getElementById('aic-atitle-' + aid);
+    var finalTitle = titleEl ? titleEl.textContent.replace(/\u270E Edit|\u2713 Save edit/g, '').trim() : (a.title || '');
+    msg.exec = true; msg.execLabel = 'Ticket created \u2014 <b>' + aicEsc(finalTitle) + '</b>' + (a.assignee ? ' \u00B7 assigned to ' + a.assignee : '') + ' \u00B7 <button class="aic-linky" onclick="showView(\'tickets\', document.getElementById(\'nav-tickets\'))">Open Tickets \u2197</button>';
+    a.title = finalTitle;
     if (a.assignee && typeof KB_USERS !== 'undefined') {
       var tok = a.assignee.toLowerCase();
       var u = KB_USERS.find(function(x){ return x.role !== 'partner' && x.name.toLowerCase().indexOf(tok) !== -1; });
@@ -45776,6 +45795,7 @@ function aicExecAction(taskId, aid){
     aicTimeline(t.merchant, 'Ticket created: ' + (a.title || '') + '.');
     aicToastSafe('\u{1F3AB}', 'Ticket created \u2014 <strong>' + aicEsc(a.title || '') + '</strong>');
     t.transcript.push({ role:'agent', text:'Ticket created: ' + (a.title || '') + '.' });
+    if (a.completesTask) { aicRenderQueue(); aicSubLine(); aicDone(taskId, true, true); return; }
   } else if (a.type === 'create_lead') {
     msg.exec = true; msg.execLabel = 'Lead created \u2014 ' + (a.name || 'new merchant');
     aicToastSafe('\uFF0B', 'Lead created \u2014 <strong>' + aicEsc(a.name || '') + '</strong>');
@@ -46001,6 +46021,662 @@ function aicCmdKey(ev){
   var chat = document.getElementById('aicChatInput');
   if (chat) { chat.value = q; aicChatSend(); }
 }
+</script>
+<style>
+/* ═══ SETTINGS — Ticket Routing / Deal Routing / Teams & Departments (trs-*) ═══ */
+body.persona-rep #nav-settings, body.persona-rep #view-settings { display:none !important; }
+#view-settings .trs-wrap { max-width:1060px; margin:0 auto; padding:20px 28px 60px; }
+.trs-tabhost { display:none; } .trs-tabhost.on { display:block; }
+.trs-chip { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:800; font-family:var(--font-ui); padding:2px 7px; border-radius:5px; background:rgba(131,88,168,.12); color:#8358A8; border:1px solid rgba(131,88,168,.3); cursor:pointer; letter-spacing:.03em; white-space:nowrap; }
+.trs-mode-strip { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.trs-mode-pill { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; font-family:var(--font-ui); color:var(--text-secondary); background:var(--bg-elevated); border:1px solid var(--border); border-radius:8px; padding:6px 12px; }
+.trs-mode-pill b { color:var(--text-primary); }
+.trs-dept-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; padding:16px 18px; }
+.trs-dept { background:var(--bg-elevated); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.trs-dept-hd { display:flex; align-items:center; gap:8px; }
+.trs-dept-hd b { font-size:14px; color:var(--text-primary); font-family:var(--font-ui); }
+.trs-dept-count { margin-left:auto; font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
+.trs-mem { display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--border); }
+.trs-mem:last-child { border-bottom:none; }
+.trs-mem-av { width:26px; height:26px; border-radius:50%; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--font-ui); margin-top:1px; }
+.trs-mem-name { font-size:12.5px; font-weight:600; color:var(--text-primary); font-family:var(--font-ui); }
+.trs-mem-tags { display:inline-flex; gap:5px; margin-left:7px; vertical-align:1px; }
+.trs-lead-tag { font-size:8px; font-weight:800; background:rgba(201,168,0,.16); color:#8a7400; border-radius:4px; padding:1px 6px; letter-spacing:.05em; }
+.trs-load-tag { font-size:9px; color:var(--text-muted); font-family:var(--font-mono); }
+.trs-mem-role { font-size:11px; color:var(--text-secondary); line-height:1.55; margin-top:3px; cursor:text; border:1px dashed transparent; border-radius:5px; padding:2px 4px; margin-left:-4px; }
+.trs-mem-role:hover { border-color:var(--border-strong); background:var(--bg-surface); }
+.trs-mem-role.empty { color:var(--text-muted); font-style:italic; }
+.trs-mem-roleedit { width:100%; font-size:11px; font-family:var(--font-ui); color:var(--text-primary); background:var(--bg-surface); border:1px solid var(--yellow); border-radius:5px; padding:5px 7px; line-height:1.5; resize:vertical; min-height:44px; }
+.trs-mem-acts { margin-left:auto; flex-shrink:0; display:none; gap:5px; align-items:center; }
+.trs-mem:hover .trs-mem-acts { display:inline-flex; }
+.trs-mini-sel { font-size:10px; font-family:var(--font-ui); background:var(--bg-surface); color:var(--text-secondary); border:1px solid var(--border-strong); border-radius:5px; padding:2px 5px; }
+.trs-sim-form { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:14px 18px 4px; }
+.trs-sim-form label { font-size:10px; font-weight:700; font-family:var(--font-ui); text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); display:block; margin-bottom:4px; }
+.trs-sim-form select, .trs-sim-form input[type=text] { width:100%; font-size:12.5px; font-family:var(--font-ui); background:var(--bg-elevated); color:var(--text-primary); border:1px solid var(--border-strong); border-radius:6px; padding:7px 9px; outline:none; }
+.trs-sim-msg { grid-column:1/-1; }
+.trs-sim-msg textarea { width:100%; font-size:12.5px; font-family:var(--font-data); background:var(--bg-elevated); color:var(--text-primary); border:1px solid var(--border-strong); border-radius:6px; padding:8px 10px; outline:none; resize:vertical; min-height:52px; line-height:1.5; }
+.trs-preset { font-size:10px; font-weight:600; font-family:var(--font-ui); color:var(--text-secondary); background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:20px; padding:3px 11px; cursor:pointer; }
+.trs-preset:hover { color:var(--text-primary); border-color:var(--text-muted); }
+.trs-trace { margin:12px 18px 16px; background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:10px; padding:14px 16px; }
+.trs-trace-ai { font-size:12.5px; color:var(--text-primary); line-height:1.65; }
+.trs-hit { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; font-family:var(--font-ui); border-radius:5px; padding:3px 9px; margin:0 6px 6px 0; }
+.trs-hit.hard { background:rgba(239,68,68,.09); color:var(--red); border:1px solid rgba(239,68,68,.25); }
+.trs-hit.weight { background:rgba(34,197,94,.09); color:var(--green); border:1px solid rgba(34,197,94,.25); }
+.trs-hit.esc { background:rgba(245,158,11,.11); color:var(--amber); border:1px solid rgba(245,158,11,.3); }
+.trs-score { display:flex; align-items:center; gap:10px; padding:4px 0; }
+.trs-score-name { font-size:11.5px; font-weight:600; font-family:var(--font-ui); color:var(--text-primary); width:150px; flex-shrink:0; }
+.trs-score-bar { flex:1; height:7px; background:var(--bg-hover); border-radius:4px; overflow:hidden; }
+.trs-score-fill { height:100%; border-radius:4px; background:var(--green); }
+.trs-score-n { font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--text-secondary); width:34px; text-align:right; flex-shrink:0; }
+.trs-decision { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:12.5px; color:var(--text-primary); font-family:var(--font-ui); }
+.trs-kbdoc { font-family:var(--font-mono); font-size:11px; line-height:1.7; background:var(--bg-base); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin:0 18px 14px; white-space:pre-wrap; color:var(--text-secondary); max-height:340px; overflow:auto; }
+</style>
+<script>
+/* ═══ SETTINGS: nav view + Teams & Departments + Ticket Routing + live simulation ═══
+   Scope locked 8/17 from the Weekly UI/UX call: weighted engine (hard rules force,
+   weights prefer, LLM scores candidates), full-auto with an audit chip everyone sees,
+   additive assignment only, fallback = every rep on the deal. */
+
+const TRS_DEPTS = [
+  { id:'support',      name:'Support',      icon:'🎧', lead:'Blake Chen',   desc:'Front line for live merchants — statements, deposits, fees, portal access.' },
+  { id:'underwriting', name:'Underwriting', icon:'🛡️', lead:'Tara Patel',   desc:'Applications, documents, pends — everything before a merchant goes live.' },
+  { id:'operations',   name:'Operations',   icon:'⚙️', lead:'Dan Mitchell', desc:'Deployment, equipment, funding ops, chargeback and dispute workflows.' },
+  { id:'sales',        name:'Sales',        icon:'📈', lead:'James Carter', desc:'The book. Pre-activation questions on a rep\'s own merchants.' },
+];
+const TRS_RULES = [
+  { id:'TR-01', kind:'hard', raw:'Any ticket on a merchant that is still in underwriting goes to the Underwriting department, least-loaded first',
+    when:'Merchant stage = underwriting · any source', action:'Force route → Underwriting (least-loaded)', target:{dept:'underwriting', strategy:'least-loaded'} },
+  { id:'TR-02', kind:'hard', raw:'Chargebacks and disputes go straight to Operations; add the account owner as a watcher',
+    when:'Ticket type or content = chargeback / dispute', action:'Force route → Operations · watcher: account owner', target:{dept:'operations', strategy:'least-loaded'}, watchers:['account owner'] },
+  { id:'TR-03', kind:'weight', w:30, raw:'General support from active merchants prefers the Support team, round-robin',
+    when:'Merchant active · type = support / general', action:'+30 Support (round-robin)', target:{dept:'support', strategy:'round-robin'} },
+  { id:'TR-04', kind:'weight', w:20, raw:'Equipment and terminal issues prefer Operations',
+    when:'Type or content = equipment / terminal / activation', action:'+20 Operations', target:{dept:'operations', strategy:'least-loaded'} },
+  { id:'TR-05', kind:'weight', w:15, raw:'When scores tie, prefer whoever has the fewest open tickets',
+    when:'Score tie between candidates', action:'+15 to the least-loaded candidate', target:{strategy:'least-loaded'} },
+  { id:'TR-06', kind:'hard', raw:'When a processor ticket names an assignee, match them to a portal user and add them as a watcher',
+    when:'Source = processor · payload names an assignee', action:'Fuzzy-match → add as watcher (never reassigns)', target:{watcherFromPayload:true} },
+  { id:'TR-07', kind:'escalation', raw:'If a routed ticket gets no first response inside 4 business hours, add the department lead and raise the priority one level',
+    when:'No first response in 4 business hours', action:'Add department lead · priority +1', target:{} },
+];
+let TRS_SEQ = 8, _trsDraft = null, _trsEditId = null, _trsRemoveId = null, _trsRoleEdit = null;
+const TRS_RR = {}; /* round-robin pointers per dept */
+const TRS_BASE_LOAD = { 'Blake Chen':1, 'Tara Patel':2, 'Dan Mitchell':3, 'Sara Reyes':1, 'James Carter':0, 'Mike Wright':0 };
+
+/* every portal user is also an assignable ticket member */
+if (typeof TKT_MEMBERS !== 'undefined' && typeof usersData !== 'undefined')
+  usersData.forEach(u => { if (!TKT_MEMBERS.some(m => m.name === u.name)) TKT_MEMBERS.push({ name:u.name, av:u.initials, avc:u.color }); });
+
+function trsEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function trsEscAttr(s){ return trsEsc(s).replace(/"/g,'&quot;'); }
+function trsUsers(){ return (typeof usersData !== 'undefined') ? usersData : []; }
+function trsDept(id){ return TRS_DEPTS.find(d => d.id === id); }
+function trsDeptByName(n){ const t=(n||'').toLowerCase(); return TRS_DEPTS.find(d => d.id === t || d.name.toLowerCase() === t); }
+function trsMembers(deptId){ const d = trsDept(deptId); return d ? trsUsers().filter(u => (u.dept||'').toLowerCase() === d.name.toLowerCase()) : []; }
+function trsVariants(name){
+  const p = (name||'').split(' ');
+  if (p.length < 2) return [name];
+  return [name, p[0].charAt(0)+'. '+p[p.length-1], p[0]+' '+p[p.length-1].charAt(0)+'.'];
+}
+function trsOpenCount(name){
+  let n = TRS_BASE_LOAD[name] || 0;
+  const vars = trsVariants(name);
+  if (typeof TKT !== 'undefined') Object.values(TKT).forEach(t => {
+    if (t.status !== 'resolved' && (t.members||[]).some(m => vars.includes(m.name))) n++;
+  });
+  return n;
+}
+function trsMemberObj(name){
+  const u = trsUsers().find(x => x.name === name);
+  if (u) return { name:u.name, av:u.initials, avc:u.color };
+  const m = (typeof TKT_MEMBERS !== 'undefined') && TKT_MEMBERS.find(x => trsVariants(name).includes(x.name));
+  if (m) return m;
+  const ini = (name||'?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  return { name:name, av:ini, avc:'#8C7A5E' };
+}
+function trsFuzzyUser(raw){
+  const toks = (raw||'').toLowerCase().split(/[^a-z]+/).filter(w => w.length > 1);
+  if (!toks.length) return null;
+  let best = null, bestScore = 0;
+  trsUsers().forEach(u => {
+    const nt = u.name.toLowerCase().split(/\s+/);
+    let s = 0;
+    toks.forEach(tk => nt.forEach(w => { if (w === tk) s += 2; else if (w.startsWith(tk) || tk.startsWith(w)) s += 1; }));
+    if (s > bestScore) { bestScore = s; best = u; }
+  });
+  return bestScore >= 2 ? best : null;
+}
+
+/* ── view skeleton (injected once) ── */
+function trsBuildView(){
+  if (document.getElementById('view-settings')) return;
+  const host = document.getElementById('view-dashboard');
+  if (!host || !host.parentElement) return;
+  const v = document.createElement('div');
+  v.className = 'view'; v.id = 'view-settings';
+  v.innerHTML =
+    '<div class="topbar"><div class="topbar-left"><div><div class="page-title">Settings</div>' +
+    '<div class="page-sub">Routing, teams and portal configuration — ops only</div></div></div>' +
+    '<div class="topbar-right"><div class="sig-uw-mode-toggle visible" id="trs-tabs">' +
+    '<div class="sig-uw-mode-btn on" id="trs-tab-b-ticket" onclick="trsTab(\'ticket\')">🎫 Ticket Routing</div>' +
+    '<div class="sig-uw-mode-btn" id="trs-tab-b-deal" onclick="trsTab(\'deal\')">🧭 Deal Routing</div>' +
+    '<div class="sig-uw-mode-btn" id="trs-tab-b-teams" onclick="trsTab(\'teams\')">👥 Teams &amp; Departments</div>' +
+    '</div></div></div>' +
+    '<div class="trs-wrap">' +
+    '<div class="trs-tabhost on" id="trs-host-ticket"></div>' +
+    '<div class="trs-tabhost" id="trs-host-deal"><div style="font-size:11px;color:var(--text-muted);margin:2px 2px 12px;">Deal placement rules — moved here from the Library. The knowledge chat still cites them.</div></div>' +
+    '<div class="trs-tabhost" id="trs-host-teams"></div>' +
+    '</div>';
+  host.parentElement.appendChild(v);
+  /* relocate the BIN routing panel out of the Library into Deal Routing */
+  const bin = document.getElementById('klb-routing');
+  if (bin) { document.getElementById('trs-host-deal').appendChild(bin); }
+}
+function trsInit(tab){
+  trsBuildView();
+  trsTab(tab || _trsCurTab || 'ticket');
+}
+let _trsCurTab = 'ticket';
+function trsTab(tab){
+  _trsCurTab = tab;
+  ['ticket','deal','teams'].forEach(k => {
+    const h = document.getElementById('trs-host-' + k), b = document.getElementById('trs-tab-b-' + k);
+    if (h) h.classList.toggle('on', k === tab);
+    if (b) b.classList.toggle('on', k === tab);
+  });
+  if (tab === 'deal') {
+    const bin = document.getElementById('klb-routing');
+    if (bin) bin.style.display = 'block';
+    if (typeof klbrRender === 'function') klbrRender();
+  }
+  if (tab === 'teams') trsRenderTeams();
+  if (tab === 'ticket') trsRenderTicket();
+}
+function trsOpen(tab){
+  trsBuildView();
+  showView('settings', document.getElementById('nav-settings'));
+  trsTab(tab || 'ticket');
+}
+/* a rep persona must never sit on the settings view */
+if (typeof personaToggle === 'function' && !window._trsPersonaWrapped) {
+  window._trsPersonaWrapped = true;
+  const _trsPT = personaToggle;
+  window.personaToggle = function(){
+    _trsPT();
+    if (document.body.classList.contains('persona-rep') && document.getElementById('view-settings')?.classList.contains('active'))
+      showView('dashboard', document.getElementById('nav-dashboard'));
+  };
+}
+
+/* ── TEAMS & DEPARTMENTS ── */
+function trsRenderTeams(){
+  const host = document.getElementById('trs-host-teams');
+  if (!host) return;
+  const deptCards = TRS_DEPTS.map(d => {
+    const mem = trsMembers(d.id);
+    const rows = mem.map(u => {
+      const isLead = d.lead === u.name;
+      const editing = _trsRoleEdit === u.id;
+      const roleHtml = editing
+        ? '<textarea class="trs-mem-roleedit" id="trs-role-in" onblur="trsSaveRole(\'' + u.id + '\')" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();this.blur();}">' + trsEsc(u.roleDesc||'') + '</textarea>'
+        : '<div class="trs-mem-role' + (u.roleDesc ? '' : ' empty') + '" onclick="trsEditRole(\'' + u.id + '\')" title="Click to edit — the routing agent reads this">' + (trsEsc(u.roleDesc) || 'No role description yet — click to add. The routing agent reads this.') + '</div>';
+      const moveOpts = TRS_DEPTS.filter(x => x.id !== d.id).map(x => '<option value="' + x.id + '">→ ' + x.name + '</option>').join('');
+      return '<div class="trs-mem"><div class="trs-mem-av" style="background:' + u.color + ';">' + u.initials + '</div>' +
+        '<div style="flex:1;min-width:0;"><span class="trs-mem-name">' + trsEsc(u.name) + '</span>' +
+        '<span class="trs-mem-tags">' + (isLead ? '<span class="trs-lead-tag">LEAD</span>' : '') +
+        '<span class="p-badge" style="font-size:8px;">' + u.type + '</span>' +
+        '<span class="trs-load-tag">' + trsOpenCount(u.name) + ' open</span></span>' +
+        roleHtml + '</div>' +
+        '<span class="trs-mem-acts">' + (!isLead ? '<span class="klbr-act" onclick="trsSetLead(\'' + d.id + '\',\'' + trsEscAttr(u.name) + '\')">☆ Lead</span>' : '') +
+        '<select class="trs-mini-sel" onchange="trsMoveUser(\'' + u.id + '\', this.value)"><option value="">Move…</option>' + moveOpts + '</select></span></div>';
+    }).join('') || '<div style="font-size:11px;color:var(--text-muted);padding:8px 0;">No members yet — move someone in, or set the department on a new user.</div>';
+    return '<div class="trs-dept"><div class="trs-dept-hd"><span style="font-size:15px;">' + d.icon + '</span><b>' + d.name + '</b>' +
+      '<span class="trs-dept-count">' + mem.length + ' member' + (mem.length === 1 ? '' : 's') + '</span></div>' +
+      '<div style="font-size:11px;color:var(--text-secondary);line-height:1.5;margin:5px 0 7px;">' + trsEsc(d.desc) + '</div>' + rows + '</div>';
+  }).join('');
+  const routed = TRS_DEPTS.map(d => d.name.toLowerCase());
+  const outside = trsUsers().filter(u => !routed.includes((u.dept||'').toLowerCase()));
+  const outsideHtml = outside.length
+    ? '<div class="klbr-sec"><div class="klbr-hdr"><b>Outside the routing departments</b><span>visible to the router by name only — rules can still target them directly</span></div>' +
+      outside.map(u => '<div class="trs-mem" style="padding:9px 18px;"><div class="trs-mem-av" style="background:' + u.color + ';">' + u.initials + '</div>' +
+        '<div style="flex:1;"><span class="trs-mem-name">' + trsEsc(u.name) + '</span><span class="trs-mem-tags"><span class="p-badge" style="font-size:8px;">' + trsEsc(u.dept) + '</span><span class="trs-load-tag">' + trsOpenCount(u.name) + ' open</span></span>' +
+        '<div class="trs-mem-role' + (u.roleDesc ? '' : ' empty') + '" onclick="trsEditRole(\'' + u.id + '\')">' + (u.roleDesc && _trsRoleEdit !== u.id ? trsEsc(u.roleDesc) : (_trsRoleEdit === u.id ? '' : 'No role description yet — click to add.')) + '</div>' +
+        (_trsRoleEdit === u.id ? '<textarea class="trs-mem-roleedit" id="trs-role-in" onblur="trsSaveRole(\'' + u.id + '\')">' + trsEsc(u.roleDesc||'') + '</textarea>' : '') + '</div>' +
+        '<span class="trs-mem-acts"><select class="trs-mini-sel" onchange="trsMoveUser(\'' + u.id + '\', this.value)"><option value="">Move into…</option>' + TRS_DEPTS.map(x => '<option value="' + x.id + '">→ ' + x.name + '</option>').join('') + '</select></span></div>').join('') +
+      '</div>'
+    : '';
+  host.innerHTML =
+    '<div class="klbr-sec"><div class="klbr-hdr"><b>Teams &amp; Departments</b><span>who the router can send work to — role descriptions are read by the AI, word for word</span></div>' +
+    '<div class="trs-dept-grid">' + deptCards + '</div>' +
+    '<div class="klbr-compose" style="margin:0 18px 14px;"><div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">＋ New department</div>' +
+    '<div style="display:flex;gap:8px;"><input id="trs-newdept" placeholder=\'e.g. "Risk" — then move people in and reference it in rules\' onkeydown="if(event.key===\'Enter\')trsAddDept()"><button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="trsAddDept()">Create</button></div></div>' +
+    '<div class="klbr-foot">New users pick a department and a role description at creation (Users → Add User). Moving a member here updates their user record — one source of truth.</div></div>' +
+    outsideHtml;
+}
+function trsEditRole(uid){ _trsRoleEdit = uid; trsRenderTeams(); setTimeout(() => { const i = document.getElementById('trs-role-in'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 40); }
+function trsSaveRole(uid){
+  const i = document.getElementById('trs-role-in');
+  const u = trsUsers().find(x => x.id === uid);
+  if (u && i) u.roleDesc = i.value.trim();
+  _trsRoleEdit = null; trsRenderTeams();
+}
+function trsSetLead(deptId, name){ const d = trsDept(deptId); if (d) d.lead = name; trsRenderTeams(); }
+function trsMoveUser(uid, deptId){
+  if (!deptId) return;
+  const u = trsUsers().find(x => x.id === uid), d = trsDept(deptId);
+  if (u && d) { u.dept = d.name; if (typeof ccToast === 'function') ccToast('👥 ' + u.name + ' → ' + d.name); }
+  trsRenderTeams();
+}
+function trsAddDept(){
+  const i = document.getElementById('trs-newdept');
+  const name = (i && i.value || '').trim();
+  if (!name) return;
+  if (trsDeptByName(name)) { if (typeof ccToast === 'function') ccToast('That department already exists'); return; }
+  TRS_DEPTS.push({ id:name.toLowerCase().replace(/[^a-z0-9]+/g,'-'), name:name, icon:'🏷️', lead:null, desc:'' });
+  trsRenderTeams();
+}
+
+/* ── TICKET ROUTING TAB ── */
+function trsRuleChip(r){
+  const cls = r.kind === 'hard' ? 'r' : r.kind === 'weight' ? 'g' : 'a';
+  const lbl = r.kind === 'hard' ? 'Hard route' : r.kind === 'weight' ? 'Weight +' + (r.w || 20) : 'Escalation';
+  return '<span class="klbr-chip ' + cls + '" style="cursor:default;flex-shrink:0;">' + lbl + '</span>';
+}
+function trsRenderTicket(){
+  const host = document.getElementById('trs-host-ticket');
+  if (!host) return;
+  const rules = TRS_RULES.map(r => {
+    if (_trsEditId === r.id) return '<div class="klbr-rule" style="border-color:rgba(59,130,246,.35);"><span class="rid">' + r.id + '</span><div class="klbr-edit-wrap">' +
+      '<div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">✎ Restate the rule — the routing agent recompiles it</div>' +
+      '<div style="display:flex;gap:8px;"><input id="trs-edit-in" style="flex:1;border:1px solid var(--border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:var(--font-data);background:var(--bg-elevated);color:var(--text-primary);" value="' + trsEscAttr(r.raw) + '" onkeydown="if(event.key===\'Enter\')trsCompose(\'' + r.id + '\')">' +
+      '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="trsCompose(\'' + r.id + '\')">Recompile</button>' +
+      '<button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="_trsEditId=null;_trsDraft=null;trsRenderTicket();">✕</button></div>' +
+      '<div id="trs-preview-edit"></div></div></div>';
+    if (_trsRemoveId === r.id) return '<div class="klbr-rule" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);"><span class="rid">' + r.id + '</span>' + trsRuleChip(r) +
+      '<span style="flex:1;">Remove this rule? Tickets it currently routes fall through to the rules below, then the fallback.</span>' +
+      '<span style="display:inline-flex;gap:6px;"><button class="btn btn-danger" style="font-size:11px;padding:4px 12px;" onclick="trsRemove(\'' + r.id + '\')">Remove</button>' +
+      '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="_trsRemoveId=null;trsRenderTicket();">Cancel</button></span></div>';
+    return '<div class="klbr-rule"><span class="rid">' + r.id + '</span>' + trsRuleChip(r) +
+      '<span style="flex:1;">' + trsEsc(r.when) + ' → <b>' + trsEsc(r.action) + '</b>' +
+      '<span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px;">“' + trsEsc(r.raw) + '”</span></span>' +
+      (r.isNew ? '<span class="klbr-new">NEW</span>' : '') + (r.edited ? '<span class="klbr-edited">EDITED</span>' : '') +
+      '<span class="klbr-acts"><span class="klbr-act" onclick="_trsEditId=\'' + r.id + '\';_trsRemoveId=null;trsRenderTicket();">✎ Edit</span>' +
+      '<span class="klbr-act danger" onclick="_trsRemoveId=\'' + r.id + '\';_trsEditId=null;trsRenderTicket();">🗑 Remove</span></span></div>';
+  }).join('');
+  const merchants = (typeof merchantData !== 'undefined' ? merchantData : []).slice(0, 14);
+  const mOpts = merchants.map(m => '<option value="' + trsEscAttr(m.name) + '">' + trsEsc(m.name) + ' — ' + trsEsc(m.status) + '</option>').join('');
+  host.innerHTML =
+    '<div class="trs-mode-strip">' +
+    '<span class="trs-mode-pill">⚡ <b>Full auto</b>&nbsp;— routes on creation, audit chip on every ticket</span>' +
+    '<span class="trs-mode-pill">➕ <b>Additive only</b>&nbsp;— never removes an assignee</span>' +
+    '<span class="trs-mode-pill">🎯 Hard rules force · weights prefer · AI scores candidates</span>' +
+    '<span class="trs-mode-pill">🕳️ Runs only on tickets arriving unassigned</span></div>' +
+
+    '<div class="klbr-sec"><div class="klbr-hdr"><b>Ticket Routing Rules</b><span>evaluated on every new unassigned ticket, from any source</span></div>' +
+    '<div class="klbr-compose" style="margin-top:14px;"><div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">✍️ Write a rule in plain language — the routing agent compiles the specification</div>' +
+    '<div style="display:flex;gap:8px;"><input id="trs-compose-in" placeholder=\'e.g. "Statement questions from Coastal Commerce merchants go to Blake" or "Anything mentioning refunds needs a watcher from Sales"\' onkeydown="if(event.key===\'Enter\')trsCompose()">' +
+    '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="trsCompose()">Create rule</button></div><div id="trs-preview"></div></div>' +
+    rules +
+    '<div class="klbr-rule" style="border-style:dashed;"><span class="rid">FALL</span><span class="klbr-chip g" style="cursor:default;">Fallback</span>' +
+    '<span style="flex:1;">Nothing scores → assign <b>every rep on the deal</b>; the account owner keeps visibility. A ticket never sits unassigned.</span></div>' +
+    '<div class="klbr-foot">Rules compile into the knowledge base — the routing agent reads the document below, not hidden code. None of this screen exists in the rep view; the audit chip on a routed ticket is visible to everyone.</div></div>' +
+
+    '<div class="klbr-sec"><div class="klbr-hdr"><b>Simulate an incoming ticket</b><span>full pipeline — the agent reads the rules, scores candidates, and the ticket lands in the queue</span></div>' +
+    '<div style="display:flex;gap:7px;flex-wrap:wrap;padding:12px 18px 0;">' +
+    '<span class="trs-preset" onclick="trsPreset(\'uw\')">📄 UW document request</span>' +
+    '<span class="trs-preset" onclick="trsPreset(\'cb\')">⚠️ Chargeback from Maverick</span>' +
+    '<span class="trs-preset" onclick="trsPreset(\'term\')">🖥️ Terminal offline</span>' +
+    '<span class="trs-preset" onclick="trsPreset(\'stmt\')">💬 Statement question</span></div>' +
+    '<div class="trs-sim-form">' +
+    '<div><label>Source</label><select id="trs-sim-src"><option value="processor|Maverick">Processor — Maverick</option><option value="processor|First Data">Processor — First Data</option><option value="merchant|">Merchant portal</option><option value="partner|Coastal Commerce">Child partner — Coastal Commerce</option><option value="partner|NovaPay">Parent partner — NovaPay</option><option value="internal|">Internal</option></select></div>' +
+    '<div><label>Type</label><select id="trs-sim-type"><option value="support">General support</option><option value="chargeback">Chargeback · dispute</option><option value="underwriting">Underwriting · documents</option><option value="activation">Equipment · terminal</option><option value="pricing">Statement · fees</option><option value="general">Funding · deposit</option></select></div>' +
+    '<div><label>Merchant</label><select id="trs-sim-merchant">' + mOpts + '</select></div>' +
+    '<div id="trs-sim-procwrap" style="grid-column:1/-1;"><label>Processor assignee in the payload <span style="text-transform:none;letter-spacing:0;font-weight:500;">(optional — TR-06 fuzzy-matches it)</span></label><input id="trs-sim-proc" type="text" placeholder=\'e.g. "Chris Novick"\'></div>' +
+    '<div class="trs-sim-msg"><label>Ticket message</label><textarea id="trs-sim-msg" placeholder="The ticket body, as it would arrive."></textarea></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;align-items:center;padding:2px 18px 16px;"><button class="btn btn-primary" style="font-size:12px;padding:7px 16px;" onclick="trsSimulate()">⚡ Run the router</button>' +
+    '<span style="font-size:11px;color:var(--text-muted);">Live AI when connected — a deterministic engine with the same semantics otherwise.</span></div>' +
+    '<div id="trs-sim-out"></div></div>' +
+
+    '<div class="klbr-sec"><div class="klbr-hdr"><b>Compiled knowledge-base document</b><span>what the routing agent actually reads — regenerated as rules and teams change</span>' +
+    '<span style="margin-left:auto;"><button class="btn btn-ghost" style="font-size:10px;padding:3px 10px;" onclick="const k=document.getElementById(\'trs-kbdoc\');k.style.display=k.style.display===\'none\'?\'block\':\'none\';">Show / hide</button></span></div>' +
+    '<div class="trs-kbdoc" id="trs-kbdoc" style="display:none;">' + trsEsc(trsKbDoc()) + '</div>' +
+    '<div class="klbr-foot">Filed in the Library as “Ticket Routing Playbook” — the knowledge chat cites it like any other document.</div></div>';
+  const srcSel = document.getElementById('trs-sim-src');
+  if (srcSel) { srcSel.onchange = trsSimSrcChange; trsSimSrcChange(); }
+}
+function trsSimSrcChange(){
+  const v = (document.getElementById('trs-sim-src')||{}).value || '';
+  const w = document.getElementById('trs-sim-procwrap');
+  if (w) w.style.display = v.startsWith('processor') ? 'block' : 'none';
+}
+function trsPreset(k){
+  const S = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+  if (k === 'uw') { S('trs-sim-src','partner|NovaPay'); S('trs-sim-type','underwriting'); S('trs-sim-merchant','Sunrise Bakery'); S('trs-sim-msg','Uploading the corrected articles of organization for Sunrise Bakery — can someone confirm the pend is cleared and what else underwriting still needs?'); }
+  if (k === 'cb') { S('trs-sim-src','processor|Maverick'); S('trs-sim-type','chargeback'); S('trs-sim-merchant','Golden State Auto'); S('trs-sim-proc','Chris Novick'); S('trs-sim-msg','New chargeback case 4853-2211 on Golden State Auto, $840.00, reason 4853 cardholder dispute. Response due within 7 days.'); }
+  if (k === 'term') { S('trs-sim-src','merchant|'); S('trs-sim-type','activation'); S('trs-sim-merchant','TechSupply Pro LLC'); S('trs-sim-msg','Our PAX terminal has been offline since this morning — restarted twice, still says connection error. We cannot take cards.'); }
+  if (k === 'stmt') { S('trs-sim-src','merchant|'); S('trs-sim-type','support'); S('trs-sim-merchant','Harbor View Hotels'); S('trs-sim-msg','Quick question on our March statement — the service fee line looks higher than last month. Can someone walk me through it?'); }
+  trsSimSrcChange();
+}
+
+/* ── KB document the agent "reads" ── */
+function trsKbDoc(){
+  const lines = ['# Ticket Routing Playbook', '', 'Engine: hard rules force a destination; weight rules add preference; the agent scores', 'candidates and picks. Assignment is additive — a route never removes an existing assignee.', 'Runs only on tickets that arrive unassigned. Every routed ticket carries its audit.', ''];
+  lines.push('## Teams');
+  TRS_DEPTS.forEach(d => {
+    lines.push('- ' + d.name + (d.lead ? ' (lead: ' + d.lead + ')' : '') + ' — ' + d.desc);
+    trsMembers(d.id).forEach(u => lines.push('    - ' + u.name + ' (' + u.type + ', ' + trsOpenCount(u.name) + ' open): ' + (u.roleDesc || 'no role description')));
+  });
+  lines.push('', '## Rules');
+  TRS_RULES.forEach(r => lines.push('- ' + r.id + ' [' + (r.kind === 'weight' ? 'weight +' + (r.w||20) : r.kind) + '] ' + r.when + ' -> ' + r.action));
+  lines.push('- FALLBACK: nothing scores -> assign every rep on the deal; account owner keeps visibility.');
+  return lines.join('\n');
+}
+
+/* ── NL rule composer: live AI with a deterministic fallback ── */
+async function trsAI(mode, message, extra){
+  const board = Object.assign({ mode:mode, semantics:'hard rules force; weights accumulate; least-loaded breaks ties; assignment additive; fallback = all reps on the deal',
+    departments: TRS_DEPTS.map(d => ({ name:d.name, lead:d.lead, desc:d.desc,
+      members: trsMembers(d.id).map(u => ({ name:u.name, type:u.type, role:u.roleDesc || '', openTickets:trsOpenCount(u.name) })) })),
+    rules: TRS_RULES.map(r => r.id + ' [' + r.kind + (r.kind==='weight' ? ' +' + (r.w||20) : '') + '] ' + r.when + ' -> ' + r.action),
+    parameters:['source (processor / partner / merchant portal / internal / AI)','creator + creator role','ticket type','priority','message content (semantic)','merchant stage + sub-stage','merchant attributes (partner, processor, MCC, risk tier, volume)','assigned reps + splits / account owner','time (business hours, ticket age)','candidate workload + availability'] }, extra || {});
+  const ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), 14000) : null;
+  try {
+    const res = await fetch('/api/agent/chat', { method:'POST', headers:{ 'content-type':'application/json' }, signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ token: window.AGENT_CHAT_TOKEN || undefined, sessionType:'ticket-routing',
+        merchant:{ surface:'Twill Partner OS — Settings → Ticket Routing' }, board:board, transcript:[], message:message }) });
+    if (timer) clearTimeout(timer);
+    if (!res.ok) return null;
+    const j = await res.json();
+    return (j && j.text) ? j.text : null;
+  } catch(e) { if (timer) clearTimeout(timer); return null; }
+}
+function trsExtractJson(text, tag){
+  if (!text) return null;
+  let m = text.match(new RegExp(tag + '\\s*:\\s*(\\{[\\s\\S]*\\})\\s*$'));
+  if (m) { try { return JSON.parse(m[1]); } catch(e){} }
+  const lines = text.trim().split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const t = lines[i].trim();
+    if (t.startsWith('{') && t.endsWith('}')) { try { return JSON.parse(t); } catch(e){} }
+  }
+  return null;
+}
+function trsStripJsonLine(text, tag){
+  if (!text) return '';
+  return text.replace(new RegExp(tag + '\\s*:\\s*\\{[\\s\\S]*\\}\\s*$'), '').replace(/\{[\s\S]*\}\s*$/, '').trim();
+}
+function trsParseLocal(text){
+  const t = (text||'').toLowerCase();
+  const dept = TRS_DEPTS.find(d => t.includes(d.name.toLowerCase()));
+  const user = trsUsers().find(u => t.includes(u.name.toLowerCase()) || t.includes(u.name.split(' ')[0].toLowerCase()));
+  let kind = 'weight', w = 20;
+  const wm = t.match(/\+\s?(\d+)/); if (wm) w = +wm[1];
+  if (/\bmust\b|\bonly\b|\balways\b|\bnever\b|straight to|go(es)? to\b/.test(t) && !/prefer|weight/.test(t)) kind = 'hard';
+  if (/no (first )?response|within \d+ (business )?hours|escalat|overdue|sla/.test(t)) kind = 'escalation';
+  const strategy = /round.?robin/.test(t) ? 'round-robin' : /least|fewest|load|balance/.test(t) ? 'least-loaded' : /\ball\b.*(member|rep)/.test(t) ? 'all' : (user ? 'named' : 'least-loaded');
+  const watchers = /watcher|cc\b|loop in|keep .* informed|visibility/.test(t) ? [/owner/.test(t) ? 'account owner' : (user && dept ? user.name : 'account owner')] : [];
+  const types = [];
+  [['chargeback','chargeback'],['dispute','chargeback'],['refund','chargeback'],['statement','pricing'],['fee','pricing'],['deposit','general'],['funding','general'],['terminal','activation'],['equipment','activation'],['pos','activation'],['document','underwriting'],['underwriting','underwriting'],['application','underwriting'],['billing','pricing'],['support','support']].forEach(p => { if (t.includes(p[0]) && !types.includes(p[1])) types.push(p[1]); });
+  const stages = [];
+  [['underwriting','underwriting'],['in review','inreview'],['lead','lead'],['active','active'],['closed','closed']].forEach(p => { if (t.includes(p[0]) && !stages.includes(p[1])) stages.push(p[1]); });
+  const sources = [];
+  [['maverick','processor'],['processor','processor'],['partner','partner'],['merchant portal','merchant'],['internal','internal']].forEach(p => { if (t.includes(p[0]) && !sources.includes(p[1])) sources.push(p[1]); });
+  const partner = (typeof merchantData !== 'undefined') && [...new Set(merchantData.map(m => m.partner))].find(p => p && t.includes(p.toLowerCase()));
+  const whenBits = [];
+  if (stages.length) whenBits.push('Merchant stage = ' + stages.join(' / '));
+  if (types.length) whenBits.push('type/content = ' + types.join(' / '));
+  if (sources.length) whenBits.push('source = ' + sources.join(' / '));
+  if (partner) whenBits.push('partner = ' + partner);
+  if (kind === 'escalation') whenBits.push('SLA breach');
+  const when = whenBits.join(' · ') || 'Content match (semantic)';
+  let action;
+  const targetName = user ? user.name : (dept ? dept.name : null);
+  if (kind === 'escalation') action = 'Add department lead · priority +1';
+  else if (kind === 'hard') action = 'Force route → ' + (targetName || 'ops review') + (strategy !== 'named' && dept ? ' (' + strategy + ')' : '');
+  else action = '+' + w + ' ' + (targetName || 'preferred candidate') + (strategy === 'round-robin' ? ' (round-robin)' : '');
+  if (watchers.length) action += ' · watcher: ' + watchers.join(', ');
+  return { kind:kind, w:w, when:when, action:action, target:{ dept: dept ? dept.id : null, user: user ? user.name : null, strategy:strategy }, watchers:watchers,
+    problem: (!dept && !user && kind !== 'escalation') ? 'No known department or user named — the rule will rely on semantic matching.' : null };
+}
+async function trsCompose(editId){
+  const inp = document.getElementById(editId ? 'trs-edit-in' : 'trs-compose-in');
+  const txt = (inp && inp.value || '').trim();
+  if (!txt) return;
+  const prevHost = document.getElementById(editId ? 'trs-preview-edit' : 'trs-preview');
+  prevHost.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 2px;">🤖 Compiling against the teams, role descriptions and existing rules…</div>';
+  const ai = await trsAI('compile', txt);
+  let spec = null, prose = '';
+  if (ai) { spec = trsExtractJson(ai, 'RULE_JSON'); prose = trsStripJsonLine(ai, 'RULE_JSON'); }
+  if (spec) {
+    spec.kind = ['hard','weight','escalation'].includes(spec.kind) ? spec.kind : 'weight';
+    spec.w = spec.weight || spec.w || 20;
+    spec.when = spec.when || 'Content match (semantic)';
+    spec.action = spec.action || 'Route per rule';
+    spec.target = spec.target || {};
+    spec.watchers = spec.watchers || [];
+  } else { spec = trsParseLocal(txt); prose = ''; }
+  const id = editId || ('TR-' + String(TRS_SEQ).padStart(2,'0'));
+  _trsDraft = { spec:spec, raw:txt, editId:editId || null };
+  const json = JSON.stringify({ id:id, type:spec.kind, weight:spec.kind==='weight'?(spec.w||20):undefined, when:spec.when, action:spec.action, target:spec.target, watchers:spec.watchers, evaluate_at:'ticket creation' }, null, 2);
+  prevHost.innerHTML = '<div class="klbr-spec">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">' + (editId ? 'Recompiled' : 'Generated') + ' specification</span>' + trsRuleChip(spec) +
+    '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">' + id + (editId ? ' (edit)' : ' (draft)') + '</span>' + (ai ? '<span class="p-badge badge-green" style="font-size:8px;">LIVE AI</span>' : '<span class="p-badge" style="font-size:8px;">LOCAL PARSE</span>') + '</div>' +
+    (prose ? '<div style="font-size:12px;color:var(--text-secondary);line-height:1.55;margin-bottom:8px;">' + trsEsc(prose) + '</div>' : '') +
+    (spec.problem ? '<div style="font-size:11.5px;color:var(--amber);margin-bottom:8px;">⚠ ' + trsEsc(spec.problem) + '</div>' : '') +
+    '<table><tr><td>When</td><td>' + trsEsc(spec.when) + '</td></tr><tr><td>Action</td><td>' + trsEsc(spec.action) + '</td></tr>' +
+    '<tr><td>Kind</td><td>' + spec.kind + (spec.kind === 'weight' ? ' (+' + (spec.w||20) + ')' : '') + '</td></tr>' +
+    (spec.watchers && spec.watchers.length ? '<tr><td>Watchers</td><td>' + trsEsc(spec.watchers.join(', ')) + '</td></tr>' : '') + '</table>' +
+    '<div class="klbr-json">' + trsEsc(json) + '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="trsSaveRule()">✓ ' + (editId ? 'Save changes' : 'Add rule') + '</button>' +
+    '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_trsDraft=null;document.getElementById(\'' + (editId ? 'trs-preview-edit' : 'trs-preview') + '\').innerHTML=\'\';">✕ Discard</button></div></div>';
+}
+function trsSaveRule(){
+  if (!_trsDraft) return;
+  const s = _trsDraft.spec;
+  if (_trsDraft.editId) {
+    const r = TRS_RULES.find(x => x.id === _trsDraft.editId);
+    if (r) { r.kind = s.kind; r.w = s.w; r.raw = _trsDraft.raw; r.when = s.when; r.action = s.action; r.target = s.target; r.watchers = s.watchers; r.edited = true; r.isNew = false; }
+    _trsEditId = null;
+  } else {
+    TRS_RULES.push({ id:'TR-' + String(TRS_SEQ++).padStart(2,'0'), kind:s.kind, w:s.w, raw:_trsDraft.raw, when:s.when, action:s.action, target:s.target || {}, watchers:s.watchers || [], isNew:true });
+  }
+  _trsDraft = null;
+  trsRenderTicket();
+  const doc = document.getElementById('trs-kbdoc'); if (doc) doc.textContent = trsKbDoc();
+}
+function trsRemove(id){
+  const i = TRS_RULES.findIndex(x => x.id === id);
+  if (i >= 0) TRS_RULES.splice(i, 1);
+  _trsRemoveId = null;
+  trsRenderTicket();
+}
+
+/* ── the deterministic router (same semantics the live agent is told to follow) ── */
+function trsRouteLocal(ctx){
+  const hits = [], watchers = [];
+  let forcedDept = null, priority = ctx.type === 'chargeback' ? 'high' : 'normal';
+  const stage = (ctx.merchant && ctx.merchant.status || '').toLowerCase();
+  if (['underwriting','inreview','uw','pending'].includes(stage)) { forcedDept = 'underwriting'; hits.push({ id:'TR-01', kind:'hard', effect:'merchant is in underwriting — forced to Underwriting' }); }
+  const cbHit = ctx.type === 'chargeback' || /chargeback|dispute|4853|retrieval/.test((ctx.text||'').toLowerCase());
+  if (!forcedDept && cbHit) { forcedDept = 'operations'; hits.push({ id:'TR-02', kind:'hard', effect:'chargeback/dispute — forced to Operations, owner watching' });
+    if (ctx.merchant && ctx.merchant.assignee) watchers.push(ctx.merchant.assignee); }
+  if (ctx.source === 'processor' && ctx.procAssignee) {
+    const fm = trsFuzzyUser(ctx.procAssignee);
+    if (fm) { watchers.push(fm.name); hits.push({ id:'TR-06', kind:'hard', effect:'payload names “' + ctx.procAssignee + '” — matched ' + fm.name + ', added as watcher' }); }
+  }
+  const weights = {};
+  if (!forcedDept) {
+    if (stage === 'active' && ['support','general','pricing'].includes(ctx.type)) { weights.support = (weights.support||0) + 30; hits.push({ id:'TR-03', kind:'weight', effect:'+30 Support — active merchant, support traffic' }); }
+    if (ctx.type === 'activation' || /terminal|equipment|pax|offline|device/.test((ctx.text||'').toLowerCase())) { weights.operations = (weights.operations||0) + 20; hits.push({ id:'TR-04', kind:'weight', effect:'+20 Operations — equipment/terminal issue' }); }
+  }
+  let deptId = forcedDept, fallback = false;
+  if (!deptId) {
+    const ranked = Object.keys(weights).sort((a,b) => weights[b] - weights[a]);
+    deptId = ranked[0] || null;
+    if (!deptId) fallback = true;
+  }
+  let assignees = [], strategy = null, scores = [];
+  if (deptId) {
+    const mem = trsMembers(deptId);
+    strategy = forcedDept ? 'least-loaded' : ((TRS_RULES.find(r => r.target && r.target.dept === deptId) || {}).target || {}).strategy || 'least-loaded';
+    if (mem.length) {
+      scores = mem.map(u => ({ name:u.name, open:trsOpenCount(u.name), score:(weights[deptId] || 40) - trsOpenCount(u.name) * 2, why:(u.roleDesc||'').split('.')[0] }));
+      if (strategy === 'round-robin') {
+        const i = (TRS_RR[deptId] || 0) % mem.length;
+        TRS_RR[deptId] = i + 1;
+        assignees = [mem[i].name];
+        hits.push({ id:'TR-03', kind:'weight', effect:'round-robin pointer → ' + mem[i].name });
+      } else {
+        const sorted = scores.slice().sort((a,b) => b.score - a.score);
+        assignees = [sorted[0].name];
+        if (sorted.length > 1 && sorted[0].open < sorted[1].open) hits.push({ id:'TR-05', kind:'weight', effect:'least-loaded pick: ' + sorted[0].name + ' (' + sorted[0].open + ' open vs ' + sorted[1].open + ')' });
+      }
+    } else fallback = true;
+  }
+  if (fallback || !assignees.length) {
+    const rep = ctx.merchant && ctx.merchant.assignee;
+    assignees = rep ? [rep] : ['James Carter'];
+    deptId = deptId || null;
+    hits.push({ id:'FALL', kind:'weight', effect:'no rule scored — every rep on the deal assigned (' + assignees.join(', ') + ')' });
+  }
+  const dept = deptId ? trsDept(deptId) : null;
+  return { dept: dept ? dept.name : null, deptId:deptId, assignees:assignees, watchers:[...new Set(watchers)], priority:priority, strategy:strategy,
+    rule_hits:hits, scores:scores, why:(hits[0] ? hits[0].effect : 'fallback') };
+}
+
+/* ── SIMULATION → the ticket actually lands ── */
+async function trsSimulate(){
+  const srcRaw = (document.getElementById('trs-sim-src')||{}).value || 'internal|';
+  const kind = srcRaw.split('|')[0], srcName = srcRaw.split('|')[1] || '';
+  const type = (document.getElementById('trs-sim-type')||{}).value || 'support';
+  const mName = (document.getElementById('trs-sim-merchant')||{}).value || '';
+  const text = ((document.getElementById('trs-sim-msg')||{}).value || '').trim() || 'New ticket — no message body.';
+  const procAssignee = kind === 'processor' ? ((document.getElementById('trs-sim-proc')||{}).value || '').trim() : '';
+  const m = (typeof merchantData !== 'undefined') ? merchantData.find(x => x.name === mName) : null;
+  const ctx = { source:kind, sourceName:srcName, type:type, text:text, procAssignee:procAssignee,
+    merchant: m ? { name:m.name, status:m.status, partner:m.partner, assignee:m.assignee, risk:m.risk, tags:m.tags } : { name:mName, status:'active', assignee:null } };
+  const out = document.getElementById('trs-sim-out');
+  out.innerHTML = '<div class="trs-trace"><div style="font-size:12px;color:var(--text-muted);">🤖 The routing agent is reading the playbook — rules, teams, role descriptions, workload…</div></div>';
+  const msg = 'Route this ticket. SOURCE: ' + kind + (srcName ? ' (' + srcName + ')' : '') + '. TYPE: ' + type + '. MERCHANT: ' + JSON.stringify(ctx.merchant) + (procAssignee ? '. PROCESSOR ASSIGNEE IN PAYLOAD: ' + procAssignee : '') + '. MESSAGE: ' + text;
+  const ai = await trsAI('simulate', msg, { ticket:{ source:kind, sourceName:srcName, type:type, procAssignee:procAssignee, text:text }, merchant:ctx.merchant });
+  let route = null, prose = '', live = false;
+  if (ai) { route = trsExtractJson(ai, 'ROUTE_JSON'); prose = trsStripJsonLine(ai, 'ROUTE_JSON'); }
+  if (route && (route.assignees || []).length) {
+    live = true;
+    route.rule_hits = route.rule_hits || [];
+    route.scores = route.scores || [];
+    route.watchers = route.watchers || [];
+    route.priority = ['urgent','high','normal','low'].includes(route.priority) ? route.priority : 'normal';
+    const d = trsDeptByName(route.dept); route.deptId = d ? d.id : null; route.dept = d ? d.name : route.dept;
+  } else { route = trsRouteLocal(ctx); prose = ''; }
+  const t = trsLandTicket(ctx, route, live);
+  trsRenderTrace(out, route, prose, live, t);
+}
+function trsRenderTrace(out, route, prose, live, t){
+  const hitCls = { hard:'hard', weight:'weight', escalation:'esc' };
+  const hitsHtml = (route.rule_hits || []).map(h => '<span class="trs-hit ' + (hitCls[h.kind] || 'weight') + '">' + trsEsc(h.id) + ' · ' + trsEsc(h.effect) + '</span>').join('');
+  const maxScore = Math.max(1, ...(route.scores || []).map(s => s.score || 0));
+  const scoresHtml = (route.scores || []).length
+    ? '<div style="margin-top:10px;">' + route.scores.map(s => '<div class="trs-score"><span class="trs-score-name">' + trsEsc(s.name) + ' <span class="trs-load-tag">' + (s.open != null ? s.open + ' open' : '') + '</span></span>' +
+      '<div class="trs-score-bar"><div class="trs-score-fill" style="width:' + Math.max(6, Math.round((s.score || 0) / maxScore * 100)) + '%;"></div></div>' +
+      '<span class="trs-score-n">' + (s.score != null ? s.score : '—') + '</span></div>').join('') + '</div>' : '';
+  const avs = (route.assignees || []).map(n => { const mo = trsMemberObj(n); return '<span class="assign-av" style="background:' + mo.avc + ';color:#fff;display:inline-flex;" title="' + trsEscAttr(mo.name) + '">' + mo.av + '</span>'; }).join('');
+  out.innerHTML = '<div class="trs-trace">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="font-size:11px;font-weight:800;font-family:var(--font-ui);letter-spacing:.05em;color:var(--text-muted);">ROUTING TRACE</span>' +
+    (live ? '<span class="p-badge badge-green" style="font-size:8px;">LIVE AI</span>' : '<span class="p-badge" style="font-size:8px;">DETERMINISTIC ENGINE</span>') + '</div>' +
+    (prose ? '<div class="trs-trace-ai" style="margin-bottom:10px;">' + trsEsc(prose) + '</div>' : '') +
+    '<div>' + hitsHtml + '</div>' + scoresHtml +
+    '<div class="trs-decision">→ <b>' + trsEsc(route.dept || 'Deal reps (fallback)') + '</b> ' + avs + ' <b>' + trsEsc((route.assignees || []).join(', ')) + '</b>' +
+    (route.watchers && route.watchers.length ? '<span style="color:var(--text-secondary);">· 👁 watching: ' + trsEsc(route.watchers.join(', ')) + '</span>' : '') +
+    '<span style="color:var(--text-secondary);">· priority ' + trsEsc(route.priority) + '</span></div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">' +
+    '<button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="if(typeof openTicket===\'function\')openTicket(\'' + t.id + '\')">🎫 Open ' + t.id + '</button>' +
+    '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="trsEscalateDemo(\'' + t.id + '\')">⏱ Fast-forward the 4h SLA (TR-07)</button>' +
+    '<span style="font-size:11px;color:var(--text-muted);align-self:center;">Landed in the Tickets queue with its audit chip — visible to every role.</span></div></div>';
+}
+function trsLandTicket(ctx, route, live){
+  const id = 'TKT-' + String(typeof TKT_SEQ !== 'undefined' ? TKT_SEQ++ : ++TRS_SEQ + 400).padStart(3,'0');
+  const title = ctx.text.length > 70 ? ctx.text.slice(0, 67) + '…' : ctx.text;
+  const srcMap = { processor:{ kind:'processor', name:ctx.sourceName || 'Processor', via:'API' }, partner:{ kind:'partner', name:ctx.sourceName || 'Partner', via:'Portal' },
+    merchant:{ kind:'merchant', name:ctx.merchant.name, via:'Portal' }, internal:{ kind:'internal', name:'Internal', via:'Auto-route' } };
+  const ruleIds = [...new Set((route.rule_hits || []).map(h => h.id))];
+  const t = { id:id, title:title, merchant:ctx.merchant.name, status:'open', priority:route.priority || 'normal',
+    type:ctx.type, dept:(route.deptId || route.dept || 'sales').toString().toLowerCase(), processor: ctx.source === 'processor' ? (ctx.sourceName || 'Maverick') : undefined,
+    members:(route.assignees || []).map(trsMemberObj), sla:'4h first response', tags:[], docs:[], thread:[], created:(typeof tNow === 'function' ? tNow() : ''),
+    sourceText:ctx.text, source:srcMap[ctx.source] || srcMap.internal, seeded:true,
+    routing:{ rules:ruleIds, why:route.why || '', watchers:route.watchers || [], engine: live ? 'live' : 'local', escalation:{ armed:true, after:'4 business hours' } } };
+  t.thread.push({ kind: ctx.source === 'processor' ? 'procmsg' : 'src', text:ctx.text, time:t.created, from: ctx.source === 'processor' ? (ctx.sourceName || 'Maverick') : undefined, via:'API' });
+  t.thread.push({ kind:'ai', text:'<b>Auto-routed</b> — ' + trsEsc(ruleIds.join(' + ') || 'fallback') + ' → <b>' + trsEsc(route.dept || 'deal reps') + '</b> · ' + trsEsc((route.assignees || []).join(', ')) +
+    (route.watchers && route.watchers.length ? ' · watching: ' + trsEsc(route.watchers.join(', ')) : '') + '<br>' + trsEsc(route.why || '') +
+    '<br><span style="opacity:.7;">Engine: ' + (live ? 'live agent' : 'deterministic rules') + ' · assignment additive · TR-07 escalation armed (4 business hours)</span>', time:t.created });
+  t.thread.push({ kind:'sys', text:'⚡ Routed on arrival — unassigned ticket, rules evaluated in ' + (live ? '1.2s' : '0.1s'), time:t.created });
+  if (typeof TKT !== 'undefined') TKT[id] = t;
+  /* land it in the dashboard list if the Tickets view has been built */
+  const list = document.getElementById('ticket-list');
+  if (list && list.querySelector('[data-tkt]') && typeof tktToTicketData === 'function' && typeof ticketData !== 'undefined') {
+    t._dashIdx = ticketData.length;
+    const td = tktToTicketData(t);
+    td.details.reason = 'Auto-routed · ' + (ruleIds.join(' + ') || 'fallback');
+    ticketData.push(td);
+    trsInsertRow(t, td);
+  }
+  if (typeof updateTicketDashCounts === 'function') updateTicketDashCounts();
+  if (typeof pushNotif === 'function') pushNotif({ icon:'⚡', title:'Auto-routed ' + id + ' → ' + (route.dept || (route.assignees || []).join(', ')), sub:title, merchant:ctx.merchant.name, mst:'active' });
+  if (typeof ccToast === 'function') ccToast('⚡ ' + id + ' routed → ' + trsEsc((route.assignees || []).join(', ')));
+  return t;
+}
+function trsRowEl(t, td, idx){
+  const st = (typeof TKT_STATUS !== 'undefined') ? TKT_STATUS[t.status] : { label:'Open', color:'var(--blue)' };
+  const row = document.createElement('div');
+  row.className = 'trow' + (td.assigned === 'You' ? ' mine' : '');
+  row.setAttribute('data-tkt', t.id);
+  row.setAttribute('data-idx', idx);
+  row.setAttribute('data-assigned', td.assigned);
+  row.setAttribute('data-dept', t.dept);
+  row.setAttribute('onclick', 'selectTicket(this, ' + idx + ')');
+  row.innerHTML = '<div class="trow-priority pri-' + t.priority + '"></div>' +
+    '<div class="trow-body">' +
+      '<div class="trow-top"><span class="trow-id">#' + t.id + '</span>' +
+        '<span class="p-badge" style="background:' + TKT_PRI_COLOR[t.priority] + '1a;color:' + TKT_PRI_COLOR[t.priority] + ';">' + TKT_PRI_LBL[t.priority] + '</span>' +
+        (typeof ccSourceBadge === 'function' ? ccSourceBadge(t.source) : '') +
+        trsAuditBadge(t) +
+        '<span class="kb-dept-badge" style="margin-left:auto;text-transform:capitalize;">' + t.dept + '</span></div>' +
+      '<div class="trow-title">' + trsEsc(t.title) + '</div>' +
+      '<div class="trow-mid"><span class="trow-merchant">' + trsEsc(t.merchant) + '</span><span class="p-badge" style="background:' + st.color + '1a;color:' + st.color + ';">' + st.label + '</span></div>' +
+      '<div class="trow-bot"><div class="trow-assign"><div class="assign-av" style="background:' + t.members[0].avc + ';color:#fff;">' + t.members[0].av + '</div> ' + trsEsc(t.members[0].name) + (t.members.length > 1 ? ' +' + (t.members.length - 1) : '') + '</div><span class="trow-age">Just now</span></div>' +
+    '</div>';
+  return row;
+}
+function trsInsertRow(t, td){
+  const list = document.getElementById('ticket-list');
+  if (list) list.insertBefore(trsRowEl(t, td, t._dashIdx), list.firstElementChild);
+}
+function trsAuditBadge(t){
+  const r = t.routing || {};
+  const ids = (r.rules || []).slice(0, 2).join('+') || 'AI';
+  return '<span class="trs-chip" title="' + trsEscAttr('Auto-routed — ' + (r.why || 'rules evaluated on arrival') + ' · click for the audit') + '" onclick="event.stopPropagation();if(typeof openTicket===\'function\')openTicket(\'' + t.id + '\')">⚡ ' + trsEsc(ids) + '</span>';
+}
+function trsEscalateDemo(id){
+  const t = (typeof TKT !== 'undefined') && TKT[id];
+  if (!t || !t.routing || t.routing.escalated) return;
+  t.routing.escalated = true;
+  const d = trsDept(t.dept) || trsDeptByName(t.dept);
+  const leadName = d && d.lead;
+  const order = ['low','normal','high','urgent'];
+  t.priority = order[Math.min(order.indexOf(t.priority) + 1, 3)];
+  if (leadName && !t.members.some(m => m.name === leadName)) t.members.push(trsMemberObj(leadName));
+  t.thread.push({ kind:'sys', text:'⏱ TR-07 escalation — no first response in 4 business hours: ' + (leadName ? leadName + ' (department lead) added · ' : '') + 'priority → ' + t.priority, time:(typeof tNow === 'function' ? tNow() : '') });
+  if (t._dashIdx != null && typeof ticketData !== 'undefined' && ticketData[t._dashIdx]) {
+    const row = document.querySelector('#ticket-list [data-tkt="' + id + '"]');
+    if (row && typeof tktToTicketData === 'function') { const td = tktToTicketData(t); td.details.reason = 'Auto-routed · escalated TR-07'; ticketData[t._dashIdx] = td; trsReplaceRow(row, t, td); }
+  }
+  if (typeof pushNotif === 'function') pushNotif({ icon:'⏱', title:'TR-07 escalation on ' + id, sub:(leadName ? leadName + ' added · ' : '') + 'priority ' + t.priority, merchant:t.merchant, mst:'active' });
+  if (typeof ccToast === 'function') ccToast('⏱ ' + id + ' escalated — ' + (leadName ? leadName + ' added, ' : '') + 'priority ' + t.priority);
+  if (typeof openTicket === 'function') openTicket(id);
+}
+function trsReplaceRow(row, t, td){ row.replaceWith(trsRowEl(t, td, t._dashIdx)); }
 </script>
 </body>
 </html>
