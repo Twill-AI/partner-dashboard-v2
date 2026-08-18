@@ -80,15 +80,20 @@ function systemPrompt(sessionType, merchant, board) {
       "ROUTING DATA:",
       "Semantics: " + (board.semantics || "hard rules force; weights accumulate; least-loaded breaks ties; assignment additive; fallback = all reps on the deal"),
       "Departments (members carry role descriptions written by ops — treat them as policy, cite them by name): " + JSON.stringify(board.departments || []).slice(0, 6000),
-      "Active rules: " + JSON.stringify(board.rules || []).slice(0, 4000),
+      "ALL portal users — the complete roster, including people outside the routing departments (execs, finance). A user listed here EXISTS; never say a named person does not exist without checking this list: " + JSON.stringify(board.allUsers || []).slice(0, 3000),
+      "Active rules (structured — use these ids when flagging conflicts): " + JSON.stringify(board.rules || []).slice(0, 5000),
+      "Condition parameters available to the if/then editor — conds MUST use these param keys, ops and values: " + JSON.stringify(board.conditionParams || []).slice(0, 2000),
       "Routable parameters: " + JSON.stringify(board.parameters || []).slice(0, 1200),
     ];
     if (mode === "compile") {
       return [
-        "You are Twill's ticket-routing rule compiler inside Settings → Ticket Routing. Ops writes a routing rule in plain language; you compile it into a precise specification against the real departments, people, role descriptions and routable parameters below.",
-        "Reply with 1-2 plain sentences confirming how you read the rule (name the department or person you resolved it to, and why, citing a role description when that's what decided it). No markdown, no emoji.",
-        "Then output the specification as the FINAL line, exactly: RULE_JSON: {\"kind\":\"hard|weight|escalation\",\"weight\":<number, weight rules only>,\"when\":\"<the trigger, human-readable>\",\"action\":\"<the effect, human-readable>\",\"target\":{\"dept\":\"<department id or null>\",\"user\":\"<full user name or null>\",\"strategy\":\"round-robin|least-loaded|all|named\"},\"watchers\":[\"<names or 'account owner'>\"],\"problem\":\"<only if the rule names a department or person that does not exist, or conflicts with an active rule — else omit>\"}",
-        "Rules of the engine you compile for: hard rules force a destination; weight rules add preference (default +20 when unstated); escalation rules fire on SLA age, not at creation. Assignment is always additive — never compile a rule that removes an assignee. If the user names a nonexistent team or person, still compile your best reading but set \"problem\".",
+        "You are Twill's ticket-routing rule compiler inside Settings → Ticket Routing. Ops writes a routing rule in plain language; you compile it into structured switches they can then adjust by hand in an if/then editor.",
+        "Reply with AT MOST 3 sentences, under 90 words total: how you read the rule, the conditions you turned it into, and who you resolved it to and why (cite a role description when that is what decided it). This text is stored as the rule's reasoning, so make it worth reading later — but the JSON line after it is mandatory and must never be cut off, so keep the prose short. No markdown, no emoji.",
+        "NAME RESOLUTION (get this right): resolve every named person against the FULL roster in ALL portal users, not just the routing departments. A first name alone (\"mike\", \"blake\") resolves to the matching full name if exactly one user matches. Only when NO user matches any spelling do you set \"problem\" — and then still name the closest sensible alternative. Never claim a person does not exist when they appear in the roster; the roster is the authority.",
+        "Then output the specification as the FINAL line, exactly: RULE_JSON: {\"kind\":\"hard|weight|escalation\",\"weight\":<number, weight rules only>,\"conds\":[{\"param\":\"<key from the condition parameters>\",\"op\":\"<a listed op>\",\"value\":\"<a listed value, or free text where the param is free>\"}],\"any\":<true if the conditions are alternatives, else false>,\"target\":{\"dept\":\"<department id or null>\",\"user\":\"<full user name or null>\",\"strategy\":\"round-robin|least-loaded|all|named\"},\"priority\":\"<low|normal|high|urgent, only if the rule sets one, else omit>\",\"watchers\":[\"<full names or 'account owner'>\"],\"conflicts\":[{\"with\":\"<TR-xx>\",\"sev\":\"warn|info\",\"note\":\"<one clause on how they interact>\"}],\"problem\":\"<only when a named person or department genuinely does not exist — else omit>\"}",
+        "CONDS are the switches ops will see and edit: decompose the sentence into one condition per clause (a volume threshold, a stage, a type, a partner, a source). Use ONLY param keys, ops and values from the condition parameters list — volume values are plain numbers of dollars per month (200k becomes 200000). If the rule is genuinely about wording rather than fields, emit a single content/mentions condition.",
+        "CONFLICTS: compare against the active rules and flag real interactions — two hard rules that can match the same ticket with different destinations (sev warn), or a weight that a hard rule would shadow (sev info). Say how they interact in one clause. Empty array when there is no interaction; never invent one.",
+        "Engine rules you compile for: hard rules force a destination; weight rules add preference (default +20 when unstated); escalation rules fire on SLA age, not at creation. Assignment is always additive — never compile a rule that removes an assignee.",
         "Single-line valid JSON. Nothing after the RULE_JSON line.",
         ...CTX,
       ].join("\n");
@@ -179,7 +184,9 @@ export async function onRequestPost({ request, env }) {
     model: MODEL,
     // ticket-routing replies carry a mandatory trailing JSON line (rule_hits + scores);
     // the 900 cap truncated mid-reasoning before the JSON could be emitted
-    max_tokens: body.sessionType === "ticket-routing" ? 1400 : MAX_TOKENS,
+    max_tokens: body.sessionType === "ticket-routing"
+      ? (body.board && body.board.mode === "compile" ? 2200 : 1400)
+      : MAX_TOKENS,
     system: systemPrompt(body.sessionType, body.merchant || {}, body.board || {}),
     messages: collapsed,
   };

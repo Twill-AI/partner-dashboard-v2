@@ -46120,6 +46120,34 @@ body.persona-rep #nav-settings, body.persona-rep #view-settings { display:none !
 .trs-score-n { font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--text-secondary); width:34px; text-align:right; flex-shrink:0; }
 .trs-decision { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:12.5px; color:var(--text-primary); font-family:var(--font-ui); }
 .trs-kbdoc { font-family:var(--font-mono); font-size:11px; line-height:1.7; background:var(--bg-base); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin:0 18px 14px; white-space:pre-wrap; color:var(--text-secondary); max-height:340px; overflow:auto; }
+/* ── structured rule statement (if/then editor) ── */
+.trs-stmt { background:var(--bg-elevated); border:1px solid var(--border); border-radius:9px; padding:12px 14px; }
+.trs-stmt-kw { font-size:10px; font-weight:800; font-family:var(--font-ui); letter-spacing:.08em; color:var(--text-muted); width:44px; flex-shrink:0; padding-top:7px; }
+.trs-stmt-row { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; }
+.trs-stmt-row:last-child { margin-bottom:0; }
+.trs-stmt-conds { flex:1; display:flex; flex-direction:column; gap:6px; }
+.trs-cond { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.trs-stmt select, .trs-stmt input[type=text], .trs-stmt input[type=number] { font-size:12px; font-family:var(--font-ui); background:var(--bg-surface); color:var(--text-primary); border:1px solid var(--border-strong); border-radius:6px; padding:5px 8px; outline:none; }
+.trs-stmt select:disabled, .trs-stmt input:disabled { opacity:1; color:var(--text-primary); background:var(--bg-elevated); border-color:var(--border); -webkit-text-fill-color:var(--text-primary); cursor:default; }
+.trs-stmt input.trs-freeval { width:120px; font-family:var(--font-mono); }
+.trs-cond-x { font-size:11px; color:var(--text-muted); cursor:pointer; padding:2px 5px; border-radius:4px; }
+.trs-cond-x:hover { color:var(--red); background:rgba(239,68,68,.08); }
+.trs-cond-add { font-size:10.5px; font-weight:600; font-family:var(--font-ui); color:var(--text-secondary); border:1px dashed var(--border-strong); border-radius:6px; padding:3px 10px; cursor:pointer; align-self:flex-start; background:none; }
+.trs-cond-add:hover { color:var(--text-primary); border-color:var(--text-muted); }
+.trs-anytog { font-size:9px; font-weight:800; font-family:var(--font-ui); letter-spacing:.05em; border:1px solid var(--border-strong); border-radius:5px; padding:2px 8px; cursor:pointer; color:var(--text-secondary); background:var(--bg-surface); }
+.trs-then { flex:1; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.trs-watch-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; font-family:var(--font-ui); background:var(--bg-surface); border:1px solid var(--border-strong); border-radius:14px; padding:2px 9px; color:var(--text-secondary); }
+.trs-watch-chip span { cursor:pointer; color:var(--text-muted); } .trs-watch-chip span:hover { color:var(--red); }
+.trs-confl { margin-top:10px; }
+.trs-confl-item { display:flex; gap:8px; align-items:flex-start; font-size:11.5px; line-height:1.5; padding:6px 10px; border-radius:7px; margin-bottom:5px; }
+.trs-confl-item.warn { background:rgba(245,158,11,.09); color:var(--text-primary); border:1px solid rgba(245,158,11,.3); }
+.trs-confl-item.info { background:var(--bg-surface); color:var(--text-secondary); border:1px solid var(--border); }
+.trs-confl-none { font-size:11px; color:var(--text-muted); padding:4px 2px; }
+.trs-reason { font-size:12px; color:var(--text-secondary); line-height:1.6; background:var(--bg-surface); border-left:3px solid var(--yellow); border-radius:0 7px 7px 0; padding:9px 12px; margin-bottom:10px; }
+.trs-rule-open { background:var(--bg-surface); border:1px solid var(--border-strong); border-top:none; border-radius:0 0 9px 9px; margin:-10px 18px 10px; padding:14px 16px; }
+.klbr-rule.trs-openhdr { border-radius:9px 9px 0 0; margin-bottom:0; border-color:var(--border-strong); }
+.trs-jsontog { font-size:10px; font-family:var(--font-mono); color:var(--text-muted); cursor:pointer; margin-left:auto; padding:2px 7px; border:1px solid var(--border); border-radius:5px; }
+.trs-jsontog:hover { color:var(--text-primary); }
 </style>
 <script>
 /* ═══ SETTINGS: nav view + Teams & Departments + Ticket Routing + live simulation ═══
@@ -46135,21 +46163,34 @@ const TRS_DEPTS = [
 ];
 const TRS_RULES = [
   { id:'TR-01', kind:'hard', raw:'Any ticket on a merchant that is still in underwriting goes to the Underwriting department, least-loaded first',
-    when:'Merchant stage = underwriting · any source', action:'Force route → Underwriting (least-loaded)', target:{dept:'underwriting', strategy:'least-loaded'} },
-  { id:'TR-02', kind:'hard', raw:'Chargebacks and disputes go straight to Operations; add the account owner as a watcher',
-    when:'Ticket type or content = chargeback / dispute', action:'Force route → Operations · watcher: account owner', target:{dept:'operations', strategy:'least-loaded'}, watchers:['account owner'] },
+    when:'Merchant stage = underwriting · any source', action:'Force route → Underwriting (least-loaded)', target:{dept:'underwriting', strategy:'least-loaded'},
+    conds:[{param:'stage', op:'is', value:'underwriting'}],
+    reason:'Underwriting-stage merchants have one accountable desk: Tara\'s role description says everything pre-live lands with her first, so the stage alone forces the department regardless of source.' },
+  { id:'TR-02', kind:'hard', raw:'Chargebacks and disputes go straight to Operations; add the account owner as a watcher', priority:'high',
+    when:'Ticket type or content = chargeback / dispute', action:'Force route → Operations · watcher: account owner', target:{dept:'operations', strategy:'least-loaded'}, watchers:['account owner'],
+    conds:[{param:'type', op:'is', value:'chargeback'}, {param:'content', op:'mentions', value:'chargeback / dispute / 4853'}], condsAny:true,
+    reason:'Disputes are deadline-bound money: Dan\'s role covers chargeback workflows day to day, and the account owner watches because the merchant relationship is theirs. High priority by default.' },
   { id:'TR-03', kind:'weight', w:30, raw:'General support from active merchants prefers the Support team, round-robin',
-    when:'Merchant active · type = support / general', action:'+30 Support (round-robin)', target:{dept:'support', strategy:'round-robin'} },
+    when:'Merchant active · type = support / general', action:'+30 Support (round-robin)', target:{dept:'support', strategy:'round-robin'},
+    conds:[{param:'stage', op:'is', value:'active'}, {param:'type', op:'is', value:'support / general / pricing'}],
+    reason:'Live-merchant questions are Support\'s remit per Blake\'s role description; round-robin keeps the load even as the team grows. A weight, not a force, so harder rules can still win.' },
   { id:'TR-04', kind:'weight', w:20, raw:'Equipment and terminal issues prefer Operations',
-    when:'Type or content = equipment / terminal / activation', action:'+20 Operations', target:{dept:'operations', strategy:'least-loaded'} },
+    when:'Type or content = equipment / terminal / activation', action:'+20 Operations', target:{dept:'operations', strategy:'least-loaded'},
+    conds:[{param:'type', op:'is', value:'activation'}, {param:'content', op:'mentions', value:'terminal / equipment / offline / device'}], condsAny:true,
+    reason:'Deployment and device work belongs to Operations (Dan runs provisioning, VAR files, shipping). Weighted so a harder rule, like a chargeback on the same merchant, still outranks it.' },
   { id:'TR-05', kind:'weight', w:15, raw:'When scores tie, prefer whoever has the fewest open tickets',
-    when:'Score tie between candidates', action:'+15 to the least-loaded candidate', target:{strategy:'least-loaded'} },
+    when:'Score tie between candidates', action:'+15 to the least-loaded candidate', target:{strategy:'least-loaded'},
+    conds:[], reason:'The Corvia ask from the call: workload-aware assignment. This is a tie-break policy, not a destination — it never picks the department, only the person inside it.' },
   { id:'TR-06', kind:'hard', raw:'When a processor ticket names an assignee, match them to a portal user and add them as a watcher',
-    when:'Source = processor · payload names an assignee', action:'Fuzzy-match → add as watcher (never reassigns)', target:{watcherFromPayload:true} },
+    when:'Source = processor · payload names an assignee', action:'Fuzzy-match → add as watcher (never reassigns)', target:{watcherFromPayload:true},
+    conds:[{param:'source', op:'is', value:'processor'}],
+    reason:'The processor\'s assignee and the portal\'s assignee are different systems (assignment never propagates back). Fuzzy-matching the payload name to a watcher keeps the named person informed without letting Maverick decide accountability.' },
   { id:'TR-07', kind:'escalation', raw:'If a routed ticket gets no first response inside 4 business hours, add the department lead and raise the priority one level',
-    when:'No first response in 4 business hours', action:'Add department lead · priority +1', target:{} },
+    when:'No first response in 4 business hours', action:'Add department lead · priority +1', target:{}, escalate_after:'4 business hours',
+    conds:[{param:'sla', op:'after', value:'4 business hours'}],
+    reason:'Routing is only accountable if silence has a consequence: after 4 business hours the department lead joins and the priority steps up. Fires on SLA age, not at creation.' },
 ];
-let TRS_SEQ = 8, _trsDraft = null, _trsEditId = null, _trsRemoveId = null, _trsRoleEdit = null;
+let TRS_SEQ = 8, _trsDraft = null, _trsEditId = null, _trsRemoveId = null, _trsRoleEdit = null, _trsOpenId = null, _trsRewordId = null;
 const TRS_RR = {}; /* round-robin pointers per dept */
 const TRS_BASE_LOAD = { 'Blake Chen':1, 'Tara Patel':2, 'Dan Mitchell':3, 'Sara Reyes':1, 'James Carter':0, 'Mike Wright':0 };
 
@@ -46195,6 +46236,172 @@ function trsFuzzyUser(raw){
     if (s > bestScore) { bestScore = s; best = u; }
   });
   return bestScore >= 2 ? best : null;
+}
+
+/* ── routable parameter catalog: what the if/then editor can switch on ── */
+const TRS_PARAMS = {
+  source:  { label:'Source',                 ops:['is','is not'],  opts:['processor','partner','merchant','internal'] },
+  type:    { label:'Ticket type',            ops:['is','is not'],  opts:['support','chargeback','underwriting','activation','pricing','general'] },
+  stage:   { label:'Merchant stage',         ops:['is','is not'],  opts:['lead','underwriting','inreview','active','closed'] },
+  partner: { label:'Partner',                ops:['is','is not'],  opts:function(){ return [...new Set((typeof merchantData!=='undefined'?merchantData:[]).map(m=>m.partner))].filter(Boolean).sort(); } },
+  volume:  { label:'Merchant volume $/mo',   ops:['>','<'],        free:true },
+  risk:    { label:'Risk tier',              ops:['is'],           opts:['Low','Medium','High'] },
+  content: { label:'Content mentions',       ops:['mentions'],     free:true },
+  creator: { label:'Created by role',        ops:['is'],           opts:['Owner','Rep','System','Merchant user'] },
+  sla:     { label:'No first response for',  ops:['after'],        free:true },
+};
+function trsParamOpts(k){ const p = TRS_PARAMS[k]; if (!p || !p.opts) return null; return typeof p.opts === 'function' ? p.opts() : p.opts; }
+function trsVolNum(v){ const s = String(v||'').toLowerCase().replace(/[$,\s]/g,''); const m = s.match(/^([\d.]+)k?$/); if (!m) return parseFloat(s)||0; return parseFloat(m[1]) * (s.endsWith('k') ? 1000 : 1); }
+function trsCondText(c){
+  const p = TRS_PARAMS[c.param] || { label:c.param };
+  /* labels that already read as a verb phrase don't repeat the operator */
+  if (c.param === 'content') return 'Content mentions ' + c.value;
+  if (c.param === 'sla') return 'No first response for ' + c.value;
+  return p.label + ' ' + c.op + ' ' + c.value;
+}
+function trsWhenText(r){
+  if (!r.conds || !r.conds.length) return 'Content match (semantic)';
+  return r.conds.map(trsCondText).join(r.condsAny ? ' OR ' : ' · ');
+}
+function trsActionText(r){
+  if (r.kind === 'escalation') return 'Add department lead · priority +1 (after ' + (r.escalate_after || '4 business hours') + ')';
+  const t = r.target || {};
+  let dest = t.user ? t.user : (t.dept ? ((trsDept(t.dept) || {name:t.dept}).name + (t.strategy && t.strategy !== 'named' ? ' (' + t.strategy + ')' : '')) : (t.watcherFromPayload ? 'fuzzy-match payload name → watcher' : 'ops review'));
+  let s = (r.kind === 'hard' ? 'Force route → ' : '+' + (r.w || 20) + ' ') + dest;
+  if (r.priority) s += ' · priority ' + r.priority;
+  if (r.watchers && r.watchers.length) s += ' · watcher: ' + r.watchers.join(', ');
+  return s;
+}
+function trsSpecProblem(spec){
+  if (spec.kind === 'escalation') return null;
+  const t = spec.target || {};
+  if (t.user && !trsUsers().some(u => u.name === t.user)) return 'No user named "' + t.user + '" exists — pick the intended assignee below before adding.';
+  if (t.dept && !trsDept(t.dept) && !trsDeptByName(t.dept)) return 'No department named "' + t.dept + '" exists — pick one below or create it in Teams first.';
+  if (!t.user && !t.dept && !t.watcherFromPayload && !t.strategy) return 'This rule has no destination yet — pick a user or department below.';
+  return null;
+}
+/* ── cross-rule conflict scan (deterministic; AI conflicts merge on top) ── */
+function trsCondOverlap(a, b){
+  if (!a || !a.length || !b || !b.length) return true; /* an unconditioned rule matches broadly */
+  return a.some(x => b.some(y => x.param === y.param && (x.param === 'content' || String(x.value).toLowerCase().split('/').some(v => String(y.value).toLowerCase().includes(v.trim())))));
+}
+function trsConflicts(spec, excludeId){
+  const out = [];
+  const st = spec.target || {};
+  if (spec.kind === 'escalation') return out;
+  TRS_RULES.forEach(r => {
+    if (r.id === excludeId || r.kind === 'escalation') return;
+    const rt = r.target || {};
+    if (!rt.dept && !rt.user) return; /* strategy/watcher-only rules don't compete for a destination */
+    if (!trsCondOverlap(spec.conds, r.conds)) return;
+    const sameDest = (rt.user && rt.user === st.user) || (rt.dept && rt.dept === st.dept);
+    if (spec.kind === 'hard' && r.kind === 'hard' && !sameDest)
+      out.push({ with:r.id, sev:'warn', note:'both hard rules can match the same ticket with different destinations — the lower rule number wins today; reorder or narrow one' });
+    else if (spec.kind === 'hard' && r.kind === 'weight' && !sameDest)
+      out.push({ with:r.id, sev:'info', note:'this hard rule overrides ' + r.id + '’s preference whenever both match' });
+    else if (spec.kind === 'weight' && r.kind === 'hard' && !sameDest)
+      out.push({ with:r.id, sev:'info', note:'shadowed by hard rule ' + r.id + ' whenever both match — the weight only matters when ' + r.id + ' doesn’t fire' });
+    else if (sameDest && spec.kind === r.kind)
+      out.push({ with:r.id, sev:'info', note:'overlaps ' + r.id + ' with the same destination — consider merging them' });
+  });
+  return out;
+}
+function trsConflictsHTML(list){
+  if (!list || !list.length) return '<div class="trs-confl-none">✓ No conflicts with the active rules.</div>';
+  return list.map(c => '<div class="trs-confl-item ' + (c.sev || 'info') + '">' + (c.sev === 'warn' ? '⚠' : 'ℹ') + '<span><b>' + trsEsc(c.with) + '</b> — ' + trsEsc(c.note) + '</span></div>').join('');
+}
+/* ── the statement editor: one spec, rendered as adjustable switches ── */
+const _trsStmt = {};   /* prefix -> spec being edited */
+function trsStmtSpec(prefix){ return _trsStmt[prefix]; }
+function trsStmtRender(prefix){
+  const spec = _trsStmt[prefix];
+  const host = document.getElementById('trs-stmt-' + prefix);
+  if (!spec || !host) return;
+  host.innerHTML = trsStmtInner(prefix, spec, host.getAttribute('data-editable') === '1');
+  const ch = document.getElementById('trs-confl-' + prefix);
+  if (ch) ch.innerHTML = trsConflictsHTML(trsAllConflicts(spec, spec.id));
+  const btn = document.getElementById('trs-addbtn-' + prefix);
+  const prob = trsSpecProblem(spec);
+  const pb = document.getElementById('trs-prob-' + prefix);
+  if (pb) { pb.style.display = prob ? 'block' : 'none'; pb.innerHTML = prob ? '⚠ ' + trsEsc(prob) : ''; }
+  if (btn) { btn.disabled = !!prob; btn.style.opacity = prob ? '.45' : '1'; btn.title = prob || ''; }
+  const js = document.getElementById('trs-json-' + prefix);
+  if (js) js.textContent = JSON.stringify({ id:spec.id, type:spec.kind, weight:spec.kind==='weight'?(spec.w||20):undefined, when:trsWhenText(spec), action:trsActionText(spec), conds:spec.conds, any:spec.condsAny||undefined, target:spec.target, priority:spec.priority||undefined, watchers:spec.watchers, evaluate_at: spec.kind==='escalation' ? 'sla age' : 'ticket creation' }, null, 2);
+}
+function trsAllConflicts(spec, excludeId){
+  const det = trsConflicts(spec, excludeId);
+  (spec.aiConflicts || []).forEach(c => { if (!det.some(d => d.with === c.with)) det.push({ with:c.with, sev:c.sev || 'warn', note:c.note }); });
+  return det;
+}
+function trsStmtInner(prefix, spec, editable){
+  const dis = editable ? '' : ' disabled';
+  const sel = (path, opts, cur, extra) => '<select' + dis + ' onchange="trsStmtSet(\'' + prefix + '\',\'' + path + '\',this.value)"' + (extra||'') + '>' +
+    opts.map(o => '<option value="' + trsEscAttr(o.v != null ? o.v : o) + '"' + ((o.v != null ? o.v : o) === cur ? ' selected' : '') + '>' + trsEsc(o.l != null ? o.l : o) + '</option>').join('') + '</select>';
+  /* IF side */
+  const condRows = (spec.conds || []).map((c, i) => {
+    const p = TRS_PARAMS[c.param] || TRS_PARAMS.content;
+    const opts = trsParamOpts(c.param);
+    const valCtl = opts
+      ? sel('cond.' + i + '.value', opts.concat(opts.includes(c.value) ? [] : [c.value]), c.value)
+      : '<input' + dis + ' type="text" class="trs-freeval" value="' + trsEscAttr(c.value) + '" onchange="trsStmtSet(\'' + prefix + '\',\'cond.' + i + '.value\',this.value)">';
+    return '<div class="trs-cond">' +
+      sel('cond.' + i + '.param', Object.keys(TRS_PARAMS).map(k => ({ v:k, l:TRS_PARAMS[k].label })), c.param) +
+      sel('cond.' + i + '.op', p.ops, c.op) + valCtl +
+      (editable ? '<span class="trs-cond-x" onclick="trsStmtSet(\'' + prefix + '\',\'cond.' + i + '.del\',1)">✕</span>' : '') + '</div>';
+  }).join('');
+  const anyTog = (spec.conds || []).length > 1
+    ? '<span class="trs-anytog"' + (editable ? ' onclick="trsStmtSet(\'' + prefix + '\',\'any\',\'' + (spec.condsAny ? '' : '1') + '\')"' : '') + '>' + (spec.condsAny ? 'match ANY row' : 'match ALL rows') + '</span>' : '';
+  const ifSide = '<div class="trs-stmt-row"><span class="trs-stmt-kw">IF</span><div class="trs-stmt-conds">' +
+    (condRows || '<div style="font-size:11.5px;color:var(--text-muted);padding-top:6px;">any ticket — matched on message content (semantic)</div>') +
+    '<div style="display:flex;gap:8px;align-items:center;">' + (editable ? '<button class="trs-cond-add" onclick="trsStmtSet(\'' + prefix + '\',\'cond.add\',1)">＋ condition</button>' : '') + anyTog + '</div></div></div>';
+  /* THEN side */
+  const t = spec.target || (spec.target = {});
+  const users = trsUsers().map(u => u.name);
+  const kindSel = sel('kind', [{v:'hard',l:'Force route'},{v:'weight',l:'Prefer (weight)'},{v:'escalation',l:'Escalate'}], spec.kind);
+  let thenCtls = kindSel;
+  if (spec.kind === 'weight') thenCtls += ' <input' + dis + ' type="number" min="5" max="95" step="5" style="width:58px;" value="' + (spec.w || 20) + '" onchange="trsStmtSet(\'' + prefix + '\',\'w\',this.value)"> pts';
+  if (spec.kind === 'escalation') {
+    thenCtls += ' after <input' + dis + ' type="text" class="trs-freeval" value="' + trsEscAttr(spec.escalate_after || '4 business hours') + '" onchange="trsStmtSet(\'' + prefix + '\',\'escafter\',this.value)"> → add department lead · priority +1';
+  } else {
+    const tt = t.user ? 'user' : 'dept';
+    thenCtls += ' → ' + sel('targettype', [{v:'dept',l:'department'},{v:'user',l:'user'}], tt);
+    if (tt === 'user') thenCtls += ' ' + sel('user', ['— pick a user —'].concat(users), t.user && users.includes(t.user) ? t.user : '— pick a user —');
+    else thenCtls += ' ' + sel('dept', TRS_DEPTS.map(d => ({v:d.id, l:d.name})), t.dept || TRS_DEPTS[0].id) + ' ' + sel('strategy', [{v:'least-loaded',l:'least-loaded'},{v:'round-robin',l:'round-robin'},{v:'all',l:'all members'}], t.strategy || 'least-loaded');
+    thenCtls += ' · priority ' + sel('priority', [{v:'',l:'unchanged'},{v:'normal',l:'normal'},{v:'high',l:'high'},{v:'urgent',l:'urgent'}], spec.priority || '');
+  }
+  const wChips = (spec.watchers || []).map((w, i) => '<span class="trs-watch-chip">👁 ' + trsEsc(w) + (editable ? '<span onclick="trsStmtSet(\'' + prefix + '\',\'watcher.' + i + '.del\',1)">✕</span>' : '') + '</span>').join(' ');
+  const wAdd = editable ? ' ' + sel('watcher.add', ['＋ watcher…','account owner'].concat(users.filter(u => !(spec.watchers||[]).includes(u))), '＋ watcher…') : '';
+  const thenSide = spec.kind === 'escalation'
+    ? '<div class="trs-stmt-row"><span class="trs-stmt-kw">THEN</span><div class="trs-then">' + thenCtls + '</div></div>'
+    : '<div class="trs-stmt-row"><span class="trs-stmt-kw">THEN</span><div class="trs-then">' + thenCtls + '</div></div>' +
+      '<div class="trs-stmt-row"><span class="trs-stmt-kw">WATCH</span><div class="trs-then">' + (wChips || '<span style="font-size:11px;color:var(--text-muted);">nobody watching</span>') + wAdd + '</div></div>';
+  return ifSide + thenSide;
+}
+function trsStmtSet(prefix, path, val){
+  const spec = _trsStmt[prefix];
+  if (!spec) return;
+  const t = spec.target || (spec.target = {});
+  if (path === 'kind') { spec.kind = val; if (val === 'escalation') { spec.escalate_after = spec.escalate_after || '4 business hours'; } }
+  else if (path === 'w') spec.w = parseInt(val, 10) || 20;
+  else if (path === 'escafter') spec.escalate_after = val;
+  else if (path === 'any') spec.condsAny = !!val;
+  else if (path === 'targettype') { if (val === 'user') { t.dept = null; t.strategy = 'named'; t.user = t.user || ''; } else { t.user = null; t.dept = t.dept || TRS_DEPTS[0].id; t.strategy = 'least-loaded'; } }
+  else if (path === 'user') { t.user = val.startsWith('—') ? '' : val; t.dept = null; t.strategy = 'named'; }
+  else if (path === 'dept') { t.dept = val; t.user = null; if (t.strategy === 'named') t.strategy = 'least-loaded'; }
+  else if (path === 'strategy') t.strategy = val;
+  else if (path === 'priority') spec.priority = val || null;
+  else if (path === 'cond.add') (spec.conds = spec.conds || []).push({ param:'type', op:'is', value:'support' });
+  else if (path === 'watcher.add') { if (!val.startsWith('＋')) (spec.watchers = spec.watchers || []).push(val); }
+  else if (path.startsWith('watcher.')) { const i = +path.split('.')[1]; if (path.endsWith('.del')) spec.watchers.splice(i, 1); }
+  else if (path.startsWith('cond.')) {
+    const parts = path.split('.'), i = +parts[1], field = parts[2];
+    const c = spec.conds[i];
+    if (field === 'del') spec.conds.splice(i, 1);
+    else if (field === 'param') { c.param = val; const p = TRS_PARAMS[val]; c.op = p.ops[0]; const o = trsParamOpts(val); c.value = o ? o[0] : ''; }
+    else c[field] = val;
+  }
+  spec.aiConflicts = null; /* manual edits invalidate the AI's conflict read; deterministic scan re-runs */
+  trsStmtRender(prefix);
 }
 
 /* ── view skeleton (injected once) ── */
@@ -46336,22 +46543,43 @@ function trsRenderTicket(){
   const host = document.getElementById('trs-host-ticket');
   if (!host) return;
   const rules = TRS_RULES.map(r => {
-    if (_trsEditId === r.id) return '<div class="klbr-rule" style="border-color:rgba(59,130,246,.35);"><span class="rid">' + r.id + '</span><div class="klbr-edit-wrap">' +
-      '<div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">✎ Restate the rule — the routing agent recompiles it</div>' +
-      '<div style="display:flex;gap:8px;"><input id="trs-edit-in" style="flex:1;border:1px solid var(--border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:var(--font-data);background:var(--bg-elevated);color:var(--text-primary);" value="' + trsEscAttr(r.raw) + '" onkeydown="if(event.key===\'Enter\')trsCompose(\'' + r.id + '\')">' +
-      '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="trsCompose(\'' + r.id + '\')">Recompile</button>' +
-      '<button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="_trsEditId=null;_trsDraft=null;trsRenderTicket();">✕</button></div>' +
-      '<div id="trs-preview-edit"></div></div></div>';
     if (_trsRemoveId === r.id) return '<div class="klbr-rule" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);"><span class="rid">' + r.id + '</span>' + trsRuleChip(r) +
       '<span style="flex:1;">Remove this rule? Tickets it currently routes fall through to the rules below, then the fallback.</span>' +
       '<span style="display:inline-flex;gap:6px;"><button class="btn btn-danger" style="font-size:11px;padding:4px 12px;" onclick="trsRemove(\'' + r.id + '\')">Remove</button>' +
       '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="_trsRemoveId=null;trsRenderTicket();">Cancel</button></span></div>';
-    return '<div class="klbr-rule"><span class="rid">' + r.id + '</span>' + trsRuleChip(r) +
-      '<span style="flex:1;">' + trsEsc(r.when) + ' → <b>' + trsEsc(r.action) + '</b>' +
+    const open = _trsOpenId === r.id, editing = open && _trsEditId === r.id;
+    const head = '<div class="klbr-rule' + (open ? ' trs-openhdr' : '') + '" style="cursor:pointer;" onclick="trsToggleRule(\'' + r.id + '\')"><span class="rid">' + r.id + '</span>' + trsRuleChip(r) +
+      '<span style="flex:1;">' + trsEsc(trsWhenText(r)) + ' → <b>' + trsEsc(trsActionText(r)) + '</b>' +
       '<span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px;">“' + trsEsc(r.raw) + '”</span></span>' +
       (r.isNew ? '<span class="klbr-new">NEW</span>' : '') + (r.edited ? '<span class="klbr-edited">EDITED</span>' : '') +
-      '<span class="klbr-acts"><span class="klbr-act" onclick="_trsEditId=\'' + r.id + '\';_trsRemoveId=null;trsRenderTicket();">✎ Edit</span>' +
-      '<span class="klbr-act danger" onclick="_trsRemoveId=\'' + r.id + '\';_trsEditId=null;trsRenderTicket();">🗑 Remove</span></span></div>';
+      '<span style="font-size:10px;color:var(--text-muted);margin-left:8px;flex-shrink:0;">' + (open ? '▲ close' : '▾ open') + '</span></div>';
+    if (!open) return head;
+    /* editing works on a deep copy so Cancel truly reverts; viewing reads the live rule */
+    if (editing && !_trsStmt['r-' + r.id]) _trsStmt['r-' + r.id] = JSON.parse(JSON.stringify(r));
+    const spec = editing ? _trsStmt['r-' + r.id] : r;
+    return head + '<div class="trs-rule-open">' +
+      '<div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">WHY THE AGENT BUILT IT THIS WAY</div>' +
+      '<div class="trs-reason">' + trsEsc(r.reason || 'Compiled from the plain-language rule above; no reasoning was recorded for this rule.') + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);">' + (editing ? 'SWITCHES — ADJUST ANY OF THEM' : 'SWITCHES THIS RULE FLIPS') + '</span>' +
+      '<span class="trs-jsontog" onclick="event.stopPropagation();const j=document.getElementById(\'trs-json-r-' + r.id + '\');j.style.display=j.style.display===\'none\'?\'block\':\'none\';">{ } spec</span></div>' +
+      '<div class="trs-stmt" id="trs-stmt-r-' + r.id + '" data-editable="' + (editing ? '1' : '0') + '" onclick="event.stopPropagation();">' + trsStmtInner('r-' + r.id, spec, editing) + '</div>' +
+      '<div class="klbr-json" id="trs-json-r-' + r.id + '" style="display:none;"></div>' +
+      '<div id="trs-prob-r-' + r.id + '" style="display:none;font-size:11.5px;color:var(--amber);margin-top:8px;"></div>' +
+      '<div class="trs-confl"><div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin:12px 0 6px;">FLAGS AGAINST OTHER RULES</div>' +
+      '<div id="trs-confl-r-' + r.id + '">' + trsConflictsHTML(trsAllConflicts(r, r.id)) + '</div></div>' +
+      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;" onclick="event.stopPropagation();">' +
+      (editing
+        ? '<button class="btn btn-primary" id="trs-addbtn-r-' + r.id + '" style="font-size:11px;padding:5px 14px;" onclick="trsSaveStmtEdit(\'' + r.id + '\')">✓ Save changes</button>' +
+          '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="delete _trsStmt[\'r-' + r.id + '\'];_trsEditId=null;trsRenderTicket();">✕ Cancel</button>' +
+          '<span style="font-size:11px;color:var(--text-muted);align-self:center;">Or restate it in words: <button class="klbr-act" onclick="trsReword(\'' + r.id + '\')">✍️ reword for the agent</button></span>'
+        : '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_trsEditId=\'' + r.id + '\';trsRenderTicket();">✎ Edit switches</button>' +
+          '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="trsReword(\'' + r.id + '\')">✍️ Reword</button>' +
+          '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;color:var(--red);" onclick="_trsRemoveId=\'' + r.id + '\';_trsOpenId=null;trsRenderTicket();">🗑 Remove</button>') +
+      '</div>' +
+      (_trsRewordId === r.id ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:6px;">✍️ Restate the rule — the agent recompiles the switches</div>' +
+        '<div style="display:flex;gap:8px;"><input id="trs-edit-in" style="flex:1;border:1px solid var(--border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:var(--font-data);background:var(--bg-elevated);color:var(--text-primary);" value="' + trsEscAttr(r.raw) + '" onkeydown="if(event.key===\'Enter\')trsCompose(\'' + r.id + '\')">' +
+        '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="trsCompose(\'' + r.id + '\')">Recompile</button></div><div id="trs-preview-edit"></div></div>' : '') +
+      '</div>';
   }).join('');
   const merchants = (typeof merchantData !== 'undefined' ? merchantData : []).slice(0, 14);
   const mOpts = merchants.map(m => '<option value="' + trsEscAttr(m.name) + '">' + trsEsc(m.name) + ' — ' + trsEsc(m.status) + '</option>').join('');
@@ -46425,13 +46653,22 @@ function trsKbDoc(){
 
 /* ── NL rule composer: live AI with a deterministic fallback ── */
 async function trsAI(mode, message, extra){
+  const routedNames = TRS_DEPTS.flatMap(d => trsMembers(d.id).map(u => u.name));
   const board = Object.assign({ mode:mode, semantics:'hard rules force; weights accumulate; least-loaded breaks ties; assignment additive; fallback = all reps on the deal',
-    departments: TRS_DEPTS.map(d => ({ name:d.name, lead:d.lead, desc:d.desc,
+    departments: TRS_DEPTS.map(d => ({ name:d.name, id:d.id, lead:d.lead, desc:d.desc,
       members: trsMembers(d.id).map(u => ({ name:u.name, type:u.type, role:u.roleDesc || '', openTickets:trsOpenCount(u.name) })) })),
-    rules: TRS_RULES.map(r => r.id + ' [' + r.kind + (r.kind==='weight' ? ' +' + (r.w||20) : '') + '] ' + r.when + ' -> ' + r.action),
+    /* EVERY portal user, including those outside the routing departments — a rule may
+       legitimately name an exec or a finance user, and the agent must resolve the name
+       rather than report them as nonexistent */
+    allUsers: trsUsers().map(u => ({ name:u.name, dept:u.dept, type:u.type, role:u.roleDesc || '',
+      inRoutingDept: routedNames.includes(u.name), openTickets:trsOpenCount(u.name) })),
+    conditionParams: Object.keys(TRS_PARAMS).map(k => k + ' (' + TRS_PARAMS[k].label + ', ops: ' + TRS_PARAMS[k].ops.join('/') + (trsParamOpts(k) ? ', values: ' + trsParamOpts(k).join('|') : ', free text') + ')'),
+    rules: TRS_RULES.map(r => ({ id:r.id, kind:r.kind, weight:r.w, conds:r.conds || [], any:!!r.condsAny, target:r.target || {}, watchers:r.watchers || [], text:trsWhenText(r) + ' -> ' + trsActionText(r) })),
     parameters:['source (processor / partner / merchant portal / internal / AI)','creator + creator role','ticket type','priority','message content (semantic)','merchant stage + sub-stage','merchant attributes (partner, processor, MCC, risk tier, volume)','assigned reps + splits / account owner','time (business hours, ticket age)','candidate workload + availability'] }, extra || {});
   const ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-  const timer = ctl ? setTimeout(() => ctl.abort(), 14000) : null;
+  /* compile carries the full roster + structured rules and returns reasoning, conds and
+     conflicts — it needs materially longer than a simulate turn before we give up */
+  const timer = ctl ? setTimeout(() => ctl.abort(), mode === 'compile' ? 30000 : 18000) : null;
   try {
     const res = await fetch('/api/agent/chat', { method:'POST', headers:{ 'content-type':'application/json' }, signal: ctl ? ctl.signal : undefined,
       body: JSON.stringify({ token: window.AGENT_CHAT_TOKEN || undefined, sessionType:'ticket-routing',
@@ -46455,7 +46692,11 @@ function trsExtractJson(text, tag){
 }
 function trsStripJsonLine(text, tag){
   if (!text) return '';
-  return text.replace(new RegExp(tag + '\\s*:\\s*\\{[\\s\\S]*\\}\\s*$'), '').replace(/\{[\s\S]*\}\s*$/, '').trim();
+  /* strip the tagged JSON line — including a TRUNCATED one, which has no closing brace */
+  return text.replace(new RegExp(tag + '\\s*:\\s*[\\s\\S]*$'), '')
+             .replace(/\{[\s\S]*\}\s*$/, '')
+             .replace(/\{[^{}]*$/, '')
+             .trim();
 }
 function trsParseLocal(text){
   const t = (text||'').toLowerCase();
@@ -46463,7 +46704,7 @@ function trsParseLocal(text){
   const user = trsUsers().find(u => t.includes(u.name.toLowerCase()) || t.includes(u.name.split(' ')[0].toLowerCase()));
   let kind = 'weight', w = 20;
   const wm = t.match(/\+\s?(\d+)/); if (wm) w = +wm[1];
-  if (/\bmust\b|\bonly\b|\balways\b|\bnever\b|straight to|go(es)? to\b/.test(t) && !/prefer|weight/.test(t)) kind = 'hard';
+  if (/\bmust\b|\bonly\b|\balways\b|\bnever\b|straight to|go(es)? to\b|sent to|send to|assign(?:ed)? to|route[d]? to/.test(t) && !/prefer|weight/.test(t)) kind = 'hard';
   if (/no (first )?response|within \d+ (business )?hours|escalat|overdue|sla/.test(t)) kind = 'escalation';
   const strategy = /round.?robin/.test(t) ? 'round-robin' : /least|fewest|load|balance/.test(t) ? 'least-loaded' : /\ball\b.*(member|rep)/.test(t) ? 'all' : (user ? 'named' : 'least-loaded');
   const watchers = /watcher|cc\b|loop in|keep .* informed|visibility/.test(t) ? [/owner/.test(t) ? 'account owner' : (user && dept ? user.name : 'account owner')] : [];
@@ -46474,21 +46715,34 @@ function trsParseLocal(text){
   const sources = [];
   [['maverick','processor'],['processor','processor'],['partner','partner'],['merchant portal','merchant'],['internal','internal']].forEach(p => { if (t.includes(p[0]) && !sources.includes(p[1])) sources.push(p[1]); });
   const partner = (typeof merchantData !== 'undefined') && [...new Set(merchantData.map(m => m.partner))].find(p => p && t.includes(p.toLowerCase()));
-  const whenBits = [];
-  if (stages.length) whenBits.push('Merchant stage = ' + stages.join(' / '));
-  if (types.length) whenBits.push('type/content = ' + types.join(' / '));
-  if (sources.length) whenBits.push('source = ' + sources.join(' / '));
-  if (partner) whenBits.push('partner = ' + partner);
-  if (kind === 'escalation') whenBits.push('SLA breach');
-  const when = whenBits.join(' · ') || 'Content match (semantic)';
-  let action;
+  /* structured conditions the if/then editor renders as switches */
+  const conds = [];
+  stages.forEach(s => conds.push({ param:'stage', op:'is', value:s }));
+  types.forEach(t2 => conds.push({ param:'type', op:'is', value:t2 }));
+  sources.forEach(s => conds.push({ param:'source', op:'is', value:s }));
+  if (partner) conds.push({ param:'partner', op:'is', value:partner });
+  const vol = t.match(/(?:over|above|more than|>)\s*\$?\s*([\d.,]+)\s*(k|m)?/);
+  if (vol) conds.push({ param:'volume', op:'>', value:String(Math.round(parseFloat(vol[1].replace(/,/g,'')) * (vol[2]==='k'?1000:vol[2]==='m'?1000000:1))) });
+  const risk = t.match(/\b(high|medium|low)[- ]risk\b/);
+  if (risk) conds.push({ param:'risk', op:'is', value:risk[1].charAt(0).toUpperCase()+risk[1].slice(1) });
+  const slaM = t.match(/(\d+)\s*(business\s*)?(hour|hr|day)/);
+  if (kind === 'escalation' && slaM) conds.push({ param:'sla', op:'after', value:slaM[1] + ' ' + (slaM[2]?'business ':'') + slaM[3] + 's' });
+  let priority = null;
+  const pm = t.match(/\b(urgent|high|normal|low)\s*priority\b/) || t.match(/priority\s*(?:to\s*)?(urgent|high|normal|low)\b/);
+  if (pm) priority = pm[1];
+  /* a named person the parser could not resolve — surface it, never silently drop it */
+  let unresolved = null;
+  if (!user) {
+    const nm = t.match(/\b(?:to|assign(?:ed)? to|sent to|goes to|give it to)\s+([a-z][a-z.'-]+)/);
+    if (nm && !TRS_DEPTS.some(d => d.name.toLowerCase() === nm[1])) unresolved = nm[1].charAt(0).toUpperCase() + nm[1].slice(1);
+  }
   const targetName = user ? user.name : (dept ? dept.name : null);
-  if (kind === 'escalation') action = 'Add department lead · priority +1';
-  else if (kind === 'hard') action = 'Force route → ' + (targetName || 'ops review') + (strategy !== 'named' && dept ? ' (' + strategy + ')' : '');
-  else action = '+' + w + ' ' + (targetName || 'preferred candidate') + (strategy === 'round-robin' ? ' (round-robin)' : '');
-  if (watchers.length) action += ' · watcher: ' + watchers.join(', ');
-  return { kind:kind, w:w, when:when, action:action, target:{ dept: dept ? dept.id : null, user: user ? user.name : null, strategy:strategy }, watchers:watchers,
-    problem: (!dept && !user && kind !== 'escalation') ? 'No known department or user named — the rule will rely on semantic matching.' : null };
+  const spec = { kind:kind, w:w, conds:conds, condsAny:false, priority:priority,
+    target:{ dept: user ? null : (dept ? dept.id : null), user: user ? user.name : (unresolved || null), strategy: user ? 'named' : strategy },
+    watchers:watchers,
+    reason: 'Compiled locally (the routing agent was unreachable): ' + (targetName ? 'matched "' + targetName + '" from your wording' : unresolved ? 'you named "' + unresolved + '", who is not a portal user' : 'no destination was named') + (conds.length ? ', with ' + conds.length + ' condition' + (conds.length>1?'s':'') + ' read from the text' : ', so it will match on content') + '.' };
+  spec.when = trsWhenText(spec); spec.action = trsActionText(spec);
+  return spec;
 }
 async function trsCompose(editId){
   const inp = document.getElementById(editId ? 'trs-edit-in' : 'trs-compose-in');
@@ -46499,40 +46753,91 @@ async function trsCompose(editId){
   const ai = await trsAI('compile', txt);
   let spec = null, prose = '';
   if (ai) { spec = trsExtractJson(ai, 'RULE_JSON'); prose = trsStripJsonLine(ai, 'RULE_JSON'); }
+  const liveSpec = !!spec;   /* the badge reports where the SWITCHES came from, not whether a call happened */
   if (spec) {
     spec.kind = ['hard','weight','escalation'].includes(spec.kind) ? spec.kind : 'weight';
     spec.w = spec.weight || spec.w || 20;
-    spec.when = spec.when || 'Content match (semantic)';
-    spec.action = spec.action || 'Route per rule';
     spec.target = spec.target || {};
     spec.watchers = spec.watchers || [];
-  } else { spec = trsParseLocal(txt); prose = ''; }
+    spec.conds = (spec.conds || []).filter(c => c && c.param && TRS_PARAMS[c.param]).map(c => ({ param:c.param, op:c.op || TRS_PARAMS[c.param].ops[0], value:String(c.value == null ? '' : c.value) }));
+    spec.condsAny = !!spec.any || !!spec.condsAny;
+    spec.aiConflicts = (spec.conflicts || []).filter(c => c && c.with);
+    spec.reason = prose || spec.reason || '';
+    /* resolve a named user against the full roster; keep the raw name so the editor can flag it */
+    if (spec.target.user) {
+      const exact = trsUsers().find(u => u.name.toLowerCase() === String(spec.target.user).toLowerCase());
+      const fz = exact || trsFuzzyUser(spec.target.user);
+      if (fz) { spec.target.user = fz.name; spec.target.dept = null; spec.target.strategy = 'named'; }
+    }
+    spec.when = trsWhenText(spec); spec.action = trsActionText(spec);
+  } else {
+    const local = trsParseLocal(txt);
+    /* the agent replied but its spec line was unusable (usually truncated) — keep its
+       reasoning, take the switches from the local parse, and say so honestly */
+    if (ai && prose) local.reason = prose + ' (The agent\'s reply did not carry a usable specification, so these switches were compiled locally — check them before adding.)';
+    spec = local; prose = local.reason || '';
+  }
   const id = editId || ('TR-' + String(TRS_SEQ).padStart(2,'0'));
+  const prefix = editId ? 'edit' : 'new';
+  spec.id = id;
+  if (!spec.conds) spec.conds = [];
   _trsDraft = { spec:spec, raw:txt, editId:editId || null };
-  const json = JSON.stringify({ id:id, type:spec.kind, weight:spec.kind==='weight'?(spec.w||20):undefined, when:spec.when, action:spec.action, target:spec.target, watchers:spec.watchers, evaluate_at:'ticket creation' }, null, 2);
+  _trsStmt[prefix] = spec;
   prevHost.innerHTML = '<div class="klbr-spec">' +
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">' + (editId ? 'Recompiled' : 'Generated') + ' specification</span>' + trsRuleChip(spec) +
-    '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">' + id + (editId ? ' (edit)' : ' (draft)') + '</span>' + (ai ? '<span class="p-badge badge-green" style="font-size:8px;">LIVE AI</span>' : '<span class="p-badge" style="font-size:8px;">LOCAL PARSE</span>') + '</div>' +
-    (prose ? '<div style="font-size:12px;color:var(--text-secondary);line-height:1.55;margin-bottom:8px;">' + trsEsc(prose) + '</div>' : '') +
-    (spec.problem ? '<div style="font-size:11.5px;color:var(--amber);margin-bottom:8px;">⚠ ' + trsEsc(spec.problem) + '</div>' : '') +
-    '<table><tr><td>When</td><td>' + trsEsc(spec.when) + '</td></tr><tr><td>Action</td><td>' + trsEsc(spec.action) + '</td></tr>' +
-    '<tr><td>Kind</td><td>' + spec.kind + (spec.kind === 'weight' ? ' (+' + (spec.w||20) + ')' : '') + '</td></tr>' +
-    (spec.watchers && spec.watchers.length ? '<tr><td>Watchers</td><td>' + trsEsc(spec.watchers.join(', ')) + '</td></tr>' : '') + '</table>' +
-    '<div class="klbr-json">' + trsEsc(json) + '</div>' +
-    '<div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="trsSaveRule()">✓ ' + (editId ? 'Save changes' : 'Add rule') + '</button>' +
-    '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_trsDraft=null;document.getElementById(\'' + (editId ? 'trs-preview-edit' : 'trs-preview') + '\').innerHTML=\'\';">✕ Discard</button></div></div>';
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">' + (editId ? 'Recompiled' : 'Proposed') + ' rule</span>' + trsRuleChip(spec) +
+    '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">' + id + (editId ? ' (edit)' : ' (draft)') + '</span>' + (liveSpec ? '<span class="p-badge badge-green" style="font-size:8px;">LIVE AI</span>' : '<span class="p-badge" style="font-size:8px;">LOCAL PARSE</span>') +
+    '<span class="trs-jsontog" onclick="const j=document.getElementById(\'trs-json-' + prefix + '\');j.style.display=j.style.display===\'none\'?\'block\':\'none\';">{ } spec</span></div>' +
+    (prose ? '<div class="trs-reason">' + trsEsc(prose) + '</div>' : '') +
+    '<div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">ADJUST ANYTHING BEFORE ADDING</div>' +
+    '<div class="trs-stmt" id="trs-stmt-' + prefix + '" data-editable="1"></div>' +
+    '<div class="klbr-json" id="trs-json-' + prefix + '" style="display:none;"></div>' +
+    '<div id="trs-prob-' + prefix + '" style="display:none;font-size:11.5px;color:var(--amber);margin-top:8px;"></div>' +
+    '<div class="trs-confl"><div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin:12px 0 6px;">FLAGS AGAINST OTHER RULES</div>' +
+    '<div id="trs-confl-' + prefix + '"></div></div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-primary" id="trs-addbtn-' + prefix + '" style="font-size:11px;padding:5px 14px;" onclick="trsSaveRule()">✓ ' + (editId ? 'Save changes' : 'Add rule') + '</button>' +
+    '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_trsDraft=null;delete _trsStmt[\'' + prefix + '\'];document.getElementById(\'' + (editId ? 'trs-preview-edit' : 'trs-preview') + '\').innerHTML=\'\';">✕ Discard</button></div></div>';
+  trsStmtRender(prefix);
+}
+function trsToggleRule(id){
+  if (_trsOpenId === id) { _trsOpenId = null; _trsEditId = null; _trsRewordId = null; delete _trsStmt['r-' + id]; }
+  else { _trsOpenId = id; _trsEditId = null; _trsRewordId = null; }
+  trsRenderTicket();
+}
+function trsReword(id){ _trsOpenId = id; _trsRewordId = _trsRewordId === id ? null : id; trsRenderTicket();
+  setTimeout(() => { const i = document.getElementById('trs-edit-in'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 40); }
+function trsApplySpec(r, s, raw){
+  r.kind = s.kind; r.w = s.w; r.conds = s.conds || []; r.condsAny = s.condsAny;
+  r.target = s.target || {}; r.watchers = s.watchers || []; r.priority = s.priority || null;
+  r.escalate_after = s.escalate_after; if (raw != null) r.raw = raw;
+  if (s.reason) r.reason = s.reason;
+  r.when = trsWhenText(r); r.action = trsActionText(r);
+  return r;
+}
+function trsSaveStmtEdit(id){
+  const spec = _trsStmt['r-' + id], r = TRS_RULES.find(x => x.id === id);
+  if (!spec || !r) return;
+  if (trsSpecProblem(spec)) return;
+  trsApplySpec(r, spec);
+  r.edited = true; r.isNew = false;
+  delete _trsStmt['r-' + id]; _trsEditId = null;
+  trsRenderTicket();
+  const doc = document.getElementById('trs-kbdoc'); if (doc) doc.textContent = trsKbDoc();
+  if (typeof ccToast === 'function') ccToast('✓ ' + id + ' updated');
 }
 function trsSaveRule(){
-  if (!_trsDraft) return;
-  const s = _trsDraft.spec;
-  if (_trsDraft.editId) {
+  const prefix = _trsDraft && _trsDraft.editId ? 'edit' : 'new';
+  const s = _trsStmt[prefix];
+  if (!s || trsSpecProblem(s)) return;
+  if (_trsDraft && _trsDraft.editId) {
     const r = TRS_RULES.find(x => x.id === _trsDraft.editId);
-    if (r) { r.kind = s.kind; r.w = s.w; r.raw = _trsDraft.raw; r.when = s.when; r.action = s.action; r.target = s.target; r.watchers = s.watchers; r.edited = true; r.isNew = false; }
-    _trsEditId = null;
+    if (r) { trsApplySpec(r, s, _trsDraft.raw); r.edited = true; r.isNew = false; }
+    _trsEditId = null; _trsRewordId = null;
   } else {
-    TRS_RULES.push({ id:'TR-' + String(TRS_SEQ++).padStart(2,'0'), kind:s.kind, w:s.w, raw:_trsDraft.raw, when:s.when, action:s.action, target:s.target || {}, watchers:s.watchers || [], isNew:true });
+    const r = trsApplySpec({ id:'TR-' + String(TRS_SEQ++).padStart(2,'0'), isNew:true }, s, _trsDraft ? _trsDraft.raw : '');
+    TRS_RULES.push(r);
+    _trsOpenId = r.id;
   }
-  _trsDraft = null;
+  _trsDraft = null; delete _trsStmt[prefix];
   trsRenderTicket();
   const doc = document.getElementById('trs-kbdoc'); if (doc) doc.textContent = trsKbDoc();
 }
@@ -46544,10 +46849,53 @@ function trsRemove(id){
 }
 
 /* ── the deterministic router (same semantics the live agent is told to follow) ── */
+/* does one authored condition hold for this incoming ticket? */
+function trsCondHolds(c, ctx){
+  const m = ctx.merchant || {}, txt = (ctx.text||'').toLowerCase(), v = String(c.value||'').toLowerCase();
+  const anyOf = s => v.split('/').map(x => x.trim()).filter(Boolean).some(x => String(s||'').toLowerCase().includes(x));
+  let hit = false;
+  if (c.param === 'source') hit = anyOf(ctx.source);
+  else if (c.param === 'type') hit = anyOf(ctx.type) || v.split('/').some(x => txt.includes(x.trim()));
+  else if (c.param === 'stage') hit = anyOf(m.status);
+  else if (c.param === 'partner') hit = anyOf(m.partner);
+  else if (c.param === 'risk') hit = anyOf(m.risk);
+  else if (c.param === 'content') hit = v.split('/').map(x => x.trim()).filter(Boolean).some(x => txt.includes(x));
+  else if (c.param === 'creator') hit = anyOf(ctx.creatorRole);
+  else if (c.param === 'volume') { const mv = trsVolNum(m.potVol || m.volMTD || 0), tv = trsVolNum(c.value); hit = c.op === '>' ? mv > tv : mv < tv; return hit; }
+  else if (c.param === 'sla') return false; /* escalation rules never fire at creation */
+  return c.op === 'is not' ? !hit : hit;
+}
+function trsRuleMatches(r, ctx){
+  if (r.kind === 'escalation') return false;
+  if (!r.conds || !r.conds.length) return false;
+  return r.condsAny ? r.conds.some(c => trsCondHolds(c, ctx)) : r.conds.every(c => trsCondHolds(c, ctx));
+}
 function trsRouteLocal(ctx){
   const hits = [], watchers = [];
-  let forcedDept = null, priority = ctx.type === 'chargeback' ? 'high' : 'normal';
+  let forcedDept = null, forcedUser = null, priority = ctx.type === 'chargeback' ? 'high' : 'normal';
   const stage = (ctx.merchant && ctx.merchant.status || '').toLowerCase();
+  /* ops-authored rules (anything beyond the seeded seven) evaluate first, in order */
+  const authored = TRS_RULES.filter(r => !['TR-01','TR-02','TR-03','TR-04','TR-05','TR-06','TR-07'].includes(r.id));
+  const authoredWeights = {};
+  authored.forEach(r => {
+    if (!trsRuleMatches(r, ctx)) return;
+    const t = r.target || {};
+    if (r.priority) priority = r.priority;
+    (r.watchers || []).forEach(w => watchers.push(w === 'account owner' ? (ctx.merchant && ctx.merchant.assignee) || 'Account owner' : w));
+    if (r.kind === 'hard' && !forcedDept && !forcedUser) {
+      if (t.user) { forcedUser = t.user; hits.push({ id:r.id, kind:'hard', effect:'your rule forces this to ' + t.user }); }
+      else if (t.dept) { forcedDept = t.dept; hits.push({ id:r.id, kind:'hard', effect:'your rule forces this to ' + (trsDept(t.dept)||{name:t.dept}).name }); }
+    } else if (r.kind === 'weight' && t.dept) {
+      authoredWeights[t.dept] = (authoredWeights[t.dept] || 0) + (r.w || 20);
+      hits.push({ id:r.id, kind:'weight', effect:'+' + (r.w || 20) + ' ' + (trsDept(t.dept)||{name:t.dept}).name + ' (your rule)' });
+    }
+  });
+  if (forcedUser) {
+    const u = trsUsers().find(x => x.name === forcedUser);
+    const d = u && trsDeptByName(u.dept);
+    return { dept: d ? d.name : null, deptId: d ? d.id : null, assignees:[forcedUser], watchers:[...new Set(watchers)], priority:priority,
+      strategy:'named', rule_hits:hits, scores:[{ name:forcedUser, open:trsOpenCount(forcedUser), score:100, why:'named directly by your rule' }], why:hits[0] ? hits[0].effect : 'named by rule' };
+  }
   if (['underwriting','inreview','uw','pending'].includes(stage)) { forcedDept = 'underwriting'; hits.push({ id:'TR-01', kind:'hard', effect:'merchant is in underwriting — forced to Underwriting' }); }
   const cbHit = ctx.type === 'chargeback' || /chargeback|dispute|4853|retrieval/.test((ctx.text||'').toLowerCase());
   if (!forcedDept && cbHit) { forcedDept = 'operations'; hits.push({ id:'TR-02', kind:'hard', effect:'chargeback/dispute — forced to Operations, owner watching' });
@@ -46556,7 +46904,7 @@ function trsRouteLocal(ctx){
     const fm = trsFuzzyUser(ctx.procAssignee);
     if (fm) { watchers.push(fm.name); hits.push({ id:'TR-06', kind:'hard', effect:'payload names “' + ctx.procAssignee + '” — matched ' + fm.name + ', added as watcher' }); }
   }
-  const weights = {};
+  const weights = Object.assign({}, authoredWeights);
   if (!forcedDept) {
     if (stage === 'active' && ['support','general','pricing'].includes(ctx.type)) { weights.support = (weights.support||0) + 30; hits.push({ id:'TR-03', kind:'weight', effect:'+30 Support — active merchant, support traffic' }); }
     if (ctx.type === 'activation' || /terminal|equipment|pax|offline|device/.test((ctx.text||'').toLowerCase())) { weights.operations = (weights.operations||0) + 20; hits.push({ id:'TR-04', kind:'weight', effect:'+20 Operations — equipment/terminal issue' }); }
