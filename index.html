@@ -2857,7 +2857,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         Portfolio Alerts
         <span style="margin-left:auto;background:rgba(155,107,91,0.18);color:#9B6B5B;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">9</span>
       </div>
-      <div class="nav-item" id="nav-settings" onclick="showView('settings', this); if (typeof trsInit==='function') setTimeout(trsInit, 20);">
+      <div class="nav-item" id="nav-settings" onclick="if (typeof trsInit==='function') trsInit(); showView('settings', this);">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 5.25A2.75 2.75 0 1 0 8 10.75 2.75 2.75 0 0 0 8 5.25zm0 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/><path d="M6.9 1.5h2.2l.35 1.55c.4.14.78.33 1.13.56l1.5-.53 1.1 1.9-1.16 1.03c.05.32.05.66 0 .98l1.16 1.03-1.1 1.9-1.5-.53c-.35.23-.73.42-1.13.56L9.1 14.5H6.9l-.35-1.55a4.9 4.9 0 0 1-1.13-.56l-1.5.53-1.1-1.9 1.16-1.03a5 5 0 0 1 0-.98L2.82 4.98l1.1-1.9 1.5.53c.35-.23.73-.42 1.13-.56L6.9 1.5z" opacity=".55"/></svg>
         Settings
       </div>
@@ -3302,6 +3302,15 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-mlink:hover { text-decoration:underline; }
       .aic-doneban { display:flex; align-items:center; gap:8px; padding:10px 16px; border-bottom:1px solid var(--border); background:rgba(91,122,94,0.10); font-size:12.5px; color:var(--text-primary); flex:0 0 auto; flex-wrap:wrap; }
       .aic-thread.done .aic-decide, .aic-thread.done > .aic-ract { display:none; }
+      .aic-cbadge { display:inline-flex; align-items:center; font-size:11px; font-weight:800; border:1px solid; border-radius:12px; padding:2px 9px; margin-right:6px; }
+      .aic-cbadge.sm { font-size:10px; font-weight:700; padding:1px 7px; margin:0; }
+      .aic-rep-health { display:flex; align-items:center; flex-wrap:wrap; gap:4px; padding:9px 0 10px; }
+      .aic-rep-hl { font-size:13px; font-weight:800; color:var(--text-primary); margin-right:8px; }
+      .aic-rep-filters { font-size:10.5px; color:var(--text-muted); margin-left:auto; }
+      .aic-rsec { display:flex; align-items:center; gap:8px; margin:12px 0 6px; }
+      .aic-rsec-ttl { font-size:12.5px; font-weight:800; color:var(--text-primary); }
+      .aic-rsec-sub { font-size:11px; font-weight:600; color:var(--text-secondary); margin-left:auto; }
+      .aic-rep-more { padding:8px 12px; font-size:11px; color:var(--text-muted); border-top:1px solid var(--border); }
       .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid rgba(0,0,0,0.06); padding:11px 14px; }
       .aic-in { flex:1; font-size:13px; color:var(--text-primary); background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:7px; padding:8px 12px; font-family:var(--font-ui); outline:none; }
       .aic-in:focus { border-color:rgba(0,0,0,0.3); }
@@ -45220,7 +45229,7 @@ function aicRenderWs(){
   }
   h += doneBan + '<div class="aic-thread' + (t.state === 'done' ? ' done' : '') + '" id="aicThread">' + aicSectionsHTML(t) + (t.msgs || []).map(aicMsgHTML).join('') + '</div>';
   var ph = ((t.userCreated || t.adhoc) && !t.merchant) ? 'Search your book or describe the task \u2014 name, MID, partner, or status\u2026' : 'Reply \u2014 or type / for a playbook\u2026';
-  h += '<div class="aic-composer" style="position:relative;"><div class="aic-menu aic-sugg" id="aicSugg"></div><input class="aic-in" id="aicChatInput" placeholder="' + ph + '" oninput="aicComposerInput()" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
+  h += '<div class="aic-composer" style="position:relative;"><div class="aic-menu aic-sugg" id="aicSugg"></div><input class="aic-in" id="aicChatInput" placeholder="' + ph + '" oninput="aicComposerInput()" onfocus="aicComposerInput(true)" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
   ws.innerHTML = h;
   var th = document.getElementById('aicThread');
   if (th) th.scrollTop = th.scrollHeight;
@@ -45848,18 +45857,25 @@ function aicOptPick(taskId, name){
   var pq = t._pendingQ; t._pendingQ = null;
   if (pq) aicAI(t, pq);
 }
-function aicComposerInput(){
+function aicComposerInput(fromFocus){
   var t = aicTask();
   var input = document.getElementById('aicChatInput');
   var host = document.getElementById('aicSugg');
   if (!t || !input || !host) return;
   if (!((t.userCreated || t.adhoc) && !t.merchant)) { host.classList.remove('open'); return; }
-  var q = input.value.trim();
-  if (q.length < 3) { host.classList.remove('open'); return; }
-  var hits = aicResolve(q).slice(0, 5);
+  var q = (input.value || '').trim();
+  var hits;
+  if (q.length < 3) {
+    if (!fromFocus) { host.classList.remove('open'); return; }
+    hits = (typeof merchantData !== 'undefined' ? merchantData.slice() : [])
+      .sort(function(a, b){ return aicParseVol(b.volMTD || b.potVol) - aicParseVol(a.volMTD || a.potVol); })
+      .slice(0, 5).map(function(m){ return { m:m }; });
+  } else {
+    hits = aicResolve(q).slice(0, 5);
+  }
   if (!hits.length) { host.classList.remove('open'); return; }
-  host.innerHTML = '<div class="hd">In your book</div>' + hits.map(function(h){
-    return '<div class="aic-sugg-row" onclick="aicSuggPick(\'' + t.id + '\',\'' + aicEsc(h.m.name).replace(/'/g, "\\'") + '\')"><b>' + h.m.name + '</b><span>' + (h.m.status || '') + (h.m.partner ? ' \u00B7 ' + h.m.partner : '') + '</span></div>';
+  host.innerHTML = '<div class="hd">Search your book \u2014 name, MID, partner, or status</div>' + hits.map(function(h){
+    return '<div class="aic-sugg-row" onclick="aicSuggPick(\'' + t.id + '\',\'' + aicEsc(h.m.name).replace(/'/g, "\\'") + '\')"><b>' + h.m.name + '</b><span>' + (h.m.status || '') + (h.m.partner ? ' \u00B7 ' + h.m.partner : '') + (h.m.volMTD || h.m.potVol ? ' \u00B7 ' + (h.m.volMTD || h.m.potVol) + '/mo' : '') + '</span></div>';
   }).join('');
   host.classList.add('open');
 }
@@ -45956,6 +45972,17 @@ function aicNewTask(){
 function aicReportIntent(q){
   return /^report[:\s]/i.test(q) || /\b(report|table) (of|on|for)?\b/i.test(q) || /\b(list|show) (me )?(all|my)\b/i.test(q) || /\bpipeline report\b/i.test(q);
 }
+function aicParseVol(v){
+  var s = String(v || '').replace(/[,$\s]/g, '').toLowerCase();
+  var n = parseFloat(s); if (isNaN(n)) return 0;
+  if (s.indexOf('m') !== -1) n *= 1000000; else if (s.indexOf('k') !== -1) n *= 1000;
+  return n;
+}
+function aicFmtVol(n){
+  if (n >= 1000000) return '$' + (n / 1000000).toFixed(n >= 10000000 ? 0 : 1) + 'M';
+  if (n >= 1000) return '$' + Math.round(n / 1000) + 'K';
+  return n ? '$' + Math.round(n) : '\u2014';
+}
 function aicBuildReport(q){
   var ql = q.toLowerCase();
   var all = (typeof merchantData !== 'undefined') ? merchantData.slice() : [];
@@ -45967,16 +45994,55 @@ function aicBuildReport(q){
   var partnerSet = {};
   all.forEach(function(m){ if (m.partner) partnerSet[m.partner] = true; });
   Object.keys(partnerSet).forEach(function(pn){ if (ql.indexOf(pn.toLowerCase()) !== -1) { rows = rows.filter(function(m){ return m.partner === pn; }); applied.push('partner: ' + pn); } });
-  var vol = function(m){ return parseFloat(String(m.volMTD || m.potVol || '').replace(/[^0-9.]/g, '')) || 0; };
-  rows.sort(function(a, b){ return vol(b) - vol(a); });
-  return { q:q, cols:['Merchant','Status','Partner','Volume','Assigned'],
+  rows.sort(function(a, b){ return aicParseVol(b.volMTD || b.potVol) - aicParseVol(a.volMTD || a.potVol); });
+  var groupBy = /\bby partner\b/.test(ql) ? 'partner' : /\bby (status|stage)\b/.test(ql) ? 'status' : null;
+  var byStatus = {}, totalVol = 0;
+  rows.forEach(function(m){ byStatus[m.status || 'other'] = (byStatus[m.status || 'other'] || 0) + 1; totalVol += aicParseVol(m.volMTD || m.potVol); });
+  return { q:q, cols:['Merchant','Status','Partner','Volume','Assigned'], groupBy:groupBy,
+    byStatus:byStatus, totalVol:totalVol, applied:applied,
     summary:rows.length + ' merchants' + (applied.length ? ' \u00B7 ' + applied.join(' \u00B7 ') : ' \u00B7 whole book'),
+    raw: rows.map(function(m){ return { name:m.name, status:m.status || '\u2014', partner:m.partner || '\u2014', vol:m.volMTD || m.potVol || '\u2014', voln:aicParseVol(m.volMTD || m.potVol), assignee:m.assignee || '\u2014' }; }),
     rows: rows.map(function(m){ return [m.name, m.status || '\u2014', m.partner || '\u2014', m.volMTD || m.potVol || '\u2014', m.assignee || '\u2014']; }) };
 }
+function aicStatusColor(s){
+  var map = { underwriting:'#7C6FA0', pended:'#A67C5B', active:'#2E6B3F', signature:'#8C7A5E', boarding:'#3E5E80', inreview:'#6B839B', lead:'#737373', approved:'#2E6B3F', declined:'#A33A1F', cancelled:'#A33A1F' };
+  return map[s] || '#5C5C5C';
+}
+function aicCountBadge(label, count, color){
+  return '<span class="aic-cbadge" style="color:' + color + ';border-color:' + color + '40;background:' + color + '14;">' + count + (label ? ' ' + label : '') + '</span>';
+}
+function aicRepRowsHTML(list){
+  var CAP = 30;
+  var h = '<table class="aic-rep-table"><thead><tr><th>Merchant</th><th>Status</th><th>Partner</th><th>Volume</th><th>Assigned</th></tr></thead><tbody>' +
+    list.slice(0, CAP).map(function(m){
+      return '<tr data-m="' + aicEsc(m.name) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))"><td>' + aicEsc(m.name) + '</td>' +
+        '<td><span class="aic-cbadge sm" style="color:' + aicStatusColor(m.status) + ';border-color:' + aicStatusColor(m.status) + '40;background:' + aicStatusColor(m.status) + '14;text-transform:capitalize;">' + aicEsc(m.status) + '</span></td>' +
+        '<td>' + aicEsc(m.partner) + '</td><td>' + aicEsc(m.vol) + '</td><td>' + aicEsc(m.assignee) + '</td></tr>';
+    }).join('') + '</tbody></table>' +
+    (list.length > 30 ? '<div class="aic-rep-more">\u2026and ' + (list.length - 30) + ' more rows \u2014 CSV has everything</div>' : '');
+  return h;
+}
 function aicReportTableHTML(r){
-  return '<div class="aic-rep-wrap"><table class="aic-rep-table"><thead><tr>' + r.cols.map(function(c){ return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
-    r.rows.map(function(row){ return '<tr data-m="' + aicEsc(row[0]) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))">' + row.map(function(c, i){ return '<td' + (i === 1 ? ' style="text-transform:capitalize;"' : '') + '>' + aicEsc(String(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
-    '</tbody></table></div>';
+  var raw = r.raw || (r.rows || []).map(function(row){ return { name:row[0], status:row[1], partner:row[2], vol:row[3], voln:0, assignee:row[4] }; });
+  var h = '<div class="aic-rep-health"><span class="aic-rep-hl">' + raw.length + ' merchants \u00B7 ' + aicFmtVol(r.totalVol || 0) + '/mo</span>';
+  Object.keys(r.byStatus || {}).sort(function(a, b){ return r.byStatus[b] - r.byStatus[a]; }).forEach(function(s){
+    h += aicCountBadge(s.charAt(0).toUpperCase() + s.slice(1), r.byStatus[s], aicStatusColor(s));
+  });
+  if (r.applied && r.applied.length) h += '<span class="aic-rep-filters">filters: ' + aicEsc(r.applied.join(' \u00B7 ')) + '</span>';
+  h += '</div>';
+  if (r.groupBy) {
+    var groups = {};
+    raw.forEach(function(m){ var k = m[r.groupBy] || '\u2014'; (groups[k] = groups[k] || []).push(m); });
+    Object.keys(groups).sort(function(a, b){ return groups[b].length - groups[a].length; }).forEach(function(g){
+      var list = groups[g];
+      var sub = list.reduce(function(acc, m){ return acc + (m.voln || 0); }, 0);
+      h += '<div class="aic-rsec"><span class="aic-rsec-ttl">' + aicEsc(g) + '</span>' + aicCountBadge('', list.length, r.groupBy === 'status' ? aicStatusColor(g) : '#3E5E80') + '<span class="aic-rsec-sub">' + aicFmtVol(sub) + '/mo</span></div>';
+      h += '<div class="aic-rep-wrap">' + aicRepRowsHTML(list) + '</div>';
+    });
+  } else {
+    h += '<div class="aic-rep-wrap">' + aicRepRowsHTML(raw) + '</div>';
+  }
+  return h;
 }
 function aicRunReport(q){
   var r = aicBuildReport(q);
@@ -46353,7 +46419,7 @@ function trsSimSrcChange(){
 function trsPreset(k){
   const S = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
   if (k === 'uw') { S('trs-sim-src','partner|NovaPay'); S('trs-sim-type','underwriting'); S('trs-sim-merchant','Sunrise Bakery'); S('trs-sim-msg','Uploading the corrected articles of organization for Sunrise Bakery — can someone confirm the pend is cleared and what else underwriting still needs?'); }
-  if (k === 'cb') { S('trs-sim-src','processor|Maverick'); S('trs-sim-type','chargeback'); S('trs-sim-merchant','Golden State Auto'); S('trs-sim-proc','Chris Novick'); S('trs-sim-msg','New chargeback case 4853-2211 on Golden State Auto, $840.00, reason 4853 cardholder dispute. Response due within 7 days.'); }
+  if (k === 'cb') { S('trs-sim-src','processor|Maverick'); S('trs-sim-type','chargeback'); S('trs-sim-merchant','Golden State Auto'); S('trs-sim-proc','Blake Chen'); S('trs-sim-msg','New chargeback case 4853-2211 on Golden State Auto, $840.00, reason 4853 cardholder dispute. Response due within 7 days.'); }
   if (k === 'term') { S('trs-sim-src','merchant|'); S('trs-sim-type','activation'); S('trs-sim-merchant','TechSupply Pro LLC'); S('trs-sim-msg','Our PAX terminal has been offline since this morning — restarted twice, still says connection error. We cannot take cards.'); }
   if (k === 'stmt') { S('trs-sim-src','merchant|'); S('trs-sim-type','support'); S('trs-sim-merchant','Harbor View Hotels'); S('trs-sim-msg','Quick question on our March statement — the service fee line looks higher than last month. Can someone walk me through it?'); }
   trsSimSrcChange();
@@ -46666,8 +46732,10 @@ function trsEscalateDemo(id){
   const leadName = d && d.lead;
   const order = ['low','normal','high','urgent'];
   t.priority = order[Math.min(order.indexOf(t.priority) + 1, 3)];
-  if (leadName && !t.members.some(m => m.name === leadName)) t.members.push(trsMemberObj(leadName));
-  t.thread.push({ kind:'sys', text:'⏱ TR-07 escalation — no first response in 4 business hours: ' + (leadName ? leadName + ' (department lead) added · ' : '') + 'priority → ' + t.priority, time:(typeof tNow === 'function' ? tNow() : '') });
+  const leadAlready = leadName && t.members.some(m => m.name === leadName);
+  if (leadName && !leadAlready) t.members.push(trsMemberObj(leadName));
+  const leadNote = leadName ? (leadAlready ? leadName + ' (department lead) already holds it · ' : leadName + ' (department lead) added · ') : '';
+  t.thread.push({ kind:'sys', text:'⏱ TR-07 escalation — no first response in 4 business hours: ' + leadNote + 'priority → ' + t.priority, time:(typeof tNow === 'function' ? tNow() : '') });
   if (t._dashIdx != null && typeof ticketData !== 'undefined' && ticketData[t._dashIdx]) {
     const row = document.querySelector('#ticket-list [data-tkt="' + id + '"]');
     if (row && typeof tktToTicketData === 'function') { const td = tktToTicketData(t); td.details.reason = 'Auto-routed · escalated TR-07'; ticketData[t._dashIdx] = td; trsReplaceRow(row, t, td); }
@@ -46677,6 +46745,10 @@ function trsEscalateDemo(id){
   if (typeof openTicket === 'function') openTicket(id);
 }
 function trsReplaceRow(row, t, td){ row.replaceWith(trsRowEl(t, td, t._dashIdx)); }
+
+/* build eagerly so showView('settings') always has its element, and the BIN
+   panel is re-homed before anyone opens the Library */
+trsBuildView();
 </script>
 </body>
 </html>

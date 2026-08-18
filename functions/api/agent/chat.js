@@ -95,8 +95,8 @@ function systemPrompt(sessionType, merchant, board) {
     }
     return [
       "You are Twill's ticket-routing engine, running the exact semantics below on one incoming ticket. The user message carries the ticket: source, type, merchant record summary, optional processor-payload assignee, and the message body.",
-      "Reason in 3-6 plain sentences, in order: which hard rules fire (a hard rule ends the department decision), which weights accumulate otherwise, who the candidates inside the winning department are, and who wins on strategy (round-robin honors rotation; least-loaded compares open-ticket counts — the numbers are in the data). Cite role descriptions by name when they decide between people. If a processor payload names a person, fuzzy-match them to a portal user and add them as a WATCHER, never as the assignee. If nothing scores, apply the fallback: every rep on the deal, account owner keeps visibility. No markdown, no emoji.",
-      "Then output the decision as the FINAL line, exactly: ROUTE_JSON: {\"dept\":\"<department name or null for fallback>\",\"assignees\":[\"<full names>\"],\"watchers\":[\"<full names>\"],\"priority\":\"low|normal|high|urgent\",\"rule_hits\":[{\"id\":\"TR-xx\",\"kind\":\"hard|weight|escalation\",\"effect\":\"<one clause>\"}],\"scores\":[{\"name\":\"<candidate>\",\"open\":<open tickets>,\"score\":<number>,\"why\":\"<one clause>\"}],\"why\":\"<one-sentence audit summary>\"}",
+      "Reason in AT MOST 4 short plain sentences, in order: which hard rules fire (a hard rule ends the department decision), which weights accumulate otherwise, and who wins inside the department on strategy (round-robin honors rotation; least-loaded compares open-ticket counts — the numbers are in the data). Cite a role description by name only when it decides between people. If a processor payload names a person, fuzzy-match them to a portal user and add them as a WATCHER, never as the assignee. If nothing scores, apply the fallback: every rep on the deal, account owner keeps visibility. Keep the reasoning tight — the JSON line is mandatory and must never be cut off. No markdown, no emoji.",
+      "Then output the decision as the FINAL line, exactly: ROUTE_JSON: {\"dept\":\"<department name or null for fallback>\",\"assignees\":[\"<full names>\"],\"watchers\":[\"<full names>\"],\"priority\":\"low|normal|high|urgent\",\"rule_hits\":[{\"id\":\"TR-xx\",\"kind\":\"hard|weight|escalation\",\"effect\":\"<one clause>\"}],\"scores\":[{\"name\":\"<candidate>\",\"open\":<open tickets>,\"score\":<number>,\"why\":\"<one clause>\"}],\"why\":\"<one-sentence audit summary>\"} — scores lists only the candidates actually considered, max 4 entries, each why one short clause.",
       "Chargebacks and disputes default to high priority; genuinely urgent operational failures (merchant cannot process) may be urgent. Never invent people, departments, rules, or workload numbers — only what the data holds. Single-line valid JSON. Nothing after the ROUTE_JSON line.",
       ...CTX,
       "Ticket: " + JSON.stringify(board.ticket || {}).slice(0, 2000),
@@ -177,7 +177,9 @@ export async function onRequestPost({ request, env }) {
 
   const payload = {
     model: MODEL,
-    max_tokens: MAX_TOKENS,
+    // ticket-routing replies carry a mandatory trailing JSON line (rule_hits + scores);
+    // the 900 cap truncated mid-reasoning before the JSON could be emitted
+    max_tokens: body.sessionType === "ticket-routing" ? 1400 : MAX_TOKENS,
     system: systemPrompt(body.sessionType, body.merchant || {}, body.board || {}),
     messages: collapsed,
   };
