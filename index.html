@@ -2794,7 +2794,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="nav-item" id="nav-aicommand" onclick="showView('ai-command', this); if (typeof aicInit === 'function') setTimeout(aicInit, 20);">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.3 3.6 3.7.5-2.7 2.5.7 3.7L8 9.5l-3 1.8.7-3.7L3 5.1l3.7-.5L8 1z"/><path d="M13 10l.5 1.4 1.5.2-1.1 1 .3 1.4-1.2-.7-1.2.7.3-1.4-1.1-1 1.5-.2L13 10z" opacity=".65"/></svg>
         AI Command Center
-        <span style="margin-left:auto;background:var(--yellow);color:var(--navy-dark);font-size:8px;font-weight:800;padding:1px 6px;border-radius:8px;letter-spacing:.5px;">NEW</span>
+        <button class="aic-navplus" title="New AI task" onclick="event.stopPropagation();showView('ai-command', document.getElementById('nav-aicommand')); if (typeof aicInit === 'function') { aicInit(); aicNewTask(); }">＋</button>
       </div>
     </div>
 
@@ -3311,6 +3311,17 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-rsec-ttl { font-size:12.5px; font-weight:800; color:var(--text-primary); }
       .aic-rsec-sub { font-size:11px; font-weight:600; color:var(--text-secondary); margin-left:auto; }
       .aic-rep-more { padding:8px 12px; font-size:11px; color:var(--text-muted); border-top:1px solid var(--border); }
+      .aic-navplus { margin-left:auto; width:20px; height:20px; border-radius:50%; background:var(--yellow); color:var(--navy-dark); font-size:14px; font-weight:800; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+      .aic-navplus:hover { background:var(--gold); }
+      .aic-hero { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; min-height:420px; padding:40px 24px; }
+      .aic-hero-g { font-size:24px; font-weight:800; color:var(--text-primary); }
+      .aic-hero-spark { color:var(--gold); }
+      .aic-hero-sub { font-size:13px; color:var(--text-secondary); max-width:440px; text-align:center; line-height:1.6; }
+      .aic-hero-comp { width:min(620px, 94%); border:1.5px solid rgba(0,0,0,0.18); border-radius:12px; background:var(--bg-base); padding:8px 10px; margin-top:6px; border-top:1.5px solid rgba(0,0,0,0.18) !important; }
+      .aic-hero-comp .aic-in { border:none; background:transparent; font-size:14px; }
+      .aic-hero-ex { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+      .aic-chipx { font-size:11.5px; font-weight:600; color:var(--text-secondary); background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:16px; padding:5px 12px; cursor:pointer; font-family:var(--font-ui); }
+      .aic-chipx:hover { border-color:var(--navy); color:var(--text-primary); }
       .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid rgba(0,0,0,0.06); padding:11px 14px; }
       .aic-in { flex:1; font-size:13px; color:var(--text-primary); background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:7px; padding:8px 12px; font-family:var(--font-ui); outline:none; }
       .aic-in:focus { border-color:rgba(0,0,0,0.3); }
@@ -3346,11 +3357,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         </div>
       </div>
       <div class="aic-wrap">
-        <div class="aic-cmdbar">
-          <span class="aic-spark">&#x2726;</span>
-          <input id="aicCmdInput" class="aic-cmdin" placeholder="Ask, act, or run a report — @merchant for context, &quot;report: my underwriting files&quot; for a table" onkeydown="aicCmdKey(event)">
-          <span class="aic-hint">@ merchant</span><span class="aic-hint">/ playbook</span><span class="aic-hint">report:</span>
-        </div>
         <div class="aic-digest" id="aicDigest"></div>
         <div class="aic-panes">
           <div id="aicQueue"></div>
@@ -45198,7 +45204,23 @@ function aicOpenTask(id){
 function aicRenderWs(){
   var t = aicTask();
   var ws = document.getElementById('aicWs');
-  if (!t) { ws.innerHTML = '<div class="card"><div class="cc-work-empty"><div class="cc-work-empty-ic">\u2728</div>Queue clear. Ask anything above, or switch lens with the Role control.</div></div>'; return; }
+  if (!t) { ws.innerHTML = '<div class="card"><div class="cc-work-empty"><div class="cc-work-empty-ic">\u2728</div>Queue clear. Hit \uFF0B on AI Command Center in the nav to start something.</div></div>'; return; }
+  if ((t.userCreated || t.adhoc) && t.title === 'New task' && !(t.msgs || []).some(function(m){ return m.kind === 'user'; })) {
+    var hr = new Date().getHours();
+    var greet = (hr >= 22 || hr < 5) ? 'Working late, Mike' : hr < 12 ? 'Good morning, Mike' : hr < 17 ? 'Good afternoon, Mike' : 'Good evening, Mike';
+    ws.innerHTML = '<div class="card aic-wscard"><div class="aic-hero">' +
+      '<div class="aic-hero-g"><span class="aic-hero-spark">\u2726</span> ' + greet + '</div>' +
+      '<div class="aic-hero-sub">Name a merchant, describe what you need, or ask for a report \u2014 I\u2019ll pull the context and propose a route.</div>' +
+      '<div class="aic-composer aic-hero-comp"><input class="aic-in" id="aicChatInput" placeholder="What are we getting done?" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div>' +
+      '<div class="aic-hero-ex">' +
+        '<button class="aic-chipx" onclick="aicHeroFill(this)">chase the missing docs on a merchant</button>' +
+        '<button class="aic-chipx" onclick="aicHeroFill(this)">report: my book by status</button>' +
+        '<button class="aic-chipx" onclick="aicHeroFill(this)">message a merchant about their next step</button>' +
+      '</div></div></div>';
+    var hin = document.getElementById('aicChatInput');
+    if (hin) hin.focus();
+    return;
+  }
   var m = aicMerchantRow(t.merchant);
   var redact = aicRole().redactProcessor;
   var h = '<div class="card aic-wscard"><div class="aic-ws-hd">' +
@@ -45228,8 +45250,8 @@ function aicRenderWs(){
     doneBan = '<div class="aic-doneban">\u2713 <b>Task complete</b> \u2014 summary + transcript filed' + (t.merchant ? ' to the merchant timeline \u00B7 <button class="aic-linky" onclick="aicOpenRecord()">Verify on the record \u2197</button>' : '') + '<button class="btn btn-primary aic-sm" style="margin-left:auto;" onclick="aicNextTask()">Next task \u2192</button></div>';
   }
   h += doneBan + '<div class="aic-thread' + (t.state === 'done' ? ' done' : '') + '" id="aicThread">' + aicSectionsHTML(t) + (t.msgs || []).map(aicMsgHTML).join('') + '</div>';
-  var ph = ((t.userCreated || t.adhoc) && !t.merchant) ? 'Search your book or describe the task \u2014 name, MID, partner, or status\u2026' : 'Reply \u2014 or type / for a playbook\u2026';
-  h += '<div class="aic-composer" style="position:relative;"><div class="aic-menu aic-sugg" id="aicSugg"></div><input class="aic-in" id="aicChatInput" placeholder="' + ph + '" oninput="aicComposerInput()" onfocus="aicComposerInput(true)" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
+  var ph = ((t.userCreated || t.adhoc) && !t.merchant) ? 'Name a merchant, describe a task, or ask for a report\u2026' : 'Reply \u2014 or type / for a playbook\u2026';
+  h += '<div class="aic-composer" style="position:relative;"><input class="aic-in" id="aicChatInput" placeholder="' + ph + '" onkeydown="if(event.key===\'Enter\')aicChatSend()"><button class="btn btn-primary aic-sm" onclick="aicChatSend()">Send</button></div></div>';
   ws.innerHTML = h;
   var th = document.getElementById('aicThread');
   if (th) th.scrollTop = th.scrollHeight;
@@ -45857,38 +45879,6 @@ function aicOptPick(taskId, name){
   var pq = t._pendingQ; t._pendingQ = null;
   if (pq) aicAI(t, pq);
 }
-function aicComposerInput(fromFocus){
-  var t = aicTask();
-  var input = document.getElementById('aicChatInput');
-  var host = document.getElementById('aicSugg');
-  if (!t || !input || !host) return;
-  if (!((t.userCreated || t.adhoc) && !t.merchant)) { host.classList.remove('open'); return; }
-  var q = (input.value || '').trim();
-  var hits;
-  if (q.length < 3) {
-    if (!fromFocus) { host.classList.remove('open'); return; }
-    hits = (typeof merchantData !== 'undefined' ? merchantData.slice() : [])
-      .sort(function(a, b){ return aicParseVol(b.volMTD || b.potVol) - aicParseVol(a.volMTD || a.potVol); })
-      .slice(0, 5).map(function(m){ return { m:m }; });
-  } else {
-    hits = aicResolve(q).slice(0, 5);
-  }
-  if (!hits.length) { host.classList.remove('open'); return; }
-  host.innerHTML = '<div class="hd">Search your book \u2014 name, MID, partner, or status</div>' + hits.map(function(h){
-    return '<div class="aic-sugg-row" onclick="aicSuggPick(\'' + t.id + '\',\'' + aicEsc(h.m.name).replace(/'/g, "\\'") + '\')"><b>' + h.m.name + '</b><span>' + (h.m.status || '') + (h.m.partner ? ' \u00B7 ' + h.m.partner : '') + (h.m.volMTD || h.m.potVol ? ' \u00B7 ' + (h.m.volMTD || h.m.potVol) + '/mo' : '') + '</span></div>';
-  }).join('');
-  host.classList.add('open');
-}
-function aicSuggPick(taskId, name){
-  var t = AIC_TASKS[taskId]; if (!t) return;
-  var host = document.getElementById('aicSugg'); if (host) host.classList.remove('open');
-  var m = aicMerchantRow(name); if (!m) return;
-  var input = document.getElementById('aicChatInput');
-  var keep = input ? input.value : '';
-  aicBindMerchant(t, m, true);
-  var inp2 = document.getElementById('aicChatInput');
-  if (inp2) { inp2.value = keep; inp2.focus(); }
-}
 function aicAI(t, q, attempt){
   var th = document.getElementById('aicThread');
   if (th) th.insertAdjacentHTML('beforeend', '<div class="aic-typing" id="aicTyping">\u2726 thinking\u2026</div>');
@@ -45922,6 +45912,10 @@ function aicAI(t, q, attempt){
     t.transcript.push({ role:'agent', text:reply });
   });
 }
+function aicHeroFill(btn){
+  var inp = document.getElementById('aicChatInput');
+  if (inp) { inp.value = btn.textContent; inp.focus(); }
+}
 function aicChatSend(){
   var input = document.getElementById('aicChatInput');
   var q = (input ? input.value : '').trim(); if (!q) return;
@@ -45936,6 +45930,16 @@ function aicChatSend(){
   aicMention(t, q);
   aicPush(t, { kind:'user', html:aicEsc(q) });
   t.transcript.push({ role:'user', text:q });
+  if (!document.getElementById('aicThread')) aicRenderWs();
+  if ((t.userCreated || t.adhoc) && aicReportIntent(q)) {
+    var rr = aicBuildReport(q);
+    t.report = rr;
+    if ((t.msgs || []).filter(function(m){ return m.kind === 'user'; }).length <= 1) { t.title = 'Report \u00B7 ' + q.replace(/^report[:\s]+/i, '').slice(0, 30); t.chip = '\u25A6 Report'; t.kind = 'report'; }
+    aicPush(t, { kind:'report', tid:t.id, r:rr });
+    t.transcript.push({ role:'agent', text:'Rendered a report for "' + q + '": ' + rr.rows.length + ' rows (' + rr.summary + ').' });
+    aicRenderQueue();
+    return;
+  }
   if (q.startsWith('/')) {
     aicPush(t, { kind:'ai', html:'Playbooks on your ' + aicRole().label + ' palette: <b>UW response review</b>, <b>UW document chase</b>, <b>Anomaly investigation</b>, <b>Lead detect from call</b>, <b>Referral outreach</b>, <b>Signature chase</b>. Each one lives in the Knowledge base \u2014 edit the doc, change my behavior.' });
     return;
@@ -46067,25 +46071,6 @@ function aicRepCsv(taskId){
   a.download = 'twill-report.csv';
   document.body.appendChild(a); a.click(); a.remove();
   aicToastSafe('⬇', 'Report downloaded — twill-report.csv');
-}
-function aicCmdKey(ev){
-  if (ev.key !== 'Enter') return;
-  var input = document.getElementById('aicCmdInput');
-  var q = (input ? input.value : '').trim(); if (!q) return;
-  input.value = '';
-  if (aicReportIntent(q)) { aicRunReport(q); return; }
-  var id = 't-adhoc-' + (++AIC_STATE.adhocSeq);
-  var mName = null;
-  var rhits = aicResolve(q.replace('@', ' '));
-  if (rhits.length && rhits[0].s >= 30) mName = rhits[0].m.name;
-  AIC_TASKS[id] = { id:id, adhoc:true, dynamic:true, merchant:mName, contact:null, av:'✦', avc:'#8358A8', lane:'needs', state:'open', stage:0, age:'now',
-    title:'Ad-hoc · ' + (mName || q.slice(0, 28) + (q.length > 28 ? '…' : '')), sub:q.slice(0, 60), chip:null, status:'', playbook:'Freeform',
-    deflect:['I couldn\u2019t reach the live model on that one \u2014 likely a slow reply that timed out. Ask again and I\u2019ll retry; your task and its context are intact.'],
-    transcript:[{ role:'agent', text:'Ad-hoc session opened' + (mName ? ' with ' + mName + '’s record as context.' : ' over the queue and book.') }], msgs:[] };
-  AIC_STATE.open = id;
-  aicRenderWs();
-  var chat = document.getElementById('aicChatInput');
-  if (chat) { chat.value = q; aicChatSend(); }
 }
 </script>
 <style>
