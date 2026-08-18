@@ -45654,7 +45654,7 @@ function aicSuggPick(taskId, name){
   var inp2 = document.getElementById('aicChatInput');
   if (inp2) { inp2.value = keep; inp2.focus(); }
 }
-function aicAI(t, q){
+function aicAI(t, q, attempt){
   var th = document.getElementById('aicThread');
   if (th) th.insertAdjacentHTML('beforeend', '<div class="aic-typing" id="aicTyping">\u2726 thinking\u2026</div>');
   if (th) th.scrollTop = th.scrollHeight;
@@ -45674,6 +45674,7 @@ function aicAI(t, q){
   })
   .catch(function(){
     var el = document.getElementById('aicTyping'); if (el) el.remove();
+    if (!attempt) { aicAI(t, q, 1); return; }
     var pool = t.deflect || [];
     var idx = (t._dIdx = ((t._dIdx || 0) % Math.max(pool.length, 1)));
     var reply = pool.length ? pool[idx] : 'I\u2019m grounded in this task\u2019s data \u2014 the routes above are the fastest way to close it. If you take one that leaves an open loop, I\u2019ll propose a follow-up time and you can adjust it.';
@@ -45779,7 +45780,7 @@ function aicCmdKey(ev){
   if (rhits.length && rhits[0].s >= 30) mName = rhits[0].m.name;
   AIC_TASKS[id] = { id:id, adhoc:true, dynamic:true, merchant:mName, contact:null, av:'✦', avc:'#8358A8', lane:'needs', state:'open', stage:0, age:'now',
     title:'Ad-hoc · ' + (mName || q.slice(0, 28) + (q.length > 28 ? '…' : '')), sub:q.slice(0, 60), chip:null, status:'', playbook:'Freeform',
-    deflect:['Live AI isn’t reachable right now — on the deployed portal this is a grounded answer about ' + (mName || 'your book') + '.'],
+    deflect:['I couldn\u2019t reach the live model on that one \u2014 likely a slow reply that timed out. Ask again and I\u2019ll retry; your task and its context are intact.'],
     transcript:[{ role:'agent', text:'Ad-hoc session opened' + (mName ? ' with ' + mName + '’s record as context.' : ' over the queue and book.') }], msgs:[] };
   AIC_STATE.open = id;
   aicRenderWs();
