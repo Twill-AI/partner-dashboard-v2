@@ -3282,6 +3282,15 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       .aic-optrow:hover { border-color:var(--navy); background:var(--bg-selected); }
       .aic-optrow b { font-size:12.5px; font-weight:700; color:var(--text-primary); }
       .aic-optrow span { font-size:10.5px; color:var(--text-secondary); text-transform:capitalize; }
+      .aic-people { display:inline-flex; align-items:center; margin-left:2px; }
+      .aic-pav { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#fff; border:1.5px solid var(--bg-base); margin-left:-5px; }
+      .aic-pav:first-child { margin-left:0; }
+      .aic-pav.sm { width:18px; height:18px; font-size:8px; border:none; margin:0 2px 0 0; vertical-align:-4px; }
+      .aic-padd { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--text-secondary); background:transparent; border:1.5px dashed rgba(0,0,0,0.3); margin-left:-3px; cursor:pointer; }
+      .aic-padd:hover { border-color:var(--navy); color:var(--navy); }
+      .aic-people .aic-menu { min-width:230px; top:28px; right:auto; left:0; }
+      .aic-mlink { display:inline; background:none; border:none; padding:0; font:inherit; font-weight:700; color:#3E5E80; cursor:pointer; }
+      .aic-mlink:hover { text-decoration:underline; }
       .aic-composer { display:flex; gap:9px; align-items:center; border-top:1px solid rgba(0,0,0,0.06); padding:11px 14px; }
       .aic-in { flex:1; font-size:13px; color:var(--text-primary); background:var(--bg-base); border:1px solid rgba(0,0,0,0.15); border-radius:7px; padding:8px 12px; font-family:var(--font-ui); outline:none; }
       .aic-in:focus { border-color:rgba(0,0,0,0.3); }
@@ -45171,6 +45180,7 @@ function aicRenderWs(){
   var h = '<div class="card aic-wscard"><div class="aic-ws-hd">' +
     '<span class="aic-ws-ttl">' + t.title + '</span>' +
     (t.status ? '<span class="cc-wrow-sch aic-stchip">' + t.status + '</span>' : '') +
+    '<span class="aic-people" id="aicPeople">' + aicPeopleHTML(t) + '</span>' +
     '<div class="right">' +
       (m || t.merchant ? '<button class="btn btn-ghost aic-sm" onclick="aicToggleCtx(this)">Details \u25BE</button>' : '') +
       (m ? '<button class="btn btn-ghost aic-sm" onclick="aicOpenRecord()">Open record \u2197</button>' : '') +
@@ -45279,7 +45289,7 @@ function aicEditDraft(key, btn){
   if (!on) d.focus();
 }
 function aicSectionsHTML(t){
-  function agent(inner){ return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span></div><div class="aic-prose">' + inner + '</div></div>'; }
+  function agent(inner){ return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span></div><div class="aic-prose">' + aicLinkify(inner) + '</div></div>'; }
   function quote(n){ return n ? '<div class="aic-quote">' + n.text + '<span class="who">\u2014 ' + n.who + ' \u00B7 ' + n.when + '</span></div>' : ''; }
   var h = '';
   if (t.id === 't-pcr') {
@@ -45391,6 +45401,7 @@ function aicToggleWork(btn){
 
 /* ── messages ────────────────────────────────────────────────────── */
 function aicMsgHTML(msg){
+  if (msg.kind === 'action') return aicActionCardHTML(msg);
   if (msg.kind === 'sys') return '<div class="syse" style="padding:2px 0;"><span class="sysd"></span><span class="syst">' + msg.html + '</span></div>';
   if (msg.kind === 'out') {
     var prev = String(msg.html).replace(/<[^>]*>/g, '');
@@ -45398,7 +45409,9 @@ function aicMsgHTML(msg){
     return '<div class="aic-sent"><span class="aic-ok">\u2713</span> Sent \u2192 <b>' + (msg.to || 'recipient') + '</b> \u00B7 \u201C' + prev + '\u201D</div>';
   }
   if (msg.kind === 'user') return '<div class="aic-user">' + msg.html + '</div>';
-  return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span>' + (msg.live ? '<span class="amode int">Live</span>' : '') + '</div><div class="aic-prose">' + (msg.fmt ? msg.html : '<p>' + msg.html + '</p>') + '</div></div>';
+  var body = msg.fmt ? msg.html : '<p>' + msg.html + '</p>';
+  if (!msg.noLink) body = aicLinkify(body);
+  return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span>' + (msg.live ? '<span class="amode int">Live</span>' : '') + '</div><div class="aic-prose">' + body + '</div></div>';
 }
 function aicPush(t, msg){ (t.msgs = t.msgs || []).push(msg); if (AIC_STATE.open === t.id) { var th = document.getElementById('aicThread'); if (th) { th.insertAdjacentHTML('beforeend', aicMsgHTML(msg)); th.scrollTop = th.scrollHeight; } } }
 
@@ -45557,14 +45570,10 @@ function aicKebabAct(kind){
   if (kind === 'ticket') { aicPush(t, { kind:'sys', html:'\u{1F3AB} Converted to a ticket — transcript and findings attached' }); aicToastSafe('\u{1F3AB}', 'Ticket created from task — <strong>' + t.title + '</strong>'); }
 }
 function aicTeammate(taskId, userId){
-  var t = AIC_TASKS[taskId]; if (!t) return;
   document.querySelectorAll('.aic-menu.open').forEach(function(m){ m.classList.remove('open'); });
-  var u = (typeof KB_USERS !== 'undefined') ? KB_USERS.find(function(x){ return x.id === userId; }) : null;
-  if (!u) return;
-  try { if (t.merchant && typeof assignPerson === 'function') assignPerson(t.merchant, u, u.role === 'deploy' ? 'deploy' : 'uw', 'aic'); } catch(e) {}
-  aicPush(t, { kind:'sys', html:'＋ <b>' + u.name + '</b> joined this task — they see the full history and can act on it from their queue' });
-  t.transcript.push({ role:'agent', text:u.name + ' added to the task.' });
-  aicToastSafe('＋', '<strong>' + u.name + '</strong> added — ' + t.title);
+  var t = AIC_TASKS[taskId]; if (!t || typeof KB_USERS === 'undefined') return;
+  var u = KB_USERS.find(function(x){ return x.id === userId; });
+  if (u) aicAddPerson(t, u, false);
 }
 function aicOpenRecord(){
   var t = aicTask(); if (!t) return;
@@ -45592,6 +45601,178 @@ function aicBoard(t){
     followupPolicy: 'Always propose a resurface time with reasoning and offer a custom time.'
   };
 }
+/* ── People on a task: avatar stack, click-to-add, @mentions ── */
+function aicPeople(t){
+  t.people = t.people || [];
+  var out = [];
+  var m = aicMerchantRow(t.merchant);
+  if (m && m.assignee) out.push({ name:m.assignee, av:m.av || m.assignee.split(' ').map(function(w){ return w[0]; }).join(''), avColor:m.avColor || '#A09E9A', seed:true });
+  t.people.forEach(function(u){ if (!out.some(function(o){ return o.name === u.name; })) out.push(u); });
+  return out;
+}
+function aicPeopleHTML(t){
+  var ppl = aicPeople(t);
+  var h = ppl.map(function(u){ return '<span class="aic-pav" style="background:' + (u.avColor || '#A09E9A') + ';" title="' + u.name + (u.seed ? ' \u00B7 assigned on the record' : ' \u00B7 on this task') + '">' + u.av + '</span>'; }).join('');
+  var opts = (typeof KB_USERS !== 'undefined') ? KB_USERS.filter(function(u){ return u.role !== 'partner' && !ppl.some(function(o){ return o.name === u.name; }); }) : [];
+  h += '<span style="position:relative;"><button class="aic-padd" data-aic-menu title="Add a rep to this task" onclick="aicMenuToggle(event,\'aicPeopleMenu\')">\uFF0B</button>' +
+    '<div class="aic-menu" id="aicPeopleMenu"><div class="hd">Add to this task</div>' +
+    (opts.length ? opts.map(function(u){ return '<div onclick="aicAddPersonById(\'' + u.id + '\')"><span class="aic-pav sm" style="background:' + u.avColor + ';">' + u.av + '</span> ' + u.name + ' <span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;">' + u.role + '</span></div>'; }).join('') : '<div style="color:var(--text-muted);">Everyone is on it</div>') +
+    '</div></span>';
+  return h;
+}
+function aicRenderPeople(){
+  var t = aicTask(); var host = document.getElementById('aicPeople');
+  if (t && host) host.innerHTML = aicPeopleHTML(t);
+}
+function aicAddPerson(t, u, viaChat){
+  t.people = t.people || [];
+  if (aicPeople(t).some(function(o){ return o.name === u.name; })) return;
+  t.people.push({ name:u.name, av:u.av, avColor:u.avColor });
+  try { if (t.merchant && typeof assignPerson === 'function') assignPerson(t.merchant, u, u.role === 'deploy' ? 'deploy' : 'uw', 'aic'); } catch(e) {}
+  aicPush(t, { kind:'sys', html:'\uFF0B <b>' + u.name + '</b> joined this task' + (viaChat ? ' (tagged in chat)' : '') + ' \u2014 they see the full history from their own queue' });
+  t.transcript.push({ role:'agent', text:u.name + ' was added to the task.' });
+  aicToastSafe('\uFF0B', '<strong>' + u.name + '</strong> added \u2014 ' + t.title);
+  aicRenderPeople();
+}
+function aicAddPersonById(uid){
+  document.querySelectorAll('.aic-menu.open').forEach(function(m){ m.classList.remove('open'); });
+  var t = aicTask(); if (!t || typeof KB_USERS === 'undefined') return;
+  var u = KB_USERS.find(function(x){ return x.id === uid; });
+  if (u) aicAddPerson(t, u, false);
+}
+function aicMention(t, q){
+  if (typeof KB_USERS === 'undefined') return;
+  var mm = q.match(/@"([^"]+)"|@([A-Za-z][\w.]*)/);
+  if (!mm) return;
+  var tok = (mm[1] || mm[2]).toLowerCase();
+  var u = KB_USERS.find(function(x){ return x.role !== 'partner' && (x.name.toLowerCase().indexOf(tok) !== -1 || x.name.split(' ')[0].toLowerCase() === tok || x.id.replace('u-', '') === tok); });
+  if (u) aicAddPerson(t, u, true);
+}
+
+/* ── Agent actions from typed chat: ACTION_JSON → cards / direct effects ── */
+function aicLinkify(html){
+  if (typeof merchantData === 'undefined' || !html) return html;
+  var names = merchantData.map(function(m){ return m.name; }).sort(function(a, b){ return b.length - a.length; });
+  var out = String(html).split(/(<[^>]+>)/).map(function(seg){
+    if (seg.charAt(0) === '<') return seg;
+    names.forEach(function(n){
+      if (seg.indexOf('\u0001') !== -1 && seg.indexOf('\u0001' + n) !== -1) return;
+      var re = new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      seg = seg.replace(re, function(match){ return '\u0001' + match + '\u0002'; });
+    });
+    return seg;
+  }).join('');
+  return out.replace(/\u0001([^\u0002]+)\u0002/g, function(_, name){
+    return '<button class="aic-mlink" data-m="' + name + '" onclick="event.stopPropagation();aicRepOpen(this.getAttribute(\'data-m\'))">' + name + ' \u2197</button>';
+  });
+}
+function aicHandleAction(t, a){
+  if (!a || !a.type) return;
+  if (a.type === 'snooze') { aicSnooze(t.id, a.when || 'tomorrow 9am'); return; }
+  if (a.type === 'done') { aicDone(t.id); return; }
+  if (a.type === 'report') { aicRunReport(a.query || ''); return; }
+  if (a.type === 'assign') {
+    if (typeof KB_USERS !== 'undefined') {
+      var tok = String(a.user || '').toLowerCase();
+      var u = KB_USERS.find(function(x){ return x.role !== 'partner' && x.name.toLowerCase().indexOf(tok) !== -1; });
+      if (u) aicAddPerson(t, u, false);
+    }
+    return;
+  }
+  if (a.type === 'navigate') {
+    var hits = aicResolve(String(a.merchant || ''));
+    if (hits.length) {
+      if (!t.merchant) aicBindMerchant(t, hits[0].m, true);
+      else aicPush(t, { kind:'sys', html:'\u2726 <b>' + hits[0].m.name + '</b> \u00B7 <button class="aic-linky" onclick="aicRepOpen(\'' + aicEsc(hits[0].m.name) + '\')">Open record \u2197</button>' });
+    }
+    return;
+  }
+  var aid = 'act-' + (++AIC_STATE.adhocSeq);
+  t._acts = t._acts || {};
+  t._acts[aid] = a;
+  aicPush(t, { kind:'action', tid:t.id, aid:aid, a:a });
+}
+function aicActionCardHTML(msg){
+  var a = msg.a;
+  if (msg.exec) return '<div class="syse" style="padding:2px 0;"><span class="sysd"></span><span class="syst">\u2713 ' + (msg.execLabel || 'Done') + '</span></div>';
+  if (msg.dismissed) return '<div class="syse" style="padding:2px 0;"><span class="sysd"></span><span class="syst" style="opacity:.6;">Action dismissed</span></div>';
+  var title, btn, then, draft = '';
+  if (a.type === 'message') {
+    title = 'Message \u2014 ' + (a.to || 'recipient') + (a.channel ? ' <span class="amode ' + (a.channel === 'merchant' ? 'out' : a.channel === 'team' ? 'int' : 'ptr') + '">' + a.channel + '</span>' : '');
+    btn = '\u2713 Approve &amp; send';
+    then = 'sends \u2192 task <b>Waiting</b> \u00B7 resurfaces ' + (a.resurface || 'on reply or tomorrow 9am');
+    draft = a.body || '';
+  } else if (a.type === 'send_app') {
+    title = 'Send application \u2014 ' + (a.to || 'contact');
+    btn = '\u2713 Approve &amp; send';
+    then = 'application link goes out \u2192 task <b>Waiting</b> \u00B7 resurfaces ' + (a.resurface || 'on open or tomorrow 9am');
+    draft = a.note || '';
+  } else if (a.type === 'create_ticket') {
+    title = 'Ticket \u2014 ' + (a.title || 'untitled') + (a.assignee ? ' \u00B7 assign <b>' + a.assignee + '</b>' : '');
+    btn = '\u{1F3AB} Create &amp; assign';
+    then = 'ticket filed with this thread attached' + (a.assignee ? ' \u2192 ' + a.assignee : '');
+    draft = a.body || '';
+  } else if (a.type === 'create_lead') {
+    title = 'Create lead \u2014 ' + (a.name || 'new merchant');
+    btn = '\uFF0B Create lead';
+    then = 'record starts \u00B7 nothing is sent yet';
+    draft = a.note || '';
+  } else {
+    return '';
+  }
+  return '<div class="aic-decide"><div class="aic-route">' +
+    '<div class="aic-rtop"><span class="aic-rec">Agent action</span>' + title + '</div>' +
+    (draft ? '<div class="aic-draft" id="aic-adraft-' + msg.aid + '">' + aicEsc(draft) + ' <button class="aic-linky" onclick="aicEditDraft(\'a-' + msg.aid + '\', this)">\u270E Edit</button></div>' : '') +
+    '<div class="aic-ract"><button class="btn btn-primary aic-sm" onclick="aicExecAction(\'' + msg.tid + '\',\'' + msg.aid + '\')">' + btn + '</button>' +
+    '<button class="btn btn-ghost aic-sm" onclick="aicDismissAction(\'' + msg.tid + '\',\'' + msg.aid + '\')">Dismiss</button>' +
+    '<span class="aic-then"><b>Then:</b> ' + then + '</span></div></div></div>';
+}
+function aicActMsg(t, aid){ return (t.msgs || []).find(function(m){ return m.kind === 'action' && m.aid === aid; }); }
+function aicExecAction(taskId, aid){
+  var t = AIC_TASKS[taskId]; if (!t || !t._acts || !t._acts[aid]) return;
+  var a = t._acts[aid];
+  var msg = aicActMsg(t, aid); if (!msg || msg.exec || msg.dismissed) return;
+  var draftEl = document.getElementById('aic-adraft-' + aid);
+  var body = draftEl ? draftEl.textContent.replace(/\u270E Edit|\u2713 Save edit/g, '').trim() : (a.body || a.note || '');
+  if (a.type === 'message') {
+    aicPush(t, { kind:'out', to:a.to || 'recipient', html:aicEsc(body).slice(0, 400) });
+    t.state = 'waiting'; t.waitLabel = a.resurface || 'reply or 9am'; t.lane = t.lane === 'fyi' ? t.lane : 'needs';
+    msg.exec = true; msg.execLabel = 'Sent to ' + (a.to || 'recipient') + ' \u2014 task moved to Waiting \u00B7 resurfaces ' + (a.resurface || 'on reply or tomorrow 9am');
+    aicTimeline(t.merchant, 'Message sent to ' + (a.to || 'contact') + (a.subject ? ' \u2014 ' + a.subject : '') + '. Watching for the reply.');
+    aicToastSafe('\u2709', 'Sent \u2014 <strong>' + (a.to || 'recipient') + '</strong>');
+    t.transcript.push({ role:'agent', text:'Message approved and sent to ' + (a.to || 'recipient') + '. Task waiting; resurfaces ' + (a.resurface || 'tomorrow 9am') + '.' });
+  } else if (a.type === 'send_app') {
+    aicPush(t, { kind:'out', to:a.to || 'contact', html:aicEsc(body || 'Application link').slice(0, 400) });
+    t.state = 'waiting'; t.waitLabel = a.resurface || 'open event or 9am';
+    msg.exec = true; msg.execLabel = 'Application sent to ' + (a.to || 'contact') + ' \u2014 task moved to Waiting';
+    aicTimeline(t.merchant, 'Application sent to ' + (a.to || 'contact') + '.');
+    aicToastSafe('\u2709', 'Application sent \u2014 <strong>' + (a.to || 'contact') + '</strong>');
+    t.transcript.push({ role:'agent', text:'Application sent to ' + (a.to || 'contact') + '.' });
+  } else if (a.type === 'create_ticket') {
+    msg.exec = true; msg.execLabel = 'Ticket created \u2014 ' + (a.title || '') + (a.assignee ? ' \u00B7 assigned to ' + a.assignee : '');
+    if (a.assignee && typeof KB_USERS !== 'undefined') {
+      var tok = a.assignee.toLowerCase();
+      var u = KB_USERS.find(function(x){ return x.role !== 'partner' && x.name.toLowerCase().indexOf(tok) !== -1; });
+      if (u) aicAddPerson(t, u, false);
+    }
+    aicTimeline(t.merchant, 'Ticket created: ' + (a.title || '') + '.');
+    aicToastSafe('\u{1F3AB}', 'Ticket created \u2014 <strong>' + aicEsc(a.title || '') + '</strong>');
+    t.transcript.push({ role:'agent', text:'Ticket created: ' + (a.title || '') + '.' });
+  } else if (a.type === 'create_lead') {
+    msg.exec = true; msg.execLabel = 'Lead created \u2014 ' + (a.name || 'new merchant');
+    aicToastSafe('\uFF0B', 'Lead created \u2014 <strong>' + aicEsc(a.name || '') + '</strong>');
+    t.transcript.push({ role:'agent', text:'Lead created: ' + (a.name || '') + '.' });
+  }
+  aicRenderQueue(); aicSubLine(); aicRenderWs();
+}
+function aicDismissAction(taskId, aid){
+  var t = AIC_TASKS[taskId]; if (!t) return;
+  var msg = aicActMsg(t, aid); if (!msg || msg.exec) return;
+  msg.dismissed = true;
+  t.transcript.push({ role:'agent', text:'Proposed action dismissed by the user.' });
+  aicRenderWs();
+}
+
 /* ── Co-pilot search (from Nader's Operator's Co-Pilot: search → navigate/options) ── */
 function aicResolve(q){
   if (typeof merchantData === 'undefined') return [];
@@ -45669,8 +45850,12 @@ function aicAI(t, q, attempt){
   .then(function(d){
     var el = document.getElementById('aicTyping'); if (el) el.remove();
     if (!d || !d.text) throw new Error('empty');
-    aicPush(t, { kind:'ai', live:true, fmt:true, html:aicFmt(d.text) });
+    var raw = d.text, act = null;
+    var am = raw.match(/ACTION_JSON:\s*(\{[\s\S]*\})\s*$/);
+    if (am) { try { act = JSON.parse(am[1]); raw = raw.slice(0, am.index).trim(); } catch(e) {} }
+    if (raw) aicPush(t, { kind:'ai', live:true, fmt:true, html:aicFmt(raw) });
     t.transcript.push({ role:'agent', text:d.text });
+    if (act) aicHandleAction(t, act);
   })
   .catch(function(){
     var el = document.getElementById('aicTyping'); if (el) el.remove();
@@ -45694,6 +45879,7 @@ function aicChatSend(){
     t.sub = 'Your task'; t.chip = '\u2726 Working';
     aicRenderQueue();
   }
+  aicMention(t, q);
   aicPush(t, { kind:'user', html:aicEsc(q) });
   t.transcript.push({ role:'user', text:q });
   if (q.startsWith('/')) {
@@ -45709,7 +45895,7 @@ function aicChatSend(){
       var opts = hits.slice(0, 4).map(function(h){
         return '<button type="button" class="aic-optrow" onclick="aicOptPick(\'' + t.id + '\',\'' + aicEsc(h.m.name).replace(/'/g, "\\'") + '\')"><b>' + h.m.name + '</b><span>' + (h.m.status || '') + (h.m.partner ? ' \u00B7 ' + h.m.partner : '') + (h.m.mid && h.m.mid !== 'Pending' ? ' \u00B7 ' + h.m.mid : '') + '</span></button>';
       }).join('');
-      aicPush(t, { kind:'ai', fmt:true, html:'<p>A few records match \u2014 which one?</p><div class="aic-opts">' + opts + '</div>' });
+      aicPush(t, { kind:'ai', fmt:true, noLink:true, html:'<p>A few records match \u2014 which one?</p><div class="aic-opts">' + opts + '</div>' });
       t.transcript.push({ role:'agent', text:'Asked which of ' + hits.slice(0, 4).map(function(h){ return h.m.name; }).join(', ') + ' the user meant.' });
       return;
     }
