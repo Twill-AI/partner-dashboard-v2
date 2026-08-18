@@ -2857,6 +2857,10 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
         Portfolio Alerts
         <span style="margin-left:auto;background:rgba(155,107,91,0.18);color:#9B6B5B;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">9</span>
       </div>
+      <div class="nav-item" id="nav-settings" onclick="showView('settings', this); if (typeof trsInit==='function') setTimeout(trsInit, 20);">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 5.25A2.75 2.75 0 1 0 8 10.75 2.75 2.75 0 0 0 8 5.25zm0 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/><path d="M6.9 1.5h2.2l.35 1.55c.4.14.78.33 1.13.56l1.5-.53 1.1 1.9-1.16 1.03c.05.32.05.66 0 .98l1.16 1.03-1.1 1.9-1.5-.53c-.35.23-.73.42-1.13.56L9.1 14.5H6.9l-.35-1.55a4.9 4.9 0 0 1-1.13-.56l-1.5.53-1.1-1.9 1.16-1.03a5 5 0 0 1 0-.98L2.82 4.98l1.1-1.9 1.5.53c.35-.23.73-.42 1.13-.56L6.9 1.5z" opacity=".55"/></svg>
+        Settings
+      </div>
     </div>
 
     <div class="sidebar-spacer"></div>
@@ -5342,7 +5346,6 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
           <div class="sig-uw-mode-toggle visible" id="klb-rt-toggle" style="margin-left:16px;">
             <div class="sig-uw-mode-btn on" id="klb-tab-knowledge" onclick="klbLibTab('knowledge')">✦ Knowledge</div>
             <div class="sig-uw-mode-btn" id="klb-tab-files" onclick="klbLibTab('files')">📁 Library</div>
-            <div class="sig-uw-mode-btn" id="klb-tab-routing" onclick="klbLibTab('routing')">🧭 Routing Rules</div>
           </div>
         </div>
         <div class="topbar-right">
@@ -12627,7 +12630,7 @@ function nudgeWithDocs() {
         <div style="display:flex;flex-direction:column;gap:5px;">
           <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Department <span style="color:var(--red);">*</span></label>
           <select id="au-dept" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;appearance:none;">
-            <option>Sales</option><option>Operations</option><option>Support</option><option>Executive</option><option>Finance</option>
+            <option>Sales</option><option>Operations</option><option>Support</option><option>Underwriting</option><option>Executive</option><option>Finance</option>
           </select>
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;">
@@ -12635,6 +12638,10 @@ function nudgeWithDocs() {
           <select id="au-type" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;appearance:none;">
             <option value="Rep">Rep</option><option value="Owner">Owner</option>
           </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;grid-column:1/-1;">
+          <label style="font-size:11px;font-weight:600;color:var(--text-secondary);">Role description <span style="font-weight:500;color:var(--text-muted);">— the routing agent reads this</span></label>
+          <textarea id="au-roledesc" rows="2" placeholder="What this person owns, in plain language. e.g. &quot;Handles funding holds and deposit questions for East-coast merchants; escalate anything bank-related to them.&quot;" style="background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;color:var(--text-primary);font-size:13px;font-family:var(--font-ui);outline:none;resize:vertical;line-height:1.5;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--border-strong)'"></textarea>
         </div>
       </div>
     </div>
@@ -35290,7 +35297,7 @@ function alertMessageMerchant(idx) {
    ═══════════════════════════════════════════════════════ */
 
 const usersData = [
-  { id:'USR-001', name:'James Carter',  initials:'JC', color:'#6366F1', dept:'Sales',     type:'Owner', email:'james@twill.io', phone:'(310) 555-0182', joined:'Jan 8, 2025',
+  { id:'USR-001', name:'James Carter',  initials:'JC', color:'#6366F1', dept:'Sales',     type:'Owner', roleDesc:'Founding partner-side owner. Final word on pricing exceptions and VIP merchants; escalations on any account without a clear owner land with him.', email:'james@twill.io', phone:'(310) 555-0182', joined:'Jan 8, 2025',
     seeRes:true, payouts:true, resPct:'1.20%', bonus:'$2,500', cycle:'Net 30', earned:'$3,240', ytd:'$18,400',
     active:34, pipeline:8, closedMtd:3, ttv:'6.2d', vol:'$412K', churn:'1.8%',
     pipeStages:[{label:'Lead',count:3},{label:'Applied',count:2},{label:'Underwriting',count:1},{label:'Boarding',count:2}],
@@ -35298,7 +35305,7 @@ const usersData = [
     managedPartners:[{name:'Apex Elite',id:'PTR-0042',merchants:218,vol:'$921K',color:'#6B839B',initials:'AE'},{name:'NovaPay',id:'PTR-0038',merchants:157,vol:'$641K',color:'#5B7A5E',initials:'NV'}],
     partnerOverrides:[{name:'Apex Elite',pct:'1.40%'},{name:'NovaPay',pct:'1.25%'},{name:'Summit Lending',pct:'1.10%'},{name:'Rivermark',pct:'1.00%'}],
     merchantOverrides:[{name:'Harbor Bistro',pct:'1.60%'},{name:'Lakeview Dental',pct:'1.45%'},{name:'Green Valley Market',pct:'1.35%'}] },
-  { id:'USR-002', name:'Sara Reyes',    initials:'SR', color:'#5B7A5E', dept:'Sales',     type:'Rep',   email:'sara@twill.io',  phone:'(424) 555-0044', joined:'Mar 15, 2025',
+  { id:'USR-002', name:'Sara Reyes',    initials:'SR', color:'#5B7A5E', dept:'Sales',     type:'Rep',   roleDesc:'Sales rep for the NovaPay and Rivermark books. First call on her own merchants before activation; support questions on live accounts go to the Support team, not her.', email:'sara@twill.io',  phone:'(424) 555-0044', joined:'Mar 15, 2025',
     seeRes:true, payouts:true, resPct:'0.85%', bonus:'$1,000', cycle:'Net 30', earned:'$1,820', ytd:'$9,200',
     active:19, pipeline:4, closedMtd:2, ttv:'7.1d', vol:'$188K', churn:'2.4%',
     pipeStages:[{label:'Lead',count:2},{label:'Applied',count:1},{label:'Underwriting',count:1},{label:'Boarding',count:0}],
@@ -35306,7 +35313,7 @@ const usersData = [
     managedPartners:[{name:'NovaPay',id:'PTR-0038',merchants:157,vol:'$641K',color:'#5B7A5E',initials:'NV'}],
     partnerOverrides:[{name:'NovaPay',pct:'0.90%'},{name:'Rivermark',pct:'0.80%'}],
     merchantOverrides:[] },
-  { id:'USR-003', name:'Dan Mitchell',  initials:'DM', color:'#6B839B', dept:'Operations',type:'Rep',   email:'dan@twill.io',   phone:'(213) 555-0091', joined:'Jun 2, 2024',
+  { id:'USR-003', name:'Dan Mitchell',  initials:'DM', color:'#6B839B', dept:'Operations',type:'Rep', roleDesc:'Runs deployment and equipment: terminal provisioning, VAR files, shipping, activation. Also owns chargeback and dispute workflows day to day.',   email:'dan@twill.io',   phone:'(213) 555-0091', joined:'Jun 2, 2024',
     seeRes:true, payouts:true, resPct:'0.70%', bonus:null, cycle:'Net 45', earned:'$940', ytd:'$6,100',
     active:12, pipeline:2, closedMtd:1, ttv:'8.4d', vol:'$143K', churn:'1.2%',
     pipeStages:[{label:'Lead',count:1},{label:'Applied',count:1},{label:'Underwriting',count:0},{label:'Boarding',count:0}],
@@ -35314,7 +35321,7 @@ const usersData = [
     managedPartners:[{name:'Summit Lending',id:'PTR-0031',merchants:184,vol:'$784K',color:'#8C7A5E',initials:'SL'}],
     partnerOverrides:[{name:'Summit Lending',pct:'0.75%'}],
     merchantOverrides:[{name:'Pines Auto Group',pct:'0.80%'}] },
-  { id:'USR-004', name:'Mike Wright',   initials:'MW', color:'#C9A800', dept:'Executive', type:'Owner', email:'mike@twill.io',  phone:'(310) 555-0001', joined:'Jan 1, 2024',
+  { id:'USR-004', name:'Mike Wright',   initials:'MW', color:'#C9A800', dept:'Executive', type:'Owner', roleDesc:'Executive oversight only — do not route day-to-day tickets here. Add as a watcher on regulatory, sponsor-bank, or partner-relationship issues.', email:'mike@twill.io',  phone:'(310) 555-0001', joined:'Jan 1, 2024',
     seeRes:true, payouts:true, resPct:'1.50%', bonus:'$5,000', cycle:'Net 30', earned:'$6,100', ytd:'$38,400',
     active:94, pipeline:21, closedMtd:7, ttv:'5.8d', vol:'$3.1M', churn:'1.4%',
     pipeStages:[{label:'Lead',count:8},{label:'Applied',count:6},{label:'Underwriting',count:4},{label:'Boarding',count:3}],
@@ -35322,13 +35329,13 @@ const usersData = [
     managedPartners:[{name:'Apex Elite',id:'PTR-0042',merchants:218,vol:'$921K',color:'#6B839B',initials:'AE'},{name:'NovaPay',id:'PTR-0038',merchants:157,vol:'$641K',color:'#5B7A5E',initials:'NV'},{name:'Summit Lending',id:'PTR-0031',merchants:184,vol:'$784K',color:'#8C7A5E',initials:'SL'},{name:'Rivermark',id:'PTR-0027',merchants:132,vol:'$512K',color:'#A67C5B',initials:'RM'},{name:'Coastal Commerce',id:'PTR-0019',merchants:94,vol:'$391K',color:'#9B6B5B',initials:'CC'}],
     partnerOverrides:[{name:'All Partners',pct:'1.50%'}],
     merchantOverrides:[] },
-  { id:'USR-005', name:'Blake Chen',    initials:'BC', color:'#9B6B5B', dept:'Support',   type:'Rep',   email:'blake@twill.io', phone:'(818) 555-0072', joined:'Sep 19, 2024',
+  { id:'USR-005', name:'Blake Chen',    initials:'BC', color:'#9B6B5B', dept:'Support',   type:'Rep', roleDesc:'Front-line support for active merchants: statements, deposits, fee questions, portal access. Round-robin default for general support traffic.',   email:'blake@twill.io', phone:'(818) 555-0072', joined:'Sep 19, 2024',
     seeRes:false, payouts:false, resPct:null, bonus:null, cycle:null, earned:'$0', ytd:'$0',
     active:0, pipeline:0, closedMtd:0, ttv:'—', vol:'—', churn:'—',
     pipeStages:[], perfCloses:[0,0,0,0,0,0], perfVol:[0,0,0,0,0,0],
     managedPartners:[],
     partnerOverrides:[], merchantOverrides:[] },
-  { id:'USR-006', name:'Tara Patel',    initials:'TP', color:'#A67C5B', dept:'Sales',     type:'Rep',   email:'tara@twill.io',  phone:'(562) 555-0033', joined:'Feb 11, 2024',
+  { id:'USR-006', name:'Tara Patel',    initials:'TP', color:'#A67C5B', dept:'Underwriting', type:'Rep', roleDesc:'Underwriting analyst: document collection, pend responses, application reviews. Everything on merchants still in underwriting lands with her first.',   email:'tara@twill.io',  phone:'(562) 555-0033', joined:'Feb 11, 2024',
     seeRes:true, payouts:true, resPct:'0.60%', bonus:'$500', cycle:'Net 30', earned:'$720', ytd:'$4,520',
     active:8, pipeline:3, closedMtd:1, ttv:'9.0d', vol:'$62K', churn:'3.1%',
     pipeStages:[{label:'Lead',count:2},{label:'Applied',count:1},{label:'Boarding',count:0},{label:'Underwriting',count:0}],
@@ -35554,6 +35561,7 @@ function submitAddUser() {
   const newId  = 'USR-' + String(100 + usersData.length + 1).slice(1);
 
   usersData.push({ id:newId, name, initials, color, dept, type, email,
+    roleDesc: (document.getElementById('au-roledesc')?.value || '').trim(),
     phone:document.getElementById('au-phone').value||'—', joined: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
     seeRes: document.getElementById('au-see-res').checked,
     payouts: document.getElementById('au-payouts').checked,
@@ -39999,6 +40007,7 @@ function prependProcessorTicketRows(){
         '<div class="trow-top"><span class="trow-id">#'+t.id+'</span>' +
           '<span class="p-badge" style="background:'+TKT_PRI_COLOR[t.priority]+'1a;color:'+TKT_PRI_COLOR[t.priority]+';">'+TKT_PRI_LBL[t.priority]+'</span>' +
           ccSourceBadge(t.source) +
+          (t.routing && typeof trsAuditBadge === 'function' ? trsAuditBadge(t) : '') +
           (td.assigned === 'You' ? '<span class="mine-dot" title="Assigned to you"></span>' : '') +
           '<span class="kb-dept-badge" style="margin-left:auto;text-transform:capitalize;">'+t.dept+'</span></div>' +
         '<div class="trow-title">'+tEsc(t.title)+'</div>' +
@@ -44412,16 +44421,15 @@ const KLBR_RULES = [
 let _klbrNextId = 10, _klbrDraft = null, _klbrEditId = null, _klbrEditDraft = null, _klbrRemoveId = null;
 
 function klbLibTab(tab) {
-  const routing = document.getElementById('klb-routing');
+  /* routing rules moved to Settings → Deal Routing; old cite-chips deep-link there */
+  if (tab === 'routing') { if (typeof trsOpen === 'function') trsOpen('deal'); return; }
   const files = document.querySelector('#view-library .klb-layout');
   const know = document.getElementById('klb-knowledge');
-  const bK = document.getElementById('klb-tab-knowledge'), bF = document.getElementById('klb-tab-files'), bR = document.getElementById('klb-tab-routing');
-  [bK,bF,bR].forEach(b => b && b.classList.remove('on'));
+  const bK = document.getElementById('klb-tab-knowledge'), bF = document.getElementById('klb-tab-files');
+  [bK,bF].forEach(b => b && b.classList.remove('on'));
   if (know) know.style.display='none';
-  routing.style.display='none';
   if (files) files.style.display='none';
-  if (tab === 'routing') { routing.style.display='block'; bR && bR.classList.add('on'); klbrRender(); }
-  else if (tab === 'files') { if (files) files.style.display=''; bF && bF.classList.add('on'); }
+  if (tab === 'files') { if (files) files.style.display=''; bF && bF.classList.add('on'); }
   else { if (know) know.style.display='flex'; bK && bK.classList.add('on'); }
 }
 
@@ -45362,9 +45370,7 @@ function aicSectionsHTML(t){
   else if (t.report) {
     var r = t.report;
     h += agent('<p>Here\u2019s the table for \u201C<b>' + aicEsc(r.q) + '</b>\u201D \u2014 sorted by volume. Click a row to open the record, or ask me to slice it.</p>');
-    h += '<div class="aic-rep-wrap"><table class="aic-rep-table"><thead><tr>' + r.cols.map(function(c){ return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      r.rows.map(function(row){ return '<tr data-m="' + aicEsc(row[0]) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))">' + row.map(function(c, i){ return '<td' + (i === 1 ? ' style="text-transform:capitalize;"' : '') + '>' + aicEsc(String(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
-      '</tbody></table></div>';
+    h += aicReportTableHTML(r);
     h += '<div class="aic-ract"><button class="btn btn-ghost aic-sm" onclick="aicRepCsv(\'' + t.id + '\')">\u2B07 Download CSV</button><span class="aic-then">Stays in your queue until you mark it <b>Done</b>.</span></div>';
   }
   else if (t.simple) {
@@ -45406,6 +45412,7 @@ function aicToggleWork(btn){
 
 /* ── messages ────────────────────────────────────────────────────── */
 function aicMsgHTML(msg){
+  if (msg.kind === 'report') return '<div class="aic-agent"><div class="aic-byline"><div class="aav" style="background:var(--navy);color:#fff;">\u2726</div><span class="aname">Twill AI</span><span class="amode int">Report</span></div><div class="aic-prose"><p><b>' + aicEsc(msg.r.summary) + '</b> \u00B7 click a row to open the record.</p></div>' + aicReportTableHTML(msg.r) + '<div class="aic-ract" style="margin-top:6px;"><button class="btn btn-ghost aic-sm" onclick="aicRepCsv(\'' + msg.tid + '\')">\u2B07 Download CSV</button></div></div>';
   if (msg.kind === 'action') return aicActionCardHTML(msg);
   if (msg.kind === 'sys') return '<div class="syse" style="padding:2px 0;"><span class="sysd"></span><span class="syst">' + msg.html + '</span></div>';
   if (msg.kind === 'out') {
@@ -45675,7 +45682,13 @@ function aicHandleAction(t, a){
   if (!a || !a.type) return;
   if (a.type === 'snooze') { aicSnooze(t.id, a.when || 'tomorrow 9am'); return; }
   if (a.type === 'done') { aicDone(t.id); return; }
-  if (a.type === 'report') { aicRunReport(a.query || ''); return; }
+  if (a.type === 'report') {
+    var rep = aicBuildReport(a.query || '');
+    t.report = rep;
+    aicPush(t, { kind:'report', tid:t.id, r:rep });
+    t.transcript.push({ role:'agent', text:'Rendered an inline report for "' + (a.query || '') + '": ' + rep.rows.length + ' rows (' + rep.summary + '). It is attached to this task, not a new one.' });
+    return;
+  }
   if (a.type === 'assign') {
     if (typeof KB_USERS !== 'undefined') {
       var tok = String(a.user || '').toLowerCase();
@@ -45923,7 +45936,7 @@ function aicNewTask(){
 function aicReportIntent(q){
   return /^report[:\s]/i.test(q) || /\b(report|table) (of|on|for)?\b/i.test(q) || /\b(list|show) (me )?(all|my)\b/i.test(q) || /\bpipeline report\b/i.test(q);
 }
-function aicRunReport(q){
+function aicBuildReport(q){
   var ql = q.toLowerCase();
   var all = (typeof merchantData !== 'undefined') ? merchantData.slice() : [];
   var rows = all, applied = [];
@@ -45933,18 +45946,28 @@ function aicRunReport(q){
   if (/\b(my|mine)\b/.test(ql)) { rows = rows.filter(function(m){ return m.assignee === 'M. Wright'; }); applied.push('assigned to you'); }
   var partnerSet = {};
   all.forEach(function(m){ if (m.partner) partnerSet[m.partner] = true; });
-  Object.keys(partnerSet).forEach(function(p){ if (ql.indexOf(p.toLowerCase()) !== -1) { rows = rows.filter(function(m){ return m.partner === p; }); applied.push('partner: ' + p); } });
+  Object.keys(partnerSet).forEach(function(pn){ if (ql.indexOf(pn.toLowerCase()) !== -1) { rows = rows.filter(function(m){ return m.partner === pn; }); applied.push('partner: ' + pn); } });
   var vol = function(m){ return parseFloat(String(m.volMTD || m.potVol || '').replace(/[^0-9.]/g, '')) || 0; };
   rows.sort(function(a, b){ return vol(b) - vol(a); });
+  return { q:q, cols:['Merchant','Status','Partner','Volume','Assigned'],
+    summary:rows.length + ' merchants' + (applied.length ? ' \u00B7 ' + applied.join(' \u00B7 ') : ' \u00B7 whole book'),
+    rows: rows.map(function(m){ return [m.name, m.status || '\u2014', m.partner || '\u2014', m.volMTD || m.potVol || '\u2014', m.assignee || '\u2014']; }) };
+}
+function aicReportTableHTML(r){
+  return '<div class="aic-rep-wrap"><table class="aic-rep-table"><thead><tr>' + r.cols.map(function(c){ return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    r.rows.map(function(row){ return '<tr data-m="' + aicEsc(row[0]) + '" onclick="aicRepOpen(this.getAttribute(\'data-m\'))">' + row.map(function(c, i){ return '<td' + (i === 1 ? ' style="text-transform:capitalize;"' : '') + '>' + aicEsc(String(c)) + '</td>'; }).join('') + '</tr>'; }).join('') +
+    '</tbody></table></div>';
+}
+function aicRunReport(q){
+  var r = aicBuildReport(q);
   var id = 't-rep-' + (++AIC_STATE.adhocSeq);
-  AIC_TASKS[id] = { id:id, dynamic:true, merchant:null, contact:null, av:'▦', avc:'#3E5E80', lane:'needs', state:'open', stage:0, age:'now',
-    title:'Report · ' + q.replace(/^report[:\s]+/i, '').slice(0, 30), sub:rows.length + ' rows · ' + (applied.length ? applied.join(' · ') : 'whole book'), chip:'▦ Report', status:'', playbook:'Report',
-    report:{ q:q, cols:['Merchant','Status','Partner','Volume','Assigned'], summary:rows.length + ' merchants' + (applied.length ? ' · ' + applied.join(' · ') : ' · whole book'),
-      rows: rows.map(function(m){ return [m.name, m.status || '—', m.partner || '—', m.volMTD || m.potVol || '—', m.assignee || '—']; }) },
-    deflect:['This table is generated from the live book — ' + rows.length + ' rows. Ask me to slice it (by partner, status, volume) or open any row.'],
-    transcript:[{ role:'agent', text:'Generated report for "' + q + '": ' + rows.length + ' rows' + (applied.length ? ', filters ' + applied.join('; ') : '') + '. Columns: merchant, status, partner, volume, assigned.' }], msgs:[] };
+  AIC_TASKS[id] = { id:id, dynamic:true, merchant:null, contact:null, av:'\u25A6', avc:'#3E5E80', lane:'needs', state:'open', stage:0, age:'now',
+    title:'Report \u00B7 ' + q.replace(/^report[:\s]+/i, '').slice(0, 30), sub:r.rows.length + ' rows \u00B7 ' + r.summary.split(' \u00B7 ').slice(1).join(' \u00B7 '), chip:'\u25A6 Report', status:'', playbook:'Report',
+    report:r,
+    deflect:['This table is generated from the live book \u2014 ' + r.rows.length + ' rows. Ask me to slice it (by partner, status, volume) or open any row.'],
+    transcript:[{ role:'agent', text:'Generated report for "' + q + '": ' + r.rows.length + ' rows. Columns: merchant, status, partner, volume, assigned.' }], msgs:[] };
   aicOpenTask(id); aicSubLine();
-  aicToastSafe('▦', 'Report generated — <strong>' + rows.length + ' rows</strong>');
+  aicToastSafe('\u25A6', 'Report generated \u2014 <strong>' + r.rows.length + ' rows</strong>');
 }
 function aicRepOpen(name){
   var m = aicMerchantRow(name);
