@@ -73,6 +73,27 @@ function systemPrompt(sessionType, merchant, board) {
       "Data: " + JSON.stringify(board).slice(0, 15000),
     ].join("\n");
   }
+  if (sessionType === "deal-routing") {
+    return [
+      "You are Twill's deal-routing rule compiler inside Settings → Deal Routing. Ops writes a BIN placement rule in plain language; you compile it into structured switches they can then adjust by hand in an if/then editor.",
+      "Reply with AT MOST 3 sentences, under 90 words: how you read the rule, the conditions you turned it into, and which platform or action you resolved it to and why. Ground the why in the eligibility grid, the platform minimums, or a program requirement whenever one applies — that text is stored as the rule's reasoning. The JSON line after it is mandatory and must never be cut off, so keep the prose short. No markdown, no emoji.",
+      "Then output the specification as the FINAL line, exactly: RULE_JSON: {\"conds\":[{\"param\":\"<key from the condition parameters>\",\"op\":\"<a listed op>\",\"value\":\"<a listed value, or free text where the param is free>\"}],\"any\":<true if the conditions are alternatives, else false>,\"target\":{\"action\":\"force|blocksub|addendum|flag|weight\",\"platform\":\"<one of the platforms, for force and weight>\",\"doc\":\"<addendum name, for addendum>\",\"queue\":\"<queue name, for flag>\"},\"weight\":<number, weight only>,\"conflicts\":[{\"with\":\"<R-xx>\",\"sev\":\"warn|info\",\"note\":\"<one clause on how they interact>\"}],\"problem\":\"<only when the rule is impossible as written, e.g. it forces a placement the grid marks Blocked — else omit>\"}",
+      "ACTIONS: force places the deal on one platform and beats every weight; blocksub stops submission pending review; addendum attaches a document to the signature package without changing placement; flag sends the deal to a queue before boarding; weight only breaks ties between platforms the grid already allows (default +25).",
+      "CONDS are the switches ops will see and edit: one condition per clause. Use ONLY param keys, ops and values from the condition parameters list — volume values are plain dollars per month (150k becomes 150000). When the rule names a platform as a QUALIFIER (\"dual pricing on VPC\") that is a platform condition; when it names one as a DESTINATION (\"must go to TSYS\") that is target.platform.",
+      "GRID DISCIPLINE: before compiling a force, check the eligibility grid. If the named solution is Blocked on the destination platform, still compile the rule but set \"problem\" saying so — a deal forced somewhere it cannot board is a dead rule.",
+      "CONFLICTS: compare against the active rules and flag real interactions — two forces on the same condition to different platforms (sev warn), or a weight a force would shadow (sev info). Empty array when there is none; never invent one.",
+      "Single-line valid JSON. Nothing after the RULE_JSON line.",
+      "",
+      "DEAL ROUTING DATA:",
+      "Semantics: " + (board.semantics || ""),
+      "Platforms: " + JSON.stringify(board.platforms || []),
+      "Eligibility grid (solution by platform; Blocked means it cannot board there): " + JSON.stringify(board.eligibilityGrid || []).slice(0, 4000),
+      "Platform minimums (commitment vs month-to-date; a platform behind pace should attract eligible volume): " + JSON.stringify(board.minimums || []).slice(0, 1500),
+      "Active rules: " + JSON.stringify(board.rules || []).slice(0, 4000),
+      "Condition parameters: " + JSON.stringify(board.conditionParams || []).slice(0, 2000),
+      "Actions: " + JSON.stringify(board.actions || []),
+    ].join("\n");
+  }
   if (sessionType === "ticket-routing") {
     const mode = board && board.mode === "compile" ? "compile" : "simulate";
     const CTX = [
@@ -184,9 +205,10 @@ export async function onRequestPost({ request, env }) {
     model: MODEL,
     // ticket-routing replies carry a mandatory trailing JSON line (rule_hits + scores);
     // the 900 cap truncated mid-reasoning before the JSON could be emitted
-    max_tokens: body.sessionType === "ticket-routing"
-      ? (body.board && body.board.mode === "compile" ? 2200 : 1400)
-      : MAX_TOKENS,
+    max_tokens: body.sessionType === "deal-routing" ? 2200
+      : body.sessionType === "ticket-routing"
+        ? (body.board && body.board.mode === "compile" ? 2200 : 1400)
+        : MAX_TOKENS,
     system: systemPrompt(body.sessionType, body.merchant || {}, body.board || {}),
     messages: collapsed,
   };

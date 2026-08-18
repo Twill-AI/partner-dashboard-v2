@@ -44427,14 +44427,46 @@ const KLBR_GRID = [
   { name:'TAP program device', sub:'adds TAP merchant addendum', cells:['Eligible','Eligible','Review','Blocked'] },
   { name:'E-commerce / gateway only', sub:'', cells:['Review','Review','Native','Native'] },
 ];
-const KLBR_RULES = [
-  { id:'R-01', kind:'block', label:'Hard block', raw:'Any deal with Clover hardware must go to North FSP only', text:'Clover hardware → <b>North FSP only</b>. Deal is forced — routes itself, rule logged.' },
-  { id:'R-02', kind:'block', label:'Hard block', raw:'Split funding deals must go to TSYS only', text:'Split funding selected → <b>TSYS only</b> (4-account split supported on TSYS platform).' },
-  { id:'R-04', kind:'warn', label:'Warning', raw:'Dual pricing on VPC — attach the cash discount attestation addendum', text:'Dual pricing on VPC → auto-attach cash discount attestation addendum to the signature package.' },
-  { id:'R-07', kind:'weight', label:'Weight +25', raw:'Prefer the platform behind monthly commitment pace, TSYS +25', text:'Platform behind monthly commitment pace → prefer it when eligibility ties. <span style="font-family:var(--font-mono)">TSYS currently +25</span>.' },
-  { id:'R-09', kind:'warn', label:'Warning', raw:'Flag deals over $150k/mo for the concurrence queue', text:'Stated volume > <span style="font-family:var(--font-mono)">$150K/mo</span> → flag for concurrence queue before boarding (any platform).' },
+/* ── DEAL ROUTING domain: the switches a BIN placement rule can flip ── */
+const KLBR_PARAMS = {
+  equipment: { label:'Solution / equipment', ops:['is','is not'], opts:function(){ return KLBR_GRID.map(r => r.name).concat(['Clover hardware','Valor devices','Dual pricing']); } },
+  pricing:   { label:'Pricing model',        ops:['is'],          opts:['Dual pricing','Cash discount','Interchange plus','Flat rate'] },
+  volume:    { label:'Stated volume $/mo',   ops:['>','<'],       free:true },
+  mcc:       { label:'MCC / vertical',       ops:['is','mentions'], free:true },
+  risk:      { label:'Risk tier',            ops:['is'],          opts:['T-1 Swipe','T-2 Card Present','T-3 E-comm','T-4 Enterprise','T-5 High-Risk E-comm'] },
+  platform:  { label:'Platform',             ops:['is','is not'], opts:function(){ return KLBR_PLATFORMS.slice(); } },
+  sponsor:   { label:'Sponsor bank',         ops:['is'],          opts:['Synovus','Wells Fargo','Fifth Third','Esquire Bank'] },
+  minimums:  { label:'Platform behind pace', ops:['is'],          opts:['yes','no'] },
+  channel:   { label:'Channel',              ops:['is'],          opts:['Card present','E-commerce','MOTO','Mixed'] },
+  partner:   { label:'Partner',              ops:['is'],          opts:function(){ return [...new Set((typeof merchantData!=='undefined'?merchantData:[]).map(m=>m.partner))].filter(Boolean).sort(); } },
+};
+const KLBR_ACTIONS = [
+  { v:'force',    l:'Force placement' },
+  { v:'blocksub', l:'Block submission' },
+  { v:'addendum', l:'Attach addendum' },
+  { v:'flag',     l:'Flag for review' },
+  { v:'weight',   l:'Prefer (weight)' },
 ];
-let _klbrNextId = 10, _klbrDraft = null, _klbrEditId = null, _klbrEditDraft = null, _klbrRemoveId = null;
+const KLBR_RULES = [
+  { id:'R-01', kind:'block', label:'Hard block', _dom:'deal', raw:'Any deal with Clover hardware must go to North FSP only',
+    conds:[{param:'equipment', op:'is', value:'Clover Flex / Mini'}], target:{action:'force', platform:'North FSP'},
+    reason:'Clover is Fiserv hardware and the eligibility grid marks it Blocked everywhere except North FSP, so there is exactly one certified placement. The deal routes itself and the rule is logged on the file.' },
+  { id:'R-02', kind:'block', label:'Hard block', _dom:'deal', raw:'Split funding deals must go to TSYS only',
+    conds:[{param:'equipment', op:'is', value:'Split funding (up to 4 accts)'}], target:{action:'force', platform:'TSYS'},
+    reason:'Only the TSYS platform supports the 4-account split (per the Kurv gateway program guide); the other three are Blocked in the grid. A forced route beats every weight below.' },
+  { id:'R-04', kind:'warn', label:'Warning', _dom:'deal', raw:'Dual pricing on VPC — attach the cash discount attestation addendum',
+    conds:[{param:'pricing', op:'is', value:'Dual pricing'}, {param:'platform', op:'is', value:'VPC'}],
+    target:{action:'addendum', doc:'Cash discount attestation'},
+    reason:'VPC accepts dual pricing but the sponsor requires a signed attestation. This does not change placement, it adds the addendum to the signature package so boarding is not held up later.' },
+  { id:'R-07', kind:'weight', label:'Weight +25', _dom:'deal', w:25, raw:'Prefer the platform behind monthly commitment pace, TSYS +25',
+    conds:[{param:'minimums', op:'is', value:'yes'}], target:{action:'weight', platform:'TSYS'},
+    reason:'Commitments are use-it-or-lose-it: when a platform is behind pace, an eligible deal that closes the gap should steer there. A weight, so it only decides ties, never overrides a hard block.' },
+  { id:'R-09', kind:'warn', label:'Warning', _dom:'deal', raw:'Flag deals over $150k/mo for the concurrence queue',
+    conds:[{param:'volume', op:'>', value:'150000'}], target:{action:'flag', queue:'Concurrence queue'},
+    reason:'Policy threshold from the risk category definitions: projected volume over $150K/mo needs senior co-approval regardless of tier or platform. It flags, it does not place.' },
+];
+KLBR_RULES.forEach(r => { r._dom = 'deal'; });
+let _klbrNextId = 10, _klbrDraft = null, _klbrEditId = null, _klbrRemoveId = null;
 
 function klbLibTab(tab) {
   /* routing rules moved to Settings → Deal Routing; old cite-chips deep-link there */
@@ -44557,9 +44589,113 @@ function klbrChip(state, attrs) { return `<span class="klbr-chip ${KLBR_CLS[stat
 
 function klbrRuleChip(r) {
   const cls = r.kind==='block'?'r':r.kind==='weight'?'g':'a';
-  return `<span class="klbr-chip ${cls}">${r.label}</span>`;
+  const lbl = r.label || (r.kind==='block'?'Hard block':r.kind==='weight'?('Weight +'+(r.w||20)):'Warning');
+  return `<span class="klbr-chip ${cls}" style="cursor:default;flex-shrink:0;">${lbl}</span>`;
+}
+/* ── deal-domain pieces of the shared statement editor ── */
+function klbrActionText(r){
+  const t = r.target || {};
+  if (t.action === 'blocksub') return 'Block submission until reviewed';
+  if (t.action === 'addendum') return 'Attach “' + (t.doc || 'required addendum') + '” to the signature package';
+  if (t.action === 'flag')     return 'Flag → ' + (t.queue || 'ops review') + ' before boarding';
+  if (t.action === 'weight')   return '+' + (r.w || 20) + ' ' + (t.platform || 'preferred platform');
+  return 'Force placement → ' + (t.platform || 'a platform') + ' only';
+}
+function klbrProblem(spec){
+  const t = spec.target || {};
+  if ((t.action === 'force' || t.action === 'weight') && !t.platform) return 'No platform chosen — pick where this rule sends the deal.';
+  if (t.action === 'addendum' && !t.doc) return 'Name the addendum this rule attaches.';
+  if (t.action === 'force' && t.platform) {
+    /* a forced platform the grid marks Blocked for the matched equipment can never board */
+    const eq = (spec.conds || []).find(c => c.param === 'equipment');
+    const row = eq && KLBR_GRID.find(g => g.name === eq.value);
+    const idx = KLBR_PLATFORMS.indexOf(t.platform);
+    if (row && idx >= 0 && row.cells[idx] === 'Blocked')
+      return 'The eligibility grid marks “' + eq.value + '” Blocked on ' + t.platform + ' — a deal forced there could never board. Change the platform or the grid cell.';
+  }
+  return null;
+}
+function klbrConflicts(spec, excludeId){
+  const out = [], st = spec.target || {};
+  KLBR_RULES.forEach(r => {
+    if (r.id === excludeId) return;
+    const rt = r.target || {};
+    const shared = (spec.conds || []).some(c => (r.conds || []).some(x => x.param === c.param &&
+      String(x.value).toLowerCase() === String(c.value).toLowerCase()));
+    const bothForce = st.action === 'force' && rt.action === 'force';
+    if (bothForce && shared && rt.platform !== st.platform)
+      out.push({ with:r.id, sev:'warn', note:'both force a placement on the same condition but to different platforms (' + rt.platform + ' vs ' + st.platform + ') — one has to give' });
+    else if (bothForce && shared && rt.platform === st.platform)
+      out.push({ with:r.id, sev:'info', note:'same condition and same platform — consider merging them' });
+    else if (st.action === 'weight' && rt.action === 'force' && shared)
+      out.push({ with:r.id, sev:'info', note:'shadowed by ' + r.id + ' whenever both match — a forced placement ignores weights' });
+    else if (st.action === 'force' && rt.action === 'weight' && shared)
+      out.push({ with:r.id, sev:'info', note:'this forced placement overrides ' + r.id + '’s preference whenever both match' });
+  });
+  return out;
+}
+function klbrThenHTML(prefix, spec, editable){
+  const dis = editable ? '' : ' disabled';
+  const sel = trsSel(prefix, editable);
+  const t = spec.target || (spec.target = { action:'force' });
+  let ctls = sel('action', KLBR_ACTIONS, t.action || 'force');
+  if (t.action === 'weight') ctls += ' <input' + dis + ' type="number" min="5" max="95" step="5" style="width:58px;" value="' + (spec.w || 25) + '" onchange="trsStmtSet(\'' + prefix + '\',\'w\',this.value)"> pts → ' + sel('platform', KLBR_PLATFORMS, t.platform || KLBR_PLATFORMS[0]);
+  else if (t.action === 'force') ctls += ' → ' + sel('platform', ['— pick a platform —'].concat(KLBR_PLATFORMS), KLBR_PLATFORMS.includes(t.platform) ? t.platform : '— pick a platform —') + ' <span style="font-size:11px;color:var(--text-muted);">only</span>';
+  else if (t.action === 'addendum') ctls += ' → <input' + dis + ' type="text" class="trs-freeval" style="width:210px;" value="' + trsEscAttr(t.doc || '') + '" placeholder="addendum name" onchange="trsStmtSet(\'' + prefix + '\',\'doc\',this.value)"> <span style="font-size:11px;color:var(--text-muted);">on the signature package</span>';
+  else if (t.action === 'flag') ctls += ' → ' + sel('queue', ['Concurrence queue','Ops review','Risk Committee'], t.queue || 'Concurrence queue') + ' <span style="font-size:11px;color:var(--text-muted);">before boarding</span>';
+  else ctls += ' <span style="font-size:11px;color:var(--text-muted);">— the deal cannot be submitted until an ops review clears it</span>';
+  return '<div class="trs-stmt-row"><span class="trs-stmt-kw">THEN</span><div class="trs-then">' + ctls + '</div></div>' +
+    '<div class="trs-stmt-row"><span class="trs-stmt-kw">MODE</span><div class="trs-then"><span style="font-size:11px;color:var(--text-secondary);">' +
+    (t.action === 'force' || t.action === 'blocksub'
+      ? 'Hard — evaluated at submission, beats every weight below.'
+      : t.action === 'weight' ? 'Preference — only decides ties between platforms the grid already allows.'
+      : 'Advisory — does not change placement, adds a step before boarding.') + '</span></div></div>';
+}
+function klbrSet(prefix, spec, path, val){
+  const t = spec.target || (spec.target = {});
+  if (path === 'action') {
+    t.action = val;
+    spec.kind = (val === 'force' || val === 'blocksub') ? 'block' : val === 'weight' ? 'weight' : 'warn';
+    spec.label = spec.kind === 'block' ? 'Hard block' : spec.kind === 'weight' ? ('Weight +' + (spec.w || 25)) : 'Warning';
+    if (val === 'weight' && !spec.w) spec.w = 25;
+    if (val === 'weight' && !t.platform) t.platform = KLBR_PLATFORMS[0];
+    if (val === 'flag' && !t.queue) t.queue = 'Concurrence queue';
+  }
+  else if (path === 'platform') t.platform = val.startsWith('—') ? '' : val;
+  else if (path === 'doc') t.doc = val;
+  else if (path === 'queue') t.queue = val;
+  else if (path === 'w') { spec.w = parseInt(val, 10) || 25; spec.label = 'Weight +' + spec.w; }
 }
 
+/* plain language → structured deal spec (the switches the editor renders) */
+function klbrParseSpec(text){
+  const t = (text || '').toLowerCase();
+  const plats = KLBR_PLATFORMS.filter(p => t.includes(p.toLowerCase()) || (p === 'North FSP' && /\bnorth\b/.test(t)));
+  const conds = [];
+  const eqMap = { clover:'Clover Flex / Mini', vl100:'Valor VL100 · dual pricing', vp550:'Valor VP550 countertop', a920:'PAX A920 · dual pricing', pax:'PAX A920 · dual pricing',
+    'split funding':'Split funding (up to 4 accts)', tap:'TAP program device', 'e-commerce':'E-commerce / gateway only', ecom:'E-commerce / gateway only', gateway:'E-commerce / gateway only' };
+  Object.keys(eqMap).forEach(k => { if (t.includes(k) && !conds.some(c => c.value === eqMap[k])) conds.push({ param:'equipment', op:'is', value:eqMap[k] }); });
+  if (/dual pricing|cash discount/.test(t)) conds.push({ param:'pricing', op:'is', value:'Dual pricing' });
+  const vol = t.match(/(?:over|above|more than|>)\s*\$?\s*([\d.,]+)\s*(k|m)?/);
+  if (vol) conds.push({ param:'volume', op:'>', value:String(Math.round(parseFloat(vol[1].replace(/,/g,'')) * (vol[2]==='k'?1000:vol[2]==='m'?1000000:1))) });
+  if (/behind|pace|minimum|commitment/.test(t)) conds.push({ param:'minimums', op:'is', value:'yes' });
+  const mcc = t.match(/\bmcc\s*(\d{4})|\bsic\s*(\d{4})/);
+  if (mcc) conds.push({ param:'mcc', op:'is', value:(mcc[1] || mcc[2]) });
+  if (/high.?risk/.test(t)) conds.push({ param:'risk', op:'is', value:'T-5 High-Risk E-comm' });
+  /* the platform is the destination when the rule places, a condition when it qualifies */
+  let action = 'flag', kind = 'warn', w = 25, target = {};
+  if (/addendum|attach/.test(t)) { action = 'addendum'; target.doc = /cash discount|attestation/.test(t) ? 'Cash discount attestation' : 'Required addendum'; if (plats.length) conds.push({ param:'platform', op:'is', value:plats[0] }); }
+  else if (/prefer|weight|steer|\+\s?\d/.test(t)) { action = 'weight'; kind = 'weight'; const wm = t.match(/\+\s?(\d+)/); if (wm) w = +wm[1]; target.platform = plats[0] || KLBR_PLATFORMS[0]; }
+  else if (/block submission|do not submit|never submit/.test(t)) { action = 'blocksub'; kind = 'block'; }
+  else if (/\bonly\b|\bmust\b|force|goes to|go to|route to/.test(t) && plats.length) { action = 'force'; kind = 'block'; target.platform = plats[0]; }
+  else if (/concurrence|senior|committee|flag/.test(t)) { action = 'flag'; target.queue = /committee/.test(t) ? 'Risk Committee' : 'Concurrence queue'; }
+  else if (plats.length) { action = 'force'; kind = 'block'; target.platform = plats[0]; }
+  target.action = action;
+  const spec = { _dom:'deal', kind:kind, w:w, conds:conds, condsAny:false, target:target,
+    label: kind === 'block' ? 'Hard block' : kind === 'weight' ? ('Weight +' + w) : 'Warning',
+    reason:'Compiled locally (the routing agent was unreachable): ' + (conds.length ? 'read ' + conds.length + ' condition' + (conds.length>1?'s':'') + ' from the text' : 'no condition was recognised') + (target.platform ? ', placing on ' + target.platform : '') + '. Check the switches before adding.' };
+  return spec;
+}
 function klbrParse(text) {
   const t = text.toLowerCase();
   const plats = KLBR_PLATFORMS.filter(p => t.includes(p.toLowerCase()) || (p==='North FSP' && /\bnorth\b/.test(t)));
@@ -44578,68 +44714,102 @@ function klbrParse(text) {
   return { kind, label, trigger, platforms: plats.length?plats:['Any'], action, condition: vol ? 'volume > $'+vol[1]+'K/mo' : (equip.length ? equip.join(' + ') + ' selected' : 'attribute present'), evalAt:'submission', source:'Authored in plain language · compiled by Twill AI' };
 }
 
+/* the deal composer speaks to the same routing agent, in the BIN domain */
+async function klbrAI(mode, message){
+  const board = { mode:mode, domain:'deal',
+    semantics:'hard blocks force a platform and beat every weight; weights only break ties between platforms the grid already allows; warnings do not change placement, they add a step before boarding',
+    platforms: KLBR_PLATFORMS,
+    eligibilityGrid: KLBR_GRID.map(row => ({ solution:row.name, note:row.sub || '', cells: row.cells.reduce((o,c,i) => (o[KLBR_PLATFORMS[i]] = c, o), {}) })),
+    minimums: (typeof KLBR_MINIMUMS !== 'undefined' ? KLBR_MINIMUMS : []),
+    rules: KLBR_RULES.map(r => ({ id:r.id, kind:r.kind, weight:r.w, conds:r.conds || [], target:r.target || {}, text:trsWhenText(r) + ' -> ' + klbrActionText(r) })),
+    conditionParams: Object.keys(KLBR_PARAMS).map(k => k + ' (' + KLBR_PARAMS[k].label + ', ops: ' + KLBR_PARAMS[k].ops.join('/') + (trsParamOpts(k, KLBR_PARAMS) ? ', values: ' + trsParamOpts(k, KLBR_PARAMS).join('|') : ', free text') + ')'),
+    actions: KLBR_ACTIONS.map(a => a.v + ' (' + a.l + ')') };
+  const ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), 30000) : null;
+  try {
+    const res = await fetch('/api/agent/chat', { method:'POST', headers:{ 'content-type':'application/json' }, signal: ctl ? ctl.signal : undefined,
+      body: JSON.stringify({ token: window.AGENT_CHAT_TOKEN || undefined, sessionType:'deal-routing',
+        merchant:{ surface:'Twill Partner OS — Settings → Deal Routing' }, board:board, transcript:[], message:message }) });
+    if (timer) clearTimeout(timer);
+    if (!res.ok) return null;
+    const j = await res.json();
+    return (j && j.text) ? j.text : null;
+  } catch(e) { if (timer) clearTimeout(timer); return null; }
+}
+async function klbrComposeSpec(txt, editId){
+  const prevHost = document.getElementById(editId ? 'klbr-edit-preview' : 'klbr-preview');
+  prevHost.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 2px;">🤖 Compiling against the eligibility grid, platform minimums and the existing rules…</div>';
+  const ai = await klbrAI('compile', txt);
+  let spec = null, prose = '';
+  if (ai) { spec = trsExtractJson(ai, 'RULE_JSON'); prose = trsStripJsonLine(ai, 'RULE_JSON'); }
+  const liveSpec = !!spec;
+  if (spec) {
+    spec._dom = 'deal';
+    spec.target = spec.target || {};
+    if (!spec.target.action) spec.target.action = 'force';
+    spec.kind = (spec.target.action === 'force' || spec.target.action === 'blocksub') ? 'block' : spec.target.action === 'weight' ? 'weight' : 'warn';
+    spec.w = spec.weight || spec.w || 25;
+    spec.label = spec.kind === 'block' ? 'Hard block' : spec.kind === 'weight' ? ('Weight +' + spec.w) : 'Warning';
+    spec.conds = (spec.conds || []).filter(c => c && c.param && KLBR_PARAMS[c.param]).map(c => ({ param:c.param, op:c.op || KLBR_PARAMS[c.param].ops[0], value:String(c.value == null ? '' : c.value) }));
+    spec.condsAny = !!spec.any || !!spec.condsAny;
+    spec.aiConflicts = (spec.conflicts || []).filter(c => c && c.with);
+    spec.reason = prose || spec.reason || '';
+  } else {
+    spec = klbrParseSpec(txt);
+    if (ai && prose) spec.reason = prose + ' (The agent’s reply did not carry a usable specification, so these switches were compiled locally — check them before adding.)';
+    prose = spec.reason;
+  }
+  const id = editId || ('R-' + String(_klbrNextId).padStart(2,'0'));
+  spec.id = id;
+  const pre = editId ? 'kedit' : 'knew';
+  _klbrDraft = { spec:spec, raw:txt, editId:editId || null };
+  _trsStmt[pre] = spec;
+  prevHost.innerHTML = '<div class="klbr-spec">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">' + (editId ? 'Recompiled' : 'Proposed') + ' rule</span>' + klbrRuleChip(spec) +
+    '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">' + id + (editId ? ' (edit)' : ' (draft)') + '</span>' +
+    (liveSpec ? '<span class="p-badge badge-green" style="font-size:8px;">LIVE AI</span>' : '<span class="p-badge" style="font-size:8px;">LOCAL PARSE</span>') +
+    '<span class="trs-jsontog" onclick="const j=document.getElementById(\'trs-json-' + pre + '\');j.style.display=j.style.display===\'none\'?\'block\':\'none\';">{ } spec</span></div>' +
+    (prose ? '<div class="trs-reason">' + trsEsc(prose) + '</div>' : '') +
+    '<div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">ADJUST ANYTHING BEFORE ADDING</div>' +
+    '<div class="trs-stmt" id="trs-stmt-' + pre + '" data-editable="1"></div>' +
+    '<div class="klbr-json" id="trs-json-' + pre + '" style="display:none;"></div>' +
+    '<div id="trs-prob-' + pre + '" style="display:none;font-size:11.5px;color:var(--amber);margin-top:8px;"></div>' +
+    '<div class="trs-confl"><div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin:12px 0 6px;">FLAGS AGAINST OTHER RULES</div>' +
+    '<div id="trs-confl-' + pre + '"></div></div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-primary" id="trs-addbtn-' + pre + '" style="font-size:11px;padding:5px 14px;" onclick="klbrAddRule()">✓ ' + (editId ? 'Save changes' : 'Add rule') + '</button>' +
+    '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_klbrDraft=null;delete _trsStmt[\'' + pre + '\'];document.getElementById(\'' + (editId ? 'klbr-edit-preview' : 'klbr-preview') + '\').innerHTML=\'\';">✕ Discard</button></div></div>';
+  trsStmtRender(pre);
+}
 function klbrCompose() {
   const inp = document.getElementById('klbr-input');
   const txt = (inp?.value||'').trim();
-  if (!txt) return;
-  const host = document.getElementById('klbr-preview');
-  host.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 2px;">🤖 Analyzing rule intent against the eligibility grid + processor program docs…</div>';
-  setTimeout(() => {
-    const spec = klbrParse(txt);
-    _klbrDraft = { spec, raw: txt };
-    const json = JSON.stringify({ id:'R-'+_klbrNextId, type:spec.kind, trigger:spec.condition, platforms:spec.platforms, action:spec.action, evaluate_at:spec.evalAt }, null, 2);
-    host.innerHTML = `<div class="klbr-spec">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">Generated specification</span>${klbrRuleChip({kind:spec.kind,label:spec.label})}<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">R-${_klbrNextId} (draft)</span></div>
-      <table><tr><td>Trigger</td><td>${spec.trigger}</td></tr><tr><td>Condition</td><td>${spec.condition}</td></tr><tr><td>Action</td><td>${spec.action}</td></tr><tr><td>Platforms</td><td>${spec.platforms.join(' · ')}</td></tr><tr><td>Evaluated</td><td>at ${spec.evalAt}</td></tr></table>
-      <div class="klbr-json">${json.replace(/</g,'&lt;')}</div>
-      <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="klbrAddRule()">✓ Add rule</button><button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="document.getElementById('klbr-preview').innerHTML='';_klbrDraft=null;">✕ Discard</button></div>
-    </div>`;
-  }, 700);
+  if (txt) klbrComposeSpec(txt, null);
 }
-
-function klbrAddRule() {
-  if (!_klbrDraft) return;
-  const s = _klbrDraft.spec;
-  KLBR_RULES.push({ id:'R-'+_klbrNextId, kind:s.kind, label:s.label, raw:_klbrDraft.raw, text: s.trigger + ' → <b>' + s.action + '</b>. <span style="font-size:11px;color:var(--text-muted)">(“' + _klbrDraft.raw.replace(/</g,'&lt;') + '”)</span>', isNew:true });
-  _klbrNextId++; _klbrDraft = null;
-  klbrRender();
-  const inp = document.getElementById('klbr-input'); if (inp) inp.value='';
-}
-
-function klbrEditRule(id) { _klbrEditId = id; _klbrEditDraft = null; _klbrRemoveId = null; klbrRender();
-  setTimeout(() => { const i = document.getElementById('klbr-edit-input'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 50); }
-
 function klbrEditCompose(id) {
   const inp = document.getElementById('klbr-edit-input');
   const txt = (inp?.value||'').trim();
-  if (!txt) return;
-  const host = document.getElementById('klbr-edit-preview');
-  host.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 2px;">🤖 Recompiling ' + id + ' against the eligibility grid + processor program docs…</div>';
-  setTimeout(() => {
-    const spec = klbrParse(txt);
-    _klbrEditDraft = { spec, raw: txt };
-    const json = JSON.stringify({ id:id, type:spec.kind, trigger:spec.condition, platforms:spec.platforms, action:spec.action, evaluate_at:spec.evalAt }, null, 2);
-    host.innerHTML = `<div class="klbr-spec">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:12px;font-weight:700;font-family:var(--font-ui);">Recompiled specification</span>${klbrRuleChip({kind:spec.kind,label:spec.label})}<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">${id} (edit)</span></div>
-      <table><tr><td>Trigger</td><td>${spec.trigger}</td></tr><tr><td>Condition</td><td>${spec.condition}</td></tr><tr><td>Action</td><td>${spec.action}</td></tr><tr><td>Platforms</td><td>${spec.platforms.join(' · ')}</td></tr><tr><td>Evaluated</td><td>at ${spec.evalAt}</td></tr></table>
-      <div class="klbr-json">${json.replace(/</g,'&lt;')}</div>
-      <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-primary" style="font-size:11px;padding:5px 14px;" onclick="klbrSaveEdit('${id}')">✓ Save changes</button><button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_klbrEditId=null;_klbrEditDraft=null;klbrRender();">✕ Cancel</button></div>
-    </div>`;
-  }, 700);
+  if (txt) klbrComposeSpec(txt, id);
 }
-
-function klbrSaveEdit(id) {
-  if (!_klbrEditDraft) return;
-  const r = KLBR_RULES.find(x => x.id === id);
-  if (!r) return;
-  const s = _klbrEditDraft.spec;
-  r.kind = s.kind; r.label = s.label; r.raw = _klbrEditDraft.raw; r.isNew = false; r.edited = true;
-  r.text = s.trigger + ' → <b>' + s.action + '</b>. <span style="font-size:11px;color:var(--text-muted)">(“' + _klbrEditDraft.raw.replace(/</g,'&lt;') + '”)</span>';
-  _klbrEditId = null; _klbrEditDraft = null;
+function klbrAddRule() {
+  if (!_klbrDraft) return;
+  const pre = _klbrDraft.editId ? 'kedit' : 'knew';
+  const s = _trsStmt[pre];
+  if (!s || klbrProblem(s)) return;
+  if (_klbrDraft.editId) {
+    const r = KLBR_RULES.find(x => x.id === _klbrDraft.editId);
+    if (r) { klbrApplySpec(r, s, _klbrDraft.raw); r.edited = true; r.isNew = false; }
+    _klbrEditId = null; _klbrRewordId = null;
+  } else {
+    const r = klbrApplySpec({ id:'R-' + String(_klbrNextId).padStart(2,'0'), isNew:true }, s, _klbrDraft.raw);
+    KLBR_RULES.push(r); _klbrNextId++; _klbrOpenId = r.id;
+  }
+  _klbrDraft = null; delete _trsStmt[pre];
   klbrRender();
+  const inp = document.getElementById('klbr-input'); if (inp) inp.value = '';
 }
+function klbrEditRule(id) { _klbrOpenId = id; _klbrEditId = id; _klbrRemoveId = null; klbrRender(); }
 
-function klbrRemoveAsk(id) { _klbrRemoveId = id; _klbrEditId = null; klbrRender(); }
+function klbrRemoveAsk(id) { _klbrRemoveId = id; _klbrEditId = null; _klbrOpenId = null; klbrRender(); }
 function klbrRemove(id) {
   const i = KLBR_RULES.findIndex(x => x.id === id);
   if (i >= 0) KLBR_RULES.splice(i, 1);
@@ -44694,6 +44864,70 @@ function klbrMinPanel(){
   </div>`;
 }
 
+/* expandable deal rule — same shape as a ticket rule, BIN fields inside */
+let _klbrOpenId = null, _klbrRewordId = null;
+function klbrToggleRule(id){
+  if (_klbrOpenId === id) { _klbrOpenId = null; _klbrEditId = null; _klbrRewordId = null; delete _trsStmt['k-' + id]; }
+  else { _klbrOpenId = id; _klbrEditId = null; _klbrRewordId = null; }
+  klbrRender();
+}
+function klbrRewordRule(id){ _klbrOpenId = id; _klbrRewordId = _klbrRewordId === id ? null : id; klbrRender();
+  setTimeout(() => { const i = document.getElementById('klbr-edit-input'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 40); }
+function klbrApplySpec(r, s, raw){
+  r.kind = s.kind; r.w = s.w; r.conds = s.conds || []; r.condsAny = s.condsAny; r.target = s.target || {};
+  r.label = s.label || (r.kind === 'block' ? 'Hard block' : r.kind === 'weight' ? ('Weight +' + (r.w || 25)) : 'Warning');
+  if (raw != null) r.raw = raw;
+  if (s.reason) r.reason = s.reason;
+  r._dom = 'deal';
+  r.text = trsEsc(trsWhenText(r)) + ' → <b>' + trsEsc(klbrActionText(r)) + '</b>';
+  return r;
+}
+function klbrSaveStmtEdit(id){
+  const spec = _trsStmt['k-' + id], r = KLBR_RULES.find(x => x.id === id);
+  if (!spec || !r || klbrProblem(spec)) return;
+  klbrApplySpec(r, spec); r.edited = true; r.isNew = false;
+  delete _trsStmt['k-' + id]; _klbrEditId = null;
+  klbrRender();
+  if (typeof ccToast === 'function') ccToast('✓ ' + id + ' updated');
+}
+function klbrRuleRow(r){
+  if (_klbrRemoveId === r.id) return '<div class="klbr-rule" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);"><span class="rid">' + r.id + '</span>' + klbrRuleChip(r) +
+    '<span style="flex:1;">Remove this rule? Deals it currently forces become open (suggest-first) at next evaluation.</span>' +
+    '<span style="display:inline-flex;gap:6px;"><button class="btn btn-danger" style="font-size:11px;padding:4px 12px;" onclick="klbrRemove(\'' + r.id + '\')">Remove</button>' +
+    '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="_klbrRemoveId=null;klbrRender();">Cancel</button></span></div>';
+  const open = _klbrOpenId === r.id, editing = open && _klbrEditId === r.id;
+  const head = '<div class="klbr-rule' + (open ? ' trs-openhdr' : '') + '" style="cursor:pointer;" onclick="klbrToggleRule(\'' + r.id + '\')"><span class="rid">' + r.id + '</span>' + klbrRuleChip(r) +
+    '<span style="flex:1;">' + trsEsc(trsWhenText(r)) + ' → <b>' + trsEsc(klbrActionText(r)) + '</b>' +
+    '<span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px;">“' + trsEsc(r.raw || '') + '”</span></span>' +
+    (r.isNew ? '<span class="klbr-new">NEW</span>' : '') + (r.edited ? '<span class="klbr-edited">EDITED</span>' : '') +
+    '<span style="font-size:10px;color:var(--text-muted);margin-left:8px;flex-shrink:0;">' + (open ? '▲ close' : '▾ open') + '</span></div>';
+  if (!open) return head;
+  if (editing && !_trsStmt['k-' + r.id]) _trsStmt['k-' + r.id] = JSON.parse(JSON.stringify(r));
+  const spec = editing ? _trsStmt['k-' + r.id] : r;
+  const pre = 'k-' + r.id;
+  return head + '<div class="trs-rule-open">' +
+    '<div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">WHY THE AGENT BUILT IT THIS WAY</div>' +
+    '<div class="trs-reason">' + trsEsc(r.reason || 'Compiled from the plain-language rule above; no reasoning was recorded for this rule.') + '</div>' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);">' + (editing ? 'SWITCHES — ADJUST ANY OF THEM' : 'SWITCHES THIS RULE FLIPS') + '</span>' +
+    '<span class="trs-jsontog" onclick="event.stopPropagation();const j=document.getElementById(\'trs-json-' + pre + '\');j.style.display=j.style.display===\'none\'?\'block\':\'none\';">{ } spec</span></div>' +
+    '<div class="trs-stmt" id="trs-stmt-' + pre + '" data-editable="' + (editing ? '1' : '0') + '" onclick="event.stopPropagation();">' + trsStmtInner(pre, spec, editing) + '</div>' +
+    '<div class="klbr-json" id="trs-json-' + pre + '" style="display:none;"></div>' +
+    '<div id="trs-prob-' + pre + '" style="display:none;font-size:11.5px;color:var(--amber);margin-top:8px;"></div>' +
+    '<div class="trs-confl"><div style="font-size:10px;font-weight:800;font-family:var(--font-ui);letter-spacing:.06em;color:var(--text-muted);margin:12px 0 6px;">FLAGS AGAINST OTHER RULES</div>' +
+    '<div id="trs-confl-' + pre + '">' + trsConflictsHTML(trsAllConflicts(spec, r.id)) + '</div></div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;" onclick="event.stopPropagation();">' +
+    (editing
+      ? '<button class="btn btn-primary" id="trs-addbtn-' + pre + '" style="font-size:11px;padding:5px 14px;" onclick="klbrSaveStmtEdit(\'' + r.id + '\')">✓ Save changes</button>' +
+        '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="delete _trsStmt[\'' + pre + '\'];_klbrEditId=null;klbrRender();">✕ Cancel</button>' +
+        '<span style="font-size:11px;color:var(--text-muted);align-self:center;">Or restate it in words: <button class="klbr-act" onclick="klbrRewordRule(\'' + r.id + '\')">✍️ reword for the agent</button></span>'
+      : '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="_klbrEditId=\'' + r.id + '\';klbrRender();">✎ Edit switches</button>' +
+        '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;" onclick="klbrRewordRule(\'' + r.id + '\')">✍️ Reword</button>' +
+        '<button class="btn btn-ghost" style="font-size:11px;padding:5px 12px;color:var(--red);" onclick="_klbrRemoveId=\'' + r.id + '\';_klbrOpenId=null;klbrRender();">🗑 Remove</button>') + '</div>' +
+    (_klbrRewordId === r.id ? '<div style="margin-top:10px;"><div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:6px;">✍️ Restate the rule — Twill AI recompiles the switches</div>' +
+      '<div style="display:flex;gap:8px;"><input id="klbr-edit-input" style="flex:1;border:1px solid var(--border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:var(--font-data);background:var(--bg-elevated);color:var(--text-primary);" value="' + trsEscAttr(r.raw || '') + '" onkeydown="if(event.key===\'Enter\')klbrEditCompose(\'' + r.id + '\')">' +
+      '<button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="klbrEditCompose(\'' + r.id + '\')">Recompile</button></div><div id="klbr-edit-preview"></div></div>' : '') +
+    '</div>';
+}
 function klbrRender() {
   const host = document.getElementById('klb-routing');
   if (!host) return;
@@ -44712,14 +44946,7 @@ function klbrRender() {
       <div style="display:flex;gap:8px;"><input id="klbr-input" placeholder='e.g. "Any deal with a Clover device must go to North FSP" or "Prefer VPC when we&apos;re behind on minimums"' onkeydown="if(event.key==='Enter')klbrCompose()"><button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="klbrCompose()">Create rule</button></div>
       <div id="klbr-preview"></div>
     </div>
-    ${KLBR_RULES.map(r => {
-      if (_klbrEditId === r.id) return `<div class="klbr-rule" style="border-color:rgba(59,130,246,.35);"><span class="rid">${r.id}</span><div class="klbr-edit-wrap">
-        <div style="font-size:11px;font-weight:700;font-family:var(--font-ui);color:var(--text-secondary);margin-bottom:7px;">✎ Restate the rule in plain language — Twill AI recompiles it</div>
-        <div style="display:flex;gap:8px;"><input id="klbr-edit-input" style="flex:1;border:1px solid var(--border-strong);border-radius:6px;padding:8px 12px;font-size:13px;font-family:var(--font-data);background:var(--bg-elevated);color:var(--text-primary);" value="${(r.raw||'').replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter')klbrEditCompose('${r.id}')"><button class="btn btn-primary" style="font-size:11px;padding:6px 14px;white-space:nowrap;" onclick="klbrEditCompose('${r.id}')">Recompile</button><button class="btn btn-ghost" style="font-size:11px;padding:6px 10px;" onclick="_klbrEditId=null;_klbrEditDraft=null;klbrRender();">✕</button></div>
-        <div id="klbr-edit-preview"></div></div></div>`;
-      if (_klbrRemoveId === r.id) return `<div class="klbr-rule" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);"><span class="rid">${r.id}</span>${klbrRuleChip(r)}<span style="flex:1;">Remove this rule? Deals it currently forces become open (suggest-first) at next evaluation.</span><span style="display:inline-flex;gap:6px;"><button class="btn btn-danger" style="font-size:11px;padding:4px 12px;" onclick="klbrRemove('${r.id}')">Remove</button><button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="_klbrRemoveId=null;klbrRender();">Cancel</button></span></div>`;
-      return `<div class="klbr-rule"><span class="rid">${r.id}</span>${klbrRuleChip(r)}<span style="flex:1;">${r.text}</span>${r.isNew?'<span class="klbr-new">NEW</span>':''}${r.edited?'<span class="klbr-edited">EDITED</span>':''}<span class="klbr-acts"><span class="klbr-act" onclick="klbrEditRule('${r.id}')">✎ Edit</span><span class="klbr-act danger" onclick="klbrRemoveAsk('${r.id}')">🗑 Remove</span></span></div>`;
-    }).join('')}
+    ${KLBR_RULES.map(r => klbrRuleRow(r)).join('')}
     <div class="klbr-rule" style="border-style:dashed;"><span class="rid">MODE</span><span class="klbr-chip g">Suggest-first</span><span>Open deals wait for one ops click today. Per-rule auto-route unlocks once a rule’s accept rate proves out (e.g. <span style="font-family:var(--font-mono)">95% over 60 days</span>).</span></div>
     <div class="klbr-foot">All merchants and figures are illustrative sample data. Weights, commitments and the grid are ops configuration, never hard-coded — and none of this screen exists in the rep view.</div>
   </div>`;
@@ -46264,20 +46491,36 @@ const TRS_PARAMS = {
   creator: { label:'Created by role',        ops:['is'],           opts:['Owner','Rep','System','Merchant user'] },
   sla:     { label:'No first response for',  ops:['after'],        free:true },
 };
-function trsParamOpts(k){ const p = TRS_PARAMS[k]; if (!p || !p.opts) return null; return typeof p.opts === 'function' ? p.opts() : p.opts; }
+/* Two rule domains share this editor: ticket routing (departments and people) and
+   deal routing (BIN placement). A spec carries _dom; everything else dispatches. */
+const TRS_DOM = {
+  ticket: { params: () => TRS_PARAMS, rules: () => TRS_RULES,
+            actionText: r => trsActionTextTicket(r), problem: s => trsProblemTicket(s),
+            conflicts: (s, x) => trsConflictsTicket(s, x), thenHTML: (p, s, e) => trsThenTicket(p, s, e),
+            set: (p, s, path, v) => trsSetTicket(p, s, path, v) },
+  deal:   { params: () => KLBR_PARAMS, rules: () => KLBR_RULES,
+            actionText: r => klbrActionText(r), problem: s => klbrProblem(s),
+            conflicts: (s, x) => klbrConflicts(s, x), thenHTML: (p, s, e) => klbrThenHTML(p, s, e),
+            set: (p, s, path, v) => klbrSet(p, s, path, v) },
+};
+function trsDom(spec){ return TRS_DOM[(spec && spec._dom) || 'ticket'] || TRS_DOM.ticket; }
+function trsParamsOf(spec){ return trsDom(spec).params(); }
+function trsParamOpts(k, catalog){ const p = (catalog || TRS_PARAMS)[k]; if (!p || !p.opts) return null; return typeof p.opts === 'function' ? p.opts() : p.opts; }
 function trsVolNum(v){ const s = String(v||'').toLowerCase().replace(/[$,\s]/g,''); const m = s.match(/^([\d.]+)k?$/); if (!m) return parseFloat(s)||0; return parseFloat(m[1]) * (s.endsWith('k') ? 1000 : 1); }
-function trsCondText(c){
-  const p = TRS_PARAMS[c.param] || { label:c.param };
+function trsCondText(c, catalog){
+  const p = (catalog || TRS_PARAMS)[c.param] || { label:c.param };
   /* labels that already read as a verb phrase don't repeat the operator */
   if (c.param === 'content') return 'Content mentions ' + c.value;
   if (c.param === 'sla') return 'No first response for ' + c.value;
   return p.label + ' ' + c.op + ' ' + c.value;
 }
 function trsWhenText(r){
-  if (!r.conds || !r.conds.length) return 'Content match (semantic)';
-  return r.conds.map(trsCondText).join(r.condsAny ? ' OR ' : ' · ');
+  if (!r.conds || !r.conds.length) return (r && r._dom === 'deal') ? 'Any deal (no filter yet)' : 'Content match (semantic)';
+  const cat = trsParamsOf(r);
+  return r.conds.map(c => trsCondText(c, cat)).join(r.condsAny ? ' OR ' : ' · ');
 }
-function trsActionText(r){
+function trsActionText(r){ return trsDom(r).actionText(r); }
+function trsActionTextTicket(r){
   if (r.kind === 'escalation') return 'Add department lead · priority +1 (after ' + (r.escalate_after || '4 business hours') + ')';
   const t = r.target || {};
   let dest = t.user ? t.user : (t.dept ? ((trsDept(t.dept) || {name:t.dept}).name + (t.strategy && t.strategy !== 'named' ? ' (' + t.strategy + ')' : '')) : (t.watcherFromPayload ? 'fuzzy-match payload name → watcher' : 'ops review'));
@@ -46286,7 +46529,8 @@ function trsActionText(r){
   if (r.watchers && r.watchers.length) s += ' · watcher: ' + r.watchers.join(', ');
   return s;
 }
-function trsSpecProblem(spec){
+function trsSpecProblem(spec){ return trsDom(spec).problem(spec); }
+function trsProblemTicket(spec){
   if (spec.kind === 'escalation') return null;
   const t = spec.target || {};
   if (t.user && !trsUsers().some(u => u.name === t.user)) return 'No user named "' + t.user + '" exists — pick the intended assignee below before adding.';
@@ -46299,7 +46543,7 @@ function trsCondOverlap(a, b){
   if (!a || !a.length || !b || !b.length) return true; /* an unconditioned rule matches broadly */
   return a.some(x => b.some(y => x.param === y.param && (x.param === 'content' || String(x.value).toLowerCase().split('/').some(v => String(y.value).toLowerCase().includes(v.trim())))));
 }
-function trsConflicts(spec, excludeId){
+function trsConflictsTicket(spec, excludeId){
   const out = [];
   const st = spec.target || {};
   if (spec.kind === 'escalation') return out;
@@ -46343,23 +46587,28 @@ function trsStmtRender(prefix){
   if (js) js.textContent = JSON.stringify({ id:spec.id, type:spec.kind, weight:spec.kind==='weight'?(spec.w||20):undefined, when:trsWhenText(spec), action:trsActionText(spec), conds:spec.conds, any:spec.condsAny||undefined, target:spec.target, priority:spec.priority||undefined, watchers:spec.watchers, evaluate_at: spec.kind==='escalation' ? 'sla age' : 'ticket creation' }, null, 2);
 }
 function trsAllConflicts(spec, excludeId){
-  const det = trsConflicts(spec, excludeId);
+  const det = trsDom(spec).conflicts(spec, excludeId);
   (spec.aiConflicts || []).forEach(c => { if (!det.some(d => d.with === c.with)) det.push({ with:c.with, sev:c.sev || 'warn', note:c.note }); });
   return det;
 }
+function trsSel(prefix, editable){
+  const dis = editable ? '' : ' disabled';
+  return (path, opts, cur, extra) => '<select' + dis + ' onchange="trsStmtSet(\'' + prefix + '\',\'' + path + '\',this.value)"' + (extra||'') + '>' +
+    opts.map(o => '<option value="' + trsEscAttr(o.v != null ? o.v : o) + '"' + ((o.v != null ? o.v : o) === cur ? ' selected' : '') + '>' + trsEsc(o.l != null ? o.l : o) + '</option>').join('') + '</select>';
+}
 function trsStmtInner(prefix, spec, editable){
   const dis = editable ? '' : ' disabled';
-  const sel = (path, opts, cur, extra) => '<select' + dis + ' onchange="trsStmtSet(\'' + prefix + '\',\'' + path + '\',this.value)"' + (extra||'') + '>' +
-    opts.map(o => '<option value="' + trsEscAttr(o.v != null ? o.v : o) + '"' + ((o.v != null ? o.v : o) === cur ? ' selected' : '') + '>' + trsEsc(o.l != null ? o.l : o) + '</option>').join('') + '</select>';
+  const cat = trsParamsOf(spec);
+  const sel = trsSel(prefix, editable);
   /* IF side */
   const condRows = (spec.conds || []).map((c, i) => {
-    const p = TRS_PARAMS[c.param] || TRS_PARAMS.content;
-    const opts = trsParamOpts(c.param);
+    const p = cat[c.param] || cat[Object.keys(cat)[0]];
+    const opts = trsParamOpts(c.param, cat);
     const valCtl = opts
       ? sel('cond.' + i + '.value', opts.concat(opts.includes(c.value) ? [] : [c.value]), c.value)
       : '<input' + dis + ' type="text" class="trs-freeval" value="' + trsEscAttr(c.value) + '" onchange="trsStmtSet(\'' + prefix + '\',\'cond.' + i + '.value\',this.value)">';
     return '<div class="trs-cond">' +
-      sel('cond.' + i + '.param', Object.keys(TRS_PARAMS).map(k => ({ v:k, l:TRS_PARAMS[k].label })), c.param) +
+      sel('cond.' + i + '.param', Object.keys(cat).map(k => ({ v:k, l:cat[k].label })), c.param) +
       sel('cond.' + i + '.op', p.ops, c.op) + valCtl +
       (editable ? '<span class="trs-cond-x" onclick="trsStmtSet(\'' + prefix + '\',\'cond.' + i + '.del\',1)">✕</span>' : '') + '</div>';
   }).join('');
@@ -46368,7 +46617,11 @@ function trsStmtInner(prefix, spec, editable){
   const ifSide = '<div class="trs-stmt-row"><span class="trs-stmt-kw">IF</span><div class="trs-stmt-conds">' +
     (condRows || '<div style="font-size:11.5px;color:var(--text-muted);padding-top:6px;">any ticket — matched on message content (semantic)</div>') +
     '<div style="display:flex;gap:8px;align-items:center;">' + (editable ? '<button class="trs-cond-add" onclick="trsStmtSet(\'' + prefix + '\',\'cond.add\',1)">＋ condition</button>' : '') + anyTog + '</div></div></div>';
-  /* THEN side */
+  return ifSide + trsDom(spec).thenHTML(prefix, spec, editable);
+}
+function trsThenTicket(prefix, spec, editable){
+  const dis = editable ? '' : ' disabled';
+  const sel = trsSel(prefix, editable);
   const t = spec.target || (spec.target = {});
   const users = trsUsers().map(u => u.name);
   const kindSel = sel('kind', [{v:'hard',l:'Force route'},{v:'weight',l:'Prefer (weight)'},{v:'escalation',l:'Escalate'}], spec.kind);
@@ -46389,11 +46642,27 @@ function trsStmtInner(prefix, spec, editable){
     ? '<div class="trs-stmt-row"><span class="trs-stmt-kw">THEN</span><div class="trs-then">' + thenCtls + '</div></div>'
     : '<div class="trs-stmt-row"><span class="trs-stmt-kw">THEN</span><div class="trs-then">' + thenCtls + '</div></div>' +
       '<div class="trs-stmt-row"><span class="trs-stmt-kw">WATCH</span><div class="trs-then">' + (wChips || '<span style="font-size:11px;color:var(--text-muted);">nobody watching</span>') + wAdd + '</div></div>';
-  return ifSide + thenSide;
+  return thenSide;   /* the IF side is rendered by the shared trsStmtInner */
 }
 function trsStmtSet(prefix, path, val){
   const spec = _trsStmt[prefix];
   if (!spec) return;
+  const cat = trsParamsOf(spec);
+  /* shared IF-side edits, then the domain handles its own THEN side */
+  if (path === 'any') spec.condsAny = !!val;
+  else if (path === 'cond.add') { const k = Object.keys(cat)[0]; const o = trsParamOpts(k, cat); (spec.conds = spec.conds || []).push({ param:k, op:cat[k].ops[0], value:o ? o[0] : '' }); }
+  else if (path.startsWith('cond.')) {
+    const parts = path.split('.'), i = +parts[1], field = parts[2];
+    const c = spec.conds[i];
+    if (field === 'del') spec.conds.splice(i, 1);
+    else if (field === 'param') { c.param = val; const p = cat[val]; c.op = p.ops[0]; const o = trsParamOpts(val, cat); c.value = o ? o[0] : ''; }
+    else c[field] = val;
+  }
+  else trsDom(spec).set(prefix, spec, path, val);
+  spec.aiConflicts = null; /* manual edits invalidate the AI's conflict read; deterministic scan re-runs */
+  trsStmtRender(prefix);
+}
+function trsSetTicket(prefix, spec, path, val){
   const t = spec.target || (spec.target = {});
   if (path === 'kind') { spec.kind = val; if (val === 'escalation') { spec.escalate_after = spec.escalate_after || '4 business hours'; } }
   else if (path === 'w') spec.w = parseInt(val, 10) || 20;
@@ -46404,18 +46673,8 @@ function trsStmtSet(prefix, path, val){
   else if (path === 'dept') { t.dept = val; t.user = null; if (t.strategy === 'named') t.strategy = 'least-loaded'; }
   else if (path === 'strategy') t.strategy = val;
   else if (path === 'priority') spec.priority = val || null;
-  else if (path === 'cond.add') (spec.conds = spec.conds || []).push({ param:'type', op:'is', value:'support' });
   else if (path === 'watcher.add') { if (!val.startsWith('＋')) (spec.watchers = spec.watchers || []).push(val); }
   else if (path.startsWith('watcher.')) { const i = +path.split('.')[1]; if (path.endsWith('.del')) spec.watchers.splice(i, 1); }
-  else if (path.startsWith('cond.')) {
-    const parts = path.split('.'), i = +parts[1], field = parts[2];
-    const c = spec.conds[i];
-    if (field === 'del') spec.conds.splice(i, 1);
-    else if (field === 'param') { c.param = val; const p = TRS_PARAMS[val]; c.op = p.ops[0]; const o = trsParamOpts(val); c.value = o ? o[0] : ''; }
-    else c[field] = val;
-  }
-  spec.aiConflicts = null; /* manual edits invalidate the AI's conflict read; deterministic scan re-runs */
-  trsStmtRender(prefix);
 }
 
 /* ── view skeleton (injected once) ── */
