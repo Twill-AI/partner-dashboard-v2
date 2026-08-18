@@ -46075,7 +46075,10 @@ function aicRepCsv(taskId){
 <style>
 /* ═══ SETTINGS — Ticket Routing / Deal Routing / Teams & Departments (trs-*) ═══ */
 body.persona-rep #nav-settings, body.persona-rep #view-settings { display:none !important; }
-#view-settings .trs-wrap { max-width:1060px; margin:0 auto; padding:20px 28px 60px; }
+/* .view is a flex column with overflow:hidden — the wrapper has to BE the scroll
+   region, or the tabs simply can't be wheel-scrolled (only scripted scrollTop worked) */
+#view-settings .trs-wrap { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:20px 28px 60px; }
+#view-settings .trs-tabhost { max-width:1060px; margin:0 auto; }
 .trs-tabhost { display:none; } .trs-tabhost.on { display:block; }
 .trs-chip { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:800; font-family:var(--font-ui); padding:2px 7px; border-radius:5px; background:rgba(131,88,168,.12); color:#8358A8; border:1px solid rgba(131,88,168,.3); cursor:pointer; letter-spacing:.03em; white-space:nowrap; }
 .trs-mode-strip { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
@@ -46086,7 +46089,7 @@ body.persona-rep #nav-settings, body.persona-rep #view-settings { display:none !
 .trs-dept-hd { display:flex; align-items:center; gap:8px; }
 .trs-dept-hd b { font-size:14px; color:var(--text-primary); font-family:var(--font-ui); }
 .trs-dept-count { margin-left:auto; font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
-.trs-mem { display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--border); }
+.trs-mem { position:relative; display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--border); }
 .trs-mem:last-child { border-bottom:none; }
 .trs-mem-av { width:26px; height:26px; border-radius:50%; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--font-ui); margin-top:1px; }
 .trs-mem-name { font-size:12.5px; font-weight:600; color:var(--text-primary); font-family:var(--font-ui); }
@@ -46097,7 +46100,10 @@ body.persona-rep #nav-settings, body.persona-rep #view-settings { display:none !
 .trs-mem-role:hover { border-color:var(--border-strong); background:var(--bg-surface); }
 .trs-mem-role.empty { color:var(--text-muted); font-style:italic; }
 .trs-mem-roleedit { width:100%; font-size:11px; font-family:var(--font-ui); color:var(--text-primary); background:var(--bg-surface); border:1px solid var(--yellow); border-radius:5px; padding:5px 7px; line-height:1.5; resize:vertical; min-height:44px; }
-.trs-mem-acts { margin-left:auto; flex-shrink:0; display:none; gap:5px; align-items:center; }
+/* hover controls float ABOVE the row — in-flow reveal reflowed the tile and made it
+   jump size on hover (same fix shape as the AIC queue rows) */
+.trs-mem-acts { position:absolute; right:0; top:6px; z-index:2; flex-shrink:0; display:none; gap:5px; align-items:center;
+  background:var(--bg-elevated); padding-left:10px; box-shadow:-10px 0 10px -7px var(--bg-elevated); border-radius:6px; }
 .trs-mem:hover .trs-mem-acts { display:inline-flex; }
 .trs-mini-sel { font-size:10px; font-family:var(--font-ui); background:var(--bg-surface); color:var(--text-secondary); border:1px solid var(--border-strong); border-radius:5px; padding:2px 5px; }
 .trs-sim-form { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:14px 18px 4px; }
