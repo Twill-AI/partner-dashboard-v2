@@ -73,6 +73,36 @@ function systemPrompt(sessionType, merchant, board) {
       "Data: " + JSON.stringify(board).slice(0, 15000),
     ].join("\n");
   }
+  if (sessionType === "ticket-routing") {
+    const mode = board && board.mode === "compile" ? "compile" : "simulate";
+    const CTX = [
+      "",
+      "ROUTING DATA:",
+      "Semantics: " + (board.semantics || "hard rules force; weights accumulate; least-loaded breaks ties; assignment additive; fallback = all reps on the deal"),
+      "Departments (members carry role descriptions written by ops — treat them as policy, cite them by name): " + JSON.stringify(board.departments || []).slice(0, 6000),
+      "Active rules: " + JSON.stringify(board.rules || []).slice(0, 4000),
+      "Routable parameters: " + JSON.stringify(board.parameters || []).slice(0, 1200),
+    ];
+    if (mode === "compile") {
+      return [
+        "You are Twill's ticket-routing rule compiler inside Settings → Ticket Routing. Ops writes a routing rule in plain language; you compile it into a precise specification against the real departments, people, role descriptions and routable parameters below.",
+        "Reply with 1-2 plain sentences confirming how you read the rule (name the department or person you resolved it to, and why, citing a role description when that's what decided it). No markdown, no emoji.",
+        "Then output the specification as the FINAL line, exactly: RULE_JSON: {\"kind\":\"hard|weight|escalation\",\"weight\":<number, weight rules only>,\"when\":\"<the trigger, human-readable>\",\"action\":\"<the effect, human-readable>\",\"target\":{\"dept\":\"<department id or null>\",\"user\":\"<full user name or null>\",\"strategy\":\"round-robin|least-loaded|all|named\"},\"watchers\":[\"<names or 'account owner'>\"],\"problem\":\"<only if the rule names a department or person that does not exist, or conflicts with an active rule — else omit>\"}",
+        "Rules of the engine you compile for: hard rules force a destination; weight rules add preference (default +20 when unstated); escalation rules fire on SLA age, not at creation. Assignment is always additive — never compile a rule that removes an assignee. If the user names a nonexistent team or person, still compile your best reading but set \"problem\".",
+        "Single-line valid JSON. Nothing after the RULE_JSON line.",
+        ...CTX,
+      ].join("\n");
+    }
+    return [
+      "You are Twill's ticket-routing engine, running the exact semantics below on one incoming ticket. The user message carries the ticket: source, type, merchant record summary, optional processor-payload assignee, and the message body.",
+      "Reason in 3-6 plain sentences, in order: which hard rules fire (a hard rule ends the department decision), which weights accumulate otherwise, who the candidates inside the winning department are, and who wins on strategy (round-robin honors rotation; least-loaded compares open-ticket counts — the numbers are in the data). Cite role descriptions by name when they decide between people. If a processor payload names a person, fuzzy-match them to a portal user and add them as a WATCHER, never as the assignee. If nothing scores, apply the fallback: every rep on the deal, account owner keeps visibility. No markdown, no emoji.",
+      "Then output the decision as the FINAL line, exactly: ROUTE_JSON: {\"dept\":\"<department name or null for fallback>\",\"assignees\":[\"<full names>\"],\"watchers\":[\"<full names>\"],\"priority\":\"low|normal|high|urgent\",\"rule_hits\":[{\"id\":\"TR-xx\",\"kind\":\"hard|weight|escalation\",\"effect\":\"<one clause>\"}],\"scores\":[{\"name\":\"<candidate>\",\"open\":<open tickets>,\"score\":<number>,\"why\":\"<one clause>\"}],\"why\":\"<one-sentence audit summary>\"}",
+      "Chargebacks and disputes default to high priority; genuinely urgent operational failures (merchant cannot process) may be urgent. Never invent people, departments, rules, or workload numbers — only what the data holds. Single-line valid JSON. Nothing after the ROUTE_JSON line.",
+      ...CTX,
+      "Ticket: " + JSON.stringify(board.ticket || {}).slice(0, 2000),
+      "Merchant record: " + JSON.stringify(board.merchant || merchant || {}).slice(0, 2000),
+    ].join("\n");
+  }
   if (sessionType === "merchant") {
     return [
       "You are Suede's merchant assistant — the always-on concierge inside the Suede Merchant Portal. The merchant is the audience: warm, plain-English, zero payments jargon unless you explain it, 2-4 sentences. You are white-labeled: you are SUEDE's assistant. Never name acquiring processors, sponsor banks, or Twill.",
