@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 <style>
@@ -14,39 +14,39 @@
 
   :root {
     /* Unified warm surface — Notion-inspired cohesion, Twill personality */
-    --bg-base:       #F7F5F0;
-    --bg-surface:    #EFECE6;
-    --bg-elevated:   #F2EFEA;
-    --bg-hover:      #EAE7E0;
-    --bg-selected:   #E4E0D8;
+    --bg-base:       #F9FAF8;
+    --bg-surface:    #EDF3EE;
+    --bg-elevated:   #F1F6F2;
+    --bg-hover:      #E7EEE8;
+    --bg-selected:   #DCE7DE;
     --border:        rgba(0,0,0,0.04);
     --border-strong: rgba(0,0,0,0.055);
     --text-primary:  #111111;
     --text-secondary:#4B4B4B;
     --text-muted:    #737373;
     --text-inverse:  #FFFFFF;
-    --yellow:        #C9A800;
-    --yellow-dim:    rgba(255,222,0,0.12);
-    --navy:          #222E48;
-    --navy-dark:     #161E2D;
-    --gold:          #D1A400;
+    --yellow:        #12A150;
+    --yellow-dim:    rgba(76,218,82,0.12);
+    --navy:          #0B140F;
+    --navy-dark:     #070D0A;
+    --gold:          #17BD61;
     --green:         #5B7A5E;
     --green-dim:     rgba(91,122,94,0.10);
-    --red:           #9B6B5B;
-    --red-dim:       rgba(180,67,42,0.07);
-    --amber:         #A67C5B;
-    --amber-dim:     rgba(166,124,91,0.08);
+    --red:           #A26060;
+    --red-dim:       rgba(178,60,60,0.07);
+    --amber:         #B08A47;
+    --amber-dim:     rgba(176,138,71,0.08);
     --blue:          #6B839B;
     --blue-dim:      rgba(107,131,155,0.08);
-    --purple:        #8C7A5E;
-    --purple-dim:    rgba(140,122,94,0.08);
+    --purple:        #5E8C7A;
+    --purple-dim:    rgba(94,140,122,0.08);
     --sidebar-w:     248px;
     --font-mono:     'JetBrains Mono','SF Mono',monospace;
-    --font-ui:       'Plus Jakarta Sans',-apple-system,sans-serif;
+    --font-ui:       'Space Grotesk',-apple-system,sans-serif;
     --font-data:     'Inter',-apple-system,sans-serif;
-    --font-body:     'Plus Jakarta Sans',-apple-system,sans-serif;
+    --font-body:     'Inter',-apple-system,sans-serif;
     --green-mid:     rgba(45,122,79,0.14);
-    --yellow-mid:    rgba(255,222,0,0.14);
+    --yellow-mid:    rgba(76,218,82,0.14);
     --steps-w:       228px;
     --chat-w:        390px;
   }
@@ -94,7 +94,7 @@
   .badge-amber  { background:var(--amber-dim);  color:var(--amber); }
   .badge-warn    { background:var(--red-dim);    color:var(--red); }
   .badge-blue   { background:var(--blue-dim);   color:var(--blue); }
-  .badge-purple { background:rgba(140,122,94,0.10); color:#6E6245; }
+  .badge-purple { background:rgba(94,140,122,0.10); color:#456E58; }
   .badge-muted  { background:var(--bg-hover);   color:var(--text-muted); }
   .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
   .dot-green { background:var(--green); box-shadow:0 0 0 2px var(--green-dim); }
@@ -145,7 +145,7 @@
   .po-status-menu div:hover { background:var(--bg-hover); }
   #po-table tbody tr { cursor:pointer; }
   #po-table tbody tr:hover { background:var(--bg-hover); }
-  #po-table tbody tr.po-selected { background:rgba(255,222,0,0.06); }
+  #po-table tbody tr.po-selected { background:rgba(76,218,82,0.06); }
   /* Drawer */
   .po-drawer-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.18); z-index:900; display:none; }
   .po-drawer-backdrop.open { display:block; }
@@ -187,7 +187,7 @@
   /* Selected wins over severity tint */
   #po-table tbody tr.po-selected.po-row-high,
   #po-table tbody tr.po-selected.po-row-verify,
-  #po-table tbody tr.po-selected.po-row-info { background: rgba(255,222,0,0.10); }
+  #po-table tbody tr.po-selected.po-row-info { background: rgba(76,218,82,0.10); }
   .po-flags-count { font-size:10px; padding:2px 6px; border-radius:8px; background:var(--amber-dim); color:var(--amber); font-weight:600; font-family:var(--font-data); margin-left:6px; }
   .po-flag-toggle { display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border:1px solid rgba(0,0,0,0.12); border-radius:6px; font-size:12px; font-family:var(--font-data); background:var(--bg-base); color:var(--text-primary); cursor:pointer; }
   .po-flag-toggle.active { background:var(--amber-dim); border-color:var(--amber); color:var(--amber); font-weight:600; }
@@ -225,7 +225,7 @@
   .tiles-row > .card > .card-body { }
   .tiles-row > .card > .card-body.scroll { max-height:380px; }
   .ticket-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:6px; }
-  .ticket-mine-badge { font-size:11px; font-family:var(--font-ui); font-weight:500; color:var(--navy); background:rgba(34,46,72,0.06); padding:2px 8px; border-radius:4px; display:inline-block; margin-top:4px; }
+  .ticket-mine-badge { font-size:11px; font-family:var(--font-ui); font-weight:500; color:var(--navy); background:rgba(11,20,15,0.06); padding:2px 8px; border-radius:4px; display:inline-block; margin-top:4px; }
 
   .partner-row { display:flex; align-items:center; gap:14px; padding:14px 20px; border-bottom:1px solid rgba(0,0,0,0.04); transition:background 0.1s; cursor:pointer; }
   .partner-row:last-child { border-bottom:none; }
@@ -238,8 +238,8 @@
   .ticket-item { display:flex; align-items:flex-start; gap:12px; padding:12px 24px; border-bottom:1px solid rgba(0,0,0,0.05); cursor:pointer; transition:background 0.1s; }
   .ticket-item:last-child { border-bottom:none; }
   .ticket-item:hover { background:var(--bg-hover); }
-  .ticket-item.mine { border-left:2px solid var(--yellow); background:rgba(255,222,0,0.03); }
-  .ticket-item.mine:hover { background:rgba(255,222,0,0.06); }
+  .ticket-item.mine { border-left:2px solid var(--yellow); background:rgba(76,218,82,0.03); }
+  .ticket-item.mine:hover { background:rgba(76,218,82,0.06); }
   .ticket-icon { width:28px; height:28px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; margin-top:1px; }
   .ticket-icon.open   { background:var(--blue-dim); }
   .ticket-icon.urgent { background:var(--red-dim); }
@@ -249,7 +249,7 @@
   .ticket-desc   { font-size:13px; color:var(--text-secondary); margin-top:3px; }
   .ticket-footer { display:flex; align-items:center; gap:6px; margin-top:5px; }
   .ticket-assignee { font-size:12px; color:var(--text-secondary); }
-  .ticket-mine-badge { font-size:11px; font-family:var(--font-ui); font-weight:500; color:var(--navy); background:rgba(34,46,72,0.07); padding:3px 8px; border-radius:4px; display:inline-block; }
+  .ticket-mine-badge { font-size:11px; font-family:var(--font-ui); font-weight:500; color:var(--navy); background:rgba(11,20,15,0.07); padding:3px 8px; border-radius:4px; display:inline-block; }
   .ticket-time { font-size:12px; color:var(--text-secondary); flex-shrink:0; padding-top:2px; font-family:var(--font-data); }
 
   /* msg tile */
@@ -499,7 +499,7 @@
     max-width:80%; align-self:flex-end; font-size:12px; line-height:1.5; color:var(--text-primary);
   }
   .tmsg-note .tmsg-bubble {
-    background:rgba(255,222,0,0.05); border:1px solid rgba(255,222,0,0.15);
+    background:rgba(76,218,82,0.05); border:1px solid rgba(76,218,82,0.15);
     border-radius:8px; padding:10px 13px;
     width:100%; font-size:12px; line-height:1.5; color:var(--text-primary);
   }
@@ -515,7 +515,7 @@
   .tmsg-sender { font-size:11px; font-weight:600; color:var(--text-secondary); }
   .tmsg-time   { font-size:12px; color:var(--text-muted); }
   .tmsg-badge  { font-size:9px; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
-  .note-badge  { background:rgba(255,222,0,0.15); color:var(--yellow); }
+  .note-badge  { background:rgba(76,218,82,0.15); color:var(--yellow); }
   .sys-badge   { background:var(--bg-hover); color:var(--text-muted); }
 
   /* ─── CHANNEL BADGES ──────────────────────────────────── */
@@ -638,11 +638,11 @@
 
   /* action item cell */
   .m-aitem-text { font-size:11px; color:var(--text-secondary); line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; white-space:normal; }
-  .m-aitem-ai { font-size:9px; font-weight:500; letter-spacing:0.04em; color:#8C7A5E; opacity:0.8; margin-bottom:2px; }
+  .m-aitem-ai { font-size:9px; font-weight:500; letter-spacing:0.04em; color:#5E8C7A; opacity:0.8; margin-bottom:2px; }
 
   /* 24h activity pulse */
   .m-act-24h { position:relative; }
-  .m-act-24h::before { content:''; position:absolute; left:-10px; top:50%; transform:translateY(-50%); width:6px; height:6px; border-radius:50%; background:var(--yellow); box-shadow:0 0 6px rgba(255,222,0,0.5); }
+  .m-act-24h::before { content:''; position:absolute; left:-10px; top:50%; transform:translateY(-50%); width:6px; height:6px; border-radius:50%; background:var(--yellow); box-shadow:0 0 6px rgba(76,218,82,0.5); }
 
   /* cell components */
   .m-biz { display:flex; flex-direction:column; gap:2px; }
@@ -655,14 +655,14 @@
   .m-sdot.lead         { background:#5B7A5E; }
   .m-sdot.inreview     { background:#818CF8; }
   .m-sdot.signature    { background:#A78BFA; }
-  .m-sdot.underwriting { background:#A67C5B; box-shadow:0 0 5px rgba(245,158,11,0.4); }
+  .m-sdot.underwriting { background:#B08A47; box-shadow:0 0 5px rgba(245,158,11,0.4); }
   .m-sdot.approved     { background:#4ADE80; }
-  .m-sdot.boarding     { background:#FFDE00; }
+  .m-sdot.boarding     { background:#4CDA52; }
   .m-sdot.active       { background:var(--green); box-shadow:0 0 6px rgba(34,197,94,0.5); }
   .m-sdot.declined     { background:var(--red); opacity:0.7; }
   .m-sdot.cancelled    { background:var(--text-muted); }
   /* legacy compat */
-  .m-sdot.pending      { background:#A67C5B; }
+  .m-sdot.pending      { background:#B08A47; }
   .m-sdot.inactive     { background:var(--text-muted); }
   .m-slabel { font-size:12px; font-weight:500; white-space:nowrap; }
   .m-slabel.lead         { color:#3B82F6; }
@@ -670,7 +670,7 @@
   .m-slabel.signature    { color:#A78BFA; }
   .m-slabel.underwriting { color:#F59E0B; }
   .m-slabel.approved     { color:#4ADE80; }
-  .m-slabel.boarding     { color:#FFDE00; }
+  .m-slabel.boarding     { color:#4CDA52; }
   .m-slabel.active       { color:var(--green); }
   /* Schedule A fee table */
   .sa-table { width:100%; border-collapse:collapse; }
@@ -837,11 +837,11 @@
   .sn-prog-lbl span{font-size:12px;color:var(--text-secondary);font-weight:500;}
   .sn-prog-lbl strong{font-size:12px;color:var(--amber);font-family:var(--font-mono);}
   .sn-prog-track{height:4px;background:var(--border-strong);border-radius:4px;overflow:hidden;}
-  .sn-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--amber),#FBB740);}
+  .sn-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--amber),#4CDA52);}
   /* Drag-and-drop upload zone */
   .dropzone { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; border:2px dashed var(--border-strong); border-radius:10px; text-align:center; cursor:pointer; transition:all .2s; margin-bottom:20px; }
   .dropzone:hover { background:var(--bg-hover); border-color:var(--yellow); }
-  .dropzone.dragover { background:var(--bg-selected); border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,222,0,0.2); }
+  .dropzone.dragover { background:var(--bg-selected); border-color:var(--yellow); box-shadow:0 0 0 3px rgba(76,218,82,0.2); }
   .dropzone-icon { font-size:38px; color:var(--text-muted); margin-bottom:10px; }
   .dropzone-text { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:4px; }
   .dropzone-subtext { font-size:13px; color:var(--text-secondary); }
@@ -990,7 +990,7 @@
   .amode.inc{background:var(--green-dim);color:var(--green);}
   .atime{font-size:13px;color:var(--text-secondary);margin-left:auto;}
   .abub{background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.5;margin-left:26px;}
-  .abub.int{border-color:rgba(255,222,0,.2);background:rgba(255,222,0,.04);}
+  .abub.int{border-color:rgba(76,218,82,.2);background:rgba(76,218,82,.04);}
   .abub.out{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.05);}
   .abub.inc{border-color:rgba(34,197,94,.15);}
   .syse{display:flex;align-items:center;gap:8px;}
@@ -1034,12 +1034,12 @@
 /* Partner control buttons */
 .partner-controls { display:flex; gap:8px; padding:10px 20px; justify-content:center; border-top:1px solid var(--border); background:var(--bg-surface); max-width:680px; margin:0 auto; width:100%; }
 .partner-ctrl-btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-ui); border:1px solid; transition:all .15s; }
-.partner-ctrl-btn.pend { background:var(--amber-dim); color:var(--amber); border-color:rgba(166,124,91,0.3); }
-.partner-ctrl-btn.pend:hover { background:rgba(166,124,91,0.15); }
+.partner-ctrl-btn.pend { background:var(--amber-dim); color:var(--amber); border-color:rgba(176,138,71,0.3); }
+.partner-ctrl-btn.pend:hover { background:rgba(176,138,71,0.15); }
 .partner-ctrl-btn.approve { background:var(--green-dim); color:var(--green); border-color:rgba(91,122,94,0.3); }
 .partner-ctrl-btn.approve:hover { background:rgba(91,122,94,0.15); }
-.partner-ctrl-btn.reset { background:var(--red-dim); color:var(--red); border-color:rgba(180,67,42,0.15); }
-.partner-ctrl-btn.reset:hover { background:rgba(180,67,42,0.12); }
+.partner-ctrl-btn.reset { background:var(--red-dim); color:var(--red); border-color:rgba(178,60,60,0.15); }
+.partner-ctrl-btn.reset:hover { background:rgba(178,60,60,0.12); }
 
 /* Typing indicator for partner */
 .typing-indicator { display:inline-flex; gap:4px; padding:10px 14px; }
@@ -1059,7 +1059,7 @@
 
   .mode-row{display:flex;align-items:center;gap:2px;padding:8px 10px 4px;}
   .mbtn{padding:4px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .1s;}
-  .mbtn.int-on{background:var(--yellow-dim);color:var(--yellow);border-color:rgba(255,222,0,.25);}
+  .mbtn.int-on{background:var(--yellow-dim);color:var(--yellow);border-color:rgba(76,218,82,.25);}
   .mbtn.out-on{background:var(--green-mid);color:var(--green);border-color:rgba(34,197,94,.3);}
   .mbtn.off{color:var(--text-muted);background:transparent;}
   .mbtn.off:hover{color:var(--text-secondary);background:var(--bg-hover);}
@@ -1108,9 +1108,9 @@
   .dr-tl-step { display:flex; flex-direction:column; align-items:center; flex:1; position:relative; z-index:1; cursor:pointer; }
   .dr-tl-node { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; border:2px solid var(--border-strong); background:var(--bg-elevated); position:relative; transition:all 0.2s; }
   .dr-tl-step.done .dr-tl-node { background:var(--green); border-color:var(--green); color:#fff; font-size:11px; }
-  .dr-tl-step.current .dr-tl-node { background:var(--yellow); border-color:var(--yellow); color:var(--text-inverse); font-size:14px; box-shadow:0 0 12px rgba(255,222,0,0.4); animation:dr-pulse 2s ease-in-out infinite; }
+  .dr-tl-step.current .dr-tl-node { background:var(--yellow); border-color:var(--yellow); color:var(--text-inverse); font-size:14px; box-shadow:0 0 12px rgba(76,218,82,0.4); animation:dr-pulse 2s ease-in-out infinite; }
   .dr-tl-step.stalled .dr-tl-node { background:var(--red); border-color:var(--red); color:#fff; box-shadow:0 0 12px rgba(239,68,68,0.4); animation:dr-pulse 2s ease-in-out infinite; }
-  @keyframes dr-pulse { 0%,100%{box-shadow:0 0 8px rgba(255,222,0,0.3);} 50%{box-shadow:0 0 16px rgba(255,222,0,0.6);} }
+  @keyframes dr-pulse { 0%,100%{box-shadow:0 0 8px rgba(76,218,82,0.3);} 50%{box-shadow:0 0 16px rgba(76,218,82,0.6);} }
   .dr-tl-step.future .dr-tl-node { opacity:0.4; }
   .dr-tl-label { font-size:12px; font-weight:500; color:var(--text-muted); margin-top:8px; text-align:center; max-width:90px; line-height:1.3; }
   .dr-tl-step.current .dr-tl-label { color:var(--yellow); font-weight:600; }
@@ -1164,8 +1164,8 @@
   .dr-ai-item { display:flex; gap:8px; padding:6px 10px; background:var(--bg-surface); border:1px solid var(--border); border-radius:6px; margin-bottom:4px; font-size:11px; line-height:1.5; }
   .dr-ai-item:last-child { margin-bottom:0; }
   .dr-ai-icon { flex-shrink:0; width:18px; text-align:center; }
-  .dr-ai-suggest { background:rgba(140,122,94,0.06); border:1px solid rgba(140,122,94,0.15); border-radius:8px; padding:12px 14px; margin-top:10px; }
-  .dr-ai-suggest-label { font-size:12px; font-weight:600; color:#8C7A5E; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; }
+  .dr-ai-suggest { background:rgba(94,140,122,0.06); border:1px solid rgba(94,140,122,0.15); border-radius:8px; padding:12px 14px; margin-top:10px; }
+  .dr-ai-suggest-label { font-size:12px; font-weight:600; color:#5E8C7A; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; }
   .dr-ai-suggest-text { font-size:12px; color:var(--text-primary); line-height:1.6; white-space:pre-line; }
   .dr-ai-suggest-actions { display:flex; gap:6px; margin-top:10px; }
   .dr-ai-alt { background:var(--bg-surface); border:1px solid var(--border); border-radius:6px; padding:8px 12px; margin-bottom:4px; }
@@ -1229,10 +1229,10 @@
   .nm-field { flex:1; display:flex; flex-direction:column; gap:4px; }
   .nm-label { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; }
   .nm-input { background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:8px; padding:10px 12px; font-size:13px; color:var(--text-primary); font-family:var(--font-ui); transition:border-color 0.15s; outline:none; width:100%; }
-  .nm-input:focus { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(255,222,0,0.15); }
+  .nm-input:focus { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(76,218,82,0.15); }
   .nm-input::placeholder { color:var(--text-muted); }
   .nm-dropzone { border:2px dashed var(--border-strong); border-radius:12px; padding:32px; text-align:center; cursor:pointer; transition:all 0.2s; margin-bottom:14px; }
-  .nm-dropzone:hover, .nm-dropzone.dragover { border-color:var(--yellow); background:rgba(255,222,0,0.04); }
+  .nm-dropzone:hover, .nm-dropzone.dragover { border-color:var(--yellow); background:rgba(76,218,82,0.04); }
   .nm-dropzone-icon { font-size:32px; margin-bottom:8px; }
   .nm-dropzone-title { font-size:13px; font-weight:600; margin-bottom:4px; }
   .nm-dropzone-sub { font-size:11px; color:var(--text-muted); }
@@ -1278,7 +1278,7 @@
   .act .chat-tkt-actions { display:none; position:absolute; top:2px; right:4px; z-index:10; gap:3px; }
   .act:not(.sys):hover .chat-tkt-actions { display:flex; }
   .chat-tkt-btn { padding:2px 6px; border-radius:4px; font-size:12px; cursor:pointer; border:1px solid var(--border); background:var(--bg-elevated); color:var(--text-secondary); transition:all .12s; white-space:nowrap; }
-  .chat-tkt-btn:hover { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(255,222,0,0.25); }
+  .chat-tkt-btn:hover { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(76,218,82,0.25); }
 
   /* Inline ticket card wrapping a chat message */
   .inline-ticket { border:1px solid var(--border-strong); border-top:3px solid var(--yellow); border-radius:8px; margin:6px -4px; background:var(--bg-elevated); overflow:visible; animation:tktSlideIn .25s ease; }
@@ -1332,22 +1332,22 @@
   .chat-note-prefix { font-size:12px; font-weight:600; color:rgba(245,158,11,0.8); margin-bottom:2px; display:block; }
 
   /* Connected-to-ticket banner above chat input */
-  .tkt-connected { display:none; border-top:1px solid rgba(255,222,0,0.25); background:linear-gradient(to right, rgba(255,222,0,0.08), rgba(255,222,0,0.03)); padding:6px 10px; flex-shrink:0; align-items:center; gap:8px; }
+  .tkt-connected { display:none; border-top:1px solid rgba(76,218,82,0.25); background:linear-gradient(to right, rgba(76,218,82,0.08), rgba(76,218,82,0.03)); padding:6px 10px; flex-shrink:0; align-items:center; gap:8px; }
   .tkt-connected.active { display:flex; }
   .tkt-connected-icon { font-size:12px; }
   .tkt-connected-text { flex:1; font-size:11px; font-weight:500; color:var(--yellow); }
   .tkt-connected-id { font-family:var(--font-mono); font-weight:700; }
-  .tkt-connected-detach { padding:2px 8px; border-radius:4px; font-size:12px; cursor:pointer; border:1px solid rgba(255,222,0,0.2); background:transparent; color:var(--text-muted); transition:all .12s; }
+  .tkt-connected-detach { padding:2px 8px; border-radius:4px; font-size:12px; cursor:pointer; border:1px solid rgba(76,218,82,0.2); background:transparent; color:var(--text-muted); transition:all .12s; }
   .tkt-connected-detach:hover { background:var(--bg-hover); color:var(--text-primary); }
   /* Highlight chat input when connected to ticket */
   /* old tkt-active rule removed - see enhanced version below */
   /* Ticket input indicator bar */
-  .tkt-input-bar { display:none; padding:6px 12px; background:linear-gradient(135deg, rgba(201,168,0,0.12), rgba(201,168,0,0.06)); border-bottom:1px solid rgba(201,168,0,0.2); flex-shrink:0; align-items:center; gap:8px; font-size:11px; font-family:var(--font-ui); }
+  .tkt-input-bar { display:none; padding:6px 12px; background:linear-gradient(135deg, rgba(18,161,80,0.12), rgba(18,161,80,0.06)); border-bottom:1px solid rgba(18,161,80,0.2); flex-shrink:0; align-items:center; gap:8px; font-size:11px; font-family:var(--font-ui); }
   .tkt-input-bar.active { display:flex; }
   .tkt-input-bar-icon { font-size:12px; }
   .tkt-input-bar-text { color:var(--yellow); font-weight:600; flex:1; }
   .tkt-input-bar-id { font-family:var(--font-mono); font-weight:700; }
-  .tkt-input-bar-done { padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid rgba(201,168,0,0.3); background:transparent; color:var(--yellow); transition:all .12s; }
+  .tkt-input-bar-done { padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid rgba(18,161,80,0.3); background:transparent; color:var(--yellow); transition:all .12s; }
   .tkt-input-bar-done:hover { background:var(--yellow); color:var(--text-inverse); }
 
   /* Open ticket pills strip */
@@ -1356,10 +1356,10 @@
   .tkt-pills-label { font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-right:2px; }
   .tkt-pill { display:flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; font-family:var(--font-mono); cursor:pointer; transition:all .15s; border:1px solid; }
   .tkt-pill:hover { transform:scale(1.05); }
-  .tkt-pill.mine { background:rgba(201,168,0,0.08); border-color:rgba(201,168,0,0.25); color:var(--yellow); }
+  .tkt-pill.mine { background:rgba(18,161,80,0.08); border-color:rgba(18,161,80,0.25); color:var(--yellow); }
   .tkt-pill.other { background:rgba(107,131,155,0.08); border-color:rgba(107,131,155,0.25); color:var(--blue); }
   .tkt-pill.needs-attention { animation:pill-pulse 2s ease-in-out infinite; }
-  @keyframes pill-pulse { 0%,100%{box-shadow:none;} 50%{box-shadow:0 0 6px rgba(201,168,0,0.3);} }
+  @keyframes pill-pulse { 0%,100%{box-shadow:none;} 50%{box-shadow:0 0 6px rgba(18,161,80,0.3);} }
   .tkt-pill .pill-dot { width:5px; height:5px; border-radius:50%; background:var(--yellow); animation:tkt-glow 1.5s ease-in-out infinite; }
 
 
@@ -1396,43 +1396,43 @@
   .tkt-indicator-item-title { flex:1; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .tkt-indicator-item-status { font-size:9px; font-weight:600; padding:1px 5px; border-radius:3px; text-transform:uppercase; flex-shrink:0; }
   /* ── Ticket tile enhanced visibility ── */
-  .inline-ticket { border:1px solid rgba(201,168,0,0.2); border-radius:8px; margin:6px 0; background:rgba(201,168,0,0.04); transition:all 0.3s; }
-  .inline-ticket.tkt-linked { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(201,168,0,0.15); background:rgba(201,168,0,0.06); }
+  .inline-ticket { border:1px solid rgba(18,161,80,0.2); border-radius:8px; margin:6px 0; background:rgba(18,161,80,0.04); transition:all 0.3s; }
+  .inline-ticket.tkt-linked { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(18,161,80,0.15); background:rgba(18,161,80,0.06); }
   .inline-ticket.tkt-resolved { border-color:var(--green); background:rgba(91,122,94,0.06); opacity:1 !important; }
   .inline-ticket.tkt-resolved .itkt-header { background:rgba(91,122,94,0.08); }
 
   /* Urgency-based backgrounds */
-  .inline-ticket.pri-urgent { border-left:3px solid var(--red); background:rgba(155,107,91,0.06); }
-  .inline-ticket.pri-high { border-left:3px solid var(--amber); background:rgba(166,124,91,0.05); }
+  .inline-ticket.pri-urgent { border-left:3px solid var(--red); background:rgba(91,155,107,0.06); }
+  .inline-ticket.pri-high { border-left:3px solid var(--amber); background:rgba(176,138,71,0.05); }
   .inline-ticket.pri-normal { border-left:3px solid var(--blue); }
   .inline-ticket.pri-low { border-left:3px solid var(--text-muted); background:rgba(0,0,0,0.02); }
-  .inline-ticket.pri-reminder { border-left:3px solid var(--purple); background:rgba(140,122,94,0.05); }
+  .inline-ticket.pri-reminder { border-left:3px solid var(--purple); background:rgba(94,140,122,0.05); }
 
   /* Chat input linked state */
-  .ch-inp.tkt-active { border:2px solid var(--yellow) !important; border-radius:8px; background:rgba(201,168,0,0.06) !important; box-shadow:0 0 0 4px rgba(201,168,0,0.15), inset 0 0 12px rgba(201,168,0,0.04); transition:all 0.3s; }
-  .ch-inp.tkt-active .chat-ta { background:rgba(201,168,0,0.04) !important; border-color:rgba(201,168,0,0.3) !important; }
+  .ch-inp.tkt-active { border:2px solid var(--yellow) !important; border-radius:8px; background:rgba(18,161,80,0.06) !important; box-shadow:0 0 0 4px rgba(18,161,80,0.15), inset 0 0 12px rgba(18,161,80,0.04); transition:all 0.3s; }
+  .ch-inp.tkt-active .chat-ta { background:rgba(18,161,80,0.04) !important; border-color:rgba(18,161,80,0.3) !important; }
   .ch-inp.tkt-active .chat-ta::placeholder { color:var(--yellow) !important; opacity:0.6; }
-  .ch-inp.tkt-active .mode-row .mbtn { border-color:rgba(201,168,0,0.2); }
+  .ch-inp.tkt-active .mode-row .mbtn { border-color:rgba(18,161,80,0.2); }
   .ch-inp.tkt-active .send-btn { background:var(--yellow); color:var(--text-inverse); }
 
   /* Done button */
-  .tkt-done-btn { display:none; padding:4px 12px; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(201,168,0,0.3); background:var(--yellow-dim); color:var(--yellow); transition:all .12s; }
+  .tkt-done-btn { display:none; padding:4px 12px; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid rgba(18,161,80,0.3); background:var(--yellow-dim); color:var(--yellow); transition:all .12s; }
   .tkt-done-btn:hover { background:var(--yellow); color:var(--text-inverse); }
   .ch-inp.tkt-active .tkt-done-btn { display:inline-flex; align-items:center; gap:4px; }
 
   /* Respond button on ticket */
   .itkt-respond-btn { padding:4px 10px; border-radius:5px; font-size:11px; font-weight:500; cursor:pointer; border:1px solid var(--border); background:var(--bg-elevated); color:var(--text-secondary); transition:all .12s; display:flex; align-items:center; gap:4px; }
-  .itkt-respond-btn:hover { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(201,168,0,0.3); }
+  .itkt-respond-btn:hover { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(18,161,80,0.3); }
 
   /* Re-open button */
   .itkt-reopen-btn { padding:4px 10px; border-radius:5px; font-size:11px; font-weight:500; cursor:pointer; border:1px solid rgba(91,122,94,0.3); background:rgba(91,122,94,0.06); color:var(--green); transition:all .12s; display:flex; align-items:center; gap:4px; }
   .itkt-reopen-btn:hover { background:rgba(91,122,94,0.15); }
 
   /* Ticket pill styles */
-  .tkt-indicator-item.mine { background:rgba(201,168,0,0.06); border-left:2px solid var(--yellow); }
+  .tkt-indicator-item.mine { background:rgba(18,161,80,0.06); border-left:2px solid var(--yellow); }
   .tkt-indicator-item.other { border-left:2px solid var(--blue); }
   .tkt-indicator-item.needs-attention { animation:tkt-pulse 2s ease-in-out infinite; }
-  @keyframes tkt-pulse { 0%,100%{background:transparent;} 50%{background:rgba(201,168,0,0.08);} }
+  @keyframes tkt-pulse { 0%,100%{background:transparent;} 50%{background:rgba(18,161,80,0.08);} }
   .tkt-indicator-item .att-dot { width:6px; height:6px; border-radius:50%; background:var(--yellow); flex-shrink:0; animation:tkt-glow 1.5s ease-in-out infinite; }
   @keyframes tkt-glow { 0%,100%{opacity:0.5;} 50%{opacity:1;box-shadow:0 0 4px var(--yellow);} }
   @keyframes slideUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
@@ -1441,7 +1441,7 @@
   @keyframes shimmer { 0%{transform:translateX(-100%);} 100%{transform:translateX(100%);} }
 
   /* Reminder priority style */
-  .itkt-status.reminder { background:rgba(140,122,94,0.12); color:var(--purple); }
+  .itkt-status.reminder { background:rgba(94,140,122,0.12); color:var(--purple); }
 
 
   /* Inline ticket: ensure full visibility when docked */
@@ -1516,14 +1516,14 @@
   .res-detail-val { font-family:var(--font-mono); font-weight:600; }
 
   .res-upload-zone { border:2px dashed var(--border-strong); border-radius:12px; padding:40px; text-align:center; transition:all 0.2s; cursor:pointer; }
-  .res-upload-zone:hover { border-color:var(--yellow); background:rgba(255,222,0,0.02); }
+  .res-upload-zone:hover { border-color:var(--yellow); background:rgba(76,218,82,0.02); }
 
   .res-validation-item { display:flex; flex-direction:column; gap:2px; padding:8px 12px; border-radius:6px; font-size:11px; flex:1; min-width:200px; }
   .res-val-red { background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); color:var(--red); }
   .res-val-amber { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.15); color:var(--amber); }
   .res-val-green { background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.15); color:var(--green); }
 
-  .res-filter-btn.active { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(255,222,0,0.2); }
+  .res-filter-btn.active { background:var(--yellow-dim); color:var(--yellow); border-color:rgba(76,218,82,0.2); }
 
 
 /* ── Tickets: fix flex chain so reply-box is always visible ── */
@@ -1583,7 +1583,7 @@
 .wf-pos { width:22px; height:22px; border-radius:50%; background:var(--navy); color:var(--yellow); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--font-mono); }
 .wf-entity-name { font-size:13px; font-weight:600; flex:1; min-width:0; }
 .wf-entity-sub  { font-size:11px; color:var(--text-muted); margin-top:1px; }
-.wf-lock-badge  { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; background:rgba(255,222,0,0.12); color:var(--navy); padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.wf-lock-badge  { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; background:rgba(76,218,82,0.12); color:var(--navy); padding:2px 6px; border-radius:4px; flex-shrink:0; }
 .wf-move-btns { display:flex; flex-direction:column; gap:2px; }
 .wf-move-btn { background:none; border:1px solid var(--border); border-radius:4px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); font-size:10px; transition:all .1s; }
 .wf-move-btn:hover { background:var(--bg-hover); color:var(--text-primary); border-color:var(--border-strong); }
@@ -1614,7 +1614,7 @@
 .wf-net-input:focus { border-color:var(--yellow); }
 
 /* ── Residuals merchant accordion ─────────────── */
-.res-merch-accordion td { background: rgba(34,46,72,0.02); }
+.res-merch-accordion td { background: rgba(11,20,15,0.02); }
 .res-merch-wf-panel { padding: 14px 20px 18px 40px; }
 tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg); color: var(--yellow); }
 
@@ -1638,7 +1638,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 
 /* Partner expenses section */
 .wf-exp-section { margin-top:14px; background:var(--bg-surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
-.wf-exp-hdr { display:flex; align-items:center; gap:8px; padding:9px 12px; background:rgba(155,107,91,0.05); border-bottom:1px solid rgba(0,0,0,0.05); }
+.wf-exp-hdr { display:flex; align-items:center; gap:8px; padding:9px 12px; background:rgba(91,155,107,0.05); border-bottom:1px solid rgba(0,0,0,0.05); }
 .wf-exp-hdr-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--red); }
 .wf-exp-hdr-sub { font-size:11px; color:var(--text-muted); margin-left:auto; }
 .wf-exp-row { display:grid; grid-template-columns:1fr 90px 110px; gap:10px; align-items:center; padding:7px 12px; border-bottom:1px solid rgba(0,0,0,0.04); font-size:12px; }
@@ -1649,7 +1649,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .wf-exp-meta { font-size:10px; color:var(--text-muted); margin-left:6px; }
 .wf-exp-freq { font-size:10px; color:var(--text-muted); text-align:right; font-family:var(--font-mono); }
 .wf-exp-amt { font-size:12px; font-weight:600; font-family:var(--font-mono); color:var(--red); text-align:right; }
-.wf-exp-total { display:grid; grid-template-columns:1fr 90px 110px; gap:10px; align-items:center; padding:9px 12px; background:rgba(155,107,91,0.06); border-top:1px solid rgba(0,0,0,0.06); font-size:12px; font-weight:600; }
+.wf-exp-total { display:grid; grid-template-columns:1fr 90px 110px; gap:10px; align-items:center; padding:9px 12px; background:rgba(91,155,107,0.06); border-top:1px solid rgba(0,0,0,0.06); font-size:12px; font-weight:600; }
 .wf-exp-total .wf-exp-amt { font-size:13px; font-weight:700; }
 .wf-net-strip { display:grid; grid-template-columns:1fr 90px 110px; gap:10px; align-items:center; padding:10px 12px; background:rgba(91,122,94,0.06); border-top:1px solid rgba(0,0,0,0.06); }
 .wf-net-strip-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--green); display:flex; align-items:center; gap:6px; }
@@ -1657,7 +1657,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 /* ── Merchant header assignment pills ─────────── */
 .assign-bar { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; }
 .assign-pill { display:inline-flex; align-items:center; gap:5px; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:6px; padding:3px 8px 3px 5px; font-size:11px; cursor:pointer; transition:all .12s; user-select:none; white-space:nowrap; position:relative; }
-.assign-pill:hover { border-color:var(--yellow); background:rgba(255,222,0,0.05); }
+.assign-pill:hover { border-color:var(--yellow); background:rgba(76,218,82,0.05); }
 .assign-pill .ap-av { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; flex-shrink:0; }
 .assign-pill .ap-type { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-right:1px; }
 .assign-pill .ap-name { font-size:11px; font-weight:600; color:var(--text-primary); }
@@ -1697,7 +1697,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 </style>
 <style>
 /* ── Sub-partner specific overrides ─────────────────────────── */
-.sp-banner { background:linear-gradient(90deg,rgba(255,222,0,0.12),rgba(255,222,0,0.04)); border:1px solid rgba(255,222,0,0.30); border-radius:8px; padding:8px 14px; margin:0 24px 12px; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:8px; }
+.sp-banner { background:linear-gradient(90deg,rgba(76,218,82,0.12),rgba(76,218,82,0.04)); border:1px solid rgba(76,218,82,0.30); border-radius:8px; padding:8px 14px; margin:0 24px 12px; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:8px; }
 .sp-banner strong { color:var(--text-primary); }
 .kpi-mini { padding:10px 12px; }
 .kpi-mini .kpi-value { font-size:18px; }
@@ -1778,7 +1778,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .sp-alerts-toggle { display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:5px 10px; border-radius:6px; }
 .sp-alerts-toggle .dot { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
 .sp-alerts-toggle .count { font-family:var(--font-mono); color:var(--text-muted); margin-left:2px; }
-.sp-alerts-toggle.active { background:var(--red-dim); color:var(--red); border-color:rgba(155,107,91,0.35); font-weight:600; }
+.sp-alerts-toggle.active { background:var(--red-dim); color:var(--red); border-color:rgba(91,155,107,0.35); font-weight:600; }
 .sp-alerts-toggle.active .count { color:var(--red); }
 .sp-alerts-hero-pill[data-jump] { cursor:pointer; transition:background .12s, border-color .12s; }
 .sp-alerts-hero-pill[data-jump]:hover { background:var(--bg-elevated, #fff); border-color:rgba(0,0,0,0.18); }
@@ -1798,17 +1798,17 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
 .sp-sum-waterfall { border:1px solid var(--border); border-radius:10px; overflow:hidden; background:var(--bg-base); margin-bottom:14px; }
 .sp-wf-row { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; font-size:12px; border-bottom:1px solid var(--border); }
 .sp-wf-row:last-child { border-bottom:none; }
-.sp-wf-row.sp-wf-head { background:rgba(34,46,72,0.04); font-weight:700; font-size:13px; }
+.sp-wf-row.sp-wf-head { background:rgba(11,20,15,0.04); font-weight:700; font-size:13px; }
 .sp-wf-row.sp-wf-foot { background:rgba(91,122,94,0.08); font-weight:700; font-size:13px; border-top:1px solid var(--border); }
-.sp-wf-row.sp-wf-foot.is-loss { background:rgba(155,107,91,0.08); }
-.sp-wf-row.sp-wf-kept { background:rgba(255,222,0,0.08); font-weight:700; font-size:13px; border-top:1px dashed var(--border); }
+.sp-wf-row.sp-wf-foot.is-loss { background:rgba(91,155,107,0.08); }
+.sp-wf-row.sp-wf-kept { background:rgba(76,218,82,0.08); font-weight:700; font-size:13px; border-top:1px dashed var(--border); }
 .sp-wf-row.neg { color:var(--text-secondary); }
 .sp-wf-row.pos { color:var(--green); }
 .sp-wf-amt { font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
 .sp-wf-pct { font-size:10px; color:var(--text-muted); font-weight:400; margin-left:6px; }
 .sp-wf-bar { height:4px; background:var(--bg-surface); position:relative; }
 .sp-wf-bar-fill { height:100%; background:linear-gradient(to right, var(--green), rgba(91,122,94,0.6)); transition:width .3s; }
-.sp-wf-bar-fill.is-loss { background:linear-gradient(to right, var(--red), rgba(155,107,91,0.6)); }
+.sp-wf-bar-fill.is-loss { background:linear-gradient(to right, var(--red), rgba(91,155,107,0.6)); }
 
 .sp-sum-meta-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px; }
 .sp-sum-meta-item { background:var(--bg-base); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
@@ -1828,7 +1828,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
   <!-- ── Sidebar ───────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <img src="twill_logo_dark.png" alt="Twill" style="height:26px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="102" height="26" viewBox="0 0 156 40" fill="none" aria-label="PayDivy" style="flex-shrink:0;display:block;"><defs><linearGradient id="pdgd" x1="0" y1="40" x2="40" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#12A150"/><stop offset="0.45" stop-color="#4CDA52"/><stop offset="1" stop-color="#9BF12A"/></linearGradient><mask id="pdmd"><rect x="-8" y="-2" width="60" height="44" fill="#fff"/><rect x="-6" y="15.2" width="56" height="4.6" fill="#000" transform="rotate(-35 20 17.5)"/></mask></defs><g transform="translate(7,0) skewX(-10)" mask="url(#pdmd)"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 36 L6 6 H21 C29.5 6 34.5 11 34.5 17.5 C34.5 24 29.5 29 21 29 H14 V36 Z M14 12.5 V22.5 H20.5 C24 22.5 26.3 20.6 26.3 17.5 C26.3 14.4 24 12.5 20.5 12.5 Z" fill="url(#pdgd)"/></g><text x="48" y="27.5" font-family="'Space Grotesk',-apple-system,sans-serif" font-weight="700" font-size="24" letter-spacing="-0.6" fill="#F9FAF8">PayDivy</text></svg>
     </div>
 
     <div class="sidebar-section">
@@ -1884,12 +1884,12 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <div class="nav-item">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a5 5 0 00-5 5v1H2v3h1a5 5 0 0010 0h1V7h-1V6a5 5 0 00-5-5zm0 12a3 3 0 01-3-3h6a3 3 0 01-3 3z" opacity=".8"/></svg>
         Tickets
-        <span style="margin-left:auto;background:rgba(155,107,91,0.12);color:#9B6B5B;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">2</span>
+        <span style="margin-left:auto;background:rgba(91,155,107,0.12);color:#A26060;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">2</span>
       </div>
       <div class="nav-item">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a.75.75 0 01.75.75V3.5a4.5 4.5 0 014.5 4.5v2.25l1.25 2H1.5L2.75 10.25V8A4.5 4.5 0 017.25 3.5V1.75A.75.75 0 018 1zm0 14a2 2 0 002-2H6a2 2 0 002 2z" opacity=".85"/></svg>
         Portfolio Alerts
-        <span style="margin-left:auto;background:rgba(155,107,91,0.12);color:#9B6B5B;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">6</span>
+        <span style="margin-left:auto;background:rgba(91,155,107,0.12);color:#A26060;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;">6</span>
       </div>
     </div>
 
@@ -1921,7 +1921,7 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
       <!-- Sub-partner banner -->
       <div class="sp-banner">
         <span style="color:var(--yellow);font-size:14px;">⌗</span>
-        <span>You are viewing the <strong>Pacific Coast Retail</strong> sub-partner portal. Master partner: <strong>Twill ISO</strong>. Visibility is scoped to your direct portfolio (47 merchants · 2 sub-partners · 8 reps).</span>
+        <span>You are viewing the <strong>Pacific Coast Retail</strong> sub-partner portal. Master partner: <strong>PayDivy</strong>. Visibility is scoped to your direct portfolio (47 merchants · 2 sub-partners · 8 reps).</span>
       </div>
 
       <!-- Sub-tabs (no Fee Audit, no Processors, no Analytics, no Import — Master pushes the file) -->
@@ -2105,19 +2105,19 @@ tr.res-merch-open > td:first-child .res-merch-chevron { transform: rotate(90deg)
                 <tbody>
               <tr data-health="healthy" data-partner="Direct" data-rep="Sara Reyes" data-txn="1840" data-vol="46100" data-income="920" data-expense="234" data-agent-exp="35" data-split="60" data-net="333" data-mom="3.4" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Harbor Bistro</strong></td><td>1,840</td><td>$46.1K</td><td>$920</td><td style="color:var(--text-secondary);">−$234</td><td style="color:var(--red);">−$35</td><td>60%</td><td style="color:var(--green);">$333</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">Sara Reyes</span></div></td></tr>
               <tr data-health="healthy" data-partner="Direct" data-rep="James Carter" data-txn="980" data-vol="24500" data-income="486" data-expense="124" data-agent-exp="0" data-split="55" data-net="219" data-mom="1.8" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Pines Auto Group</strong></td><td>980</td><td>$24.5K</td><td>$486</td><td style="color:var(--text-secondary);">−$124</td><td style="color:var(--red);">—</td><td>55%</td><td style="color:var(--green);">$219</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">James Carter</span></div></td></tr>
-              <tr data-health="healthy" data-partner="Coastal Subagents" data-rep="Dan Mitchell" data-txn="620" data-vol="15500" data-income="308" data-expense="78" data-agent-exp="35" data-split="50" data-net="119" data-mom="2.1" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Green Valley Market</strong></td><td>620</td><td>$15.5K</td><td>$308</td><td style="color:var(--text-secondary);">−$78</td><td style="color:var(--red);">−$35</td><td>50%</td><td style="color:var(--green);">$119</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Dan Mitchell</span></div></td></tr>
-              <tr data-health="watch" data-partner="Coastal Subagents" data-rep="Tara Patel" data-txn="410" data-vol="8200" data-income="164" data-expense="41" data-agent-exp="35" data-split="50" data-net="47" data-mom="-8.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Metro Print Shop</strong></td><td>410</td><td>$8.2K</td><td>$164</td><td style="color:var(--text-secondary);">−$41</td><td style="color:var(--red);">−$35</td><td>50%</td><td style="color:var(--green);">$47</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Tara Patel</span></div></td></tr>
+              <tr data-health="healthy" data-partner="Coastal Subagents" data-rep="Dan Mitchell" data-txn="620" data-vol="15500" data-income="308" data-expense="78" data-agent-exp="35" data-split="50" data-net="119" data-mom="2.1" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Green Valley Market</strong></td><td>620</td><td>$15.5K</td><td>$308</td><td style="color:var(--text-secondary);">−$78</td><td style="color:var(--red);">−$35</td><td>50%</td><td style="color:var(--green);">$119</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A26060;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Dan Mitchell</span></div></td></tr>
+              <tr data-health="watch" data-partner="Coastal Subagents" data-rep="Tara Patel" data-txn="410" data-vol="8200" data-income="164" data-expense="41" data-agent-exp="35" data-split="50" data-net="47" data-mom="-8.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Metro Print Shop</strong></td><td>410</td><td>$8.2K</td><td>$164</td><td style="color:var(--text-secondary);">−$41</td><td style="color:var(--red);">−$35</td><td>50%</td><td style="color:var(--green);">$47</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A26060;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Tara Patel</span></div></td></tr>
               <tr data-health="healthy" data-partner="Direct" data-rep="Sara Reyes" data-txn="290" data-vol="5800" data-income="116" data-expense="29" data-agent-exp="0" data-split="60" data-net="46" data-mom="4.2" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Sunrise Cafe</strong></td><td>290</td><td>$5.8K</td><td>$116</td><td style="color:var(--text-secondary);">−$29</td><td style="color:var(--red);">—</td><td>60%</td><td style="color:var(--green);">$46</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">Sara Reyes</span></div></td></tr>
               <tr data-health="healthy" data-partner="Direct" data-rep="James Carter" data-txn="194" data-vol="3880" data-income="77" data-expense="20" data-agent-exp="0" data-split="55" data-net="35" data-mom="1.1" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Lakeview Dental</strong></td><td>194</td><td>$3.9K</td><td>$77</td><td style="color:var(--text-secondary);">−$20</td><td style="color:var(--red);">—</td><td>55%</td><td style="color:var(--green);">$35</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">James Carter</span></div></td></tr>
               <tr data-health="healthy" data-partner="Lighthouse Group" data-rep="Marcus Reed" data-txn="3450" data-vol="86200" data-income="1724" data-expense="437" data-agent-exp="35" data-split="65" data-net="568" data-mom="5.6" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Bayfront Hotel & Spa</strong></td><td>3,450</td><td>$86.2K</td><td>$1.7K</td><td style="color:var(--text-secondary);">−$437</td><td style="color:var(--red);">−$35</td><td>65%</td><td style="color:var(--green);">$568</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#5B7A5E;color:#fff;">LG</span>Lighthouse Group</span><span class="merch-rep-row">Marcus Reed</span></div></td></tr>
               <tr data-health="healthy" data-partner="Direct" data-rep="Sara Reyes" data-txn="720" data-vol="18000" data-income="360" data-expense="91" data-agent-exp="35" data-split="60" data-net="109" data-mom="2.7" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Northgate Cleaners</strong></td><td>720</td><td>$18.0K</td><td>$360</td><td style="color:var(--text-secondary);">−$91</td><td style="color:var(--red);">−$35</td><td>60%</td><td style="color:var(--green);">$109</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">Sara Reyes</span></div></td></tr>
-              <tr data-health="healthy" data-partner="Coastal Subagents" data-rep="Dan Mitchell" data-txn="355" data-vol="7100" data-income="142" data-expense="36" data-agent-exp="0" data-split="50" data-net="71" data-mom="1.5" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Ironwood Boutique</strong></td><td>355</td><td>$7.1K</td><td>$142</td><td style="color:var(--text-secondary);">−$36</td><td style="color:var(--red);">—</td><td>50%</td><td style="color:var(--green);">$71</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Dan Mitchell</span></div></td></tr>
+              <tr data-health="healthy" data-partner="Coastal Subagents" data-rep="Dan Mitchell" data-txn="355" data-vol="7100" data-income="142" data-expense="36" data-agent-exp="0" data-split="50" data-net="71" data-mom="1.5" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Ironwood Boutique</strong></td><td>355</td><td>$7.1K</td><td>$142</td><td style="color:var(--text-secondary);">−$36</td><td style="color:var(--red);">—</td><td>50%</td><td style="color:var(--green);">$71</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A26060;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Dan Mitchell</span></div></td></tr>
               <tr data-health="risk" data-partner="Direct" data-rep="James Carter" data-txn="810" data-vol="20250" data-income="405" data-expense="103" data-agent-exp="35" data-split="55" data-net="147" data-mom="-15.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Westbrook Pharmacy</strong></td><td>810</td><td>$20.2K</td><td>$405</td><td style="color:var(--text-secondary);">−$103</td><td style="color:var(--red);">−$35</td><td>55%</td><td style="color:var(--green);">$147</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">James Carter</span></div></td></tr>
-              <tr data-health="risk" data-partner="Coastal Subagents" data-rep="Tara Patel" data-txn="595" data-vol="14900" data-income="297" data-expense="75" data-agent-exp="35" data-split="50" data-net="114" data-mom="-18.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Capital Hardware Co</strong></td><td>595</td><td>$14.9K</td><td>$297</td><td style="color:var(--text-secondary);">−$75</td><td style="color:var(--red);">−$35</td><td>50%</td><td style="color:var(--green);">$114</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Tara Patel</span></div></td></tr>
+              <tr data-health="risk" data-partner="Coastal Subagents" data-rep="Tara Patel" data-txn="595" data-vol="14900" data-income="297" data-expense="75" data-agent-exp="35" data-split="50" data-net="114" data-mom="-18.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Capital Hardware Co</strong></td><td>595</td><td>$14.9K</td><td>$297</td><td style="color:var(--text-secondary);">−$75</td><td style="color:var(--red);">−$35</td><td>50%</td><td style="color:var(--green);">$114</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A26060;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Tara Patel</span></div></td></tr>
               <tr data-health="risk" data-partner="Lighthouse Group" data-rep="Marcus Reed" data-txn="485" data-vol="12100" data-income="242" data-expense="61" data-agent-exp="35" data-split="65" data-net="50" data-mom="-22.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Riverside Auto</strong></td><td>485</td><td>$12.1K</td><td>$242</td><td style="color:var(--text-secondary);">−$61</td><td style="color:var(--red);">−$35</td><td>65%</td><td style="color:var(--green);">$50</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#5B7A5E;color:#fff;">LG</span>Lighthouse Group</span><span class="merch-rep-row">Marcus Reed</span></div></td></tr>
               <tr data-health="healthy" data-partner="Direct" data-rep="Sara Reyes" data-txn="220" data-vol="5500" data-income="110" data-expense="28" data-agent-exp="0" data-split="60" data-net="44" data-mom="6.1" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Twin Peaks Wine</strong></td><td>220</td><td>$5.5K</td><td>$110</td><td style="color:var(--text-secondary);">−$28</td><td style="color:var(--red);">—</td><td>60%</td><td style="color:var(--green);">$44</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">Sara Reyes</span></div></td></tr>
               <tr data-health="healthy" data-partner="Direct" data-rep="James Carter" data-txn="460" data-vol="11500" data-income="230" data-expense="58" data-agent-exp="35" data-split="55" data-net="68" data-mom="3.0" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Hilltop Diner</strong></td><td>460</td><td>$11.5K</td><td>$230</td><td style="color:var(--text-secondary);">−$58</td><td style="color:var(--red);">−$35</td><td>55%</td><td style="color:var(--green);">$68</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row" style="color:var(--yellow);font-weight:600;">Direct (you)</span><span class="merch-rep-row">James Carter</span></div></td></tr>
-              <tr data-health="healthy" data-partner="Coastal Subagents" data-rep="Dan Mitchell" data-txn="305" data-vol="7625" data-income="152" data-expense="39" data-agent-exp="0" data-split="50" data-net="76" data-mom="1.8" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Coastline Liquor</strong></td><td>305</td><td>$7.6K</td><td>$152</td><td style="color:var(--text-secondary);">−$39</td><td style="color:var(--red);">—</td><td>50%</td><td style="color:var(--green);">$76</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#9B6B5B;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Dan Mitchell</span></div></td></tr>
+              <tr data-health="healthy" data-partner="Coastal Subagents" data-rep="Dan Mitchell" data-txn="305" data-vol="7625" data-income="152" data-expense="39" data-agent-exp="0" data-split="50" data-net="76" data-mom="1.8" style="cursor:pointer;" onclick="spOpenDrawer(this)"><td style="text-align:left;"><strong>Coastline Liquor</strong></td><td>305</td><td>$7.6K</td><td>$152</td><td style="color:var(--text-secondary);">−$39</td><td style="color:var(--red);">—</td><td>50%</td><td style="color:var(--green);">$76</td><td style="text-align:left;"><div class="merch-partner-cell"><span class="merch-partner-row"><span class="merch-partner-icon" style="background:#A26060;color:#fff;">CS</span>Coastal Subagents</span><span class="merch-rep-row">Dan Mitchell</span></div></td></tr>
                 </tbody>
               </table>
             </div>
@@ -2321,7 +2321,7 @@ function spInitCharts() {
       labels: months,
       datasets:[{
         label:'Net Payout', data:[18200, 19400, 20100, 21800, 22500, 23800, 24600, 25400, 26100, 26500, 26780, 28420],
-        backgroundColor:'rgba(34,46,72,0.85)', borderRadius:4
+        backgroundColor:'rgba(11,20,15,0.85)', borderRadius:4
       }]
     },
     options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{ callbacks:{label:c=>'$'+c.parsed.y.toLocaleString()}}}, scales:{ x:{grid:{display:false}, ticks:{font:fontDef}}, y:{grid:{color:gridColor}, ticks:{font:fontDef, callback:v=>'$'+(v/1000)+'K'}}}}
@@ -2367,10 +2367,10 @@ function spInitCharts() {
   // Top reps table
   var reps = [
     { name:'Sara Reyes',    color:'#5B7A5E', merch:14, vol:'$612K', payout:'$8,420' },
-    { name:'Marcus Reed',   color:'#A67C5B', merch:8,  vol:'$540K', payout:'$6,180' },
+    { name:'Marcus Reed',   color:'#B08A47', merch:8,  vol:'$540K', payout:'$6,180' },
     { name:'James Carter',  color:'#6366F1', merch:11, vol:'$418K', payout:'$5,360' },
     { name:'Dan Mitchell',  color:'#6B839B', merch:9,  vol:'$298K', payout:'$3,840' },
-    { name:'Tara Patel',    color:'#A67C5B', merch:5,  vol:'$165K', payout:'$2,100' },
+    { name:'Tara Patel',    color:'#B08A47', merch:5,  vol:'$165K', payout:'$2,100' },
   ];
   var tb = document.getElementById('sp-top-reps-tbody');
   if (tb) tb.innerHTML = reps.map(r =>
@@ -2520,7 +2520,7 @@ if (document.readyState !== 'loading') spDecorateHealthIcons();
 
 /* ── Missing MIDs modal (placeholder alert for now) ───── */
 function spOpenMissingModal() {
-  alert('Missing MIDs (Mar 2026):\n\n• Sunset Cafe — last paid Feb 28\n• Mountain View Tires — last paid Feb 19\n\nBoth missing from Mar processor file. Contact Twill Master support.');
+  alert('Missing MIDs (Mar 2026):\n\n• Sunset Cafe — last paid Feb 28\n• Mountain View Tires — last paid Feb 19\n\nBoth missing from Mar processor file. Contact PayDivy support.');
 }
 
 /* ── Churn Watch modal (placeholder) ───────────────────── */
@@ -2654,7 +2654,7 @@ function spRenderFlags(row, name) {
     ? name + ' is showing significant decline (' + mom.toFixed(1) + '% MoM on ' + spFmtMoney(vol) + ' volume). At-Risk status warrants outreach this cycle — losing this MID likely means a permanent residual loss.'
     : name + ' is on Watch — volume trending down ' + Math.abs(mom).toFixed(1) + '% MoM. Worth a check-in before the trend escalates.';
   return ''
-    + '<div style="border:1px solid rgba(255,222,0,0.25);background:rgba(255,222,0,0.05);border-radius:10px;padding:12px 14px;margin-bottom:14px;">'
+    + '<div style="border:1px solid rgba(76,218,82,0.25);background:rgba(76,218,82,0.05);border-radius:10px;padding:12px 14px;margin-bottom:14px;">'
     + '  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;background:var(--yellow);color:var(--navy);padding:2px 7px;border-radius:4px;">AI Review</span><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-data);">1 flag</span></div>'
     + '  <div style="font-size:13px;line-height:1.55;color:var(--text-primary);">' + narrative + '</div>'
     + '</div>'
@@ -2687,7 +2687,7 @@ function spRenderDetail(row, name) {
 
     + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Payout Distribution</div>'
     + '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-base);">'
-    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;background:rgba(34,46,72,0.04);"><span>Income (your share)</span><span style="font-family:var(--font-mono);">' + fmt(income) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">100.0%</span></span></div>'
+    + '  <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;background:rgba(11,20,15,0.04);"><span>Income (your share)</span><span style="font-family:var(--font-mono);">' + fmt(income) + ' <span style="color:var(--text-muted);font-weight:400;font-size:10px;">100.0%</span></span></div>'
     + '  <div style="padding:10px 14px;border-bottom:1px solid var(--border);">'
     + '    <div style="font-size:12px;font-weight:600;">' + row.dataset.rep + '</div><div style="font-size:10px;color:var(--text-muted);margin-top:1px;">Rep payout</div>'
     + '    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:var(--text-secondary);"><span>Split share (' + split + '%)</span><span style="font-family:var(--font-mono);">−' + fmt(totalPayouts) + ' <span style="color:var(--text-muted);font-size:10px;">' + pct(totalPayouts, income) + '</span></span></div>'
@@ -2713,17 +2713,17 @@ function spRenderActivityTab(row, name) {
    ═══════════════════════════════════════════════════════════ */
 
 var SP_PAY_SUBPARTNERS = [
-  { id:'CS', name:'Coastal Subagents', tier:'Silver',  avatar:'#9B6B5B', reps:4, merchants:22, vol:1210000, txns:54200, income:23920, splitPct:50, agentExp:140, bonus:0,   payout:11820, status:'approved' },
+  { id:'CS', name:'Coastal Subagents', tier:'Silver',  avatar:'#A26060', reps:4, merchants:22, vol:1210000, txns:54200, income:23920, splitPct:50, agentExp:140, bonus:0,   payout:11820, status:'approved' },
   { id:'LG', name:'Lighthouse Group',  tier:'Bronze',  avatar:'#5B7A5E', reps:1, merchants:11,  vol:98300,  txns:4830,  income:1966,  splitPct:65, agentExp:70,  bonus:500, payout:1209,  status:'pending' },
 ];
 
 var SP_PAY_REPS = [
   { id:'SR', name:'Sara Reyes',     tier:'Senior', avatar:'#5B7A5E', merchants:14, vol:612000, txns:24800, income:14060, splitPct:60, bonus:300, payout:8420, status:'approved' },
-  { id:'MR', name:'Marcus Reed',    tier:'Senior', avatar:'#A67C5B', merchants:8,  vol:540000, txns:18200, income:9510,  splitPct:65, bonus:500, payout:6180, status:'pending'  },
+  { id:'MR', name:'Marcus Reed',    tier:'Senior', avatar:'#B08A47', merchants:8,  vol:540000, txns:18200, income:9510,  splitPct:65, bonus:500, payout:6180, status:'pending'  },
   { id:'JC', name:'James Carter',   tier:'Owner',  avatar:'#6366F1', merchants:11, vol:418000, txns:14600, income:8970,  splitPct:60, bonus:0,   payout:5360, status:'approved' },
   { id:'DM', name:'Dan Mitchell',   tier:'Senior', avatar:'#6B839B', merchants:9,  vol:298000, txns:11800, income:6420,  splitPct:60, bonus:0,   payout:3840, status:'approved' },
-  { id:'TP', name:'Tara Patel',     tier:'Rep',    avatar:'#A67C5B', merchants:5,  vol:165000, txns:6420,  income:3550,  splitPct:60, bonus:0,   payout:2100, status:'approved' },
-  { id:'EM', name:'Eduardo Mendez', tier:'Rep',    avatar:'#8C7A5E', merchants:3,  vol:128000, txns:4220,  income:2820,  splitPct:55, bonus:0,   payout:1551, status:'approved' },
+  { id:'TP', name:'Tara Patel',     tier:'Rep',    avatar:'#B08A47', merchants:5,  vol:165000, txns:6420,  income:3550,  splitPct:60, bonus:0,   payout:2100, status:'approved' },
+  { id:'EM', name:'Eduardo Mendez', tier:'Rep',    avatar:'#5E8C7A', merchants:3,  vol:128000, txns:4220,  income:2820,  splitPct:55, bonus:0,   payout:1551, status:'approved' },
   { id:'PS', name:'Priya Shah',     tier:'Rep',    avatar:'#6B5FA5', merchants:4,  vol:96000,  txns:3540,  income:2180,  splitPct:55, bonus:0,   payout:1199, status:'pending'  },
   { id:'TC', name:'Tyler Chen',     tier:'Rep',    avatar:'#5B7A5E', merchants:2,  vol:62000,  txns:2410,  income:1390,  splitPct:50, bonus:0,   payout:695,  status:'hold'     },
 ];
@@ -2966,7 +2966,7 @@ function spPayRenderMerchants(kind, e) {
 function spPayRenderActivity(kind, e) {
   return ''
     + '<div>'
-    + '  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span>Statement received from Twill Master</span><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;">Apr 1, 2026 06:00</span></div>'
+    + '  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span>Statement received from PayDivy</span><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;">Apr 1, 2026 06:00</span></div>'
     + (e.status === 'approved' ? '  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--green);"><span>Status → APPROVED</span><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;">Apr 2, 2026 09:14</span></div>' : '')
     + (e.status === 'hold'     ? '  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--red);"><span>Status → HOLD</span><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;">Apr 2, 2026 11:22</span></div>' : '')
     + '  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span>Mar 2026 cycle calculation complete · ' + spFmtMoney(e.payout) + ' due</span><span style="color:var(--text-muted);font-family:var(--font-mono);font-size:10px;">Apr 1, 2026 06:00</span></div>'
